@@ -1,0 +1,1138 @@
+TAP version 13
+# Subtest: Calculation Engine — Percentage Computation (SYS-040 to SYS-045)
+    # Subtest: VV-CALC-001: All zeros returns 0.00 for every cell (SYS-042, HA-021)
+    ok 1 - VV-CALC-001: All zeros returns 0.00 for every cell (SYS-042, HA-021)
+      ---
+      duration_ms: 1.182708
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-002: Single cell counted = 100.00% (SYS-040)
+    ok 2 - VV-CALC-002: Single cell counted = 100.00% (SYS-040)
+      ---
+      duration_ms: 0.138416
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-003: Two equal cells = 50.00% each (SYS-040)
+    ok 3 - VV-CALC-003: Two equal cells = 50.00% each (SYS-040)
+      ---
+      duration_ms: 0.068791
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-004: Nine equal cells = 11.11% each (SYS-040)
+    ok 4 - VV-CALC-004: Nine equal cells = 11.11% each (SYS-040)
+      ---
+      duration_ms: 0.131
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-005: One dominant cell type (SYS-040)
+    ok 5 - VV-CALC-005: One dominant cell type (SYS-040)
+      ---
+      duration_ms: 0.060375
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-006: All ones (total=9), each = 11.11% (SYS-040)
+    ok 6 - VV-CALC-006: All ones (total=9), each = 11.11% (SYS-040)
+      ---
+      duration_ms: 0.058208
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-007: Standard BM differential (100 cells) — exact percentages (SYS-040)
+    ok 7 - VV-CALC-007: Standard BM differential (100 cells) — exact percentages (SYS-040)
+      ---
+      duration_ms: 0.065292
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-008: Abnormal BM differential — leukemia pattern (SYS-040)
+    ok 8 - VV-CALC-008: Abnormal BM differential — leukemia pattern (SYS-040)
+      ---
+      duration_ms: 0.159417
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-009: Small count (10 cells) — correct percentages (SYS-040)
+    ok 9 - VV-CALC-009: Small count (10 cells) — correct percentages (SYS-040)
+      ---
+      duration_ms: 0.178875
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-010: Large count (500 cells) — correct percentages (SYS-P04)
+    ok 10 - VV-CALC-010: Large count (500 cells) — correct percentages (SYS-P04)
+      ---
+      duration_ms: 0.317834
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-011: Repeating thirds — sum within tolerance (SYS-044)
+    ok 11 - VV-CALC-011: Repeating thirds — sum within tolerance (SYS-044)
+      ---
+      duration_ms: 0.081583
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-012: Six equal cells — sum within tolerance (SYS-044)
+    ok 12 - VV-CALC-012: Six equal cells — sum within tolerance (SYS-044)
+      ---
+      duration_ms: 0.056167
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-013: Near-even distribution (total=10) (SYS-040)
+    ok 13 - VV-CALC-013: Near-even distribution (total=10) (SYS-040)
+      ---
+      duration_ms: 0.040375
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-014: Maximum capacity 9999 cells — no degradation (SYS-P04)
+    ok 14 - VV-CALC-014: Maximum capacity 9999 cells — no degradation (SYS-P04)
+      ---
+      duration_ms: 0.052792
+      type: 'test'
+      ...
+    # Subtest: VV-CALC-015: Standard PB differential (100 cells) (SYS-040)
+    ok 15 - VV-CALC-015: Standard PB differential (100 cells) (SYS-040)
+      ---
+      duration_ms: 0.056084
+      type: 'test'
+      ...
+    # Subtest: SYS-041: All percentages have exactly 2 decimal places
+    ok 16 - SYS-041: All percentages have exactly 2 decimal places
+      ---
+      duration_ms: 0.041417
+      type: 'test'
+      ...
+    # Subtest: SYS-044: Percentage sum within ±0.10 of 100% for 20 random distributions
+    ok 17 - SYS-044: Percentage sum within ±0.10 of 100% for 20 random distributions
+      ---
+      duration_ms: 1.283042
+      type: 'test'
+      ...
+    1..17
+ok 1 - Calculation Engine — Percentage Computation (SYS-040 to SYS-045)
+  ---
+  duration_ms: 5.005208
+  type: 'suite'
+  ...
+# Subtest: Calculation Engine — Increment/Decrement (SYS-031 to SYS-033)
+    # Subtest: VV-INC-001: Increment from zero gives 1
+    ok 1 - VV-INC-001: Increment from zero gives 1
+      ---
+      duration_ms: 0.169958
+      type: 'test'
+      ...
+    # Subtest: VV-INC-002: Increment from 5 gives 6
+    ok 2 - VV-INC-002: Increment from 5 gives 6
+      ---
+      duration_ms: 0.056833
+      type: 'test'
+      ...
+    # Subtest: VV-INC-003: Decrement from 5 gives 4
+    ok 3 - VV-INC-003: Decrement from 5 gives 4
+      ---
+      duration_ms: 0.04075
+      type: 'test'
+      ...
+    # Subtest: VV-INC-004: Decrement from 1 gives 0
+    ok 4 - VV-INC-004: Decrement from 1 gives 0
+      ---
+      duration_ms: 0.031208
+      type: 'test'
+      ...
+    # Subtest: VV-INC-005: Decrement from 0 stays at 0 — NEVER negative (SYS-033, HA-013)
+    ok 5 - VV-INC-005: Decrement from 0 stays at 0 — NEVER negative (SYS-033, HA-013)
+      ---
+      duration_ms: 0.116084
+      type: 'test'
+      ...
+    # Subtest: VV-INC-006: Decrement the only cell returns to zero total
+    ok 6 - VV-INC-006: Decrement the only cell returns to zero total
+      ---
+      duration_ms: 0.041292
+      type: 'test'
+      ...
+    # Subtest: VV-INC-007: Increment after decrement to zero works
+    ok 7 - VV-INC-007: Increment after decrement to zero works
+      ---
+      duration_ms: 0.034
+      type: 'test'
+      ...
+    # Subtest: VV-INC-008: 20 rapid increments yield 20
+    ok 8 - VV-INC-008: 20 rapid increments yield 20
+      ---
+      duration_ms: 0.036167
+      type: 'test'
+      ...
+    # Subtest: Increment followed by decrement returns to original value
+    ok 9 - Increment followed by decrement returns to original value
+      ---
+      duration_ms: 0.044125
+      type: 'test'
+      ...
+    # Subtest: 1000 increments yield exactly 1000
+    ok 10 - 1000 increments yield exactly 1000
+      ---
+      duration_ms: 0.059459
+      type: 'test'
+      ...
+    1..10
+ok 2 - Calculation Engine — Increment/Decrement (SYS-031 to SYS-033)
+  ---
+  duration_ms: 0.776917
+  type: 'suite'
+  ...
+# Subtest: Calculation Engine — Output Template JSON (SYS-061)
+    # Subtest: VV-TPL: Output JSON contains case number, total, and all cell percentages
+    ok 1 - VV-TPL: Output JSON contains case number, total, and all cell percentages
+      ---
+      duration_ms: 0.118708
+      type: 'test'
+      ...
+    # Subtest: VV-TPL: Output percentages are rounded integers
+    ok 2 - VV-TPL: Output percentages are rounded integers
+      ---
+      duration_ms: 0.132459
+      type: 'test'
+      ...
+    # Subtest: VV-TPL: Zero total produces all zeros in output
+    ok 3 - VV-TPL: Zero total produces all zeros in output
+      ---
+      duration_ms: 0.042042
+      type: 'test'
+      ...
+    1..3
+ok 3 - Calculation Engine — Output Template JSON (SYS-061)
+  ---
+  duration_ms: 0.380708
+  type: 'suite'
+  ...
+# Subtest: Configuration — File Loading (SYS-100, SYS-101)
+    # Subtest: templates.json exists and is readable
+    ok 1 - templates.json exists and is readable
+      ---
+      duration_ms: 1.803458
+      type: 'test'
+      ...
+    # Subtest: templates.json contains valid JSON
+    ok 2 - templates.json contains valid JSON
+      ---
+      duration_ms: 0.4275
+      type: 'test'
+      ...
+    # Subtest: Configuration is an array with at least 1 specimen type (SYS-102)
+    ok 3 - Configuration is an array with at least 1 specimen type (SYS-102)
+      ---
+      duration_ms: 0.068417
+      type: 'test'
+      ...
+    1..3
+ok 4 - Configuration — File Loading (SYS-100, SYS-101)
+  ---
+  duration_ms: 3.196709
+  type: 'suite'
+  ...
+# Subtest: Configuration — Schema Validation (SYS-102, SYS-103)
+    # Subtest: Each entry has required fields: specimenType, outCodes, templates
+    ok 1 - Each entry has required fields: specimenType, outCodes, templates
+      ---
+      duration_ms: 0.167875
+      type: 'test'
+      ...
+    # Subtest: specimenType values are unique (no duplicates)
+    ok 2 - specimenType values are unique (no duplicates)
+      ---
+      duration_ms: 0.077458
+      type: 'test'
+      ...
+    # Subtest: Bone Marrow (bm) specimen type is configured
+    ok 3 - Bone Marrow (bm) specimen type is configured
+      ---
+      duration_ms: 0.052542
+      type: 'test'
+      ...
+    # Subtest: Peripheral Blood (pb) specimen type is configured
+    ok 4 - Peripheral Blood (pb) specimen type is configured
+      ---
+      duration_ms: 0.15125
+      type: 'test'
+      ...
+    1..4
+ok 5 - Configuration — Schema Validation (SYS-102, SYS-103)
+  ---
+  duration_ms: 0.783583
+  type: 'suite'
+  ...
+# Subtest: Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)
+    # Subtest: outCodes keys are single uppercase letters
+    ok 1 - outCodes keys are single uppercase letters
+      ---
+      duration_ms: 0.192917
+      type: 'test'
+      ...
+    # Subtest: outCodes values are non-empty strings
+    ok 2 - outCodes values are non-empty strings
+      ---
+      duration_ms: 0.208833
+      type: 'test'
+      ...
+    # Subtest: No duplicate keys within a specimen type (HA-062)
+    ok 3 - No duplicate keys within a specimen type (HA-062)
+      ---
+      duration_ms: 0.193291
+      type: 'test'
+      ...
+    # Subtest: No duplicate cell type values within a specimen type
+    ok 4 - No duplicate cell type values within a specimen type
+      ---
+      duration_ms: 0.05875
+      type: 'test'
+      ...
+    # Subtest: BM has exactly 9 cell types mapped to correct keys (SYS-014, SYS-038)
+    ok 5 - BM has exactly 9 cell types mapped to correct keys (SYS-014, SYS-038)
+      ---
+      duration_ms: 0.0585
+      type: 'test'
+      ...
+    # Subtest: PB has exactly 9 cell types mapped to correct keys (SYS-015, SYS-039)
+    ok 6 - PB has exactly 9 cell types mapped to correct keys (SYS-015, SYS-039)
+      ---
+      duration_ms: 0.051459
+      type: 'test'
+      ...
+    1..6
+ok 6 - Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)
+  ---
+  duration_ms: 0.891417
+  type: 'suite'
+  ...
+# Subtest: Configuration — Template Validation (SYS-060, HA-050)
+    # Subtest: Each template has tplCode, tplName, and outSentence
+    ok 1 - Each template has tplCode, tplName, and outSentence
+      ---
+      duration_ms: 0.075833
+      type: 'test'
+      ...
+    # Subtest: Every template contains {{total}} placeholder
+    ok 2 - Every template contains {{total}} placeholder
+      ---
+      duration_ms: 0.042375
+      type: 'test'
+      ...
+    # Subtest: Every template contains all cell type placeholders for its specimen type
+    ok 3 - Every template contains all cell type placeholders for its specimen type
+      ---
+      duration_ms: 1.05675
+      type: 'test'
+      ...
+    # Subtest: BM has 3 templates (Yale SOM, Precipio DX, MGH)
+    ok 4 - BM has 3 templates (Yale SOM, Precipio DX, MGH)
+      ---
+      duration_ms: 0.125459
+      type: 'test'
+      ...
+    # Subtest: PB has 1 template (MGH)
+    ok 5 - PB has 1 template (MGH)
+      ---
+      duration_ms: 0.046375
+      type: 'test'
+      ...
+    1..5
+ok 7 - Configuration — Template Validation (SYS-060, HA-050)
+  ---
+  duration_ms: 1.494166
+  type: 'suite'
+  ...
+# Subtest: Configuration — Minimum Cell Count (SYS-052, SYS-103)
+    # Subtest: BM minCellCount is 200
+    ok 1 - BM minCellCount is 200
+      ---
+      duration_ms: 0.079
+      type: 'test'
+      ...
+    # Subtest: PB minCellCount is 100
+    ok 2 - PB minCellCount is 100
+      ---
+      duration_ms: 0.038583
+      type: 'test'
+      ...
+    # Subtest: minCellCount values are positive integers
+    ok 3 - minCellCount values are positive integers
+      ---
+      duration_ms: 0.051417
+      type: 'test'
+      ...
+    1..3
+ok 8 - Configuration — Minimum Cell Count (SYS-052, SYS-103)
+  ---
+  duration_ms: 0.2385
+  type: 'suite'
+  ...
+# Subtest: Configuration — Template Rendering (VV-TPL-001 to VV-TPL-004)
+    # Subtest: VV-TPL-001: Yale SOM template renders with no unresolved placeholders
+    ok 1 - VV-TPL-001: Yale SOM template renders with no unresolved placeholders
+      ---
+      duration_ms: 0.151542
+      type: 'test'
+      ...
+    # Subtest: VV-TPL-002: Precipio DX template renders with no unresolved placeholders
+    ok 2 - VV-TPL-002: Precipio DX template renders with no unresolved placeholders
+      ---
+      duration_ms: 0.096875
+      type: 'test'
+      ...
+    # Subtest: VV-TPL-003: MGH BM template renders with no unresolved placeholders
+    ok 3 - VV-TPL-003: MGH BM template renders with no unresolved placeholders
+      ---
+      duration_ms: 0.057375
+      type: 'test'
+      ...
+    # Subtest: VV-TPL-004: MGH PB template renders with no unresolved placeholders
+    ok 4 - VV-TPL-004: MGH PB template renders with no unresolved placeholders
+      ---
+      duration_ms: 0.060625
+      type: 'test'
+      ...
+    1..4
+ok 9 - Configuration — Template Rendering (VV-TPL-001 to VV-TPL-004)
+  ---
+  duration_ms: 0.414958
+  type: 'suite'
+  ...
+# Subtest: HTML Structure — File Integrity
+    # Subtest: counter.html exists and is readable
+    ok 1 - counter.html exists and is readable
+      ---
+      duration_ms: 0.522083
+      type: 'test'
+      ...
+    # Subtest: HTML has correct doctype and lang attribute
+    ok 2 - HTML has correct doctype and lang attribute
+      ---
+      duration_ms: 0.064625
+      type: 'test'
+      ...
+    # Subtest: HTML includes Tailwind CSS
+    ok 3 - HTML includes Tailwind CSS
+      ---
+      duration_ms: 0.053875
+      type: 'test'
+      ...
+    # Subtest: HTML includes the application script mdc-app.js
+    ok 4 - HTML includes the application script mdc-app.js
+      ---
+      duration_ms: 0.055333
+      type: 'test'
+      ...
+    # Subtest: HTML does not include old Backbone/jQuery dependencies
+    ok 5 - HTML does not include old Backbone/jQuery dependencies
+      ---
+      duration_ms: 0.074791
+      type: 'test'
+      ...
+    1..5
+ok 10 - HTML Structure — File Integrity
+  ---
+  duration_ms: 1.299417
+  type: 'suite'
+  ...
+# Subtest: HTML Structure — Case Identification Elements (SYS-001 to SYS-004)
+    # Subtest: SYS-001: Case number input field exists with id="caseNumber"
+    ok 1 - SYS-001: Case number input field exists with id="caseNumber"
+      ---
+      duration_ms: 0.277667
+      type: 'test'
+      ...
+    # Subtest: Case number input has maxlength="30" (SYS-002)
+    ok 2 - Case number input has maxlength="30" (SYS-002)
+      ---
+      duration_ms: 0.349833
+      type: 'test'
+      ...
+    # Subtest: Case number input has autocomplete="off" (prevents browser autofill)
+    ok 3 - Case number input has autocomplete="off" (prevents browser autofill)
+      ---
+      duration_ms: 0.283291
+      type: 'test'
+      ...
+    # Subtest: SYS-004: Case badge display element exists
+    ok 4 - SYS-004: Case badge display element exists
+      ---
+      duration_ms: 0.204666
+      type: 'test'
+      ...
+    1..4
+ok 11 - HTML Structure — Case Identification Elements (SYS-001 to SYS-004)
+  ---
+  duration_ms: 2.214417
+  type: 'suite'
+  ...
+# Subtest: HTML Structure — Specimen Type Selection (SYS-010)
+    # Subtest: Specimen type select element exists with id="specimenType"
+    ok 1 - Specimen type select element exists with id="specimenType"
+      ---
+      duration_ms: 0.108875
+      type: 'test'
+      ...
+    # Subtest: Bone Marrow option with value="bm" exists
+    ok 2 - Bone Marrow option with value="bm" exists
+      ---
+      duration_ms: 0.101375
+      type: 'test'
+      ...
+    # Subtest: Peripheral Blood option with value="pb" exists
+    ok 3 - Peripheral Blood option with value="pb" exists
+      ---
+      duration_ms: 0.059625
+      type: 'test'
+      ...
+    1..3
+ok 12 - HTML Structure — Specimen Type Selection (SYS-010)
+  ---
+  duration_ms: 0.336292
+  type: 'suite'
+  ...
+# Subtest: HTML Structure — Control Buttons (SYS-050, SYS-080)
+    # Subtest: Start Count button exists and is initially disabled (SYS-003)
+    ok 1 - Start Count button exists and is initially disabled (SYS-003)
+      ---
+      duration_ms: 0.670291
+      type: 'test'
+      ...
+    # Subtest: Count Done button exists (SYS-050)
+    ok 2 - Count Done button exists (SYS-050)
+      ---
+      duration_ms: 0.063666
+      type: 'test'
+      ...
+    # Subtest: Reset button exists (SYS-080)
+    ok 3 - Reset button exists (SYS-080)
+      ---
+      duration_ms: 0.038417
+      type: 'test'
+      ...
+    # Subtest: Copy to Clipboard button exists (SYS-064)
+    ok 4 - Copy to Clipboard button exists (SYS-064)
+      ---
+      duration_ms: 0.034625
+      type: 'test'
+      ...
+    # Subtest: New Case button exists
+    ok 5 - New Case button exists
+      ---
+      duration_ms: 0.037667
+      type: 'test'
+      ...
+    1..5
+ok 13 - HTML Structure — Control Buttons (SYS-050, SYS-080)
+  ---
+  duration_ms: 0.917292
+  type: 'suite'
+  ...
+# Subtest: HTML Structure — Three-Phase Layout
+    # Subtest: Phase 1: Case entry section exists
+    ok 1 - Phase 1: Case entry section exists
+      ---
+      duration_ms: 0.048958
+      type: 'test'
+      ...
+    # Subtest: Phase 2: Counting section exists (hidden initially)
+    ok 2 - Phase 2: Counting section exists (hidden initially)
+      ---
+      duration_ms: 0.084708
+      type: 'test'
+      ...
+    # Subtest: Phase 3: Results section exists (hidden initially)
+    ok 3 - Phase 3: Results section exists (hidden initially)
+      ---
+      duration_ms: 0.063417
+      type: 'test'
+      ...
+    # Subtest: Counter table rendering area exists
+    ok 4 - Counter table rendering area exists
+      ---
+      duration_ms: 0.031541
+      type: 'test'
+      ...
+    1..4
+ok 14 - HTML Structure — Three-Phase Layout
+  ---
+  duration_ms: 0.333042
+  type: 'suite'
+  ...
+# Subtest: HTML Structure — Morphology Comments (SYS-070)
+    # Subtest: Morphology comments textarea exists with id="morphComments"
+    ok 1 - Morphology comments textarea exists with id="morphComments"
+      ---
+      duration_ms: 0.044541
+      type: 'test'
+      ...
+    # Subtest: Comments textarea has maxlength="500" (SYS-071)
+    ok 2 - Comments textarea has maxlength="500" (SYS-071)
+      ---
+      duration_ms: 0.041333
+      type: 'test'
+      ...
+    # Subtest: Character counter exists
+    ok 3 - Character counter exists
+      ---
+      duration_ms: 0.030292
+      type: 'test'
+      ...
+    1..3
+ok 15 - HTML Structure — Morphology Comments (SYS-070)
+  ---
+  duration_ms: 0.154375
+  type: 'suite'
+  ...
+# Subtest: HTML Structure — Output Area (SYS-062)
+    # Subtest: Tab navigation area exists
+    ok 1 - Tab navigation area exists
+      ---
+      duration_ms: 0.047125
+      type: 'test'
+      ...
+    # Subtest: Tab panels area exists
+    ok 2 - Tab panels area exists
+      ---
+      duration_ms: 0.030792
+      type: 'test'
+      ...
+    # Subtest: Results summary area exists
+    ok 3 - Results summary area exists
+      ---
+      duration_ms: 0.030583
+      type: 'test'
+      ...
+    1..3
+ok 16 - HTML Structure — Output Area (SYS-062)
+  ---
+  duration_ms: 0.147958
+  type: 'suite'
+  ...
+# Subtest: HTML Structure — Session History (SYS-092, SYS-094)
+    # Subtest: Session history section exists
+    ok 1 - Session history section exists
+      ---
+      duration_ms: 0.047292
+      type: 'test'
+      ...
+    # Subtest: History list container exists
+    ok 2 - History list container exists
+      ---
+      duration_ms: 0.030959
+      type: 'test'
+      ...
+    # Subtest: History count badge exists
+    ok 3 - History count badge exists
+      ---
+      duration_ms: 0.031542
+      type: 'test'
+      ...
+    # Subtest: Temporary data notice is present (SYS-094)
+    ok 4 - Temporary data notice is present (SYS-094)
+      ---
+      duration_ms: 0.043875
+      type: 'test'
+      ...
+    1..4
+ok 17 - HTML Structure — Session History (SYS-092, SYS-094)
+  ---
+  duration_ms: 0.201958
+  type: 'suite'
+  ...
+# Subtest: HTML Structure — Modal Dialogs (SYS-007, SYS-053, SYS-081)
+    # Subtest: Confirmation modal overlay exists
+    ok 1 - Confirmation modal overlay exists
+      ---
+      duration_ms: 0.05
+      type: 'test'
+      ...
+    # Subtest: Modal has title, message, confirm, and cancel elements
+    ok 2 - Modal has title, message, confirm, and cancel elements
+      ---
+      duration_ms: 0.054083
+      type: 'test'
+      ...
+    # Subtest: History detail modal exists
+    ok 3 - History detail modal exists
+      ---
+      duration_ms: 0.049125
+      type: 'test'
+      ...
+    1..3
+ok 18 - HTML Structure — Modal Dialogs (SYS-007, SYS-053, SYS-081)
+  ---
+  duration_ms: 0.188875
+  type: 'suite'
+  ...
+# Subtest: HTML Structure — Accessibility & Usability
+    # Subtest: Labels are associated with inputs via "for" attribute
+    ok 1 - Labels are associated with inputs via "for" attribute
+      ---
+      duration_ms: 0.105875
+      type: 'test'
+      ...
+    # Subtest: Status indicator elements exist
+    ok 2 - Status indicator elements exist
+      ---
+      duration_ms: 0.035334
+      type: 'test'
+      ...
+    # Subtest: Keyboard hint text is present for users
+    ok 3 - Keyboard hint text is present for users
+      ---
+      duration_ms: 0.032
+      type: 'test'
+      ...
+    1..3
+ok 19 - HTML Structure — Accessibility & Usability
+  ---
+  duration_ms: 0.227709
+  type: 'suite'
+  ...
+# Subtest: JavaScript — File Integrity
+    # Subtest: mdc-app.js exists and is readable
+    ok 1 - mdc-app.js exists and is readable
+      ---
+      duration_ms: 0.571125
+      type: 'test'
+      ...
+    # Subtest: mdc-app.js has valid syntax (no parse errors)
+    ok 2 - mdc-app.js has valid syntax (no parse errors)
+      ---
+      duration_ms: 0.447875
+      type: 'test'
+      ...
+    # Subtest: Uses strict mode
+    ok 3 - Uses strict mode
+      ---
+      duration_ms: 0.063625
+      type: 'test'
+      ...
+    # Subtest: Wraps in IIFE to avoid global namespace pollution
+    ok 4 - Wraps in IIFE to avoid global namespace pollution
+      ---
+      duration_ms: 0.051583
+      type: 'test'
+      ...
+    1..4
+ok 20 - JavaScript — File Integrity
+  ---
+  duration_ms: 2.111167
+  type: 'suite'
+  ...
+# Subtest: JavaScript — State Management
+    # Subtest: State object initializes phase to "case-entry"
+    ok 1 - State object initializes phase to "case-entry"
+      ---
+      duration_ms: 0.065958
+      type: 'test'
+      ...
+    # Subtest: State tracks isCountingActive flag
+    ok 2 - State tracks isCountingActive flag
+      ---
+      duration_ms: 0.044792
+      type: 'test'
+      ...
+    # Subtest: State tracks commentFieldFocused flag (SYS-073)
+    ok 3 - State tracks commentFieldFocused flag (SYS-073)
+      ---
+      duration_ms: 0.161708
+      type: 'test'
+      ...
+    1..3
+ok 21 - JavaScript — State Management
+  ---
+  duration_ms: 0.515333
+  type: 'suite'
+  ...
+# Subtest: JavaScript — Keyboard Handler Safety (SYS-030 to SYS-036)
+    # Subtest: Has keydown event handler function
+    ok 1 - Has keydown event handler function
+      ---
+      duration_ms: 0.704083
+      type: 'test'
+      ...
+    # Subtest: Checks isCountingActive before processing keypresses (HA-015)
+    ok 2 - Checks isCountingActive before processing keypresses (HA-015)
+      ---
+      duration_ms: 0.192041
+      type: 'test'
+      ...
+    # Subtest: Ignores keypresses when comment field is focused (SYS-073)
+    ok 3 - Ignores keypresses when comment field is focused (SYS-073)
+      ---
+      duration_ms: 0.187958
+      type: 'test'
+      ...
+    # Subtest: Ignores Ctrl, Alt, Meta modifier keys (SYS-036)
+    ok 4 - Ignores Ctrl, Alt, Meta modifier keys (SYS-036)
+      ---
+      duration_ms: 0.0635
+      type: 'test'
+      ...
+    # Subtest: Checks shiftKey for decrement operation (SYS-032)
+    ok 5 - Checks shiftKey for decrement operation (SYS-032)
+      ---
+      duration_ms: 0.039416
+      type: 'test'
+      ...
+    # Subtest: Prevents event default on mapped keys
+    ok 6 - Prevents event default on mapped keys
+      ---
+      duration_ms: 0.033333
+      type: 'test'
+      ...
+    # Subtest: Detaches keydown listener on count completion (SYS-054)
+    ok 7 - Detaches keydown listener on count completion (SYS-054)
+      ---
+      duration_ms: 0.0345
+      type: 'test'
+      ...
+    1..7
+ok 22 - JavaScript — Keyboard Handler Safety (SYS-030 to SYS-036)
+  ---
+  duration_ms: 1.397666
+  type: 'suite'
+  ...
+# Subtest: JavaScript — Decrement Safety (SYS-033, HA-013)
+    # Subtest: Has decrement guard: count > 0 check
+    ok 1 - Has decrement guard: count > 0 check
+      ---
+      duration_ms: 0.045958
+      type: 'test'
+      ...
+    # Subtest: Decrement uses -- operator (subtracts exactly 1)
+    ok 2 - Decrement uses -- operator (subtracts exactly 1)
+      ---
+      duration_ms: 0.029541
+      type: 'test'
+      ...
+    # Subtest: Increment uses ++ operator (adds exactly 1)
+    ok 3 - Increment uses ++ operator (adds exactly 1)
+      ---
+      duration_ms: 0.058208
+      type: 'test'
+      ...
+    1..3
+ok 23 - JavaScript — Decrement Safety (SYS-033, HA-013)
+  ---
+  duration_ms: 0.176917
+  type: 'suite'
+  ...
+# Subtest: JavaScript — Division by Zero Guard (SYS-042, HA-021)
+    # Subtest: Checks total === 0 before percentage calculation
+    ok 1 - Checks total === 0 before percentage calculation
+      ---
+      duration_ms: 0.053875
+      type: 'test'
+      ...
+    # Subtest: Returns 0.00 when total is 0 (not NaN)
+    ok 2 - Returns 0.00 when total is 0 (not NaN)
+      ---
+      duration_ms: 0.266875
+      type: 'test'
+      ...
+    1..2
+ok 24 - JavaScript — Division by Zero Guard (SYS-042, HA-021)
+  ---
+  duration_ms: 0.502042
+  type: 'suite'
+  ...
+# Subtest: JavaScript — Minimum Cell Count Enforcement (SYS-052, SYS-053, HA-030)
+    # Subtest: References minCellCount from config
+    ok 1 - References minCellCount from config
+      ---
+      duration_ms: 0.060541
+      type: 'test'
+      ...
+    # Subtest: Compares total against minimum before completion
+    ok 2 - Compares total against minimum before completion
+      ---
+      duration_ms: 0.036416
+      type: 'test'
+      ...
+    # Subtest: Shows modal/dialog for low count warning
+    ok 3 - Shows modal/dialog for low count warning
+      ---
+      duration_ms: 0.03875
+      type: 'test'
+      ...
+    1..3
+ok 25 - JavaScript — Minimum Cell Count Enforcement (SYS-052, SYS-053, HA-030)
+  ---
+  duration_ms: 0.177333
+  type: 'suite'
+  ...
+# Subtest: JavaScript — Reset Confirmation (SYS-081, HA-040)
+    # Subtest: Shows confirmation before reset when data exists
+    ok 1 - Shows confirmation before reset when data exists
+      ---
+      duration_ms: 0.046208
+      type: 'test'
+      ...
+    # Subtest: Checks if total > 0 before showing confirmation
+    ok 2 - Checks if total > 0 before showing confirmation
+      ---
+      duration_ms: 0.14575
+      type: 'test'
+      ...
+    1..2
+ok 26 - JavaScript — Reset Confirmation (SYS-081, HA-040)
+  ---
+  duration_ms: 0.232458
+  type: 'suite'
+  ...
+# Subtest: JavaScript — Copy to Clipboard (SYS-065, SYS-066)
+    # Subtest: Uses navigator.clipboard API
+    ok 1 - Uses navigator.clipboard API
+      ---
+      duration_ms: 0.068667
+      type: 'test'
+      ...
+    # Subtest: Has fallback for clipboard API failure
+    ok 2 - Has fallback for clipboard API failure
+      ---
+      duration_ms: 0.038542
+      type: 'test'
+      ...
+    # Subtest: Shows "Copied!" confirmation text (SYS-066)
+    ok 3 - Shows "Copied!" confirmation text (SYS-066)
+      ---
+      duration_ms: 0.034625
+      type: 'test'
+      ...
+    1..3
+ok 27 - JavaScript — Copy to Clipboard (SYS-065, SYS-066)
+  ---
+  duration_ms: 0.198667
+  type: 'suite'
+  ...
+# Subtest: JavaScript — Session History (SYS-090, SYS-095)
+    # Subtest: Uses sessionStorage (not localStorage) for history (SYS-095)
+    ok 1 - Uses sessionStorage (not localStorage) for history (SYS-095)
+      ---
+      duration_ms: 0.094042
+      type: 'test'
+      ...
+    # Subtest: Saves to sessionStorage with a key prefix
+    ok 2 - Saves to sessionStorage with a key prefix
+      ---
+      duration_ms: 0.038959
+      type: 'test'
+      ...
+    # Subtest: Has try/catch around sessionStorage operations (graceful degradation)
+    ok 3 - Has try/catch around sessionStorage operations (graceful degradation)
+      ---
+      duration_ms: 0.030209
+      type: 'test'
+      ...
+    1..3
+ok 28 - JavaScript — Session History (SYS-090, SYS-095)
+  ---
+  duration_ms: 0.201666
+  type: 'suite'
+  ...
+# Subtest: JavaScript — Security (SYS-S04)
+    # Subtest: Escapes HTML in user-provided content (XSS prevention)
+    ok 1 - Escapes HTML in user-provided content (XSS prevention)
+      ---
+      duration_ms: 0.06125
+      type: 'test'
+      ...
+    # Subtest: Has HTML escape function defined
+    ok 2 - Has HTML escape function defined
+      ---
+      duration_ms: 0.041416
+      type: 'test'
+      ...
+    1..2
+ok 29 - JavaScript — Security (SYS-S04)
+  ---
+  duration_ms: 0.142458
+  type: 'suite'
+  ...
+# Subtest: JavaScript — Configuration Loading (SYS-100, SYS-101)
+    # Subtest: Fetches templates.json
+    ok 1 - Fetches templates.json
+      ---
+      duration_ms: 0.376875
+      type: 'test'
+      ...
+    # Subtest: Handles fetch failure with error display (SYS-101)
+    ok 2 - Handles fetch failure with error display (SYS-101)
+      ---
+      duration_ms: 0.029833
+      type: 'test'
+      ...
+    # Subtest: Applies default minCellCount when missing from config (SYS-103)
+    ok 3 - Applies default minCellCount when missing from config (SYS-103)
+      ---
+      duration_ms: 0.086
+      type: 'test'
+      ...
+    1..3
+ok 30 - JavaScript — Configuration Loading (SYS-100, SYS-101)
+  ---
+  duration_ms: 0.531542
+  type: 'suite'
+  ...
+# Subtest: JavaScript — Flash Feedback (SYS-037)
+    # Subtest: Has flash/animation function for keypress feedback
+    ok 1 - Has flash/animation function for keypress feedback
+      ---
+      duration_ms: 0.049417
+      type: 'test'
+      ...
+    # Subtest: Distinguishes increment and decrement visually
+    ok 2 - Distinguishes increment and decrement visually
+      ---
+      duration_ms: 0.044916
+      type: 'test'
+      ...
+    1..2
+ok 31 - JavaScript — Flash Feedback (SYS-037)
+  ---
+  duration_ms: 0.241875
+  type: 'suite'
+  ...
+# Subtest: End-to-End — VV-E2E-001: Standard BM 100-Cell Differential
+    # Subtest: Checkpoint 1: All counts correct
+    ok 1 - Checkpoint 1: All counts correct
+      ---
+      duration_ms: 1.879208
+      type: 'test'
+      ...
+    # Subtest: Checkpoint 1: Total = 100
+    ok 2 - Checkpoint 1: Total = 100
+      ---
+      duration_ms: 0.213041
+      type: 'test'
+      ...
+    # Subtest: Checkpoint 1: Percentages are correct
+    ok 3 - Checkpoint 1: Percentages are correct
+      ---
+      duration_ms: 0.104042
+      type: 'test'
+      ...
+    # Subtest: Checkpoint 1: Percentage sum = 100.00
+    ok 4 - Checkpoint 1: Percentage sum = 100.00
+      ---
+      duration_ms: 0.082167
+      type: 'test'
+      ...
+    # Subtest: Checkpoint 2: Yale SOM output contains total
+    ok 5 - Checkpoint 2: Yale SOM output contains total
+      ---
+      duration_ms: 0.090792
+      type: 'test'
+      ...
+    # Subtest: Checkpoint 2: Yale SOM output contains cell percentages
+    ok 6 - Checkpoint 2: Yale SOM output contains cell percentages
+      ---
+      duration_ms: 0.055709
+      type: 'test'
+      ...
+    # Subtest: Checkpoint 2: Precipio DX output is populated
+    ok 7 - Checkpoint 2: Precipio DX output is populated
+      ---
+      duration_ms: 0.046708
+      type: 'test'
+      ...
+    # Subtest: Checkpoint 2: MGH output is populated
+    ok 8 - Checkpoint 2: MGH output is populated
+      ---
+      duration_ms: 0.420584
+      type: 'test'
+      ...
+    # Subtest: Checkpoint 2: No unresolved placeholders in any output
+    ok 9 - Checkpoint 2: No unresolved placeholders in any output
+      ---
+      duration_ms: 0.348583
+      type: 'test'
+      ...
+    1..9
+ok 32 - End-to-End — VV-E2E-001: Standard BM 100-Cell Differential
+  ---
+  duration_ms: 9.085667
+  type: 'suite'
+  ...
+# Subtest: End-to-End — Undo/Correction Flow
+    # Subtest: Shift+key correctly decrements and recalculates
+    ok 1 - Shift+key correctly decrements and recalculates
+      ---
+      duration_ms: 0.20175
+      type: 'test'
+      ...
+    # Subtest: Cannot undo below zero
+    ok 2 - Cannot undo below zero
+      ---
+      duration_ms: 0.088792
+      type: 'test'
+      ...
+    # Subtest: Undo then re-count returns to correct state
+    ok 3 - Undo then re-count returns to correct state
+      ---
+      duration_ms: 0.171125
+      type: 'test'
+      ...
+    1..3
+ok 33 - End-to-End — Undo/Correction Flow
+  ---
+  duration_ms: 0.62425
+  type: 'suite'
+  ...
+# Subtest: End-to-End — Peripheral Blood Workflow
+    # Subtest: PB differential produces correct output
+    ok 1 - PB differential produces correct output
+      ---
+      duration_ms: 0.167625
+      type: 'test'
+      ...
+    1..1
+ok 34 - End-to-End — Peripheral Blood Workflow
+  ---
+  duration_ms: 0.211708
+  type: 'suite'
+  ...
+# Subtest: End-to-End — Unmapped Key Handling (SYS-035)
+    # Subtest: Unmapped keys are silently ignored
+    ok 1 - Unmapped keys are silently ignored
+      ---
+      duration_ms: 3.950041
+      type: 'test'
+      ...
+    1..1
+ok 35 - End-to-End — Unmapped Key Handling (SYS-035)
+  ---
+  duration_ms: 4.011125
+  type: 'suite'
+  ...
+# Subtest: End-to-End — Edge Cases
+    # Subtest: Single cell count produces 100%
+    ok 1 - Single cell count produces 100%
+      ---
+      duration_ms: 0.121709
+      type: 'test'
+      ...
+    # Subtest: Large count (500 cells) produces correct percentages
+    ok 2 - Large count (500 cells) produces correct percentages
+      ---
+      duration_ms: 0.234666
+      type: 'test'
+      ...
+    # Subtest: All zeros with undo attempts produces safe output
+    ok 3 - All zeros with undo attempts produces safe output
+      ---
+      duration_ms: 0.078209
+      type: 'test'
+      ...
+    1..3
+ok 36 - End-to-End — Edge Cases
+  ---
+  duration_ms: 0.493
+  type: 'suite'
+  ...
+1..36
+# tests 146
+# suites 36
+# pass 146
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 93.351542

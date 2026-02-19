@@ -1,0 +1,56 @@
+[
+    {
+        "specimenType": "bm",
+        "minCellCount": 200,
+        "outCodes": {
+            "A": "blast",
+            "S": "pro",
+            "D": "gran",
+            "F": "eryth",
+            "Z": "baso",
+            "X": "eos",
+            "C": "plasma",
+            "V": "lymph",
+            "B": "mono"
+        },
+        "templates": [
+            {
+                "tplCode": "ysm",
+                "tplName": "Yale SOM",
+                "outSentence": "A {{total}}-cell count reveals {{blast}}% blasts, {{pro}}% promyelocytes/myelocytes, {{gran}}% maturing granulocyte forms, {{eryth}}% erythroid forms, {{lymph}}% lymphocytes, {{eos}}% eosinophils, {{plasma}}% plasma cells, {{baso}}% basophils/mast cells, and {{mono}}% monocytes."
+            },
+            {
+                "tplCode": "pdx",
+                "tplName": "Precipio DX",
+                "outSentence": "Number of cells counted: {{total}}<br><br>Cell Type | Percent | Ref. Range<br>Blasts | {{blast}}% | 0.3 - 3.0%<br>Immature Myeloid | {{pro}}% | 12.0 - 21.0%<br>Mature Myeloid | {{gran}}% | 35.0 - 55.0%<br>Eosinophils | {{eos}}% | 1.0 - 3.0%<br>Basophils | {{baso}}% | 0.0 - 1.0%<br>Lymphocytes | {{lymph}}% | 10.0 - 15.0%<br>Plasma Cells | {{plasma}}% | 0.0 - 1.0%<br>Monocytes | {{mono}}% | 0.0 - 1.0%<br>Erythroid | {{eryth}}% | 15.0 - 25.0%<br>M:E ratio | _ | 2 - 4:1"
+            },
+            {
+                "tplCode": "mgh",
+                "tplName": "MGH",
+                "outSentence": "A {{total}}-cell differential count reveals {{gran}}% myeloid precursors, {{eryth}}% erythroid precursors, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{pro}}% promyelocytes, {{blast}}% blasts, and {{plasma}}% plasma cells."
+            }
+        ]
+    },
+    {
+        "specimenType": "pb",
+        "minCellCount": 100,
+        "outCodes": {
+            "A": "poly",
+            "S": "band",
+            "D": "lymph",
+            "F": "mono",
+            "Z": "eos",
+            "X": "baso",
+            "C": "pro",
+            "V": "blast",
+            "B": "other"
+        },
+        "templates": [
+            {
+                "tplCode": "mgh",
+                "tplName": "MGH",
+                "outSentence": "A {{total}}-cell differential count of peripheral blood reveals: {{poly}}% mature neutrophils, {{band}}% band forms, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{pro}}% immature granulocytic precursors, {{blast}}% blasts, and {{other}}% others."
+            }
+        ]
+    }
+]

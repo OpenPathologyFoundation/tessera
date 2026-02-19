@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Differential Counter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#172033',
+                            950: '#0c1220'
+                        },
+                        accent: {
+                            DEFAULT: '#60a5fa',
+                            dim: '#3b82f6',
+                            bright: '#93c5fd'
+                        },
+                        surface: {
+                            DEFAULT: '#1e293b',
+                            light: '#334155',
+                            lighter: '#475569'
+                        }
+                    },
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Bauhaus principle: minimal, functional animation */
+        .flash-increment {
+            animation: flashGreen 200ms ease-out;
+        }
+        .flash-decrement {
+            animation: flashAmber 200ms ease-out;
+        }
+        @keyframes flashGreen {
+            0% { background-color: rgb(34 197 94 / 0.4); }
+            100% { background-color: transparent; }
+        }
+        @keyframes flashAmber {
+            0% { background-color: rgb(245 158 11 / 0.4); }
+            100% { background-color: transparent; }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in {
+            animation: fadeIn 300ms ease-out;
+        }
+        /* Clean scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        /* Focus ring for accessibility */
+        *:focus-visible {
+            outline: 2px solid #60a5fa;
+            outline-offset: 2px;
+        }
+        /* Tab active indicator */
+        .tab-active {
+            border-bottom: 2px solid #60a5fa;
+            color: #60a5fa;
+        }
+        /* Prevent text selection during counting */
+        .counting-active {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans min-h-screen antialiased">
+
+    <!-- ============================================================ -->
+    <!-- TOP BAR: Case ID + Specimen Type + Status                     -->
+    <!-- ============================================================ -->
+    <header id="top-bar" class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50">
+        <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+            <!-- Left: App identity -->
+            <div class="flex items-center gap-3 shrink-0">
+                <div class="w-2 h-2 rounded-full bg-accent" id="status-dot"></div>
+                <h1 class="text-sm font-semibold tracking-wide text-slate-300 uppercase">Manual Diff Counter</h1>
+            </div>
+            <!-- Center: Case number (prominent) -->
+            <div id="case-badge" class="hidden items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-600 rounded-md">
+                <span class="text-xs text-slate-400 uppercase tracking-wider">Case</span>
+                <span id="case-badge-number" class="text-sm font-mono font-semibold text-accent"></span>
+                <span class="text-xs text-slate-500">|</span>
+                <span id="case-badge-spec" class="text-xs text-slate-400 uppercase"></span>
+            </div>
+            <!-- Right: State indicator -->
+            <div class="flex items-center gap-3 shrink-0">
+                <span id="state-label" class="text-xs font-medium text-slate-500 uppercase tracking-widest">Ready</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- MAIN CONTENT                                                  -->
+    <!-- ============================================================ -->
+    <main class="max-w-6xl mx-auto px-4 pt-20 pb-12">
+
+        <!-- ======================================================== -->
+        <!-- PHASE 1: Case Entry                                       -->
+        <!-- ======================================================== -->
+        <section id="phase-case-entry" class="animate-in">
+            <div class="max-w-md mx-auto mt-24">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-light text-slate-300 mb-2">Begin Differential Count</h2>
+                    <p class="text-sm text-slate-500">Enter the case accession number and select specimen type</p>
+                </div>
+                <div class="space-y-4">
+                    <!-- Case number input -->
+                    <div>
+                        <label for="caseNumber" class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">
+                            Case / Accession #
+                        </label>
+                        <input
+                            type="text"
+                            id="caseNumber"
+                            maxlength="30"
+                            autocomplete="off"
+                            spellcheck="false"
+                            placeholder="e.g. S25-1234"
+                            class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-lg font-mono text-slate-100 placeholder-slate-600 focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                        />
+                    </div>
+                    <!-- Specimen type -->
+                    <div>
+                        <label for="specimenType" class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">
+                            Specimen Type
+                        </label>
+                        <select
+                            id="specimenType"
+                            class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-base text-slate-100 focus:border-accent focus:ring-1 focus:ring-accent transition-colors appearance-none cursor-pointer"
+                        >
+                            <option value="bm">Bone Marrow</option>
+                            <option value="pb">Peripheral Blood</option>
+                        </select>
+                    </div>
+                    <!-- Start button -->
+                    <button
+                        id="btnStartCount"
+                        disabled
+                        class="w-full mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all duration-150 text-base"
+                    >
+                        Start Count
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- PHASE 2: Active Counting                                  -->
+        <!-- ======================================================== -->
+        <section id="phase-counting" class="hidden">
+            <!-- Counting table -->
+            <div id="counter-table-area" class="animate-in">
+                <!-- Table will be injected here by JS -->
+            </div>
+
+            <!-- Morphology comments (collapsible) -->
+            <div class="mt-6 max-w-4xl mx-auto">
+                <details class="group">
+                    <summary class="cursor-pointer text-xs font-medium text-slate-500 uppercase tracking-wider hover:text-slate-400 transition-colors flex items-center gap-2">
+                        <svg class="w-3 h-3 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        Morphology Comments
+                    </summary>
+                    <textarea
+                        id="morphComments"
+                        rows="2"
+                        maxlength="500"
+                        placeholder="Note morphology findings (Auer rods, toxic granulation, dysplasia...)"
+                        class="mt-2 w-full px-4 py-3 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-slate-300 placeholder-slate-600 focus:border-accent focus:ring-1 focus:ring-accent transition-colors resize-none"
+                    ></textarea>
+                    <div class="mt-1 text-right">
+                        <span id="commentCharCount" class="text-xs text-slate-600">0 / 500</span>
+                    </div>
+                </details>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="mt-6 flex items-center justify-center gap-3 max-w-4xl mx-auto">
+                <button
+                    id="btnCountDone"
+                    class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-lg transition-all duration-150 text-sm"
+                >
+                    Count Done
+                </button>
+                <button
+                    id="btnCountReset"
+                    class="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium rounded-lg transition-all duration-150 text-sm"
+                >
+                    Reset
+                </button>
+            </div>
+
+            <!-- Keyboard hint -->
+            <div class="mt-4 text-center">
+                <p class="text-xs text-slate-600">
+                    Press mapped keys to count &middot; <kbd class="px-1 py-0.5 bg-slate-800 border border-slate-600 rounded text-[10px] font-mono">Shift</kbd> + key to undo &middot; Total shown in rightmost column
+                </p>
+            </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- PHASE 3: Results / Output                                 -->
+        <!-- ======================================================== -->
+        <section id="phase-results" class="hidden">
+            <div class="animate-in max-w-4xl mx-auto">
+                <!-- Locked count summary -->
+                <div id="results-summary" class="mb-6 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+                    <!-- Filled by JS: read-only table -->
+                </div>
+
+                <!-- Output tabs -->
+                <div id="output-tabs" class="mb-4">
+                    <div id="tab-nav" class="flex gap-1 border-b border-slate-700">
+                        <!-- Tab buttons injected by JS -->
+                    </div>
+                    <div id="tab-panels" class="mt-4">
+                        <!-- Tab content injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center justify-between mt-6">
+                    <button
+                        id="btnCopyOutput"
+                        class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium rounded-lg transition-all duration-150 text-sm"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                        <span id="copyBtnText">Copy to Clipboard</span>
+                    </button>
+                    <button
+                        id="btnNewCase"
+                        class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition-all duration-150 text-sm"
+                    >
+                        New Case
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ======================================================== -->
+        <!-- SESSION HISTORY (collapsible, bottom)                     -->
+        <!-- ======================================================== -->
+        <section id="session-history-section" class="hidden mt-12 max-w-4xl mx-auto">
+            <details class="group">
+                <summary class="cursor-pointer text-xs font-medium text-slate-500 uppercase tracking-wider hover:text-slate-400 transition-colors flex items-center gap-2">
+                    <svg class="w-3 h-3 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    Session History
+                    <span id="history-count" class="text-slate-600">(0)</span>
+                </summary>
+                <div id="history-list" class="mt-3 space-y-2">
+                    <!-- Entries injected by JS -->
+                </div>
+                <p class="mt-3 text-[11px] text-slate-600 italic">
+                    Session data is temporary and will be lost when the browser is closed.
+                </p>
+            </details>
+        </section>
+
+    </main>
+
+    <!-- ============================================================ -->
+    <!-- MODAL: Confirmation dialogs                                   -->
+    <!-- ============================================================ -->
+    <div id="modal-overlay" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div id="modal-box" class="bg-slate-800 border border-slate-600 rounded-xl shadow-2xl max-w-sm w-full p-6 animate-in">
+            <h3 id="modal-title" class="text-lg font-semibold text-slate-200 mb-2"></h3>
+            <p id="modal-message" class="text-sm text-slate-400 mb-6"></p>
+            <div class="flex justify-end gap-3">
+                <button id="modal-cancel" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-lg text-sm font-medium transition-colors">Cancel</button>
+                <button id="modal-confirm" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg text-sm font-medium transition-colors"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL: History Entry Viewer                                   -->
+    <!-- ============================================================ -->
+    <div id="history-modal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6 animate-in">
+            <div class="flex items-center justify-between mb-4">
+                <h3 id="history-modal-title" class="text-lg font-semibold text-slate-200"></h3>
+                <button id="history-modal-close" class="text-slate-500 hover:text-slate-300 transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <div id="history-modal-content" class="text-sm text-slate-300">
+                <!-- Filled by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- APPLICATION SCRIPT                                            -->
+    <!-- ============================================================ -->
+    <script src="scripts/mdc-app.js"></script>
+
+</body>
+</html>

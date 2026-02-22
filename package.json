@@ -1,7 +1,7 @@
 {
-  "name": "tessera",
+  "name": "wbc-delta-sigma",
   "version": "1.0.0",
-  "description": "Tessera — Keyboard-driven manual differential WBC counting tool for hematology",
+  "description": "WBC ΔΣ — Keyboard-driven manual differential WBC counting tool for hematology",
   "main": "web/scripts/mdc-app.js",
   "scripts": {
     "test": "node --test 'tests/*.test.js'",

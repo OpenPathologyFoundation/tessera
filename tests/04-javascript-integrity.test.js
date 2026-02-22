@@ -186,7 +186,7 @@ describe('JavaScript — Session History (SYS-090, SYS-095)', () => {
     });
 
     it('Saves to sessionStorage with a key prefix', () => {
-        assert.ok(jsCode.includes('tessera_history'), 'Must use tessera_history key');
+        assert.ok(jsCode.includes('wbcds_history'), 'Must use wbcds_history key');
     });
 
     it('Has try/catch around sessionStorage operations (graceful degradation)', () => {
@@ -216,11 +216,11 @@ describe('JavaScript — Theme Toggle', () => {
     it('Defines theme toggle controls and storage key', () => {
         assert.ok(jsCode.includes('btnToggleTheme'), 'Must reference theme toggle button');
         assert.ok(jsCode.includes('toggleTheme'), 'Must define toggleTheme');
-        assert.ok(jsCode.includes('tessera_theme'), 'Must define theme storage key');
-        const themeKeyPattern = /THEME_KEY\s*=\s*['"]tessera_theme['"]/;
+        assert.ok(jsCode.includes('wbcds_theme'), 'Must define theme storage key');
+        const themeKeyPattern = /THEME_KEY\s*=\s*['"]wbcds_theme['"]/;
         const themeSetPattern = /sessionStorage\.setItem\(\s*THEME_KEY/;
         const themeGetPattern = /sessionStorage\.getItem\(\s*THEME_KEY/;
-        assert.ok(themeKeyPattern.test(jsCode), 'Must define THEME_KEY as tessera_theme');
+        assert.ok(themeKeyPattern.test(jsCode), 'Must define THEME_KEY as wbcds_theme');
         assert.ok(themeSetPattern.test(jsCode), 'Must persist theme in sessionStorage');
         assert.ok(themeGetPattern.test(jsCode), 'Must read theme from sessionStorage');
     });

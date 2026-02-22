@@ -1,6 +1,6 @@
 # DCR-001: Design Change Record — Theme Toggle, Session Export, Clipboard Safety, QMS Evidence
 
-## Tessera
+## WBC ΔΣ
 
 | Field | Value |
 |-------|-------|

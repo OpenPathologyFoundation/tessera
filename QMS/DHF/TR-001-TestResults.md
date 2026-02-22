@@ -1,12 +1,12 @@
 # TR-001: Test Execution Results
 
-## Tessera
+## WBC ΔΣ
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
 | **Version** | 1.0 |
-| **Product** | Tessera v1.0 |
+| **Product** | WBC ΔΣ v1.0 |
 | **Date Executed** | 2026-02-18 |
 | **Status** | **PASS** |
 | **Parent Document** | DHF-001 |
@@ -214,7 +214,7 @@ Every FMEA hazard mitigation is covered by at least one passing test:
 
 ## 5. Conclusion
 
-**Tessera v1.0 PASSES all automated verification tests.**
+**WBC ΔΣ v1.0 PASSES all automated verification tests.**
 
 - All 146 tests pass with 0 failures
 - All 15 VV-CALC calculation vectors verified

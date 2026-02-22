@@ -1,12 +1,12 @@
 # URS-001: User Requirements Specification
 
-## Tessera
+## WBC ΔΣ
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | URS-001 |
 | **Version** | 1.0 |
-| **Product** | Tessera |
+| **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -15,11 +15,11 @@
 
 ## 1. Purpose
 
-This document defines the user requirements for the Tessera software application (a manual differential counter). Requirements are derived from clinical workflow analysis, regulatory standards, and laboratory best practices. Each requirement is assigned a unique identifier, priority, and rationale.
+This document defines the user requirements for the WBC ΔΣ software application (a manual differential counter). Requirements are derived from clinical workflow analysis, regulatory standards, and laboratory best practices. Each requirement is assigned a unique identifier, priority, and rationale.
 
 ## 2. Scope
 
-This URS covers all user-facing functionality of Tessera including specimen identification, cell counting, calculation, output generation, data integrity, and usability requirements.
+This URS covers all user-facing functionality of WBC ΔΣ including specimen identification, cell counting, calculation, output generation, data integrity, and usability requirements.
 
 ## 3. Users and Stakeholders
 
@@ -164,7 +164,7 @@ The following capabilities were considered but are explicitly out of scope for t
 | LIS/EMR Integration | Direct electronic transmission of results to LIS via HL7/FHIR | Requires institution-specific interface development; copy-to-clipboard provides interim solution |
 | User Authentication | Login/password for operator identification | Application is a personal aid; operator ID can be captured without full auth system |
 | Long-term Data Persistence | Database storage of historical counts | Requires server infrastructure; session storage provides adequate short-term history |
-| Automated Cell Recognition | AI/ML-based cell identification | Fundamentally different product; Tessera is a manual counting aid |
+| Automated Cell Recognition | AI/ML-based cell identification | Fundamentally different product; WBC ΔΣ is a manual counting aid |
 | Reference Range Flagging | Automatic flagging of abnormal percentages | Deferred to v2.0; requires institution-specific reference range configuration |
 | Electronic Signatures | 21 CFR Part 11 compliant digital signatures | Requires identity management infrastructure |
 | Multi-user Collaboration | Simultaneous access to the same case | Not consistent with manual counting workflow |

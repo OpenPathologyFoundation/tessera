@@ -1,12 +1,10 @@
-# Tessera – Manual Differential Counter
+# WBC ΔΣ – Manual Differential Counter
 
 A keyboard-driven manual differential white blood cell counting tool for hematology laboratory personnel. Built for speed, accuracy, and clinical safety.
 
-**Branding note:** The software is Apache-2.0 licensed, but the Tessera logo (`assets/card.png`) is reserved for project-identifying use and is not licensed for reuse as branding.
-
 ## Overview
 
-Tessera enables medical technologists and pathologists to perform manual differential WBC counts while looking through the microscope. Each cell type is assigned a single keyboard key. Press the key, the count increments. Real-time percentages update automatically. When done, formatted output is ready to copy into your LIS/EMR.
+WBC ΔΣ enables medical technologists and pathologists to perform manual differential WBC counts while looking through the microscope. Each cell type is assigned a single keyboard key. Press the key, the count increments. Real-time percentages update automatically. When done, formatted output is ready to copy into your LIS/EMR.
 
 **Key design principles**: Bauhaus-inspired (form follows function), keyboard-first operation, zero server-side patient data, clinically-validated calculation engine.
 
@@ -102,8 +100,8 @@ The built-in `serve.js` uses Node's native `http` module — no extra packages n
 ```nginx
 server {
     listen 80;
-    server_name tessera.yourlab.org;
-    root /var/www/tessera/web;
+    server_name wbcds.yourlab.org;
+    root /var/www/wbcds/web;
     index counter.html;
 
     location / {
@@ -120,7 +118,7 @@ server {
 
 ```bash
 # Copy files to server
-scp -r web/ user@server:/var/www/tessera/web/
+scp -r web/ user@server:/var/www/wbcds/web/
 sudo systemctl restart nginx
 ```
 
@@ -128,11 +126,11 @@ sudo systemctl restart nginx
 
 ```apache
 <VirtualHost *:80>
-    ServerName tessera.yourlab.org
-    DocumentRoot /var/www/tessera/web
+    ServerName wbcds.yourlab.org
+    DocumentRoot /var/www/wbcds/web
     DirectoryIndex counter.html
 
-    <Directory /var/www/tessera/web>
+    <Directory /var/www/wbcds/web>
         AllowOverride None
         Require all granted
     </Directory>
@@ -152,18 +150,18 @@ If you already run Tomcat / Jetty for the legacy app:
 ```bash
 # 1. Build the WAR (the web/ directory IS the WAR content)
 cd /path/to/project
-jar -cf tessera.war -C web .
+jar -cf wbcds.war -C web .
 
 # 2. Deploy to Tomcat
-cp tessera.war $CATALINA_HOME/webapps/
+cp wbcds.war $CATALINA_HOME/webapps/
 
-# 3. Access at http://server:8080/tessera/counter.html
+# 3. Access at http://server:8080/wbcds/counter.html
 ```
 
 Or copy directly into Tomcat's webapps:
 
 ```bash
-cp -r web/ $CATALINA_HOME/webapps/tessera/
+cp -r web/ $CATALINA_HOME/webapps/wbcds/
 ```
 
 ### Option 3: Docker
@@ -175,8 +173,8 @@ EXPOSE 80
 ```
 
 ```bash
-docker build -t tessera .
-docker run -d -p 8089:80 tessera
+docker build -t wbcds .
+docker run -d -p 8089:80 wbcds
 # Open http://localhost:8089/counter.html
 ```
 
@@ -391,4 +389,4 @@ The application works offline after initial page load (all assets served locally
 ## License
 
 - **Source code**: Apache License 2.0 — see `LICENSE`.
-- **Branding / logo assets**: Not licensed under Apache-2.0. The Tessera logo at `assets/card.png` is reserved for project-identifying use and may not be reused to brand derivative products/services or to imply endorsement.
+- **Branding / logo assets**: Not licensed under Apache-2.0. The WBC ΔΣ logo and branding assets are reserved for project-identifying use and may not be reused to brand derivative products/services or to imply endorsement.

@@ -1,12 +1,12 @@
 # SRS-001: System Requirements Specification
 
-## Tessera
+## WBC ΔΣ
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
 | **Version** | 1.0 |
-| **Product** | Tessera |
+| **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -20,7 +20,7 @@ This document translates the User Requirements (URS-001) into specific, measurab
 
 ## 2. Scope
 
-This SRS covers the functional, performance, interface, data, and security requirements of the Tessera application.
+This SRS covers the functional, performance, interface, data, and security requirements of the WBC ΔΣ application.
 
 ## 3. Reference Standards
 

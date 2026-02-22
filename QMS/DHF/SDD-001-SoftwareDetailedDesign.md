@@ -1,12 +1,12 @@
 # SDD-001: Software Detailed Design
 
-## Tessera
+## WBC ΔΣ
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | SDD-001 |
 | **Version** | 1.0 |
-| **Product** | Tessera |
+| **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -16,7 +16,7 @@
 
 ## 1. Purpose
 
-This document provides the detailed software design for Tessera. It specifies the implementation of each module, data structures, algorithms, DOM structure, event handling, and inter-module communication. This document provides sufficient detail for implementation and code review.
+This document provides the detailed software design for WBC ΔΣ. It specifies the implementation of each module, data structures, algorithms, DOM structure, event handling, and inter-module communication. This document provides sufficient detail for implementation and code review.
 
 ## 2. Scope
 
@@ -177,10 +177,10 @@ app.c.CellCounts = Backbone.Collection.extend({
 app.c.SessionHistory = Backbone.Collection.extend({
     model: app.m.CountSession,
     saveToStorage: function() {
-        sessionStorage.setItem('tessera_history', JSON.stringify(this.toJSON()));
+        sessionStorage.setItem('wbcds_history', JSON.stringify(this.toJSON()));
     },
     loadFromStorage: function() {
-        var data = sessionStorage.getItem('tessera_history');
+        var data = sessionStorage.getItem('wbcds_history');
         if (data) {
             this.reset(JSON.parse(data));
         }
@@ -442,7 +442,7 @@ app.v.SessionHistory = Backbone.View.extend({
 
 **Behavior**:
 - Applies `data-theme="light|dark"` on `<body>` to switch CSS overrides.
-- Persists the selected theme for the current browser session using `sessionStorage` key `tessera_theme`.
+- Persists the selected theme for the current browser session using `sessionStorage` key `wbcds_theme`.
 - Keyboard shortcut: `Ctrl/Cmd + Shift + L` toggles theme without affecting counting.
 
 ---

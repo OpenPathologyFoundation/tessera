@@ -48,6 +48,7 @@ This SRS covers the functional, performance, interface, data, and security requi
 | SYS-006 | When the case number field value changes after a count session has been completed or is in progress, the system SHALL: (a) display a confirmation dialog, (b) upon confirmation, clear all cell counts to zero, (c) clear all percentages to 0.00%, (d) clear the total to zero, (e) clear all output text, (f) reset the UI to pre-count state. | URS-003, URS-062 | Test |
 | SYS-007 | The confirmation dialog for case change SHALL display the text: "Changing the case number will clear all current count data. Continue?" with "OK" and "Cancel" options. | URS-003 | Inspection |
 | SYS-008 | If the user cancels the case change confirmation, the system SHALL restore the previous case number value and make no changes to count data. | URS-003 | Test |
+| SYS-009 | When the case number input field is focused and the user presses Enter, the system SHALL trigger the "Start Count" action if the field contains a valid (non-empty) value; if the field is empty, pressing Enter SHALL have no effect. | URS-006 | Test |
 
 ### 4.2 Specimen Type Selection Module
 

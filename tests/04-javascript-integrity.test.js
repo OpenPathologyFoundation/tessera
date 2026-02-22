@@ -176,6 +176,23 @@ describe('JavaScript — Clipboard Safety', () => {
     });
 });
 
+describe('JavaScript — Enter Key Starts Count (SYS-009)', () => {
+
+    it('Case input has keydown listener for Enter key (SYS-009)', () => {
+        const enterPattern = /caseInput[\s\S]*addEventListener\(['"]keydown['"][\s\S]*ev\.key\s*===\s*['"]Enter['"]/;
+        assert.ok(enterPattern.test(jsCode), 'Must listen for Enter key on case input');
+    });
+
+    it('Enter key triggers btnStart.click() when not disabled', () => {
+        assert.ok(jsCode.includes('btnStart.click()'), 'Must programmatically click Start Count on Enter');
+    });
+
+    it('Enter key calls preventDefault to avoid form submission', () => {
+        const enterPreventDefault = /['"]Enter['"][\s\S]*?preventDefault/;
+        assert.ok(enterPreventDefault.test(jsCode), 'Must preventDefault on Enter in case input');
+    });
+});
+
 describe('JavaScript — Session History (SYS-090, SYS-095)', () => {
 
     it('Uses sessionStorage (not localStorage) for history (SYS-095)', () => {

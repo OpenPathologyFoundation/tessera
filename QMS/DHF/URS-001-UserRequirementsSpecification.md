@@ -54,6 +54,7 @@ This URS covers all user-facing functionality of WBC ΔΣ including specimen ide
 | URS-003 | The system SHALL completely clear all count data, percentages, and output when a new case number is entered. | **P0 - Critical** | Prevents carryover of data between patients, which would result in erroneous results and potential misdiagnosis. |
 | URS-004 | The system SHALL prevent counting from starting if the case number field is empty. | **P0 - Critical** | Enforces mandatory identification before data entry. |
 | URS-005 | The system SHALL accept alphanumeric case/accession numbers of variable length consistent with common LIS formats. | **P1 - High** | Different institutions use different accession number formats (e.g., S25-1234, H25-00567, 25-A-12345). |
+| URS-006 | The system SHALL allow the user to start counting by pressing Enter while the case number field is focused, supporting barcode-scanner workflows where the scanner appends an Enter keystroke after input. | **P1 - High** | Barcode scanners typically emit a carriage return after scanning. Requiring a separate button click interrupts the scan-to-count workflow and is less intuitive than pressing Enter. |
 
 ### 5.2 Specimen Type Selection
 

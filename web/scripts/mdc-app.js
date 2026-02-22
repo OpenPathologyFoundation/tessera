@@ -158,6 +158,14 @@
             btnStart.disabled = val.length === 0;
         });
 
+        // Enter key in case input starts count (SYS-009)
+        caseInput.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Enter' && !btnStart.disabled) {
+                ev.preventDefault();
+                btnStart.click();
+            }
+        });
+
         // Specimen type change
         specSelect.addEventListener('change', function () {
             state.specimenType = specSelect.value;

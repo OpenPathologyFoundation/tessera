@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for improving the Manual Differential Counter (MDC). This is a safety‑critical, clinical workflow tool, so changes must be careful, testable, and traceable.
+Thanks for improving Tessera, the manual differential counter. This is a safety‑critical, clinical workflow tool, so changes must be careful, testable, and traceable.
 
 ## Principles
 - Keep the product **keyboard‑first**, **fast**, and **offline‑capable**.

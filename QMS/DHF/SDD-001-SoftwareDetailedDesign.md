@@ -1,12 +1,12 @@
 # SDD-001: Software Detailed Design
 
-## Manual Differential Counter
+## Tessera
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | SDD-001 |
 | **Version** | 1.0 |
-| **Product** | Manual Differential Counter (MDC) |
+| **Product** | Tessera |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -16,7 +16,7 @@
 
 ## 1. Purpose
 
-This document provides the detailed software design for the Manual Differential Counter. It specifies the implementation of each module, data structures, algorithms, DOM structure, event handling, and inter-module communication. This document provides sufficient detail for implementation and code review.
+This document provides the detailed software design for Tessera. It specifies the implementation of each module, data structures, algorithms, DOM structure, event handling, and inter-module communication. This document provides sufficient detail for implementation and code review.
 
 ## 2. Scope
 
@@ -177,10 +177,10 @@ app.c.CellCounts = Backbone.Collection.extend({
 app.c.SessionHistory = Backbone.Collection.extend({
     model: app.m.CountSession,
     saveToStorage: function() {
-        sessionStorage.setItem('mdc_history', JSON.stringify(this.toJSON()));
+        sessionStorage.setItem('tessera_history', JSON.stringify(this.toJSON()));
     },
     loadFromStorage: function() {
-        var data = sessionStorage.getItem('mdc_history');
+        var data = sessionStorage.getItem('tessera_history');
         if (data) {
             this.reset(JSON.parse(data));
         }
@@ -408,7 +408,9 @@ app.v.SessionHistory = Backbone.View.extend({
     el: '#session-history',
     events: {
         'click .history-toggle': 'togglePanel',
-        'click .history-entry':  'viewEntry'
+        'click .history-entry':  'viewEntry',
+        'click #btnExportCsv':   'exportCsv',
+        'click #btnExportJson':  'exportJson'
     },
     render: function() {
         // Render list of completed sessions
@@ -417,9 +419,31 @@ app.v.SessionHistory = Backbone.View.extend({
     viewEntry: function(e) {
         // Display read-only overlay with full session data
         // No editing capability
+    },
+    exportCsv: function() {
+        // Build CSV from session history and trigger local download
+    },
+    exportJson: function() {
+        // Serialize session history to JSON and trigger local download
     }
 });
 ```
+
+**Notes**:
+- Session history view includes "Export CSV" and "Export JSON" controls to save a local record.
+
+#### 3.4.7 ThemeToggle (NEW)
+
+**Purpose**: Provides Light/Dark presentation modes for ergonomic use under varying ambient lighting.
+
+**DOM Targets**:
+- `#btnToggleTheme` (toggle button)
+- `#themeLabel` (dynamic label)
+
+**Behavior**:
+- Applies `data-theme="light|dark"` on `<body>` to switch CSS overrides.
+- Persists the selected theme for the current browser session using `sessionStorage` key `tessera_theme`.
+- Keyboard shortcut: `Ctrl/Cmd + Shift + L` toggles theme without affecting counting.
 
 ---
 
@@ -713,6 +737,8 @@ function onKeyDown(event) {
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - detailed design |
+| B | 2026-02-19 | QMS | Added session export design notes |
+| C | 2026-02-20 | QMS | Added theme toggle design notes |
 
 ## 8. Approval Signatures
 

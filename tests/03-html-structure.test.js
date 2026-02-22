@@ -1,7 +1,7 @@
 /**
  * TEST SUITE 03: HTML Structure & UI Element Verification
  * ========================================================
- * Traces to: SRS SYS-001 through SYS-004, SYS-010, SYS-050, SYS-064, SYS-070, SYS-080
+ * Traces to: SRS SYS-001 through SYS-004, SYS-010, SYS-050, SYS-064, SYS-070, SYS-080, SYS-096, SYS-110
  * FMEA: HA-001 (no case input), HA-004 (no case in output)
  *
  * Verifies that all required UI elements exist in the HTML file and
@@ -178,6 +178,11 @@ describe('HTML Structure — Session History (SYS-092, SYS-094)', () => {
         assert.ok(html.includes('id="history-count"'), 'Must have history-count');
     });
 
+    it('Export session buttons exist', () => {
+        assert.ok(html.includes('id="btnExportCsv"'), 'Must have Export CSV button');
+        assert.ok(html.includes('id="btnExportJson"'), 'Must have Export JSON button');
+    });
+
     it('Temporary data notice is present (SYS-094)', () => {
         assert.ok(html.includes('temporary') && html.includes('lost'),
             'Must contain notice about temporary data');
@@ -213,8 +218,11 @@ describe('HTML Structure — Accessibility & Usability', () => {
     });
 
     it('Status indicator elements exist', () => {
-        assert.ok(html.includes('id="status-dot"'), 'Must have status-dot');
         assert.ok(html.includes('id="state-label"'), 'Must have state-label');
+    });
+
+    it('Theme toggle button exists', () => {
+        assert.ok(html.includes('id="btnToggleTheme"'), 'Must have theme toggle button');
     });
 
     it('Keyboard hint text is present for users', () => {

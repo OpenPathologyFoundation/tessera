@@ -1,12 +1,12 @@
 # SRS-001: System Requirements Specification
 
-## Manual Differential Counter
+## Tessera
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
 | **Version** | 1.0 |
-| **Product** | Manual Differential Counter (MDC) |
+| **Product** | Tessera |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -20,7 +20,7 @@ This document translates the User Requirements (URS-001) into specific, measurab
 
 ## 2. Scope
 
-This SRS covers the functional, performance, interface, data, and security requirements of the MDC application.
+This SRS covers the functional, performance, interface, data, and security requirements of the Tessera application.
 
 ## 3. Reference Standards
 
@@ -154,8 +154,18 @@ This SRS covers the functional, performance, interface, data, and security requi
 | SYS-093 | Clicking a session history entry SHALL display the completed count data in a read-only overlay without affecting the current active session. | URS-082 | Test |
 | SYS-094 | The system SHALL display a notice in the session history panel: "Session data is temporary and will be lost when the browser is closed." | URS-083 | Inspection |
 | SYS-095 | Session history SHALL be stored in browser sessionStorage (not localStorage) to ensure automatic cleanup. | URS-080 | Test |
+| SYS-096 | The system SHALL provide controls to export the current session history as local files in CSV and JSON formats. | URS-084 | Test |
+| SYS-097 | The exported files SHALL include, for each completed session: case number, specimen type, timestamp, total count, per-cell-type counts, per-cell-type percentages, morphology comments, and output text. | URS-084 | Test |
 
-### 4.11 Configuration Module
+### 4.11 Presentation & Theme Module
+
+| ID | Requirement | URS Trace | Verification Method |
+|----|------------|-----------|-------------------|
+| SYS-110 | The system SHALL provide a visible control to toggle between Light and Dark themes without altering count data or session state. | URS-095 | Test |
+| SYS-111 | The system SHALL provide a keyboard shortcut (Ctrl/Cmd+Shift+L) to toggle themes and SHALL NOT interfere with counting key inputs. | URS-095 | Test |
+| SYS-112 | The system SHALL remember the selected theme for the duration of the browser session using sessionStorage. | URS-095 | Test |
+
+### 4.12 Configuration Module
 
 | ID | Requirement | URS Trace | Verification Method |
 |----|------------|-----------|-------------------|
@@ -211,6 +221,8 @@ This SRS covers the functional, performance, interface, data, and security requi
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
+| B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
+| C | 2026-02-20 | QMS | Added theme toggle requirements |
 
 ## 10. Approval Signatures
 

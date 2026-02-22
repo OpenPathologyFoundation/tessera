@@ -1,12 +1,12 @@
 # TR-001: Test Execution Results
 
-## Manual Differential Counter
+## Tessera
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
 | **Version** | 1.0 |
-| **Product** | Manual Differential Counter (MDC) v1.0 |
+| **Product** | Tessera v1.0 |
 | **Date Executed** | 2026-02-18 |
 | **Status** | **PASS** |
 | **Parent Document** | DHF-001 |
@@ -19,6 +19,8 @@
 ## 1. Executive Summary
 
 **All 146 tests passed across 36 test suites with 0 failures.**
+
+**Note**: This report reflects the test run executed on 2026-02-18. After code or test changes, execute `npm run test:qms` to capture updated evidence and results.
 
 | Metric | Value |
 |--------|-------|
@@ -212,7 +214,7 @@ Every FMEA hazard mitigation is covered by at least one passing test:
 
 ## 5. Conclusion
 
-**The Manual Differential Counter v1.0 PASSES all automated verification tests.**
+**Tessera v1.0 PASSES all automated verification tests.**
 
 - All 146 tests pass with 0 failures
 - All 15 VV-CALC calculation vectors verified
@@ -230,6 +232,8 @@ Every FMEA hazard mitigation is covered by at least one passing test:
 
 Full TAP output is archived in `test-output-raw.txt` in this directory.
 
+**Future runs**: Use `npm run test:qms` to capture raw output and environment metadata under `QMS/DHF/TestEvidence/<timestamp>_run/`.
+
 ---
 
 ## 7. Revision History
@@ -237,6 +241,8 @@ Full TAP output is archived in `test-output-raw.txt` in this directory.
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial test execution — 146/146 pass |
+| B | 2026-02-20 | QMS | Added test evidence capture reference |
+| C | 2026-02-20 | QMS | Clarified run date scope and update procedure |
 
 ## 8. Approval Signatures
 
@@ -244,3 +250,16 @@ Full TAP output is archived in `test-output-raw.txt` in this directory.
 |------|------|-----------|------|
 | Test Lead | | | |
 | Quality Assurance | | | |
+
+## 8. Automated Run Log
+- Date (UTC): 2026-02-20T21:23:10.020Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-02-20_162310_run/`
+
+- Date (UTC): 2026-02-20T15:23:13.464Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-02-20_102313_run/`

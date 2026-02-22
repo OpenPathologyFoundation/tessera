@@ -1,10 +1,10 @@
 # SOP-002: Deployment
 
 ## Purpose
-Define a controlled, repeatable process to package, verify, and deploy the Manual Differential Counter (MDC) application.
+Define a controlled, repeatable process to package, verify, and deploy the Tessera application.
 
 ## Scope
-Applies to all releases of the MDC application, including internal staging and production environments.
+Applies to all releases of Tessera, including internal staging and production environments.
 
 ## Roles and Responsibilities
 - **Release Owner**: Prepares the release, runs verification, and documents results.
@@ -15,6 +15,7 @@ Applies to all releases of the MDC application, including internal staging and p
 - Requirements, design, risk, and test artifacts are updated as needed.
 - All automated tests pass.
 - Release is versioned and tagged.
+- A Design Change Record (DCR) exists for the change set.
 
 ## Inputs
 - `web/` directory (deployable artifact)
@@ -28,8 +29,8 @@ Applies to all releases of the MDC application, including internal staging and p
    - Ensure configuration (`web/settings/templates.json`) is validated and approved.
 
 2) **Run verification**
-   - Execute `npm test`.
-   - Record results in `QMS/DHF/TR-001-TestResults.md` if new testing is performed.
+   - Execute `npm run test:qms` to capture evidence and update TR/DCR.
+   - `npm test` may be used for quick checks, but does not capture QMS evidence.
 
 3) **Package**
    - For static hosting: copy `web/` as-is.
@@ -58,6 +59,6 @@ Applies to all releases of the MDC application, including internal staging and p
 
 ## Records
 - `QMS/DHF/TR-001-TestResults.md`
+- `QMS/DHF/TestEvidence/`
 - Release notes (if applicable)
 - Deployment log (date/time/environment)
-

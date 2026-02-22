@@ -46,6 +46,6 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`MDC server running at http://localhost:${PORT}/`);
+  console.log(`Tessera server running at http://localhost:${PORT}/`);
   console.log('Press Ctrl+C to stop');
 });

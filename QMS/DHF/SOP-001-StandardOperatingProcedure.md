@@ -1,12 +1,12 @@
 # SOP-001: Standard Operating Procedure
 
-## Tessera — Operating Instructions
+## WBC ΔΣ — Operating Instructions
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | SOP-001 |
 | **Version** | 1.0 |
-| **Product** | Tessera |
+| **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -16,11 +16,11 @@
 
 ## 1. Purpose
 
-This Standard Operating Procedure provides step-by-step instructions for using the Tessera application to perform manual differential white blood cell counts on bone marrow aspirate and peripheral blood smears.
+This Standard Operating Procedure provides step-by-step instructions for using the WBC ΔΣ application to perform manual differential white blood cell counts on bone marrow aspirate and peripheral blood smears.
 
 ## 2. Scope
 
-This SOP applies to all clinical laboratory personnel who use the Tessera application for manual differential counting. It covers the complete workflow from case entry to result documentation.
+This SOP applies to all clinical laboratory personnel who use the WBC ΔΣ application for manual differential counting. It covers the complete workflow from case entry to result documentation.
 
 ## 3. Responsibilities
 
@@ -38,7 +38,7 @@ This SOP applies to all clinical laboratory personnel who use the Tessera applic
 - Completion of laboratory orientation
 - Competency assessment in manual differential counting (per CAP HEM.30550)
 - Review of this SOP with supervisor sign-off
-- Hands-on demonstration of Tessera application use
+- Hands-on demonstration of WBC ΔΣ application use
 
 ### 4.2 Equipment Requirements
 - Laboratory workstation with supported web browser:
@@ -50,7 +50,7 @@ This SOP applies to all clinical laboratory personnel who use the Tessera applic
 - Stained smear (Wright-Giemsa or equivalent)
 
 ### 4.3 Application Access
-- Tessera application URL: `[configured per institution]`
+- WBC ΔΣ application URL: `[configured per institution]`
 - No login or account required
 - Application loads entirely in the browser; no data is transmitted to any server
 
@@ -61,9 +61,9 @@ This SOP applies to all clinical laboratory personnel who use the Tessera applic
 ### 5.1 Opening the Application
 
 1. Open a supported web browser on the laboratory workstation.
-2. Navigate to the Tessera application URL.
+2. Navigate to the WBC ΔΣ application URL.
 3. Verify that the application loads completely:
-   - Page title displays "Tessera"
+   - Page title displays "WBC ΔΣ"
    - Counting table is visible
    - "Start Count" button is visible but disabled
    - Case number input field is empty and ready for input
@@ -298,7 +298,7 @@ If the application produces unexpected results:
 
 ## 11. Training Acknowledgment
 
-I have read and understand SOP-001 for the Tessera application. I have been trained on its use and am competent to perform manual differential counts using this tool.
+I have read and understand SOP-001 for the WBC ΔΣ application. I have been trained on its use and am competent to perform manual differential counts using this tool.
 
 | Name (Print) | Signature | Date | Trainer |
 |--------------|-----------|------|---------|

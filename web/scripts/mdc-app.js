@@ -1,6 +1,6 @@
 /**
- * Tessera — Manual Differential Counter
- * ======================================
+ * WBC ΔΣ — Manual Differential Counter
+ * =====================================
  * Implements: URS-001, SRS-001, SDD-001
  * Keyboard-driven differential WBC counting tool for hematology.
  *
@@ -31,7 +31,7 @@
     const DEFAULT_MIN = { bm: 200, pb: 100 };
 
     // Theme selection (light/dark)
-    const THEME_KEY = 'tessera_theme';
+    const THEME_KEY = 'wbcds_theme';
     const THEMES = { dark: 'dark', light: 'light' };
 
     function getPreferredTheme() {
@@ -118,14 +118,14 @@
     // ================================================================
     function loadSessionHistory() {
         try {
-            const data = sessionStorage.getItem('tessera_history');
+            const data = sessionStorage.getItem('wbcds_history');
             if (data) state.sessionHistory = JSON.parse(data);
         } catch (e) { /* graceful degradation */ }
     }
 
     function saveSessionHistory() {
         try {
-            sessionStorage.setItem('tessera_history', JSON.stringify(state.sessionHistory));
+            sessionStorage.setItem('wbcds_history', JSON.stringify(state.sessionHistory));
         } catch (e) { /* graceful degradation */ }
     }
 
@@ -156,6 +156,14 @@
         caseInput.addEventListener('input', function () {
             const val = caseInput.value.trim();
             btnStart.disabled = val.length === 0;
+        });
+
+        // Enter key in case input starts count (SYS-009)
+        caseInput.addEventListener('keydown', function (ev) {
+            if (ev.key === 'Enter' && !btnStart.disabled) {
+                ev.preventDefault();
+                btnStart.click();
+            }
         });
 
         // Specimen type change
@@ -825,7 +833,7 @@
 
     function buildExportFilename(ext) {
         const stamp = new Date().toISOString().replace(/[:.]/g, '-');
-        return 'tessera-session-' + stamp + '.' + ext;
+        return 'wbcds-session-' + stamp + '.' + ext;
     }
 
     // ================================================================

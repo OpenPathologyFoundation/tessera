@@ -1,6 +1,6 @@
 # DCR-XXX: Design Change Record
 
-## Tessera
+## WBC ΔΣ
 
 | Field | Value |
 |-------|-------|

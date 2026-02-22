@@ -176,6 +176,23 @@ describe('JavaScript — Clipboard Safety', () => {
     });
 });
 
+describe('JavaScript — Enter Key Starts Count (SYS-009)', () => {
+
+    it('Case input has keydown listener for Enter key (SYS-009)', () => {
+        const enterPattern = /caseInput[\s\S]*addEventListener\(['"]keydown['"][\s\S]*ev\.key\s*===\s*['"]Enter['"]/;
+        assert.ok(enterPattern.test(jsCode), 'Must listen for Enter key on case input');
+    });
+
+    it('Enter key triggers btnStart.click() when not disabled', () => {
+        assert.ok(jsCode.includes('btnStart.click()'), 'Must programmatically click Start Count on Enter');
+    });
+
+    it('Enter key calls preventDefault to avoid form submission', () => {
+        const enterPreventDefault = /['"]Enter['"][\s\S]*?preventDefault/;
+        assert.ok(enterPreventDefault.test(jsCode), 'Must preventDefault on Enter in case input');
+    });
+});
+
 describe('JavaScript — Session History (SYS-090, SYS-095)', () => {
 
     it('Uses sessionStorage (not localStorage) for history (SYS-095)', () => {
@@ -186,7 +203,7 @@ describe('JavaScript — Session History (SYS-090, SYS-095)', () => {
     });
 
     it('Saves to sessionStorage with a key prefix', () => {
-        assert.ok(jsCode.includes('tessera_history'), 'Must use tessera_history key');
+        assert.ok(jsCode.includes('wbcds_history'), 'Must use wbcds_history key');
     });
 
     it('Has try/catch around sessionStorage operations (graceful degradation)', () => {
@@ -216,11 +233,11 @@ describe('JavaScript — Theme Toggle', () => {
     it('Defines theme toggle controls and storage key', () => {
         assert.ok(jsCode.includes('btnToggleTheme'), 'Must reference theme toggle button');
         assert.ok(jsCode.includes('toggleTheme'), 'Must define toggleTheme');
-        assert.ok(jsCode.includes('tessera_theme'), 'Must define theme storage key');
-        const themeKeyPattern = /THEME_KEY\s*=\s*['"]tessera_theme['"]/;
+        assert.ok(jsCode.includes('wbcds_theme'), 'Must define theme storage key');
+        const themeKeyPattern = /THEME_KEY\s*=\s*['"]wbcds_theme['"]/;
         const themeSetPattern = /sessionStorage\.setItem\(\s*THEME_KEY/;
         const themeGetPattern = /sessionStorage\.getItem\(\s*THEME_KEY/;
-        assert.ok(themeKeyPattern.test(jsCode), 'Must define THEME_KEY as tessera_theme');
+        assert.ok(themeKeyPattern.test(jsCode), 'Must define THEME_KEY as wbcds_theme');
         assert.ok(themeSetPattern.test(jsCode), 'Must persist theme in sessionStorage');
         assert.ok(themeGetPattern.test(jsCode), 'Must read theme from sessionStorage');
     });

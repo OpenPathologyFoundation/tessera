@@ -1,12 +1,12 @@
 # RTM-001: Requirements Traceability Matrix
 
-## Tessera
+## WBC ΔΣ
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | RTM-001 |
 | **Version** | 1.0 |
-| **Product** | Tessera |
+| **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |

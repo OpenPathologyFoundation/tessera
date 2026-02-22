@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tessera — Manual Differential Counter</title>
+    <title>WBC ΔΣ — Manual Differential Counter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -35,7 +35,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Franklin:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* Bauhaus principle: minimal, functional animation */
         .flash-increment {
@@ -120,9 +120,16 @@
     <header id="top-bar" class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50">
         <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
             <!-- Left: App identity (hidden during case-entry, shown during counting/results) -->
-            <div id="header-logo" class="flex items-center shrink-0 hidden">
-                <img src="images/tessera-logo.png" alt="Tessera" class="h-8 w-auto opacity-85 hover:opacity-100 transition-opacity" />
-                <h1 class="sr-only">Tessera</h1>
+            <div id="header-logo" class="flex items-center shrink-0 hidden" role="img" aria-label="WBC Delta Sigma — Manual Differential Counter">
+                <svg width="28" height="28" viewBox="0 0 40 40" fill="none" class="text-slate-300 shrink-0" aria-hidden="true">
+                    <g fill="currentColor"><rect x="3" y="5" width="8" height="8" rx="1"/><rect x="16" y="9" width="8" height="8" rx="1"/><rect x="29" y="5" width="8" height="8" rx="1"/></g>
+                    <path d="M4 24 L36 24 M4 24 L20 30 L4 36 M4 36 L36 36" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" fill="none"/>
+                </svg>
+                <div class="flex flex-col ml-2.5 leading-tight">
+                    <span class="text-sm font-bold text-slate-300" style="font-family:'Libre Franklin',sans-serif;font-variant-caps:small-caps;">WBC&#8201;&#916;&#931;</span>
+                    <span class="text-[9px] text-slate-500">Manual Differential Counter</span>
+                </div>
+                <h1 class="sr-only">WBC ΔΣ — Manual Differential Counter</h1>
             </div>
             <!-- Center: Case number (prominent) -->
             <div id="case-badge" class="hidden items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-600 rounded-md">
@@ -157,11 +164,17 @@
         <!-- ======================================================== -->
         <section id="phase-case-entry" class="animate-in">
             <div class="max-w-md mx-auto mt-20">
-                <div class="flex justify-center mb-6">
-                    <img src="images/tessera-logo.png" alt="Tessera" class="h-20 w-auto" />
-                </div>
-                <div class="text-center mb-8">
-                    <h2 class="text-lg font-light text-slate-400">Manual Differential Counter</h2>
+                <div class="flex justify-center mb-8">
+                    <div class="flex items-center gap-4" role="img" aria-label="WBC Delta Sigma — Manual Differential Counter">
+                        <svg width="48" height="48" viewBox="0 0 40 40" fill="none" class="text-slate-300 shrink-0" aria-hidden="true">
+                            <g fill="currentColor"><rect x="3" y="5" width="8" height="8" rx="1"/><rect x="16" y="9" width="8" height="8" rx="1"/><rect x="29" y="5" width="8" height="8" rx="1"/></g>
+                            <path d="M4 24 L36 24 M4 24 L20 30 L4 36 M4 36 L36 36" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" fill="none"/>
+                        </svg>
+                        <div class="flex flex-col leading-tight">
+                            <span class="text-2xl font-bold text-slate-200" style="font-family:'Libre Franklin',sans-serif;font-variant-caps:small-caps;letter-spacing:0.02em;">WBC&#8201;&#916;&#931;</span>
+                            <span class="text-xs text-slate-500 mt-0.5">Manual Differential Counter</span>
+                        </div>
+                    </div>
                 </div>
                 <div class="space-y-4">
                     <!-- Case number input -->

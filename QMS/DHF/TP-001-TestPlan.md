@@ -1,12 +1,12 @@
 # TP-001: Test Plan
 
-## Tessera
+## WBC ΔΣ
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | TP-001 |
 | **Version** | 1.0 |
-| **Product** | Tessera |
+| **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -16,7 +16,7 @@
 
 ## 1. Purpose
 
-This document defines the test strategy, test cases, acceptance criteria, and pass/fail criteria for verifying Tessera against the System Requirements Specification (SRS-001). Testing shall demonstrate that the software meets all functional, performance, and safety requirements.
+This document defines the test strategy, test cases, acceptance criteria, and pass/fail criteria for verifying WBC ΔΣ against the System Requirements Specification (SRS-001). Testing shall demonstrate that the software meets all functional, performance, and safety requirements.
 
 ## 2. Scope
 

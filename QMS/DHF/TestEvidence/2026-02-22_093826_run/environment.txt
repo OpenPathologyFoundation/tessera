@@ -1,0 +1,6 @@
+date_utc=2026-02-22T14:38:26.031Z
+node=v25.6.1
+platform=darwin
+arch=arm64
+cwd=/Users/pg/IdeaProjects/tessera
+npm=11.9.0

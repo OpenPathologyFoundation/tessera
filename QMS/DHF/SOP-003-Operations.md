@@ -1,10 +1,10 @@
 # SOP-003: Operations
 
 ## Purpose
-Define standard operating procedures for day-to-day operation, monitoring, and controlled change management of the Tessera application.
+Define standard operating procedures for day-to-day operation, monitoring, and controlled change management of the WBC ΔΣ application.
 
 ## Scope
-Applies to all operational use of Tessera in laboratory or clinical environments.
+Applies to all operational use of WBC ΔΣ in laboratory or clinical environments.
 
 ## Roles and Responsibilities
 - **Operator**: Uses the application for counting tasks.

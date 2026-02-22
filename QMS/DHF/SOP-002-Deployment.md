@@ -1,10 +1,10 @@
 # SOP-002: Deployment
 
 ## Purpose
-Define a controlled, repeatable process to package, verify, and deploy the Tessera application.
+Define a controlled, repeatable process to package, verify, and deploy the WBC ΔΣ application.
 
 ## Scope
-Applies to all releases of Tessera, including internal staging and production environments.
+Applies to all releases of WBC ΔΣ, including internal staging and production environments.
 
 ## Roles and Responsibilities
 - **Release Owner**: Prepares the release, runs verification, and documents results.

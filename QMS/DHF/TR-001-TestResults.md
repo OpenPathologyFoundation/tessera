@@ -1,12 +1,12 @@
 # TR-001: Test Execution Results
 
-## Tessera
+## WBC ΔΣ
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
 | **Version** | 1.0 |
-| **Product** | Tessera v1.0 |
+| **Product** | WBC ΔΣ v1.0 |
 | **Date Executed** | 2026-02-18 |
 | **Status** | **PASS** |
 | **Parent Document** | DHF-001 |
@@ -214,7 +214,7 @@ Every FMEA hazard mitigation is covered by at least one passing test:
 
 ## 5. Conclusion
 
-**Tessera v1.0 PASSES all automated verification tests.**
+**WBC ΔΣ v1.0 PASSES all automated verification tests.**
 
 - All 146 tests pass with 0 failures
 - All 15 VV-CALC calculation vectors verified
@@ -252,6 +252,36 @@ Full TAP output is archived in `test-output-raw.txt` in this directory.
 | Quality Assurance | | | |
 
 ## 8. Automated Run Log
+- Date (UTC): 2026-02-22T14:57:42.658Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-02-22_095742_run/`
+
+- Date (UTC): 2026-02-22T14:55:17.397Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-02-22_095517_run/`
+
+- Date (UTC): 2026-02-22T14:55:01.105Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-02-22_095501_run/`
+
+- Date (UTC): 2026-02-22T14:54:32.180Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-02-22_095432_run/`
+
+- Date (UTC): 2026-02-22T14:38:26.031Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-02-22_093826_run/`
+
 - Date (UTC): 2026-02-20T21:23:10.020Z
 - Command: `npm test`
 - Exit Code: 0

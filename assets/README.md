@@ -1,8 +1,5 @@
 # Assets
 
-This directory contains Tessera branding assets.
+This directory contains WBC ΔΣ branding assets and logo explorations.
 
-- `card.png` is the Tessera logo and is **not** licensed under Apache License 2.0.
-- You may not reuse this logo to brand derivative works, products, or services, or to imply endorsement.
-
-See `LICENSE` and `TRADEMARKS.md`.
+See `TRADEMARKS.md` and `LICENSE`.

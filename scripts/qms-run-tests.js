@@ -125,6 +125,237 @@ const summaryLines = [
 
 fs.writeFileSync(path.join(runDir, 'test-summary.md'), summaryLines.join('\n') + '\n', 'utf8');
 
+function getDefaultBranch() {
+    try {
+        const ref = spawnSync('git', ['symbolic-ref', 'refs/remotes/origin/HEAD'], {
+            cwd: repoRoot, encoding: 'utf8'
+        });
+        if (ref.status === 0) {
+            const match = ref.stdout.trim().match(/refs\/remotes\/origin\/(.+)/);
+            if (match) return match[1];
+        }
+    } catch (e) { /* ignore */ }
+    for (const candidate of ['main', 'master']) {
+        const check = spawnSync('git', ['rev-parse', '--verify', candidate], {
+            cwd: repoRoot, encoding: 'utf8'
+        });
+        if (check.status === 0) return candidate;
+    }
+    return 'main';
+}
+
+function getChangedFiles() {
+    const base = getDefaultBranch();
+    const sets = [];
+    // Uncommitted (staged + unstaged)
+    const uncommitted = spawnSync('git', ['diff', 'HEAD', '--name-only'], {
+        cwd: repoRoot, encoding: 'utf8'
+    });
+    if (uncommitted.status === 0) sets.push(uncommitted.stdout);
+    // Branch diff vs base
+    const branch = spawnSync('git', ['diff', `${base}..HEAD`, '--name-only'], {
+        cwd: repoRoot, encoding: 'utf8'
+    });
+    if (branch.status === 0) sets.push(branch.stdout);
+    // Untracked
+    const untracked = spawnSync('git', ['ls-files', '--others', '--exclude-standard'], {
+        cwd: repoRoot, encoding: 'utf8'
+    });
+    if (untracked.status === 0) sets.push(untracked.stdout);
+    const all = sets.join('\n').split('\n').map(l => l.trim()).filter(Boolean);
+    return [...new Set(all)].sort();
+}
+
+function getCommitMessages() {
+    const base = getDefaultBranch();
+    const log = spawnSync('git', ['log', `${base}..HEAD`, '--format=%s'], {
+        cwd: repoRoot, encoding: 'utf8'
+    });
+    if (log.status !== 0) return [];
+    return log.stdout.split('\n').map(l => l.trim()).filter(Boolean);
+}
+
+function categorizeFiles(files) {
+    const categories = {
+        'UI': [],
+        'Logic': [],
+        'Tests': [],
+        'QMS Docs': [],
+        'Project Docs': [],
+        'Build/Config': []
+    };
+    const rules = [
+        [/^web\/.*\.html$/, 'UI'],
+        [/^web\/images\//, 'UI'],
+        [/^web\/styles\//, 'UI'],
+        [/^web\/scripts\/.*\.js$/, 'Logic'],
+        [/^serve\.js$/, 'Logic'],
+        [/^tests\//, 'Tests'],
+        [/^QMS\//, 'QMS Docs'],
+        [/^(README|CONTRIBUTING|LICENSE|NOTICE|CHANGELOG|instructions)/, 'Project Docs'],
+        [/^package\.json$/, 'Build/Config'],
+        [/^scripts\//, 'Build/Config']
+    ];
+    for (const f of files) {
+        let matched = false;
+        for (const [re, cat] of rules) {
+            if (re.test(f)) {
+                categories[cat].push(f);
+                matched = true;
+                break;
+            }
+        }
+        if (!matched) categories['Build/Config'].push(f);
+    }
+    return categories;
+}
+
+function scanRequirementIds(files) {
+    const base = getDefaultBranch();
+    const ids = new Set();
+    const patterns = ['tests/', 'QMS/'];
+    const relevantFiles = files.filter(f => patterns.some(p => f.startsWith(p)));
+    for (const f of relevantFiles) {
+        const diff = spawnSync('git', ['diff', `${base}..HEAD`, '--', f], {
+            cwd: repoRoot, encoding: 'utf8'
+        });
+        if (diff.status === 0) {
+            const added = diff.stdout.split('\n').filter(l => l.startsWith('+'));
+            for (const line of added) {
+                const matches = line.matchAll(/(SYS-\d+|URS-\d+|HA-\d+)/g);
+                for (const m of matches) ids.add(m[1]);
+            }
+        }
+    }
+    return [...ids].sort();
+}
+
+function generateChangeSummary(commitMessages, categories) {
+    const parts = [];
+    if (commitMessages.length > 0) {
+        parts.push(commitMessages.map(m => `- ${m}`).join('\n'));
+    }
+    const active = Object.entries(categories)
+        .filter(([, files]) => files.length > 0)
+        .map(([cat]) => cat);
+    if (active.length > 0) {
+        parts.push(`\nAffected areas: ${active.join(', ')}.`);
+    }
+    return parts.join('\n') || 'No commit history available on this branch.';
+}
+
+function generateDcrFromGit(dcrFilePath) {
+    const templatePath = path.join(dcrRoot, 'DCR-TEMPLATE.md');
+    if (!fs.existsSync(templatePath)) {
+        console.error(`DCR template not found: ${templatePath}`);
+        return false;
+    }
+    const template = fs.readFileSync(templatePath, 'utf8');
+
+    const basename = path.basename(dcrFilePath, '.md');
+    const idMatch = basename.match(/^(DCR-\d+)/);
+    const dcrId = idMatch ? idMatch[1] : basename;
+    const slugPart = basename.replace(/^DCR-\d+-?/, '');
+    const title = slugPart
+        ? slugPart.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+        : dcrId;
+
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const changedFiles = getChangedFiles();
+    const commits = getCommitMessages();
+    const categories = categorizeFiles(changedFiles);
+    const reqIds = scanRequirementIds(changedFiles);
+
+    const changeSummary = generateChangeSummary(commits, categories);
+
+    // Scope lines
+    const scopeLines = Object.entries(categories).map(([cat, files]) => {
+        if (files.length === 0) return `- ${cat}: (none)`;
+        return `- ${cat}: ${files.join(', ')}`;
+    }).join('\n');
+
+    // Requirements
+    const ursIds = reqIds.filter(id => id.startsWith('URS-'));
+    const sysIds = reqIds.filter(id => id.startsWith('SYS-'));
+    const ursText = ursIds.length > 0 ? ursIds.map(id => `- ${id}`).join('\n') : '- (none detected — review manually)';
+    const sysText = sysIds.length > 0 ? sysIds.map(id => `- ${id}`).join('\n') : '- (none detected — review manually)';
+
+    // Design/Doc updates — only top-level QMS DHF documents, not test evidence artifacts
+    const qmsDocFiles = categories['QMS Docs'].filter(f =>
+        !f.includes('TestEvidence/') && f.endsWith('.md')
+    );
+    const docUpdates = qmsDocFiles.length > 0
+        ? qmsDocFiles.map(f => `- ${path.basename(f, '.md')}`).join('\n')
+        : '- (none detected — review manually)';
+
+    let content = template;
+
+    // Title line
+    content = content.replace(
+        /^# DCR-XXX: Design Change Record$/m,
+        `# ${dcrId}: Design Change Record — ${title}`
+    );
+
+    // Document ID in table
+    content = content.replace(
+        /\| \*\*Document ID\*\* \| DCR-XXX \|/,
+        `| **Document ID** | ${dcrId} |`
+    );
+
+    // Date
+    content = content.replace(
+        /\| \*\*Date Created\*\* \| YYYY-MM-DD \|/,
+        `| **Date Created** | ${dateStr} |`
+    );
+
+    // Change Summary
+    content = content.replace(
+        /Brief, plain-language summary of the change\./,
+        changeSummary
+    );
+
+    // Scope — replace the impacted components block
+    content = content.replace(
+        /\*\*Impacted Components\*\*\n- UI:\n- Logic:\n- Tests:\n- QMS Docs:/,
+        `**Impacted Components**\n${scopeLines}`
+    );
+
+    // Requirements — URS
+    content = content.replace(
+        /\*\*URS Impacted\*\*:\n- URS-XXX/,
+        `**URS Impacted**:\n${ursText}`
+    );
+
+    // Requirements — SRS
+    content = content.replace(
+        /\*\*SRS Impacted\*\*:\n- SYS-XXX/,
+        `**SRS Impacted**:\n${sysText}`
+    );
+
+    // Design/Documentation updates
+    content = content.replace(
+        /List updated documents or design notes\./,
+        docUpdates
+    );
+
+    // Risk Assessment
+    content = content.replace(
+        /State whether RA-001 requires update and why\./,
+        'No new hazards identified. Review RA-001 if scope changes.'
+    );
+
+    // Test Plan Trace
+    content = content.replace(
+        /- TP-XXX/,
+        '- TP-001'
+    );
+
+    ensureDir(path.dirname(dcrFilePath));
+    fs.writeFileSync(dcrFilePath, content, 'utf8');
+    console.log(`Created DCR: ${path.relative(repoRoot, dcrFilePath)}`);
+    return true;
+}
+
 function normalizeDcrPath(dcrArg) {
     if (!dcrArg) return null;
     if (dcrArg.endsWith('.md')) {
@@ -202,6 +433,9 @@ function appendTrRunLog(relativeEvidencePath, statusText, exitCode, cmdText) {
 const relativeEvidencePath = path.relative(repoRoot, runDir);
 if (cliArgs.updateDcr) {
     const resolvedDcr = normalizeDcrPath(cliArgs.dcr) || findSingleDraftDcr();
+    if (resolvedDcr && !fs.existsSync(resolvedDcr) && cliArgs.dcr) {
+        generateDcrFromGit(resolvedDcr);
+    }
     updateDcrEvidence(resolvedDcr, relativeEvidencePath);
 }
 if (cliArgs.updateTr) {

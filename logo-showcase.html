@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WBC ΔΣ — Logo Explorations</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&family=Space+Mono:wght@400;700&family=Instrument+Sans:wght@400;500;600;700&family=Libre+Franklin:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1a1a;
+    --ink-soft: #555;
+    --ink-muted: #888;
+    --surface: #f5f4f1;
+    --surface-warm: #eae7e0;
+    --bauhaus-red: #c1272d;
+    --bauhaus-blue: #1b3a5c;
+    --bauhaus-yellow: #f5b731;
+    --grid-line: rgba(0,0,0,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+
+  .page-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ink-muted);
+    margin-bottom: 48px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--grid-line);
+  }
+
+  /* --- Showcase Cards --- */
+  .card {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.08);
+    margin-bottom: 32px;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  .card-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--ink-muted);
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--grid-line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .card-label .tag {
+    font-size: 9px;
+    background: var(--surface);
+    padding: 3px 8px;
+    border-radius: 2px;
+    color: var(--ink-soft);
+  }
+
+  .card-body {
+    padding: 40px 32px;
+    display: flex;
+    align-items: center;
+    min-height: 120px;
+  }
+
+  .card-body.centered {
+    justify-content: center;
+  }
+
+  .card-body.dark {
+    background: #1a1a1a;
+  }
+
+  .card-body.warm {
+    background: var(--surface-warm);
+  }
+
+  /* --- Logo Lockup Styles --- */
+  .lockup {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    user-select: none;
+  }
+
+  .lockup .text-block {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+  }
+
+  .lockup .primary {
+    font-weight: 700;
+    font-size: 19px;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    font-variant-caps: small-caps;
+  }
+
+  .lockup .secondary {
+    font-weight: 400;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    letter-spacing: 0.01em;
+    margin-top: 1px;
+  }
+
+  /* Dark variant */
+  .dark .lockup .primary { color: #f0efe9; }
+  .dark .lockup .secondary { color: #999; }
+  .dark .lockup svg { color: #f0efe9; }
+
+  /* --- Variation grid --- */
+  .variation-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 32px;
+  }
+
+  .variation-row .card {
+    margin-bottom: 0;
+  }
+
+  /* --- Annotations --- */
+  .annotation {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    padding: 20px 24px;
+    border-top: 1px solid var(--grid-line);
+    background: rgba(0,0,0,0.015);
+  }
+
+  .annotation strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+
+  /* --- Comparison Section --- */
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--ink-muted);
+    margin: 56px 0 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--grid-line);
+  }
+
+  /* --- In-context mock --- */
+  .ui-mock {
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 6px;
+    overflow: hidden;
+    font-family: 'Instrument Sans', sans-serif;
+  }
+
+  .ui-mock-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    background: #fafaf8;
+  }
+
+  .ui-mock-body {
+    padding: 32px 20px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+  }
+
+  .mock-cell-btn {
+    background: var(--surface);
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 4px;
+    padding: 16px 8px;
+    text-align: center;
+    font-family: 'Instrument Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    cursor: default;
+  }
+
+  .mock-cell-btn .count {
+    font-family: 'Space Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .ui-mock-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    font-size: 12px;
+    color: var(--ink-muted);
+    background: #fafaf8;
+  }
+
+  .ui-mock-footer .total {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  /* --- Responsive --- */
+  @media (max-width: 640px) {
+    .page { padding: 32px 20px; }
+    .variation-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="page-title">WBC ΔΣ — Logo Explorations · Bauhaus / Clinical Informatics</div>
+
+  <!-- ===================== -->
+  <!-- A: ORIGINAL SPEC      -->
+  <!-- ===================== -->
+  <div class="card">
+    <div class="card-label">
+      A — Original Spec (from brief)
+      <span class="tag">As specified</span>
+    </div>
+    <div class="card-body centered">
+      <div class="lockup">
+        <!-- Original SVG exactly as specified -->
+        <svg width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: #333;">
+          <g fill="currentColor">
+            <rect x="4" y="6" width="8" height="8"/>
+            <rect x="16" y="10" width="8" height="8"/>
+            <rect x="28" y="6" width="8" height="8"/>
+            <path d="M4 22H36V26L22 30L36 34V38H4V34L18 30L4 26V22Z"/>
+          </g>
+        </svg>
+        <div class="text-block">
+          <span class="primary" style="font-family: 'DM Sans', sans-serif;">WBC&#8201;ΔΣ</span>
+          <span class="secondary">Manual Differential Counter</span>
+        </div>
+      </div>
+    </div>
+    <div class="annotation">
+      The sigma-bar path is inventive but reads a bit heavy at small sizes — the zigzag competes with the keys. The depressed center key idea is strong.
+    </div>
+  </div>
+
+  <!-- ===================== -->
+  <!-- B: REFINED — Lighter Σ -->
+  <!-- ===================== -->
+  <div class="card">
+    <div class="card-label">
+      B — Refined: Lighter Summation Bar
+      <span class="tag">Recommended</span>
+    </div>
+    <div class="card-body centered">
+      <div class="lockup">
+        <svg width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: #333;">
+          <g fill="currentColor">
+            <!-- Three keys: left, center (depressed), right -->
+            <rect x="3" y="5" width="8" height="8" rx="1"/>
+            <rect x="16" y="9" width="8" height="8" rx="1"/>
+            <rect x="29" y="5" width="8" height="8" rx="1"/>
+          </g>
+          <!-- Sigma as a clean stroke, not filled -->
+          <path d="M4 24 L36 24 M4 24 L20 30 L4 36 M4 36 L36 36" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" fill="none" style="color: #333;"/>
+        </svg>
+        <div class="text-block">
+          <span class="primary" style="font-family: 'Libre Franklin', sans-serif; font-weight: 700;">WBC&#8201;ΔΣ</span>
+          <span class="secondary" style="font-family: 'DM Sans', sans-serif;">Manual Differential Counter</span>
+        </div>
+      </div>
+    </div>
+    <div class="annotation">
+      <strong>Key change:</strong> Sigma rendered as open strokes instead of a filled mass. Balances the weight of the three key-squares above. Reads cleanly at 32px. The rx="1" on the keys adds just enough softness to feel manufactured rather than raw.
+    </div>
+  </div>
+
+  <!-- ===================== -->
+  <!-- C & D SIDE BY SIDE    -->
+  <!-- ===================== -->
+  <div class="section-title">Alternatives</div>
+
+  <div class="variation-row">
+    <!-- C: Pure Geometry — no sigma path -->
+    <div class="card">
+      <div class="card-label">
+        C — Reductive: Keys + Line
+      </div>
+      <div class="card-body centered">
+        <div class="lockup">
+          <svg width="38" height="38" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: #333;">
+            <g fill="currentColor">
+              <rect x="3" y="6" width="8" height="8" rx="1"/>
+              <rect x="16" y="10" width="8" height="8" rx="1"/>
+              <rect x="29" y="6" width="8" height="8" rx="1"/>
+              <!-- Simple totalizer bar -->
+              <rect x="3" y="28" width="34" height="3" rx="1"/>
+            </g>
+          </svg>
+          <div class="text-block">
+            <span class="primary" style="font-family: 'Libre Franklin', sans-serif;">WBC&#8201;ΔΣ</span>
+            <span class="secondary">Manual Differential Counter</span>
+          </div>
+        </div>
+      </div>
+      <div class="annotation">
+        Maximum reduction. The bar is a register/accumulator. Clean, but loses the sigma reference.
+      </div>
+    </div>
+
+    <!-- D: Monogram only -->
+    <div class="card">
+      <div class="card-label">
+        D — Typographic: ΔΣ Monogram
+      </div>
+      <div class="card-body centered">
+        <div class="lockup">
+          <div style="width: 38px; height: 38px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; border-radius: 2px;">
+            <span style="font-family: 'Libre Franklin', sans-serif; font-weight: 700; font-size: 18px; color: #f0efe9; letter-spacing: -0.02em;">ΔΣ</span>
+          </div>
+          <div class="text-block">
+            <span class="primary" style="font-family: 'Libre Franklin', sans-serif;">WBC&#8201;ΔΣ</span>
+            <span class="secondary">Manual Differential Counter</span>
+          </div>
+        </div>
+      </div>
+      <div class="annotation">
+        No icon — the Greek letters <em>are</em> the mark. Works if the type is strong enough. Risks reading as "math" more than "tool."
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== -->
+  <!-- DARK + LIGHT           -->
+  <!-- ===================== -->
+  <div class="section-title">Context: Light &amp; Dark</div>
+
+  <div class="variation-row">
+    <div class="card">
+      <div class="card-label">Light surface</div>
+      <div class="card-body centered warm">
+        <div class="lockup">
+          <svg width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: #333;">
+            <g fill="currentColor">
+              <rect x="3" y="5" width="8" height="8" rx="1"/>
+              <rect x="16" y="9" width="8" height="8" rx="1"/>
+              <rect x="29" y="5" width="8" height="8" rx="1"/>
+            </g>
+            <path d="M4 24 L36 24 M4 24 L20 30 L4 36 M4 36 L36 36" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" fill="none" style="color: #333;"/>
+          </svg>
+          <div class="text-block">
+            <span class="primary" style="font-family: 'Libre Franklin', sans-serif; font-size: 16px;">WBC&#8201;ΔΣ</span>
+            <span class="secondary" style="font-size: 10.5px;">Manual Differential Counter</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Dark surface</div>
+      <div class="card-body centered dark">
+        <div class="lockup">
+          <svg width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: #f0efe9;">
+            <g fill="currentColor">
+              <rect x="3" y="5" width="8" height="8" rx="1"/>
+              <rect x="16" y="9" width="8" height="8" rx="1"/>
+              <rect x="29" y="5" width="8" height="8" rx="1"/>
+            </g>
+            <path d="M4 24 L36 24 M4 24 L20 30 L4 36 M4 36 L36 36" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" fill="none" style="color: #f0efe9;"/>
+          </svg>
+          <div class="text-block">
+            <span class="primary" style="font-family: 'Libre Franklin', sans-serif; font-size: 16px; color: #f0efe9;">WBC&#8201;ΔΣ</span>
+            <span class="secondary" style="font-size: 10.5px; color: #999;">Manual Differential Counter</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== -->
+  <!-- IN-CONTEXT MOCK        -->
+  <!-- ===================== -->
+  <div class="section-title">In Context: Application Header</div>
+
+  <div class="card">
+    <div class="card-label">UI Mock — Eukrasia counter interface</div>
+    <div class="card-body" style="padding: 0;">
+      <div class="ui-mock" style="width: 100%;">
+        <div class="ui-mock-header">
+          <div class="lockup" style="gap: 10px;">
+            <svg width="28" height="28" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="color: #333;">
+              <g fill="currentColor">
+                <rect x="3" y="5" width="8" height="8" rx="1"/>
+                <rect x="16" y="9" width="8" height="8" rx="1"/>
+                <rect x="29" y="5" width="8" height="8" rx="1"/>
+              </g>
+              <path d="M4 24 L36 24 M4 24 L20 30 L4 36 M4 36 L36 36" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" fill="none" style="color: #333;"/>
+            </svg>
+            <div class="text-block">
+              <span class="primary" style="font-family: 'Libre Franklin', sans-serif; font-size: 14px;">WBC&#8201;ΔΣ</span>
+              <span class="secondary" style="font-size: 9.5px;">Manual Differential Counter</span>
+            </div>
+          </div>
+          <span style="font-size: 11px; color: var(--ink-muted); font-family: 'Space Mono', monospace;">Case 24-S-1847</span>
+        </div>
+        <div class="ui-mock-body">
+          <div class="mock-cell-btn"><span class="count">23</span>Neut</div>
+          <div class="mock-cell-btn"><span class="count">14</span>Lymph</div>
+          <div class="mock-cell-btn"><span class="count">8</span>Mono</div>
+          <div class="mock-cell-btn"><span class="count">3</span>Eos</div>
+          <div class="mock-cell-btn"><span class="count">1</span>Baso</div>
+          <div class="mock-cell-btn"><span class="count">6</span>Band</div>
+          <div class="mock-cell-btn"><span class="count">2</span>Meta</div>
+          <div class="mock-cell-btn"><span class="count">0</span>Myelo</div>
+          <div class="mock-cell-btn"><span class="count">0</span>Promyelo</div>
+          <div class="mock-cell-btn"><span class="count">0</span>Blast</div>
+        </div>
+        <div class="ui-mock-footer">
+          <span>Σ Counted</span>
+          <span class="total">57 / 100</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

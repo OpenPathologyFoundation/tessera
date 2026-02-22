@@ -1,6 +1,6 @@
 /**
- * Manual Differential Counter (MDC) — Modern Implementation
- * =========================================================
+ * Tessera — Manual Differential Counter
+ * ======================================
  * Implements: URS-001, SRS-001, SDD-001
  * Keyboard-driven differential WBC counting tool for hematology.
  *
@@ -23,11 +23,59 @@
         config: null,              // loaded from templates.json
         counts: {},                // { cellType: number }
         sessionHistory: [],        // array of completed sessions
-        activeTab: 0
+        activeTab: 0,
+        theme: 'dark'
     };
 
     // Default minimum cell counts per specimen type (SYS-052)
     const DEFAULT_MIN = { bm: 200, pb: 100 };
+
+    // Theme selection (light/dark)
+    const THEME_KEY = 'tessera_theme';
+    const THEMES = { dark: 'dark', light: 'light' };
+
+    function getPreferredTheme() {
+        let saved = null;
+        try {
+            saved = sessionStorage.getItem(THEME_KEY);
+        } catch (e) { /* graceful degradation */ }
+        if (saved === THEMES.dark || saved === THEMES.light) return saved;
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+            return THEMES.light;
+        }
+        return THEMES.dark;
+    }
+
+    function applyTheme(theme) {
+        state.theme = theme;
+        document.body.setAttribute('data-theme', theme);
+        updateThemeToggle();
+    }
+
+    function setTheme(theme, persist) {
+        applyTheme(theme);
+        if (persist) {
+            try {
+                sessionStorage.setItem(THEME_KEY, theme);
+            } catch (e) { /* graceful degradation */ }
+        }
+    }
+
+    function toggleTheme() {
+        const next = state.theme === THEMES.dark ? THEMES.light : THEMES.dark;
+        setTheme(next, true);
+    }
+
+    function updateThemeToggle() {
+        const btn = el('btnToggleTheme');
+        const label = el('themeLabel');
+        if (!btn || !label) return;
+        const isLight = state.theme === THEMES.light;
+        label.textContent = isLight ? 'Dark Mode' : 'Light Mode';
+        btn.setAttribute('aria-pressed', String(isLight));
+    }
+
+    applyTheme(getPreferredTheme());
 
     // ================================================================
     // CONFIG LOADER
@@ -55,18 +103,29 @@
     }
 
     // ================================================================
+    // CLIPBOARD SAFETY
+    // ================================================================
+    function clearClipboard() {
+        try {
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+                navigator.clipboard.writeText('').catch(function () { /* best-effort */ });
+            }
+        } catch (e) { /* best-effort */ }
+    }
+
+    // ================================================================
     // SESSION HISTORY (SYS-090 to SYS-095)
     // ================================================================
     function loadSessionHistory() {
         try {
-            const data = sessionStorage.getItem('mdc_history');
+            const data = sessionStorage.getItem('tessera_history');
             if (data) state.sessionHistory = JSON.parse(data);
         } catch (e) { /* graceful degradation */ }
     }
 
     function saveSessionHistory() {
         try {
-            sessionStorage.setItem('mdc_history', JSON.stringify(state.sessionHistory));
+            sessionStorage.setItem('tessera_history', JSON.stringify(state.sessionHistory));
         } catch (e) { /* graceful degradation */ }
     }
 
@@ -88,6 +147,9 @@
         const btnReset = el('btnCountReset');
         const btnCopy = el('btnCopyOutput');
         const btnNewCase = el('btnNewCase');
+        const btnToggleTheme = el('btnToggleTheme');
+        const btnExportCsv = el('btnExportCsv');
+        const btnExportJson = el('btnExportJson');
         const morphField = el('morphComments');
 
         // Case input validation (SYS-003, SYS-005)
@@ -105,6 +167,8 @@
         btnStart.addEventListener('click', function () {
             const caseVal = caseInput.value.trim();
             if (!caseVal) return;
+
+            clearClipboard();
 
             state.caseNumber = caseVal;
             state.specimenType = specSelect.value;
@@ -196,6 +260,35 @@
             resetToStart();
         });
 
+        // Theme toggle
+        if (btnToggleTheme) {
+            btnToggleTheme.addEventListener('click', function () {
+                toggleTheme();
+            });
+        }
+
+        // Export session data (CSV/JSON)
+        if (btnExportCsv) {
+            btnExportCsv.addEventListener('click', function () {
+                exportSessionCsv();
+            });
+        }
+        if (btnExportJson) {
+            btnExportJson.addEventListener('click', function () {
+                exportSessionJson();
+            });
+        }
+
+        // Keyboard shortcut: Ctrl/Cmd + Shift + L
+        document.addEventListener('keydown', function (ev) {
+            if (ev.repeat) return;
+            if (!ev.shiftKey) return;
+            if (!ev.ctrlKey && !ev.metaKey) return;
+            if (String(ev.key).toUpperCase() !== 'L') return;
+            ev.preventDefault();
+            toggleTheme();
+        });
+
         // Morphology comments — keyboard isolation (SYS-073)
         morphField.addEventListener('focus', function () {
             state.commentFieldFocused = true;
@@ -214,6 +307,9 @@
 
         // Render initial history
         renderHistoryList();
+
+        // Sync theme toggle label
+        updateThemeToggle();
 
         // Focus case number input
         caseInput.focus();
@@ -660,6 +756,79 @@
     }
 
     // ================================================================
+    // SESSION EXPORT (CSV / JSON)
+    // ================================================================
+    function exportSessionJson() {
+        if (!state.sessionHistory.length) return;
+        const json = JSON.stringify(state.sessionHistory, null, 2);
+        downloadFile(json, 'application/json', buildExportFilename('json'));
+    }
+
+    function exportSessionCsv() {
+        if (!state.sessionHistory.length) return;
+        const csv = buildSessionCsv(state.sessionHistory);
+        downloadFile(csv, 'text/csv', buildExportFilename('csv'));
+    }
+
+    function buildSessionCsv(sessions) {
+        const headers = [
+            'caseNumber',
+            'specimenType',
+            'specimenLabel',
+            'timestamp',
+            'totalCount',
+            'morphologyComments',
+            'counts',
+            'percentages',
+            'outputs'
+        ];
+        const lines = [headers.join(',')];
+        sessions.forEach(function (session) {
+            const row = [
+                session.caseNumber,
+                session.specimenType,
+                session.specimenLabel,
+                session.timestamp,
+                session.totalCount,
+                session.morphologyComments || '',
+                JSON.stringify(session.counts || {}),
+                JSON.stringify(session.percentages || {}),
+                JSON.stringify(session.outputs || {})
+            ].map(escapeCsv);
+            lines.push(row.join(','));
+        });
+        return lines.join('\n');
+    }
+
+    function escapeCsv(value) {
+        if (value === null || value === undefined) return '';
+        const str = String(value);
+        if (/[",\n]/.test(str)) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+    }
+
+    function downloadFile(content, mimeType, filename) {
+        const blob = new Blob([content], { type: mimeType });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        setTimeout(function () {
+            URL.revokeObjectURL(url);
+            link.remove();
+        }, 0);
+    }
+
+    function buildExportFilename(ext) {
+        const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+        return 'tessera-session-' + stamp + '.' + ext;
+    }
+
+    // ================================================================
     // RESET (SYS-080 to SYS-084)
     // ================================================================
     function resetToStart() {
@@ -735,6 +904,14 @@
         const target = el('phase-' + (phase === 'case-entry' ? 'case-entry' : phase));
         target.classList.remove('hidden');
 
+        // Show header logo only when working (counting/results); hide during welcome
+        var headerLogo = el('header-logo');
+        if (phase === 'case-entry') {
+            headerLogo.classList.add('hidden');
+        } else {
+            headerLogo.classList.remove('hidden');
+        }
+
         // Add counting-active class to body during counting
         if (phase === 'counting') {
             document.body.classList.add('counting-active');
@@ -788,9 +965,8 @@
         el('state-label').textContent = text;
     }
 
-    function setStatusDot(animClass, colorClass) {
-        const dot = el('status-dot');
-        dot.className = 'w-2 h-2 rounded-full ' + colorClass + (animClass ? ' ' + animClass : '');
+    function setStatusDot() {
+        // Status indication handled by state-label text; logo replaces dot.
     }
 
     // ================================================================

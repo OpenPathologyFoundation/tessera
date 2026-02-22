@@ -1,12 +1,12 @@
 # VV-001: Verification & Validation Protocol
 
-## Manual Differential Counter
+## Tessera
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | VV-001 |
 | **Version** | 1.0 |
-| **Product** | Manual Differential Counter (MDC) |
+| **Product** | Tessera |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -16,7 +16,7 @@
 
 ## 1. Purpose
 
-This document defines the verification and validation (V&V) approach for the Manual Differential Counter. Verification demonstrates that the software was built correctly (meets system requirements). Validation demonstrates that the correct software was built (meets user needs in the intended use environment).
+This document defines the verification and validation (V&V) approach for Tessera. Verification demonstrates that the software was built correctly (meets system requirements). Validation demonstrates that the correct software was built (meets user needs in the intended use environment).
 
 ## 2. V&V Framework
 
@@ -260,7 +260,7 @@ System verification confirms that each SRS requirement is met. The following tab
 
 ### 5.1 Validation Objective
 
-Demonstrate that the MDC meets user needs as defined in URS-001 when used by representative clinical users in a simulated clinical environment.
+Demonstrate that Tessera meets user needs as defined in URS-001 when used by representative clinical users in a simulated clinical environment.
 
 ### 5.2 Validation Participants
 

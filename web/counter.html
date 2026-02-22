@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manual Differential Counter</title>
+    <title>Tessera — Manual Differential Counter</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -78,6 +78,38 @@
             user-select: none;
             -webkit-user-select: none;
         }
+        /* Theme: light mode overrides */
+        body[data-theme="light"] {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        body[data-theme="light"] .bg-slate-950 { background-color: #f8fafc !important; }
+        body[data-theme="light"] .bg-slate-900 { background-color: #f1f5f9 !important; }
+        body[data-theme="light"] .bg-slate-900\/95 { background-color: rgba(241, 245, 249, 0.95) !important; }
+        body[data-theme="light"] .bg-slate-800 { background-color: #e2e8f0 !important; }
+        body[data-theme="light"] .bg-slate-800\/50 { background-color: rgba(226, 232, 240, 0.7) !important; }
+        body[data-theme="light"] .bg-slate-800\/30 { background-color: rgba(226, 232, 240, 0.5) !important; }
+        body[data-theme="light"] .bg-slate-700 { background-color: #cbd5e1 !important; }
+        body[data-theme="light"] .bg-slate-700\/50 { background-color: rgba(203, 213, 225, 0.7) !important; }
+        body[data-theme="light"] .bg-slate-600 { background-color: #94a3b8 !important; }
+        body[data-theme="light"] .border-slate-800 { border-color: #e2e8f0 !important; }
+        body[data-theme="light"] .border-slate-800\/50 { border-color: rgba(226, 232, 240, 0.6) !important; }
+        body[data-theme="light"] .border-slate-700 { border-color: #cbd5e1 !important; }
+        body[data-theme="light"] .border-slate-700\/50 { border-color: rgba(203, 213, 225, 0.7) !important; }
+        body[data-theme="light"] .border-slate-600 { border-color: #94a3b8 !important; }
+        body[data-theme="light"] .text-slate-100 { color: #0f172a !important; }
+        body[data-theme="light"] .text-slate-200 { color: #0f172a !important; }
+        body[data-theme="light"] .text-slate-300 { color: #1e293b !important; }
+        body[data-theme="light"] .text-slate-400 { color: #334155 !important; }
+        body[data-theme="light"] .text-slate-500 { color: #475569 !important; }
+        body[data-theme="light"] .text-slate-600 { color: #64748b !important; }
+        body[data-theme="light"] .text-accent { color: #2563eb !important; }
+        body[data-theme="light"] .bg-accent { background-color: #2563eb !important; }
+        body[data-theme="light"] .text-emerald-400 { color: #059669 !important; }
+        body[data-theme="light"] .bg-emerald-500 { background-color: #10b981 !important; }
+        body[data-theme="light"] .placeholder-slate-600::placeholder { color: #94a3b8 !important; }
+        body[data-theme="light"] ::-webkit-scrollbar-track { background: #e2e8f0; }
+        body[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans min-h-screen antialiased">
@@ -87,10 +119,10 @@
     <!-- ============================================================ -->
     <header id="top-bar" class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50">
         <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
-            <!-- Left: App identity -->
-            <div class="flex items-center gap-3 shrink-0">
-                <div class="w-2 h-2 rounded-full bg-accent" id="status-dot"></div>
-                <h1 class="text-sm font-semibold tracking-wide text-slate-300 uppercase">Manual Diff Counter</h1>
+            <!-- Left: App identity (hidden during case-entry, shown during counting/results) -->
+            <div id="header-logo" class="flex items-center shrink-0 hidden">
+                <img src="images/tessera-logo.png" alt="Tessera" class="h-8 w-auto opacity-85 hover:opacity-100 transition-opacity" />
+                <h1 class="sr-only">Tessera</h1>
             </div>
             <!-- Center: Case number (prominent) -->
             <div id="case-badge" class="hidden items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-600 rounded-md">
@@ -101,6 +133,15 @@
             </div>
             <!-- Right: State indicator -->
             <div class="flex items-center gap-3 shrink-0">
+                <button
+                    id="btnToggleTheme"
+                    class="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md text-[11px] font-medium transition-colors"
+                    title="Toggle theme (Ctrl/Cmd+Shift+L)"
+                    aria-pressed="false"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m14.95 6.95-1.41-1.41M7.46 7.46 6.05 6.05m11.9 0-1.41 1.41M7.46 16.54l-1.41 1.41"/></svg>
+                    <span id="themeLabel">Light Mode</span>
+                </button>
                 <span id="state-label" class="text-xs font-medium text-slate-500 uppercase tracking-widest">Ready</span>
             </div>
         </div>
@@ -115,10 +156,12 @@
         <!-- PHASE 1: Case Entry                                       -->
         <!-- ======================================================== -->
         <section id="phase-case-entry" class="animate-in">
-            <div class="max-w-md mx-auto mt-24">
+            <div class="max-w-md mx-auto mt-20">
+                <div class="flex justify-center mb-6">
+                    <img src="images/tessera-logo.png" alt="Tessera" class="h-20 w-auto" />
+                </div>
                 <div class="text-center mb-8">
-                    <h2 class="text-2xl font-light text-slate-300 mb-2">Begin Differential Count</h2>
-                    <p class="text-sm text-slate-500">Enter the case accession number and select specimen type</p>
+                    <h2 class="text-lg font-light text-slate-400">Manual Differential Counter</h2>
                 </div>
                 <div class="space-y-4">
                     <!-- Case number input -->
@@ -263,6 +306,23 @@
                     Session History
                     <span id="history-count" class="text-slate-600">(0)</span>
                 </summary>
+                <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
+                    <span class="text-[11px] text-slate-600">Export session data for a local record.</span>
+                    <div class="flex items-center gap-2">
+                        <button
+                            id="btnExportCsv"
+                            class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md text-[11px] font-medium transition-colors"
+                        >
+                            Export CSV
+                        </button>
+                        <button
+                            id="btnExportJson"
+                            class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md text-[11px] font-medium transition-colors"
+                        >
+                            Export JSON
+                        </button>
+                    </div>
+                </div>
                 <div id="history-list" class="mt-3 space-y-2">
                     <!-- Entries injected by JS -->
                 </div>

@@ -1,12 +1,12 @@
 # RA-001: Risk Analysis - Failure Mode and Effects Analysis (FMEA)
 
-## Manual Differential Counter
+## Tessera
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | RA-001 |
 | **Version** | 1.0 |
-| **Product** | Manual Differential Counter (MDC) |
+| **Product** | Tessera |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -17,7 +17,7 @@
 
 ## 1. Purpose
 
-This document identifies potential failure modes of the Manual Differential Counter, assesses their effects on patient safety and clinical workflow, evaluates risk levels, and defines mitigation controls. The analysis covers software hazards, user interaction hazards, and data integrity hazards.
+This document identifies potential failure modes of Tessera, assesses their effects on patient safety and clinical workflow, evaluates risk levels, and defines mitigation controls. The analysis covers software hazards, user interaction hazards, and data integrity hazards.
 
 ## 2. Scope
 

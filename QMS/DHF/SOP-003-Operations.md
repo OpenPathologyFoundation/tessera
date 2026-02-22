@@ -1,10 +1,10 @@
 # SOP-003: Operations
 
 ## Purpose
-Define standard operating procedures for day-to-day operation, monitoring, and controlled change management of the MDC application.
+Define standard operating procedures for day-to-day operation, monitoring, and controlled change management of the Tessera application.
 
 ## Scope
-Applies to all operational use of MDC in laboratory or clinical environments.
+Applies to all operational use of Tessera in laboratory or clinical environments.
 
 ## Roles and Responsibilities
 - **Operator**: Uses the application for counting tasks.
@@ -34,11 +34,12 @@ Applies to all operational use of MDC in laboratory or clinical environments.
 4) Do not resume use until the issue is triaged and resolved.
 
 ## Change Management
-1) Log proposed changes and rationale.
+1) Create a Design Change Record (DCR) entry in `QMS/DHF/DCR/` with scope and rationale.
 2) Assess impact to requirements, design, and risk.
 3) Update QMS documents as needed.
 4) Implement change with tests and traceability.
-5) Deploy only after verification and approval.
+5) Capture verification evidence using `npm run test:qms` (archives raw output under `QMS/DHF/TestEvidence/` and updates TR-001/DCR).
+6) Deploy only after verification and approval.
 
 ## Training
 - New operators must be trained on keyboard mappings and output interpretation.
@@ -48,4 +49,4 @@ Applies to all operational use of MDC in laboratory or clinical environments.
 - Training records
 - Incident reports
 - Change logs and approvals
-
+- Test evidence archive (`QMS/DHF/TestEvidence/`)

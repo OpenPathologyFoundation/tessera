@@ -1,3 +1,13 @@
+Tessera — Licensing and Trademark Notice
+
+Copyright (c) 2026 Peter Gershkovich.
+
+This repository contains software that is licensed under the Apache License, Version 2.0 (the “License”) below.
+
+IMPORTANT: The Apache-2.0 License applies to the software source code and documentation in this repository unless a file or directory states otherwise.
+
+TRADEMARKS / BRANDING: The name “Tessera” and all associated logos, marks, and brand assets are not licensed for use under the Apache-2.0 License. This includes, without limitation, the logo image at `assets/card.png` and any other branding assets under `assets/` intended for identification/branding. You may make reasonable and customary use of the name “Tessera” solely to describe the origin of the Work, consistent with Section 6 (Trademarks) of the Apache-2.0 License below. Any other use of the name, logo, or brand assets (including use in product names, marketing, or to imply endorsement) requires prior written permission from the copyright/trademark owner.
+
                                  Apache License
                            Version 2.0, January 2004
                         http://www.apache.org/licenses/

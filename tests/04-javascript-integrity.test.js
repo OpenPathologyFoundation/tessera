@@ -164,6 +164,18 @@ describe('JavaScript — Copy to Clipboard (SYS-065, SYS-066)', () => {
     });
 });
 
+describe('JavaScript — Clipboard Safety', () => {
+
+    it('Clears clipboard on new case start', () => {
+        const clearHelperPattern = /function\s+clearClipboard\s*\(/;
+        assert.ok(clearHelperPattern.test(jsCode), 'Must define clearClipboard helper');
+        const clearWritePattern = /clipboard\.writeText\(\s*['"]\s*['"]\s*\)/;
+        assert.ok(clearWritePattern.test(jsCode), 'Must clear clipboard contents');
+        const startHandlerPattern = /btnStart[\s\S]*addEventListener\(['"]click['"][\s\S]*clearClipboard\(\)/;
+        assert.ok(startHandlerPattern.test(jsCode), 'Must clear clipboard on new case start');
+    });
+});
+
 describe('JavaScript — Session History (SYS-090, SYS-095)', () => {
 
     it('Uses sessionStorage (not localStorage) for history (SYS-095)', () => {
@@ -174,12 +186,47 @@ describe('JavaScript — Session History (SYS-090, SYS-095)', () => {
     });
 
     it('Saves to sessionStorage with a key prefix', () => {
-        assert.ok(jsCode.includes('mdc_history'), 'Must use mdc_history key');
+        assert.ok(jsCode.includes('tessera_history'), 'Must use tessera_history key');
     });
 
     it('Has try/catch around sessionStorage operations (graceful degradation)', () => {
         // Count try blocks near sessionStorage
         assert.ok(jsCode.includes('try'), 'Must have try/catch for storage operations');
+    });
+});
+
+describe('JavaScript — Session Export', () => {
+
+    it('Defines export handlers for CSV and JSON', () => {
+        assert.ok(jsCode.includes('btnExportCsv'), 'Must reference Export CSV button');
+        assert.ok(jsCode.includes('btnExportJson'), 'Must reference Export JSON button');
+        assert.ok(jsCode.includes('exportSessionCsv'), 'Must define exportSessionCsv');
+        assert.ok(jsCode.includes('exportSessionJson'), 'Must define exportSessionJson');
+    });
+
+    it('Creates downloadable files using Blob and object URLs', () => {
+        assert.ok(jsCode.includes('new Blob'), 'Must create Blob for downloads');
+        assert.ok(jsCode.includes('URL.createObjectURL'), 'Must create object URL');
+        assert.ok(jsCode.includes('download'), 'Must set download attribute');
+    });
+});
+
+describe('JavaScript — Theme Toggle', () => {
+
+    it('Defines theme toggle controls and storage key', () => {
+        assert.ok(jsCode.includes('btnToggleTheme'), 'Must reference theme toggle button');
+        assert.ok(jsCode.includes('toggleTheme'), 'Must define toggleTheme');
+        assert.ok(jsCode.includes('tessera_theme'), 'Must define theme storage key');
+        const themeKeyPattern = /THEME_KEY\s*=\s*['"]tessera_theme['"]/;
+        const themeSetPattern = /sessionStorage\.setItem\(\s*THEME_KEY/;
+        const themeGetPattern = /sessionStorage\.getItem\(\s*THEME_KEY/;
+        assert.ok(themeKeyPattern.test(jsCode), 'Must define THEME_KEY as tessera_theme');
+        assert.ok(themeSetPattern.test(jsCode), 'Must persist theme in sessionStorage');
+        assert.ok(themeGetPattern.test(jsCode), 'Must read theme from sessionStorage');
+    });
+
+    it('Applies data-theme attribute for light/dark modes', () => {
+        assert.ok(jsCode.includes('data-theme'), 'Must set data-theme attribute');
     });
 });
 

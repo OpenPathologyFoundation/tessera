@@ -1,12 +1,12 @@
 # TP-001: Test Plan
 
-## Manual Differential Counter
+## Tessera
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | TP-001 |
 | **Version** | 1.0 |
-| **Product** | Manual Differential Counter (MDC) |
+| **Product** | Tessera |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -16,7 +16,7 @@
 
 ## 1. Purpose
 
-This document defines the test strategy, test cases, acceptance criteria, and pass/fail criteria for verifying the Manual Differential Counter against the System Requirements Specification (SRS-001). Testing shall demonstrate that the software meets all functional, performance, and safety requirements.
+This document defines the test strategy, test cases, acceptance criteria, and pass/fail criteria for verifying Tessera against the System Requirements Specification (SRS-001). Testing shall demonstrate that the software meets all functional, performance, and safety requirements.
 
 ## 2. Scope
 
@@ -172,7 +172,7 @@ All other tests are **Priority 3**.
 | TC-072 | Comments accept 500 characters | SYS-071 | - | P3 | 1. Enter 500-character string. | All characters accepted. | |
 | TC-073 | Comments cleared on reset | SYS-082 | - | P3 | 1. Enter comment. 2. Reset. | Comment field is empty. | |
 
-### 5.9 Session History Tests (TC-090 through TC-095)
+### 5.9 Session History Tests (TC-090 through TC-096)
 
 | TC ID | Test Case | SRS Trace | FMEA Trace | Priority | Steps | Expected Result | Pass/Fail |
 |-------|----------|-----------|------------|----------|-------|-----------------|-----------|
@@ -181,6 +181,8 @@ All other tests are **Priority 3**.
 | TC-092 | Multiple sessions in history | SYS-090 | - | P3 | 1. Complete 3 different cases. 2. Check history. | All 3 entries present in order. | |
 | TC-093 | Session history persists on page reload | SYS-095 | - | P3 | 1. Complete a count. 2. Reload page. 3. Check history. | Previous session(s) still in history (from sessionStorage). | |
 | TC-094 | Temporary data notice displayed | SYS-094 | - | P3 | 1. Open session history. | Notice about data being temporary visible. | |
+| TC-095 | Export session history to JSON | SYS-096, SYS-097 | - | P3 | 1. Complete a count. 2. Click Export JSON. 3. Open downloaded file. | JSON file downloads and contains session fields (case number, specimen, timestamp, totals, counts, percentages, comments, outputs). | |
+| TC-096 | Export session history to CSV | SYS-096, SYS-097 | - | P3 | 1. Complete a count. 2. Click Export CSV. 3. Open downloaded file. | CSV file downloads and contains session fields for each case. | |
 
 ### 5.10 Cross-Browser Tests (TC-100 through TC-105)
 
@@ -200,6 +202,14 @@ All other tests are **Priority 3**.
 | TC-112 | Output rendering < 500ms | SYS-P03 | console.time() around countDone | All templates rendered within 500ms. | |
 | TC-113 | 9999-cell count without degradation | SYS-P04 | Automated key injection | Application responsive. All calculations correct. | |
 
+### 5.12 Presentation & Theme Tests (TC-120 through TC-122)
+
+| TC ID | Test Case | SRS Trace | Method | Expected Result | Pass/Fail |
+|-------|----------|-----------|--------|-----------------|-----------|
+| TC-120 | Theme toggle control switches between light and dark | SYS-110 | UI | Clicking the theme button changes the UI palette without altering counts or session data. | |
+| TC-121 | Theme toggle shortcut (Ctrl/Cmd+Shift+L) works | SYS-111 | UI | Shortcut toggles theme and does not interfere with counting keys. | |
+| TC-122 | Theme persists for session | SYS-112 | UI | Refreshing the page retains the selected theme within the same browser session. | |
+
 ---
 
 ## 6. Pass/Fail Criteria
@@ -217,10 +227,11 @@ All other tests are **Priority 3**.
 
 | Priority | Count | Required Pass Rate |
 |----------|-------|-------------------|
-| P1 (Safety-critical) | 27 | 100% |
-| P2 (Important) | 23 | 95% |
-| P3 (Standard) | 18 | 90% |
-| **Total** | **68** | |
+| P1 (Safety-critical) | 24 | 100% |
+| P2 (Important) | 24 | 95% |
+| P3 (Standard) | 25 | 90% |
+| Informational (no priority assigned) | 11 | N/A |
+| **Total** | **84** | |
 
 ---
 
@@ -237,6 +248,9 @@ All other tests are **Priority 3**.
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete test plan |
+| B | 2026-02-19 | QMS | Added session export test cases |
+| C | 2026-02-20 | QMS | Added theme toggle test cases |
+| D | 2026-02-20 | QMS | Updated test counts and prioritization summary |
 
 ## 9. Approval Signatures
 

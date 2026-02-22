@@ -1,12 +1,12 @@
 # URS-001: User Requirements Specification
 
-## Manual Differential Counter
+## Tessera
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | URS-001 |
 | **Version** | 1.0 |
-| **Product** | Manual Differential Counter (MDC) |
+| **Product** | Tessera |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -15,11 +15,11 @@
 
 ## 1. Purpose
 
-This document defines the user requirements for the Manual Differential Counter (MDC) software application. Requirements are derived from clinical workflow analysis, regulatory standards, and laboratory best practices. Each requirement is assigned a unique identifier, priority, and rationale.
+This document defines the user requirements for the Tessera software application (a manual differential counter). Requirements are derived from clinical workflow analysis, regulatory standards, and laboratory best practices. Each requirement is assigned a unique identifier, priority, and rationale.
 
 ## 2. Scope
 
-This URS covers all user-facing functionality of the MDC including specimen identification, cell counting, calculation, output generation, data integrity, and usability requirements.
+This URS covers all user-facing functionality of Tessera including specimen identification, cell counting, calculation, output generation, data integrity, and usability requirements.
 
 ## 3. Users and Stakeholders
 
@@ -132,6 +132,7 @@ This URS covers all user-facing functionality of the MDC including specimen iden
 | URS-081 | The system SHALL provide a session history showing case numbers and completion status. | **P2 - Medium** | Helps operator track which cases have been counted during a shift. |
 | URS-082 | The system SHALL allow retrieval of a completed count from session history for review (read-only). | **P2 - Medium** | Enables review without risk of modification. |
 | URS-083 | The system SHALL clearly indicate that session data does not persist beyond the browser session. | **P1 - High** | Manages user expectations; makes it clear that this is a counting aid, not a permanent record system. |
+| URS-084 | The system SHALL allow the user to export the current session history to local files in CSV and JSON formats. | **P1 - High** | Provides a local record for QC review, documentation, and continuity when the session ends. |
 
 ### 5.10 Usability and Accessibility
 
@@ -142,6 +143,7 @@ This URS covers all user-facing functionality of the MDC including specimen iden
 | URS-092 | The system SHALL display clear instructions guiding the user through the counting workflow. | **P1 - High** | Reduces training time and prevents procedural errors, especially for infrequent users. |
 | URS-093 | The system SHALL be compatible with standard web browsers (Chrome, Firefox, Edge) without plugins. | **P1 - High** | Institutional IT policies often restrict software installation. Browser-based deployment minimizes IT friction. |
 | URS-094 | The system SHALL not require an internet connection for counting operations after initial page load. | **P2 - Medium** | Laboratory workstations may have restricted or unreliable internet access. |
+| URS-095 | The system SHALL provide both Light and Dark presentation themes and allow the user to switch between them via an on-screen control and a keyboard shortcut that does not interfere with counting. | **P1 - High** | Bright laboratory lighting can make dark UIs fatiguing; fast theme switching improves ergonomics without disrupting workflow. |
 
 ### 5.11 Configuration
 
@@ -162,7 +164,7 @@ The following capabilities were considered but are explicitly out of scope for t
 | LIS/EMR Integration | Direct electronic transmission of results to LIS via HL7/FHIR | Requires institution-specific interface development; copy-to-clipboard provides interim solution |
 | User Authentication | Login/password for operator identification | Application is a personal aid; operator ID can be captured without full auth system |
 | Long-term Data Persistence | Database storage of historical counts | Requires server infrastructure; session storage provides adequate short-term history |
-| Automated Cell Recognition | AI/ML-based cell identification | Fundamentally different product; MDC is a manual counting aid |
+| Automated Cell Recognition | AI/ML-based cell identification | Fundamentally different product; Tessera is a manual counting aid |
 | Reference Range Flagging | Automatic flagging of abnormal percentages | Deferred to v2.0; requires institution-specific reference range configuration |
 | Electronic Signatures | 21 CFR Part 11 compliant digital signatures | Requires identity management infrastructure |
 | Multi-user Collaboration | Simultaneous access to the same case | Not consistent with manual counting workflow |
@@ -183,6 +185,7 @@ A summary of the key acceptance criteria that must be met for the system to be c
 8. All output reports include case number, total count, and per-cell percentages
 9. Reset requires confirmation when count data exists
 10. The application functions without error in Chrome, Firefox, and Edge
+11. User can switch between light and dark themes via control or shortcut without disrupting counting
 
 ---
 
@@ -191,6 +194,8 @@ A summary of the key acceptance criteria that must be met for the system to be c
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete user requirements defined |
+| B | 2026-02-19 | QMS | Added session export requirement for local record |
+| C | 2026-02-20 | QMS | Added theme switch requirement for ergonomic presentation |
 
 ## 9. Approval Signatures
 

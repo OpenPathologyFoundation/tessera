@@ -1,12 +1,12 @@
 # RTM-001: Requirements Traceability Matrix
 
-## Manual Differential Counter
+## Tessera
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | RTM-001 |
 | **Version** | 1.0 |
-| **Product** | Manual Differential Counter (MDC) |
+| **Product** | Tessera |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -122,6 +122,7 @@ URS (User Need) → SRS (System Req) → SDD (Design) → TP/VV (Verification)
 | URS-081 | Session history list | SYS-092 | 3.4.6 | - | TC-090 | Full |
 | URS-082 | Read-only history review | SYS-093 | 3.4.6 | - | TC-091 | Full |
 | URS-083 | Indicate temporary nature of data | SYS-094 | 3.4.6 | - | TC-094 | Full |
+| URS-084 | Export session history to local files | SYS-096, SYS-097 | 3.4.6 | - | TC-095, TC-096 | Full |
 
 ### 3.10 Usability
 
@@ -132,6 +133,7 @@ URS (User Need) → SRS (System Req) → SDD (Design) → TP/VV (Verification)
 | URS-092 | Clear instructions | SYS-070 (instructions) | 3.4.4 | - | Validation V1 | Full |
 | URS-093 | Cross-browser support | SYS-I01, SYS-I02, SYS-I03 | 5.1 Tech Stack | - | TC-100, TC-101, TC-102 | Full |
 | URS-094 | Offline operation after load | SYS-I04 | 5.1 | - | TC-103 | Full |
+| URS-095 | Theme toggle for ergonomic presentation | SYS-110, SYS-111, SYS-112 | 3.4.7 | - | TC-120, TC-121, TC-122 | Full |
 
 ### 3.11 Configuration
 
@@ -162,7 +164,7 @@ All orphan SRS requirements are justified as derived requirements from regulator
 
 ### 4.2 URS Requirements Without SRS Coverage (Gaps)
 
-**None identified.** All 47 URS requirements have at least one corresponding SRS requirement.
+**None identified.** All 49 URS requirements have at least one corresponding SRS requirement.
 
 ### 4.3 SRS Requirements Without Test Coverage (Untested)
 
@@ -207,10 +209,10 @@ All orphan SRS requirements are justified as derived requirements from regulator
 
 | Dimension | Items | Covered | Coverage |
 |-----------|-------|---------|----------|
-| URS → SRS | 47 URS requirements | 47 | **100%** |
-| SRS → Test | 88 SRS requirements | 88 | **100%** |
+| URS → SRS | 49 URS requirements | 49 | **100%** |
+| SRS → Test | 93 SRS requirements | 93 | **100%** |
 | FMEA → Test | 22 hazards | 22 | **100%** |
-| URS → Validation | 47 URS requirements | 47 (via validation scenarios + system tests) | **100%** |
+| URS → Validation | 49 URS requirements | 49 (via validation scenarios + system tests) | **100%** |
 
 **Conclusion**: Full bidirectional traceability is established. No gaps, no orphans without justification, no untested requirements.
 
@@ -221,6 +223,8 @@ All orphan SRS requirements are justified as derived requirements from regulator
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete RTM |
+| B | 2026-02-19 | QMS | Added session export traceability |
+| C | 2026-02-20 | QMS | Added theme toggle traceability |
 
 ## 8. Approval Signatures
 

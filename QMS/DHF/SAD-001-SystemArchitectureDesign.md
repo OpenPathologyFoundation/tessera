@@ -1,12 +1,12 @@
 # SAD-001: System Architecture Design
 
-## Manual Differential Counter
+## Tessera
 
 | Field | Value |
 |-------|-------|
 | **Document ID** | SAD-001 |
 | **Version** | 1.0 |
-| **Product** | Manual Differential Counter (MDC) |
+| **Product** | Tessera |
 | **Date Created** | 2026-02-18 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
@@ -16,11 +16,11 @@
 
 ## 1. Purpose
 
-This document describes the high-level system architecture of the Manual Differential Counter application. It defines the software architecture, component decomposition, data flows, technology stack, and design rationale.
+This document describes the high-level system architecture of the Tessera application. It defines the software architecture, component decomposition, data flows, technology stack, and design rationale.
 
 ## 2. Architecture Overview
 
-The MDC is a single-page web application (SPA) implemented as a client-side MVC application using Backbone.js. All business logic, calculation, and rendering execute in the browser. There is no application server, database, or network API. The web server (Java Servlet container) serves static assets only.
+Tessera is a single-page web application (SPA) implemented as a client-side MVC application using Backbone.js. All business logic, calculation, and rendering execute in the browser. There is no application server, database, or network API. The web server (Java Servlet container) serves static assets only.
 
 ### 2.1 Architecture Pattern
 

@@ -5,12 +5,13 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | RA-001 |
-| **Version** | 1.0 |
+| **Version** | 2.0 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
+| **Date Revised** | 2026-02-24 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
-| **Input Documents** | URS-001, SRS-001, SAD-001, SDD-001 |
+| **Input Documents** | URS-001 v2.0, SRS-001 v2.0, SAD-001 v2.0, SDD-001 v2.0 |
 | **Risk Standard** | ISO 14971:2019 - Application of Risk Management to Medical Devices |
 
 ---
@@ -78,20 +79,20 @@ This FMEA covers all software functionality described in the SRS and SDD, focusi
 
 | # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
 |---|-------------|-----------------|---|-------|---|-----------------|---|-----|-----------|----------------------------|-------------|
-| HA-001 | Count performed without case/accession number | Results cannot be traced to patient; result applied to wrong patient | 5 | User forgets to enter case number; UI does not enforce | 4 | **None (current design)** | 5 | **100** | **Critical** | SYS-003: Disable Start Count when case field is empty. SYS-004: Prominent case display. | 5x1x1 = **5** (Low) |
+| HA-001 | Count performed without case/accession number | Results cannot be traced to patient; result applied to wrong patient | 5 | User does not enter case number; case number not required by default configuration | 4 | **None (current design)** | 5 | **100** | **Critical** | URS-004/SYS-003: Case number is configurable per institutional profile (default: not required). Physical context at the microscope identifies the specimen. Institutions requiring traceability can set `requireCaseNumber: true`. SYS-004: Prominent case display when entered. SYS-067: Output handles absent case number gracefully. | 5x3x3 = **45** (Medium). **Accepted** by design — stakeholder feedback confirms physical context identifies specimen; forcing case number kills adoption. |
 | HA-002 | Wrong case number entered | Results attributed to wrong patient | 5 | Operator transcription error | 3 | Human verification against slide label | 3 | **45** | **Medium** | SYS-004: Persistent case number display for continuous verification. SOP instruction to verify against slide label. | 5x3x2 = **30** (Medium) |
-| HA-003 | Data from previous case carries over to new case | Contaminated result: percentages reflect two different patients | 5 | Application does not clear data on case change | 3 | **None (current design - page reload is the only reset)** | 4 | **60** | **High** | SYS-006: Automatic data clear on case number change with confirmation. SYS-082: Complete state reset. | 5x1x1 = **5** (Low) |
-| HA-004 | Case number not included in output | Printed/pasted result not traceable to patient | 4 | Output templates do not include case number placeholder | 3 | **None (current design)** | 3 | **36** | **Medium** | SYS-067: Case number is first element in all output text. Template schema requires {{caseNumber}}. | 4x1x1 = **4** (Low) |
+| HA-003 | Data from previous case carries over to new case | Contaminated result: percentages reflect two different patients | 5 | Application does not clear data on case change | 3 | **None (current design - page reload is the only reset)** | 4 | **60** | **High** | SYS-006: Automatic data clear on case number change with confirmation. SYS-082: Complete state reset (including case number field clear). | 5x1x1 = **5** (Low) |
+| HA-004 | Case number not included in output | Printed/pasted result not traceable to patient | 4 | Output templates do not include case number placeholder | 3 | **None (current design)** | 3 | **36** | **Medium** | SYS-067: Case number is first element in all output text when present. Template schema requires {{caseNumber}}. Output handles absent case number gracefully. | 4x1x1 = **4** (Low) |
 
 ### 4.2 Counting Accuracy Hazards
 
 | # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
 |---|-------------|-----------------|---|-------|---|-----------------|---|-----|-----------|----------------------------|-------------|
-| HA-010 | Keypress registers to wrong cell type | Incorrect differential percentages | 4 | Key mapping error in configuration; key mapping display mismatch | 2 | Configuration loaded from verified JSON file | 3 | **24** | **Medium** | SYS-038/039: Verified key mappings. TP-TC-030: Key mapping verification tests for every key. | 4x1x1 = **4** (Low) |
+| HA-010 | Keypress registers to wrong cell type | Incorrect differential percentages | 4 | Key mapping error in configuration; key mapping display mismatch | 2 | Configuration loaded from verified JSON file | 3 | **24** | **Medium** | SYS-038: Unified verified key mappings (same keys for BM and PB). TP-TC-030: Key mapping verification tests for every key. Note: unified mapping across specimen types reduces risk of mode-dependent confusion. | 4x1x1 = **4** (Low) |
 | HA-011 | Keypress not registered (missed count) | Undercounting of a cell type; skewed percentages | 3 | Rapid typing outpacing event loop; key debounce issue | 3 | **None (no feedback for missed keys)** | 4 | **36** | **Medium** | SYS-037: Visual flash feedback on each keypress. SYS-P02: <50ms keypress-to-update latency requirement. | 3x2x2 = **12** (Low) |
 | HA-012 | Double keypress registers (extra count) | Overcounting of a cell type; skewed percentages | 3 | Key repeat from held key; bounce on mechanical keyboard | 3 | None | 3 | **27** | **Medium** | SYS-032: Shift+key decrement allows correction. Keyboard repeat is OS-controlled; documented in SOP. | 3x2x2 = **12** (Low) |
 | HA-013 | Unable to correct a miscount (no undo) | Operator must restart count or accept inaccurate result | 4 | **No decrement function exists in current design** | 5 | **None** | 1 | **20** | **Medium** | SYS-032: Shift+key decrement. SYS-033: Floor at zero. | 4x1x1 = **4** (Low) |
-| HA-014 | Count performed on wrong specimen type (BM vs PB) | Completely invalid differential with wrong cell categories | 5 | Operator selects wrong specimen type; specimen type changes mid-count | 2 | Dropdown selector visible on screen | 3 | **30** | **Medium** | SYS-016: Lock specimen selector after Start Count. SYS-004: Display specimen type alongside case number. | 5x1x2 = **10** (Low) |
+| HA-014 | Count performed on wrong specimen type (BM vs PB) | Wrong specimen type selection has lower impact since unified keyboard mapping means the same 14 cell types are counted regardless of specimen type | 5 | Operator selects wrong specimen type; specimen type changes mid-count | 2 | Dropdown selector visible on screen | 3 | **30** | **Medium** | SYS-016: Lock specimen selector after Start Count. SYS-004: Display specimen type alongside case number. SYS-027: Upper row flagging provides visual cue for PB mode. Note: unified cell types reduce downstream impact — percentages remain valid for the cells actually counted. | 5x1x2 = **10** (Low) |
 | HA-015 | Counting continues after operator intends to stop | Extra cells counted, changing percentages | 3 | Accidental keypresses after mentally completing count | 4 | None | 3 | **36** | **Medium** | SYS-054: Detach keydown listener on Count Done. SYS-055: Lock inputs to readonly. | 3x1x2 = **6** (Low) |
 
 ### 4.3 Calculation Hazards
@@ -108,7 +109,7 @@ This FMEA covers all software functionality described in the SRS and SDD, focusi
 
 | # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
 |---|-------------|-----------------|---|-------|---|-----------------|---|-----|-----------|----------------------------|-------------|
-| HA-030 | Count finalized with too few cells | Statistically invalid differential; misleading percentages | 4 | Operator clicks Count Done prematurely; inadequate specimen | 4 | **None (current design has no minimum check)** | 4 | **64** | **High** | SYS-052/053: Configurable minimum threshold. Warning dialog with explicit override. Total count displayed at all times. | 4x2x2 = **16** (Medium) |
+| HA-030 | Count finalized with too few cells | Statistically invalid differential; misleading percentages | 4 | Operator clicks Count Done prematurely; inadequate specimen | 4 | **None (current design has no minimum check)** | 4 | **64** | **High** | SYS-052/053: Advisory target count (BM=500, PB=200) displayed via progress indicator. Non-blocking informational note when below target. SYS-120/121: Progress indicator shows current/target in real time. SYS-057/058: Continue Counting allows adding more cells after reviewing interim results. | 4x3x2 = **24** (Medium). **Accepted** — pathologists know when specimens are paucicellular; advisory approach matches clinical workflow. |
 | HA-031 | Count modified after finalization | Reported result no longer matches output | 4 | Inputs remain editable after Count Done | 3 | **None (current design does not lock inputs)** | 4 | **48** | **Medium** | SYS-055: Set all inputs to readonly after Count Done. SYS-054: Detach keydown listener. | 4x1x2 = **8** (Low) |
 
 ### 4.5 Data Loss Hazards
@@ -135,6 +136,14 @@ This FMEA covers all software functionality described in the SRS and SDD, focusi
 | HA-061 | templates.json contains invalid data | Unexpected behavior; wrong cell types; crashes | 4 | Manual edit error; file corruption | 2 | None (no schema validation) | 3 | **24** | **Medium** | SYS-102/103: Schema validation on load. Reject and display error for invalid config. | 4x1x2 = **8** (Low) |
 | HA-062 | Key mapping in config conflicts (two cells same key) | One cell type overwritten; never counted | 5 | Configuration editing error | 1 | None | 3 | **15** | **Low** | Schema validation: check for duplicate keys. TP-TC-100: Config validation test. | 5x1x1 = **5** (Low) |
 
+### 4.8 M:E Ratio and Continue Counting Hazards
+
+| # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
+|---|-------------|-----------------|---|-------|---|-----------------|---|-----|-----------|----------------------------|-------------|
+| HA-070 | M:E ratio displays incorrect value | Incorrect myeloid-to-erythroid ratio reported in output; could affect interpretation of marrow cellularity | 3 | Software bug in formula engine; incorrect config formula definition | 2 | M:E ratio is secondary to differential percentages; pathologist reviews in context | 2 | **12** | **Low** | SYS-046: Formula engine defined. VV tests verify M:E computation with known inputs. Config schema validates formula definition. "N/A" displayed when denominator is zero. | 3x1x1 = **3** (Low) |
+| HA-071 | Counts altered or lost when resuming from results to counting | Final differential percentages differ from what operator verified in results | 4 | Software bug in resume function; state serialization error | 2 | Resume function preserves counts in memory; no serialization boundary | 2 | **16** | **Medium** | SYS-057/058: Continue Counting preserves all tallies. Test VV-E2E verifies count preservation across resume cycle. UI displays restored counts for operator verification. | 4x1x2 = **8** (Low) |
+| HA-072 | M:E ratio displays error/crash when no erythroid cells counted | Application error or confusing display | 2 | Denominator zero when no erythroid cells counted; common in PB counts and early BM counts | 3 | Always detected: "N/A" or error is visible | 1 | **6** | **Low** | SYS-046: Denominator-zero guard displays "N/A". PB config has no M:E formula. | 2x1x1 = **2** (Low) |
+
 ---
 
 ## 5. Risk Summary
@@ -145,8 +154,8 @@ This FMEA covers all software functionality described in the SRS and SDD, focusi
 |-----------|-------|-----------|
 | Critical (75-125) | 1 | HA-001 |
 | High (50-74) | 2 | HA-003, HA-030 |
-| Medium (16-49) | 13 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-022, HA-024, HA-031, HA-042, HA-052, HA-061 |
-| Low (1-15) | 6 | HA-021, HA-023, HA-040, HA-041, HA-050, HA-051, HA-060, HA-062 |
+| Medium (16-49) | 14 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-022, HA-024, HA-031, HA-042, HA-052, HA-061, HA-071 |
+| Low (1-15) | 8 | HA-021, HA-023, HA-040, HA-041, HA-050, HA-051, HA-060, HA-062, HA-070, HA-072 |
 
 ### 5.2 Post-Mitigation Risk Distribution
 
@@ -154,14 +163,15 @@ This FMEA covers all software functionality described in the SRS and SDD, focusi
 |-----------|-------|
 | Critical (75-125) | **0** |
 | High (50-74) | **0** |
-| Medium (16-49) | **2** (HA-002, HA-030) |
-| Low (1-15) | **20** |
+| Medium (16-49) | **3** (HA-001 RPN=45, HA-002 RPN=30, HA-030 RPN=24) |
+| Low (1-15) | **22** |
 
 ### 5.3 Residual Risk Assessment
 
 After implementation of all defined mitigations:
+- **HA-001** (count without case number) remains Medium (RPN=45) because case number is optional by design. Physical context at the microscope identifies the specimen. Institutions requiring traceability can enable `requireCaseNumber: true` in their profile. **Accepted** by design — stakeholder feedback confirms physical context identifies specimen; forcing case number kills adoption.
 - **HA-002** (wrong case number entered) remains Medium (RPN=30) because this is fundamentally a human transcription error that cannot be fully prevented by software. Mitigation reduces probability through persistent display but cannot eliminate the root cause. **Accepted** with SOP mitigation (verification against slide label).
-- **HA-030** (insufficient cell count) remains Medium (RPN=16) because the override mechanism intentionally allows subthreshold counts for hypocellular specimens. **Accepted** as clinically necessary with warning dialog providing informed override.
+- **HA-030** (insufficient cell count) remains Medium (RPN=24) because the advisory approach intentionally allows subthreshold counts for paucicellular specimens. The progress indicator makes the target visible at all times, and Continue Counting enables recovery without restarting. **Accepted** — pathologists know when specimens are paucicellular; advisory approach matches clinical workflow.
 
 **Overall residual risk is acceptable** when combined with trained operator use per SOP-001.
 
@@ -173,15 +183,17 @@ After implementation of all defined mitigations:
 
 | Change | Addresses | Priority |
 |--------|----------|----------|
-| Add mandatory case number input with validation | HA-001, HA-004 | P0 |
+| Configurable case number with institutional profile support (default: not required) | HA-001, HA-004 | P0 |
 | Add auto-clear on case number change | HA-003 | P0 |
 | Add Shift+key decrement (undo) | HA-013 | P0 |
-| Add minimum cell count threshold check | HA-030 | P0 |
+| Advisory target count with progress indicator and non-blocking note | HA-030 | P0 |
 | Add post-completion input locking | HA-015, HA-031 | P1 |
 | Add reset confirmation dialog | HA-040 | P1 |
 | Add copy-to-clipboard function | HA-042 | P1 |
 | Add visual keypress feedback | HA-011 | P1 |
 | Add morphology comments field with output integration | HA-052 | P1 |
+| Implement M:E ratio with denominator-zero guard | HA-070, HA-072 | P1 |
+| Implement Continue Counting with tally preservation | HA-071 | P1 |
 | Add configuration schema validation | HA-061, HA-062 | P2 |
 
 ---
@@ -191,6 +203,7 @@ After implementation of all defined mitigations:
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete FMEA |
+| B | 2026-02-24 | QMS | v2.0 update: optional case number (HA-001), advisory target count replacing blocking dialog (HA-030), unified key mappings (HA-010), new hazards for M:E ratio (HA-070, HA-072) and Continue Counting (HA-071), updated risk summary |
 
 ## 8. Approval Signatures
 

@@ -5,12 +5,13 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SDD-001 |
-| **Version** | 1.0 |
+| **Version** | 2.0 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
+| **Date Revised** | 2026-02-24 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
-| **Input Documents** | URS-001, SRS-001, SAD-001 |
+| **Input Documents** | URS-001 v2.0, SRS-001 v2.0, SAD-001 v2.0 |
 
 ---
 
@@ -20,621 +21,565 @@ This document provides the detailed software design for WBC ΔΣ. It specifies t
 
 ## 2. Scope
 
-Covers all application-level JavaScript modules, HTML/template structure, CSS classes, and the configuration file schema.
+Covers the single-file vanilla JavaScript application (`mdc-app.js`), HTML structure (`counter.html`), Tailwind CSS styling (CDN), and the configuration file schema (`settings/templates.json`). The application uses no framework dependencies -- all functionality is implemented as a self-contained IIFE (Immediately Invoked Function Expression).
 
 ---
 
 ## 3. Module Detailed Designs
 
-### 3.1 Namespace and Initialization (defines.js)
+### 3.1 Namespace and Initialization (mdc-app.js)
 
-#### 3.1.1 Global Namespace
+#### 3.1.1 IIFE Closure Pattern
+
+All application state and functions are encapsulated in a single IIFE. There is no global namespace pollution.
 
 ```javascript
-var app = {
-    v: {},      // Views (Backbone.View instances)
-    r: {},      // Routers (Backbone.Router instances)
-    c: {},      // Collections (Backbone.Collection instances)
-    m: {},      // Models (Backbone.Model instances)
-    tools: {},  // Application tools (reset, instructions, toggle)
-    utils: {},  // Calculation utilities
-    state: {    // NEW: Application state manager
-        currentCase: null,
-        specimenType: 'bm',
-        isCountingActive: false,
-        isCountComplete: false,
-        sessionHistory: []
-    },
-    config: {   // NEW: Configuration defaults
-        minCellCount: { bm: 200, pb: 100 },
-        maxCaseNumberLength: 30
-    },
-    TPLJSON: null  // Loaded template configuration
+(function () {
+    'use strict';
+    // --- closure state ---
+    let specConfigs = [];    // Loaded from templates.json
+    let specConfig = null;   // Active specimen type config
+    let counts = {};         // { cellType: count }
+    let keydownHandler = null;
+    let currentPhase = 'case-entry'; // 'case-entry' | 'counting' | 'results'
+    // ... DOM references cached on DOMContentLoaded
+})();
+```
+
+The `state` object consolidates all mutable application state within the closure:
+
+```javascript
+const state = {
+    phase: 'case-entry',       // case-entry | counting | results
+    caseNumber: '',
+    specimenType: 'bm',
+    isCountingActive: false,
+    commentFieldFocused: false,
+    config: null,              // loaded from templates.json
+    counts: {},                // { cellType: number }
+    sessionHistory: [],        // array of completed sessions
+    activeTab: 0,
+    theme: 'dark'
 };
 ```
 
 #### 3.1.2 State Transitions
 
-| From State | Event | To State | Actions |
-|-----------|-------|----------|---------|
-| IDLE | Case number entered | CASE_ENTERED | Enable Start Count |
-| CASE_ENTERED | Start Count clicked | COUNTING | Attach keydown listener, disable specimen selector, disable Start Count |
-| COUNTING | Count Done clicked | COUNT_REVIEW | Check minimum threshold |
-| COUNT_REVIEW | Threshold met or override confirmed | COMPLETED | Detach listener, lock inputs, generate output, save history |
-| COUNT_REVIEW | Threshold warning cancelled | COUNTING | Resume counting |
-| COMPLETED | Reset clicked (confirmed) | IDLE | Clear all data, focus case input |
-| COMPLETED | New case entered (confirmed) | CASE_ENTERED | Clear all data, set new case |
-| COUNTING | Reset clicked (confirmed) | IDLE | Clear all data, focus case input |
-| Any | Page load | IDLE | Fetch config, render empty tables |
+The application uses a three-phase UI model: case-entry, counting, and results. There is no CASE_ENTERED state; Start Count is always enabled (case number is optional).
+
+| From | Event | To | Actions |
+|------|-------|----|---------|
+| case-entry | Start Count clicked | counting | Attach keydown, render counter table, show counting phase |
+| counting | Count Done clicked | results | Detach keydown, finalize, generate output |
+| results | Continue Counting clicked | counting | Re-attach keydown, restore counter table |
+| results | New Case clicked | case-entry | Clear all data, show case-entry phase |
+| Any | Page load | case-entry | Fetch config, render case-entry phase |
+
+Phase transitions are managed by the `showPhase(phase)` function, which toggles visibility of the three phase containers (`phase-case-entry`, `phase-counting`, `phase-results`) and controls the header logo visibility.
 
 ---
 
-### 3.2 Data Models (models.js)
+### 3.2 Data Models
 
-#### 3.2.1 CounterTable Model
+All data is represented as plain JavaScript objects. There are no Backbone models or framework-level data structures.
+
+#### 3.2.1 Counts Object
 
 ```javascript
-app.m.CounterTable = Backbone.Model.extend({
-    url: 'settings/templates.json',
-    defaults: {
-        specimenType: '',
-        outCodes: {},
-        templates: []
-    }
+state.counts = {};  // { cellType: integer }
+```
+
+Initialized when counting begins by iterating over the active specimen config's `outCodes` values and setting each to zero:
+
+```javascript
+state.counts = {};
+Object.values(specConfig.outCodes).forEach(function (cellType) {
+    state.counts[cellType] = 0;
 });
 ```
 
-**Purpose**: Fetches and holds the template configuration JSON.
+#### 3.2.2 Specimen Config
 
-#### 3.2.2 CellCount Model (NEW)
-
-```javascript
-app.m.CellCount = Backbone.Model.extend({
-    defaults: {
-        key: '',          // Keyboard key (e.g., 'a')
-        cellType: '',     // Cell type name (e.g., 'blast')
-        count: 0,         // Current count (integer >= 0)
-        percentage: 0.00  // Calculated percentage
-    },
-    increment: function() {
-        this.set('count', this.get('count') + 1);
-    },
-    decrement: function() {
-        var current = this.get('count');
-        if (current > 0) {
-            this.set('count', current - 1);
-        }
-    }
-});
-```
-
-**Purpose**: Represents a single cell type's count within a counting session.
-
-#### 3.2.3 CountSession Model (NEW)
+`state.config` holds the parsed array from `templates.json`. The active specimen config is retrieved via:
 
 ```javascript
-app.m.CountSession = Backbone.Model.extend({
-    defaults: {
-        caseNumber: '',
-        specimenType: '',
-        timestamp: null,
-        totalCount: 0,
-        cellCounts: {},      // { cellType: count }
-        percentages: {},     // { cellType: percentage }
-        morphologyComments: '',
-        outputText: {},      // { templateName: outputString }
-        isComplete: false
-    }
-});
+function getSpecConfig() {
+    return state.config.find(function (s) {
+        return s.specimenType === state.specimenType;
+    });
+}
 ```
 
-**Purpose**: Represents a complete counting session for session history.
+#### 3.2.3 Session History Entry
 
-#### 3.2.4 TabbedOutput Model
+Each completed counting session is saved as a plain object:
 
 ```javascript
-app.m.TabbedOutput = Backbone.Model.extend({
-    defaults: {
-        templateName: '',
-        institutionName: '',
-        favicon: '',
-        outputHtml: ''
-    }
-});
+{
+    caseNumber: '',           // string
+    specimenType: '',         // string ('bm' | 'pb')
+    specimenLabel: '',        // string ('Bone Marrow' | 'Peripheral Blood')
+    timestamp: '',            // ISO 8601 string
+    totalCount: 0,            // integer
+    counts: {},               // { cellType: count }
+    percentages: {},          // { cellType: float }
+    meRatio: '',              // string ('3.2:1' | 'N/A' | null)
+    morphologyComments: '',   // string
+    outputs: {}               // { tplCode: outputString }
+}
 ```
+
+Session history is stored as a plain array in `state.sessionHistory` and serialized to `sessionStorage` under the key `wbcds_history`.
 
 ---
 
-### 3.3 Collections (collections.js)
+### 3.3 Collections
 
-#### 3.3.1 CellCountCollection (NEW)
-
-```javascript
-app.c.CellCounts = Backbone.Collection.extend({
-    model: app.m.CellCount,
-    totalCount: function() {
-        return this.reduce(function(sum, model) {
-            return sum + model.get('count');
-        }, 0);
-    },
-    recalculatePercentages: function() {
-        var total = this.totalCount();
-        this.each(function(model) {
-            if (total === 0) {
-                model.set('percentage', 0.00);
-            } else {
-                var pct = (model.get('count') / total) * 100;
-                model.set('percentage', Math.round(pct * 100) / 100);
-            }
-        });
-    }
-});
-```
-
-#### 3.3.2 SessionHistory Collection (NEW)
+There are no Backbone collections. Session history is a plain JavaScript array (`state.sessionHistory`). Persistence is handled by two functions:
 
 ```javascript
-app.c.SessionHistory = Backbone.Collection.extend({
-    model: app.m.CountSession,
-    saveToStorage: function() {
-        sessionStorage.setItem('wbcds_history', JSON.stringify(this.toJSON()));
-    },
-    loadFromStorage: function() {
-        var data = sessionStorage.getItem('wbcds_history');
-        if (data) {
-            this.reset(JSON.parse(data));
-        }
-    }
-});
+function loadSessionHistory() {
+    try {
+        const data = sessionStorage.getItem('wbcds_history');
+        if (data) state.sessionHistory = JSON.parse(data);
+    } catch (e) { /* graceful degradation */ }
+}
+
+function saveSessionHistory() {
+    try {
+        sessionStorage.setItem('wbcds_history', JSON.stringify(state.sessionHistory));
+    } catch (e) { /* graceful degradation */ }
+}
 ```
 
 ---
 
-### 3.4 Views (views.js)
+### 3.4 Functions (replacing Backbone Views)
 
-#### 3.4.1 CaseInputView (NEW)
+All UI rendering and interaction is handled by standalone functions within the IIFE closure. There are no Backbone views.
 
-```javascript
-app.v.CaseInput = Backbone.View.extend({
-    el: '#case-input-container',
-    events: {
-        'input #caseNumber':  'onCaseInput',
-        'change #caseNumber': 'onCaseChange'
-    },
-    // Validates case number format
-    // Enables/disables Start Count button
-    // Triggers data clear on case change during active session
-});
+#### 3.4.1 renderCounterTable()
+
+Builds a two-row counter table using `specConfig.categories.upper` and `.lower`. Creates a reverse map (cellType to key) from `outCodes`. Calls `renderRowGroup()` for each row group. Also renders the grand total display, M:E ratio (if formulas are present), and progress bar toward the target count.
+
+```
+FUNCTION renderCounterTable()
+    specConfig = getSpecConfig()
+    outCodes = specConfig.outCodes
+    categories = specConfig.categories
+
+    // Build reverse map: cellType -> key
+    cellToKey = {}
+    FOR EACH key IN outCodes
+        cellToKey[outCodes[key]] = key
+    END FOR
+
+    // Render upper row group (Precursors)
+    html += renderRowGroup('Precursors', categories.upper, cellToKey, specConfig.upperRowAbnormal)
+
+    // Render lower row group (Mature)
+    html += renderRowGroup('Mature', categories.lower, cellToKey, false)
+
+    // Render grand total, M:E ratio (if applicable), progress bar
+    el('counter-table-area').innerHTML = html
+END FUNCTION
 ```
 
-**DOM Target**: `#case-input-container`
+#### 3.4.2 renderRowGroup(label, cells, cellToKey, flagAbnormal)
 
-**Template**:
-```html
-<div id="case-input-container">
-    <label for="caseNumber">Case / Accession #:</label>
-    <input type="text" id="caseNumber" maxlength="30"
-           pattern="[A-Za-z0-9\-\/]+" placeholder="Enter case number" />
-    <span id="active-case-display" class="case-display"></span>
-</div>
+Renders one row group with a header label, per-cell columns (key, name, count, percentage), and a subtotal column. If `flagAbnormal` is true, adds an amber dashed border around the group to indicate abnormality in peripheral blood specimens.
+
+```
+FUNCTION renderRowGroup(label, cells, cellToKey, flagAbnormal)
+    INPUT: label (string, 'Precursors' or 'Mature')
+           cells (array of cell type names)
+           cellToKey (object, cellType -> keyboard key)
+           flagAbnormal (boolean)
+    OUTPUT: HTML string
+
+    IF flagAbnormal THEN
+        Apply 'border border-dashed border-amber-500/50' class
+        Show 'Abnormal in PB' label
+    END IF
+
+    Render <table> with 4 rows:
+        Row 1 (thead): Cell type names (uppercase) + 'Sub' header
+        Row 2 (tbody): Count values (id="val-{cellType}"), initialized to 0
+                       Subtotal column (id="val-sub-{label}")
+        Row 3 (tbody): Percentage values (id="pct-{cellType}"), initialized to '0.00%'
+                       Subtotal percentage (id="pct-sub-{label}")
+        Row 4 (tbody): Keyboard key labels in <kbd> elements
+
+    RETURN html
+END FUNCTION
 ```
 
-**Validation Rules**:
-- Not empty and not whitespace-only
-- Alphanumeric + hyphens + forward slashes
-- Maximum 30 characters
-- Leading/trailing whitespace trimmed
+**DOM ID Convention for Counter Elements**:
+- Cell count value: `val-{cellType}` (e.g., `val-blasts`)
+- Cell percentage: `pct-{cellType}` (e.g., `pct-blasts`)
+- Row subtotal: `val-sub-{rowLabel}` (e.g., `val-sub-precursors`)
+- Row subtotal percentage: `pct-sub-{rowLabel}` (e.g., `pct-sub-precursors`)
+- Cell wrapper (for flash): `cell-{cellType}` (e.g., `cell-blasts`)
 
-#### 3.4.2 MakeTable View (EXISTING - Enhanced)
+#### 3.4.3 updateCounterDisplay()
 
-```javascript
-app.v.MakeTable = Backbone.View.extend({
-    tagName: 'table',
-    id: 'counter',
-    initialize: function(options) {
-        this.specimenType = options.specimenType;
-        this.outCodes = options.outCodes;
-        this.render();
-    },
-    render: function() {
-        // Row 1: Cell type header names
-        this.mkTitleRow();
-        // Row 2: Numeric input spinners (initialized to 0)
-        this.mkSpinnerRow();
-        // Row 3: Percentage display cells
-        this.mkPercentRow();
-        // Row 4: Keyboard key labels
-        this.mkKeyRow();
-        // Append to #counter-tbl
-    },
-    lockInputs: function() {
-        this.$('.cellAmount').prop('readonly', true);
-    },
-    unlockInputs: function() {
-        this.$('.cellAmount').prop('readonly', false).val(0);
-    }
-});
+Updates all count values, percentages, subtotals, grand total, M:E ratio (if formulas are present), and the progress bar. Called after every increment or decrement.
+
+```
+FUNCTION updateCounterDisplay()
+    specConfig = getSpecConfig()
+    total = getTotal()
+
+    // Update each cell value and percentage
+    FOR EACH cellType IN outCodes values
+        count = state.counts[cellType]
+        el('val-' + cellType).textContent = count
+        IF total == 0 THEN
+            el('pct-' + cellType).textContent = '0.00%'
+        ELSE
+            pct = (count / total) * 100
+            el('pct-' + cellType).textContent = pct.toFixed(2) + '%'
+        END IF
+    END FOR
+
+    // Calculate and display subtotals for upper and lower rows
+    upperSub = SUM(state.counts[ct] for ct in categories.upper)
+    lowerSub = SUM(state.counts[ct] for ct in categories.lower)
+    el('val-sub-precursors').textContent = upperSub
+    el('val-sub-mature').textContent = lowerSub
+
+    // Subtotal percentages (show em-dash when total is 0)
+    el('pct-sub-precursors').textContent = total > 0 ? (upperSub/total*100).toFixed(2)+'%' : '—'
+    el('pct-sub-mature').textContent = total > 0 ? (lowerSub/total*100).toFixed(2)+'%' : '—'
+
+    // Grand total
+    el('val-grand-total').textContent = total
+
+    // M:E ratio
+    IF specConfig has ME_ratio formula THEN
+        el('val-me-ratio').textContent = computeMERatio(specConfig) || 'N/A'
+    END IF
+
+    // Progress bar
+    pctProgress = MIN((total / specConfig.targetCount) * 100, 100)
+    el('progress-bar').style.width = pctProgress + '%'
+    IF total >= targetCount THEN bar color = emerald ELSE bar color = blue
+    el('progress-label').textContent = total + ' / ' + targetCount + ' (target)'
+END FUNCTION
 ```
 
-**DOM Structure Generated**:
-```html
-<table id="counter" class="table bm">
-    <tr class="title-row">
-        <td class="namecell">blast</td>
-        <td class="namecell">pro</td>
-        <!-- ... one per cell type ... -->
-        <td class="namecell">tot</td>
-    </tr>
-    <tr class="spinner-row">
-        <td class="datacell">
-            <input type="number" class="cellAmount" id="bm-blast" value="0" />
-        </td>
-        <!-- ... one per cell type ... -->
-        <td class="datacell">
-            <input type="number" class="totalAmount" id="bm-tot" value="0" readonly />
-        </td>
-    </tr>
-    <tr class="percent-row">
-        <td class="percentrow" id="bm-blast-pct">0.00</td>
-        <!-- ... one per cell type ... -->
-        <td class="percentrow" id="bm-tot-pct">100.00</td>
-    </tr>
-    <tr class="key-row">
-        <td class="keys">A</td>
-        <td class="keys">S</td>
-        <!-- ... one per cell type ... -->
-        <td class="keys"></td>
-    </tr>
-</table>
+#### 3.4.4 computeMERatio(specConfig)
+
+Computes the M:E ratio from `specConfig.formulas.ME_ratio`. Returns a string like `"3.2:1"` or `"N/A"` when the denominator is zero. Returns `null` if no ME_ratio formula is defined.
+
+```
+FUNCTION computeMERatio(specConfig)
+    INPUT: specConfig (object with optional formulas.ME_ratio)
+    OUTPUT: string ("X.X:1") or "N/A" or null
+
+    IF no formulas or no ME_ratio THEN RETURN null
+
+    formula = specConfig.formulas.ME_ratio
+    numSum = SUM(state.counts[ct] for ct in formula.numerator)
+    denSum = SUM(state.counts[ct] for ct in formula.denominator)
+
+    IF denSum == 0 THEN RETURN 'N/A'
+
+    ratio = numSum / denSum
+    RETURN ratio.toFixed(formula.precision) + ':1'
+END FUNCTION
 ```
 
-**CSS ID Convention**: `{specimenType}-{cellType}` (e.g., `bm-blast`, `pb-poly`)
+#### 3.4.5 finalizeCount()
 
-#### 3.4.3 CreateOutputField View (EXISTING - Enhanced)
+Generates output text for all templates. Substitutes `{{cellType}}`, `{{total}}`, `{{ME_ratio}}`, `{{comments}}`, and `{{caseNumber}}` placeholders. Saves session to history. Transitions to results phase.
 
-```javascript
-app.v.CreateOutputField = Backbone.View.extend({
-    tagName: 'div',
-    id: 'tabs',
-    className: 'output',
-    render: function() {
-        // Tab navigation bar with favicons
-        // Content divs for each template
-        // Copy-to-clipboard buttons per tab
-    }
-});
+```
+FUNCTION finalizeCount()
+    state.isCountingActive = false
+    DETACH keydown listener
+
+    specConfig = getSpecConfig()
+    total = getTotal()
+
+    // Calculate percentages for each cell type
+    percentages = {}
+    FOR EACH cellType IN outCodes values
+        percentages[cellType] = total > 0 ? (state.counts[cellType] / total * 100) : 0
+    END FOR
+
+    // Compute M:E ratio
+    meRatio = computeMERatio(specConfig)
+
+    // Build output for each template
+    outputs = {}
+    FOR EACH template IN specConfig.templates
+        text = template.outSentence
+        REPLACE {{caseNumber}} with state.caseNumber
+        REPLACE {{total}} with total
+        REPLACE {{comments}} with morphology comments
+        REPLACE {{ME_ratio}} with meRatio or 'N/A'
+        FOR EACH cellType
+            REPLACE {{cellType}} with Math.round(percentages[cellType])
+        END FOR
+        outputs[template.tplCode] = text
+    END FOR
+
+    // Build session object and save to history
+    session = { caseNumber, specimenType, specimenLabel, timestamp, totalCount,
+                counts, percentages, meRatio, morphologyComments, outputs }
+    addToHistory(session)
+
+    // Transition to results phase
+    showPhase('results')
+    renderResults(session)
+END FUNCTION
 ```
 
-**DOM Structure Generated**:
-```html
-<div id="tabs" class="output bm">
-    <ul class="tabs">
-        <li class="tab-link current" data-tab="bm-ysm">
-            <img class="favicon" src="images/ysm-favicon.png" /> Yale SOM
-        </li>
-        <li class="tab-link" data-tab="bm-pdx">
-            <img class="favicon" src="images/pdx-favicon.png" /> Precipio DX
-        </li>
-        <li class="tab-link" data-tab="bm-mgh">
-            <img class="favicon" src="images/mgh-favicon.png" /> MGH
-        </li>
-    </ul>
-    <div id="bm-ysm" class="tab-content current">
-        <div class="output-sentence"></div>
-        <button class="copy-btn" data-target="bm-ysm">Copy to Clipboard</button>
-    </div>
-    <!-- ... one per template ... -->
-</div>
+#### 3.4.6 resumeCounting()
+
+Re-enters the counting phase with existing counts preserved. Re-attaches the keydown listener. Calls `renderCounterTable()` and `updateCounterDisplay()`.
+
+```
+FUNCTION resumeCounting()
+    state.isCountingActive = true
+
+    showPhase('counting')
+    renderCounterTable()
+    updateCounterDisplay()
+    updateCaseBadge()
+
+    // Re-lock specimen selector and case input
+    el('specimenType').disabled = true
+    el('caseNumber').readOnly = true
+
+    // Re-attach keyboard listener
+    ATTACH keydown listener
+END FUNCTION
 ```
 
-#### 3.4.4 Buttons View (EXISTING - Enhanced)
+#### 3.4.7 startCount() (via btnStartCount click handler)
 
-```javascript
-app.v.Buttons = Backbone.View.extend({
-    el: '#buttons',
-    events: {
-        'change #specimenType':   'toggleSpecType',
-        'click #btnStartCount':   'startCount',
-        'click #btnCountDone':    'countDone',
-        'click #btnCountReset':   'countReset'
-    },
-    startCount: function() {
-        // 1. Validate case number is present (SYS-003)
-        // 2. Disable Start Count button
-        // 3. Disable specimen type selector (SYS-016)
-        // 4. Set app.state.isCountingActive = true
-        // 5. Attach document keydown listener
-        // 6. Display counting instructions
-    },
-    countDone: function() {
-        // 1. Check total >= minimum threshold (SYS-052, SYS-053)
-        // 2. If below minimum, show warning dialog with override option
-        // 3. Detach keydown listener (SYS-054)
-        // 4. Lock all count inputs to readonly (SYS-055)
-        // 5. Generate output for all templates (SYS-056)
-        // 6. Save to session history
-        // 7. Set app.state.isCountComplete = true
-    },
-    countReset: function() {
-        // 1. Check if any count data exists
-        // 2. If data exists, show confirmation dialog (SYS-081)
-        // 3. On confirm: clear all state (SYS-082)
-        // 4. Focus case number input (SYS-084)
-    }
-});
+Transitions from case-entry to counting. Builds the initial counts object (all zeros), renders the counter table, and attaches the keydown handler. Case number is optional; Start Count is always enabled.
+
+```
+FUNCTION startCount()
+    clearClipboard()
+
+    state.caseNumber = caseInput.value.trim()
+    state.specimenType = specSelect.value
+    state.isCountingActive = true
+
+    // Initialize counts to zero for this specimen type
+    specConfig = getSpecConfig()
+    state.counts = {}
+    FOR EACH cellType IN specConfig.outCodes values
+        state.counts[cellType] = 0
+    END FOR
+
+    // Update UI
+    showPhase('counting')
+    renderCounterTable()
+    updateCaseBadge()
+
+    // Lock specimen selector and case input
+    specSelect.disabled = true
+    caseInput.readOnly = true
+
+    // Attach keyboard listener
+    ATTACH keydown listener
+END FUNCTION
 ```
 
-#### 3.4.5 MorphologyCommentsView (NEW)
+#### 3.4.8 renderResults(session)
 
-```javascript
-app.v.MorphologyComments = Backbone.View.extend({
-    el: '#morphology-container',
-    events: {
-        'focus #morphComments':  'onFocus',
-        'blur #morphComments':   'onBlur'
-    },
-    onFocus: function() {
-        // Temporarily detach counting keydown listener
-        // Prevents keypresses in textarea from triggering counts
-        app.state.commentFieldFocused = true;
-    },
-    onBlur: function() {
-        // Reattach counting keydown listener if counting active
-        app.state.commentFieldFocused = false;
-    },
-    getValue: function() {
-        return this.$('#morphComments').val().trim();
-    },
-    clear: function() {
-        this.$('#morphComments').val('');
-    }
-});
-```
+Renders the results phase with a summary table (case number, specimen label, total count, per-cell percentages, M:E ratio, morphology comments) and tabbed output panels for each template. Tab switching is handled by click event delegation.
 
-**DOM Template**:
-```html
-<div id="morphology-container">
-    <label for="morphComments">Morphology Comments:</label>
-    <textarea id="morphComments" rows="3" maxlength="500"
-              placeholder="Optional: Note morphology findings..."></textarea>
-    <span class="char-count">0 / 500</span>
-</div>
-```
+#### 3.4.9 renderHistoryList()
 
-#### 3.4.6 SessionHistoryView (NEW)
+Renders the session history list in reverse chronological order. Each entry shows case number, specimen label, total count, and timestamp. Clicking an entry opens a modal with full session details.
 
-```javascript
-app.v.SessionHistory = Backbone.View.extend({
-    el: '#session-history',
-    events: {
-        'click .history-toggle': 'togglePanel',
-        'click .history-entry':  'viewEntry',
-        'click #btnExportCsv':   'exportCsv',
-        'click #btnExportJson':  'exportJson'
-    },
-    render: function() {
-        // Render list of completed sessions
-        // Each entry shows: case number, specimen type, timestamp, total count
-    },
-    viewEntry: function(e) {
-        // Display read-only overlay with full session data
-        // No editing capability
-    },
-    exportCsv: function() {
-        // Build CSV from session history and trigger local download
-    },
-    exportJson: function() {
-        // Serialize session history to JSON and trigger local download
-    }
-});
-```
+#### 3.4.10 showPhase(phase)
 
-**Notes**:
-- Session history view includes "Export CSV" and "Export JSON" controls to save a local record.
+Manages phase transitions by toggling visibility of the three phase containers. Controls header logo visibility (hidden during case-entry, visible during counting and results). Adds `counting-active` class to `<body>` during the counting phase.
 
-#### 3.4.7 ThemeToggle (NEW)
+#### 3.4.11 Theme Management
 
-**Purpose**: Provides Light/Dark presentation modes for ergonomic use under varying ambient lighting.
+Four functions manage the light/dark theme:
+- `getPreferredTheme()`: Checks sessionStorage, falls back to `prefers-color-scheme` media query, defaults to `'dark'`
+- `applyTheme(theme)`: Sets `data-theme` attribute on `<body>`, updates toggle button label
+- `setTheme(theme, persist)`: Applies theme and optionally persists to sessionStorage (key: `wbcds_theme`)
+- `toggleTheme()`: Switches between light and dark
 
-**DOM Targets**:
-- `#btnToggleTheme` (toggle button)
-- `#themeLabel` (dynamic label)
+#### 3.4.12 Export Functions
 
-**Behavior**:
-- Applies `data-theme="light|dark"` on `<body>` to switch CSS overrides.
-- Persists the selected theme for the current browser session using `sessionStorage` key `wbcds_theme`.
-- Keyboard shortcut: `Ctrl/Cmd + Shift + L` toggles theme without affecting counting.
+- `exportSessionJson()`: Serializes `state.sessionHistory` to pretty-printed JSON, triggers download as `wbcds-session-{timestamp}.json`
+- `exportSessionCsv()`: Builds CSV with headers (caseNumber, specimenType, specimenLabel, timestamp, totalCount, morphologyComments, counts, percentages, outputs), triggers download as `wbcds-session-{timestamp}.csv`
+- `buildExportFilename(ext)`: Generates filename with ISO timestamp prefix `wbcds-session-`
 
 ---
 
-### 3.5 Business Logic Utilities (app.js)
+### 3.5 Business Logic
 
-#### 3.5.1 app.utils.addToCell(whichCell, isDecrement)
+#### 3.5.1 addToCell(cellType, isDecrement)
+
+Handles cell count increment and decrement via the keydown handler. This is not a separate named function; the logic is inline within `onKeyDown()`.
 
 ```
-FUNCTION addToCell(whichCell, isDecrement)
-    INPUT: whichCell (string, single character key)
-           isDecrement (boolean, true if Shift was held)
-
-    IF app.state.commentFieldFocused THEN
-        RETURN  // Do not count while typing in comments
-
-    specimenType = app.state.specimenType
-    cellId = specimenType + '-' + outCodes[whichCell]
-    cellInput = DOM.find('#' + cellId)
-
-    IF cellInput does not exist THEN
-        RETURN  // Key not mapped to any cell
-
-    currentValue = parseInt(cellInput.value)
+FUNCTION onKeyDown(ev) -- increment/decrement logic:
+    IF isDecrement AND state.counts[cellType] <= 0 THEN
+        RETURN  // Floor at zero, no negative counts
+    END IF
 
     IF isDecrement THEN
-        IF currentValue > 0 THEN
-            cellInput.value = currentValue - 1
-        END IF
+        state.counts[cellType]--
+        flashCell(cellType, 'decrement')
     ELSE
-        cellInput.value = currentValue + 1
+        state.counts[cellType]++
+        flashCell(cellType, 'increment')
     END IF
 
-    // Update total
-    totalInput = DOM.find('#' + specimenType + '-tot')
-    totalInput.value = SUM(all cellAmount inputs in active table)
-
-    // Visual feedback
-    FLASH(cellInput, color='#90EE90', duration=150ms)
-
-    // Recalculate percentages
-    CALL calcPercent(specimenType)
-END FUNCTION
+    CALL updateCounterDisplay()
+END
 ```
 
-#### 3.5.2 app.utils.calcPercent(whichTable)
+Visual flash feedback is provided by `flashCell(cellType, direction)`, which briefly applies CSS class `flash-increment` (green) or `flash-decrement` (red) for 250ms.
+
+#### 3.5.2 calcPercent(cellType)
+
+Percentage calculation is performed inline within `updateCounterDisplay()`:
 
 ```
-FUNCTION calcPercent(whichTable)
-    INPUT: whichTable (string, 'bm' or 'pb')
-
-    table = DOM.find('table.' + whichTable)
-    cellInputs = table.findAll('.cellAmount')
-    total = parseInt(DOM.find('#' + whichTable + '-tot').value)
-
-    FOR EACH cellInput IN cellInputs
-        cellType = cellInput.id.replace(whichTable + '-', '')
-        IF cellType == 'tot' THEN CONTINUE
-
-        count = parseInt(cellInput.value)
-
-        IF total == 0 THEN
-            percentage = 0.00
-        ELSE
-            percentage = (count / total) * 100
-            percentage = ROUND(percentage, 2)  // Round to 2 decimal places
-        END IF
-
-        percentCell = DOM.find('#' + whichTable + '-' + cellType + '-pct')
-        percentCell.textContent = percentage.toFixed(2)
-    END FOR
-
-    // Update total percentage display
-    IF total > 0 THEN
-        sumPct = SUM(all displayed percentages)
-        DOM.find('#' + whichTable + '-tot-pct').textContent = sumPct.toFixed(2)
-    ELSE
-        DOM.find('#' + whichTable + '-tot-pct').textContent = '0.00'
-    END IF
-END FUNCTION
+percentage = (state.counts[cellType] / total) * 100
 ```
 
-**Verification Note**: The percentage calculation is the single most critical algorithm in the application. It must be verified with boundary cases:
-- total = 0 (all zeros)
-- total = 1 (single cell)
-- All cells equal (should each show `100/N`)
-- One cell has all counts (should show 100.00, rest 0.00)
-- Large counts (9999 total)
+Rounded to 2 decimal places via `toFixed(2)`. Returns `'0.00%'` when total equals zero.
 
-#### 3.5.3 app.utils.mkOutTplJson(outCodes, context, caseNumber, comments)
+**Verification Boundary Cases**:
+- total = 0 (all zeros): all percentages display `0.00%`
+- total = 1 (single cell): that cell shows `100.00%`, rest `0.00%`
+- All cells equal: each shows `100/N` percent
+- One cell has all counts: shows `100.00%`, rest `0.00%`
+- Large counts (e.g., 9999 total): normal floating-point arithmetic
 
-```
-FUNCTION mkOutTplJson(outCodes, context, caseNumber, comments)
-    INPUT: outCodes (object, key-to-cellType mapping)
-           context (DOM element, the counting table)
-           caseNumber (string)
-           comments (string)
-    OUTPUT: JSON object for Handlebars template
+#### 3.5.3 generateOutput(specConfig, counts, caseNumber, comments)
 
-    result = {}
-    result.caseNumber = caseNumber
-    result.comments = comments
-    total = context.find('.totalAmount').value
+Output generation is performed within `finalizeCount()`. For each template in `specConfig.templates`, placeholders are replaced using simple string replacement (regex-based):
 
-    result.total = parseInt(total)
+- `{{caseNumber}}` -- replaced with `state.caseNumber`
+- `{{total}}` -- replaced with total count (integer)
+- `{{comments}}` -- replaced with morphology comments (trimmed)
+- `{{ME_ratio}}` -- replaced with computed M:E ratio or `'N/A'`
+- `{{cellType}}` -- replaced with `Math.round(percentage)` for each cell type
 
-    FOR EACH key, cellType IN outCodes
-        count = context.find('#' + specimenType + '-' + cellType).value
-        IF total > 0 THEN
-            result[cellType] = ROUND((count / total) * 100)
-        ELSE
-            result[cellType] = 0
-        END IF
-    END FOR
+No Handlebars or template engine is used. All substitution is via `String.replace()` with regex patterns.
 
-    RETURN result
-END FUNCTION
-```
+#### 3.5.4 getTotal()
 
-#### 3.5.4 app.tools.resetCounter(specimenType)
-
-```
-FUNCTION resetCounter(specimenType)
-    INPUT: specimenType (string, 'bm' or 'pb')
-
-    table = DOM.find('table.' + specimenType)
-    FOR EACH input IN table.findAll('.cellAmount')
-        input.value = 0
-        input.readonly = false
-    END FOR
-    table.find('.totalAmount').value = 0
-
-    FOR EACH cell IN table.findAll('.percentrow')
-        cell.textContent = '0.00'
-    END FOR
-    table.find('#' + specimenType + '-tot-pct').textContent = '0.00'
-END FUNCTION
+```javascript
+function getTotal() {
+    var sum = 0;
+    Object.values(state.counts).forEach(function (v) { sum += v; });
+    return sum;
+}
 ```
 
 ---
 
-### 3.6 Router and Initialization (routes.js)
+### 3.6 Application Bootstrap
 
-#### 3.6.1 Application Bootstrap Sequence
+There is no Backbone Router. Initialization is performed by the IIFE calling `loadConfig()` at the bottom of the closure:
 
+```javascript
+async function loadConfig() {
+    try {
+        const resp = await fetch('settings/templates.json');
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        state.config = await resp.json();
+        // Add targetCount defaults if missing
+        state.config.forEach(function (spec) {
+            if (!spec.targetCount) {
+                spec.targetCount = DEFAULT_TARGET[spec.specimenType] || 200;
+            }
+        });
+        loadSessionHistory();
+        init();
+    } catch (e) {
+        // Display full-page error message; disable all controls
+        document.body.innerHTML = '<div>Configuration Error: ' + e.message + '</div>';
+    }
+}
+
+// BOOT
+loadConfig();
 ```
-ON document.ready:
-    1. Initialize Backbone Router
-    2. Fetch settings/templates.json
-    3. ON fetch success:
-        a. Store parsed JSON in app.TPLJSON
-        b. FOR EACH specimen type config:
-            i.   Create MakeTable view
-            ii.  Create CreateOutputField view
-            iii. Initialize tab click handlers
-        c. Create Buttons view
-        d. Create CaseInput view          (NEW)
-        e. Create MorphologyComments view (NEW)
-        f. Create SessionHistory view     (NEW)
-        g. Load session history from sessionStorage
-        h. Set initial state to IDLE
-        i.  Focus case number input
-    4. ON fetch failure:
-        a. Display error: "Configuration could not be loaded."
-        b. Disable all controls
-    5. Start Backbone.history
-```
+
+**Bootstrap Sequence**:
+1. IIFE executes immediately; applies saved theme via `applyTheme(getPreferredTheme())`
+2. `loadConfig()` fetches `settings/templates.json`
+3. On success: parses JSON, applies default target counts, loads session history from sessionStorage, calls `init()`
+4. `init()` caches DOM references, attaches event listeners (Start Count, Count Done, Reset, Copy, Resume, New Case, Theme Toggle, Export), renders initial history list, focuses case number input
+5. On fetch failure: displays full-page error message, all controls disabled
 
 ---
 
 ### 3.7 Keydown Event Handler
 
 ```javascript
-// Attached by startCount(), detached by countDone() and countReset()
-function onKeyDown(event) {
-    // Ignore if comment field is focused
-    if (app.state.commentFieldFocused) return;
+function onKeyDown(ev) {
+    if (!state.isCountingActive) return;
+    if (state.commentFieldFocused) return;
 
-    // Ignore modifier keys (except Shift)
-    if (event.ctrlKey || event.altKey || event.metaKey) return;
+    // Ignore modifier combos except Shift
+    if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
 
-    var key = String.fromCharCode(event.which).toLowerCase();
-    var isDecrement = event.shiftKey;
+    var key = ev.key.toUpperCase();
+    var specConfig = getSpecConfig();
+    var outCodes = specConfig.outCodes;
 
-    // Check if key is mapped for current specimen type
-    var outCodes = app.TPLJSON[currentSpecIndex].outCodes;
-    if (outCodes.hasOwnProperty(key)) {
-        event.preventDefault();
-        app.utils.addToCell(key, isDecrement);
+    if (!outCodes.hasOwnProperty(key)) return;
+
+    ev.preventDefault();
+
+    var cellType = outCodes[key];
+    var isDecrement = ev.shiftKey;
+
+    if (isDecrement) {
+        if (state.counts[cellType] > 0) {
+            state.counts[cellType]--;
+            flashCell(cellType, 'decrement');
+        }
+    } else {
+        state.counts[cellType]++;
+        flashCell(cellType, 'increment');
     }
+
+    updateCounterDisplay();
 }
 ```
+
+**Key Design Notes**:
+- Uses `ev.key.toUpperCase()` (not `String.fromCharCode(event.which)`) for modern key event handling
+- Checks `outCodes` with UPPERCASE keys (configuration stores keys as uppercase)
+- Ignores keypress when `state.commentFieldFocused` is true (textarea or input has focus)
+- Ignores keypress when any modifier key other than Shift is held
+- Shift + key triggers decrement; plain key triggers increment
+- The handler is attached via `document.addEventListener('keydown', onKeyDown)` during `startCount()` and `resumeCounting()`, and detached via `document.removeEventListener('keydown', onKeyDown)` during `finalizeCount()` and `resetToStart()`
+
+**Keyboard Isolation for Morphology Comments**:
+
+The morphology comments textarea detaches counting behavior by setting `state.commentFieldFocused`:
+
+```javascript
+morphField.addEventListener('focus', function () {
+    state.commentFieldFocused = true;
+});
+morphField.addEventListener('blur', function () {
+    state.commentFieldFocused = false;
+});
+```
+
+This prevents keypresses in the textarea from triggering cell counts without physically detaching and reattaching the keydown listener.
 
 ---
 
@@ -643,18 +588,30 @@ function onKeyDown(event) {
 ```json
 [
     {
-        "specimenType": "bm | pb",
-        "minCellCount": 200,
+        "specimenType": "bm",
+        "targetCount": 500,
+        "upperRowAbnormal": false,
+        "categories": {
+            "upper": ["nrbc","blasts","pro","myelo","meta","plasma","mast"],
+            "lower": ["bands","poly","baso","eos","mono","lymph","other"]
+        },
         "outCodes": {
-            "a": "cellTypeName",
-            "s": "cellTypeName"
+            "R":"nrbc","L":"blasts","O":"pro","M":"myelo","T":"meta","C":"plasma","S":"mast",
+            "B":"bands","P":"poly","A":"baso","E":"eos","N":"mono","Y":"lymph","X":"other"
+        },
+        "formulas": {
+            "ME_ratio": {
+                "label": "M:E Ratio",
+                "numerator": ["blasts","pro","myelo","meta","bands","poly","baso","eos","mono"],
+                "denominator": ["nrbc"],
+                "precision": 1
+            }
         },
         "templates": [
             {
-                "name": "templateDisplayName",
-                "shortName": "abbrev",
-                "favicon": "images/favicon.png",
-                "template": "Handlebars template string with {{caseNumber}} {{total}} {{cellType}} {{comments}}"
+                "tplCode": "ysm",
+                "tplName": "Yale SOM",
+                "outSentence": "A {{total}}-cell count reveals {{blasts}}% blasts, ..."
             }
         ]
     }
@@ -662,13 +619,26 @@ function onKeyDown(event) {
 ```
 
 **Schema Validation Rules**:
-1. Root must be an array with at least 1 element
-2. Each element must have `specimenType` (string, unique), `outCodes` (object), `templates` (array)
-3. `outCodes` keys must be single lowercase letters
-4. `outCodes` values must be non-empty strings
-5. Each template must have `name` (string) and `template` (string)
-6. Template strings must contain `{{total}}`
-7. `minCellCount` is optional; defaults to 200 (BM) or 100 (PB) if absent
+
+1. **Root**: Must be an array with at least 1 element
+2. **Each element** must have:
+   - `specimenType` (string, unique across array)
+   - `outCodes` (object)
+   - `templates` (array)
+   - `targetCount` (integer, positive; defaults to 500 for BM, 200 for PB if absent)
+   - `categories` (object with `upper` and `lower` arrays)
+   - `upperRowAbnormal` (boolean)
+3. **outCodes**: Keys must be single uppercase letters; values must be non-empty strings matching entries in `categories.upper` or `categories.lower`
+4. **No duplicate keys or cell type values** within a single specimen type
+5. **formulas** (optional): Object where each formula has:
+   - `label` (string, display name)
+   - `numerator` (array of cell type strings)
+   - `denominator` (array of cell type strings)
+   - `precision` (integer, decimal places for `.toFixed()`)
+6. **templates**: Each must have:
+   - `tplCode` (string, unique identifier)
+   - `tplName` (string, display name)
+   - `outSentence` (string, must contain `{{total}}` placeholder)
 
 ---
 
@@ -677,44 +647,91 @@ function onKeyDown(event) {
 | Element ID | Type | Purpose |
 |-----------|------|---------|
 | `caseNumber` | input[text] | Case/accession number entry |
-| `active-case-display` | span | Persistent case number display |
 | `specimenType` | select | BM/PB dropdown selector |
-| `counter-tbl` | div | Container for counting table(s) |
-| `counter` | table | The counting table |
-| `{spec}-{cellType}` | input[number] | Individual cell count (e.g., `bm-blast`) |
-| `{spec}-tot` | input[number] | Total count display |
-| `{spec}-{cellType}-pct` | td | Percentage display cell |
-| `{spec}-tot-pct` | td | Total percentage display |
-| `morphComments` | textarea | Morphology comments |
-| `btnStartCount` | button | Start Count button |
+| `btnStartCount` | button | Start Count button (always enabled, NOT disabled by default) |
 | `btnCountDone` | button | Count Done button |
-| `btnCountReset` | button | Reset button |
-| `tabs` | div | Output tabbed container |
-| `session-history` | div | Session history panel |
-| `output-here` | div | Master output container |
+| `btnCountReset` | button | Reset button (counting phase) |
+| `btnNewCase` | button | New Case button (results phase, resets to case-entry) |
+| `btnResumeCounting` | button | Continue Counting button (results phase, returns to counting) |
+| `btnCopyOutput` | button | Copy to Clipboard button (results phase) |
+| `btnToggleTheme` | button | Theme toggle button (light/dark) |
+| `btnExportCsv` | button | Export session history as CSV |
+| `btnExportJson` | button | Export session history as JSON |
+| `morphComments` | textarea | Morphology comments entry |
+| `commentCharCount` | span | Character count display for morphology comments |
+| `counter-table-area` | div | Container for dynamically rendered counter table |
+| `phase-case-entry` | div | Case-entry phase container |
+| `phase-counting` | div | Counting phase container |
+| `phase-results` | div | Results phase container |
+| `header-logo` | element | Header logo (hidden during case-entry, visible during counting/results) |
+| `val-{cellType}` | span | Cell count value display (e.g., `val-blasts`) |
+| `pct-{cellType}` | span | Cell percentage display (e.g., `pct-blasts`) |
+| `cell-{cellType}` | td | Cell wrapper for flash feedback (e.g., `cell-blasts`) |
+| `val-sub-precursors` | span | Upper row subtotal |
+| `val-sub-mature` | span | Lower row subtotal |
+| `pct-sub-precursors` | span | Upper row subtotal percentage |
+| `pct-sub-mature` | span | Lower row subtotal percentage |
+| `val-grand-total` | span | Grand total count display |
+| `val-me-ratio` | span | M:E ratio display |
+| `progress-bar` | div | Progress bar fill element |
+| `progress-label` | span | Progress label text (e.g., "42 / 500 (target)") |
+| `results-summary` | div | Results phase summary display |
+| `tab-nav` | div | Output template tab navigation |
+| `tab-panels` | div | Output template tab content panels |
+| `case-badge` | div | Case number badge (counting/results header) |
+| `case-badge-number` | span | Case number text within badge |
+| `case-badge-spec` | span | Specimen label text within badge |
+| `state-label` | span | State indicator text ("Ready", "Counting", "Complete") |
+| `session-history-section` | div | Session history panel container |
+| `history-list` | div | Session history entry list |
+| `history-count` | span | Session history count badge |
+| `history-modal` | div | Session history detail modal overlay |
+| `history-modal-title` | element | History modal title |
+| `history-modal-content` | div | History modal content area |
+| `history-modal-close` | button | History modal close button |
+| `modal-overlay` | div | Confirmation modal overlay |
+| `modal-title` | element | Confirmation modal title |
+| `modal-message` | element | Confirmation modal message |
+| `modal-confirm` | button | Confirmation modal confirm button |
+| `modal-cancel` | button | Confirmation modal cancel button |
+| `themeLabel` | span | Theme toggle button label text |
 
 ---
 
-## 5. CSS Class Reference
+## 5. CSS Classes
 
-| Class | Applied To | Purpose |
-|-------|-----------|---------|
-| `hidden` | div, table | Display: none toggle |
-| `bm` | table, div.output | Bone marrow elements |
-| `pb` | table, div.output | Peripheral blood elements |
-| `cellAmount` | input | Cell count input styling and selection |
-| `totalAmount` | input | Total count input (read-only) |
-| `namecell` | td | Header row cell type label |
-| `datacell` | td | Count row input container |
-| `percentrow` | td | Percentage display cell |
-| `keys` | td | Key mapping display cell |
-| `tab-link` | li | Tab navigation item |
-| `tab-content` | div | Tab content panel |
-| `current` | li, div | Active tab indicator |
-| `output` | div | Output container |
-| `copy-btn` | button | Copy to clipboard button |
-| `case-display` | span | Persistent case number badge |
-| `flash` | td | Keypress visual feedback (150ms) |
+The application uses **Tailwind CSS** (loaded via CDN) for all styling. There is no custom stylesheet. All visual presentation is achieved through Tailwind utility classes applied directly in HTML and in dynamically generated markup.
+
+**Key Tailwind patterns used**:
+
+| Pattern | Purpose |
+|---------|---------|
+| `hidden` | Display: none toggle for phase containers and conditional UI elements |
+| `flex`, `items-center`, `justify-between` | Flexbox layout for header, badges, rows |
+| `grid`, `gap-*` | Grid layout where applicable |
+| `bg-slate-*` | Background colors for dark theme (slate palette) |
+| `text-slate-*`, `text-accent` | Text colors; `text-accent` is a custom color via CSS variable |
+| `font-mono` | Monospace font for counts, percentages, ratios |
+| `border`, `border-slate-*` | Borders for table cells and sections |
+| `rounded-lg`, `rounded-md` | Border radius for cards and inputs |
+| `transition-colors`, `transition-all` | Smooth transitions for hover and state changes |
+| `animate-pulse` | Pulsing animation for active counting status indicator |
+| `px-*`, `py-*`, `mt-*`, `mb-*` | Spacing utilities |
+| `text-xs`, `text-sm`, `text-lg`, `text-2xl` | Font size scale |
+| `uppercase`, `tracking-wider` | Text transform for labels |
+| `overflow-x-auto` | Horizontal scroll for counter table on small screens |
+| `min-h-screen` | Full viewport height for layout |
+
+**Custom CSS classes** (defined in `<style>` within `counter.html`):
+
+| Class | Purpose |
+|-------|---------|
+| `flash-increment` | Green flash animation on cell increment (250ms) |
+| `flash-decrement` | Red flash animation on cell decrement (250ms) |
+| `tab-active` | Active tab indicator (border-bottom accent color) |
+| `counting-active` | Applied to `<body>` during counting phase |
+
+**Theme system**: `data-theme="light"` or `data-theme="dark"` attribute on `<body>` drives CSS variable overrides for background, text, and accent colors.
 
 ---
 
@@ -722,13 +739,16 @@ function onKeyDown(event) {
 
 | Error Condition | Detection | Response |
 |----------------|-----------|----------|
-| templates.json load failure | Backbone fetch error callback | Display error message; disable all controls |
-| Invalid JSON in templates.json | JSON.parse exception | Display error message; disable all controls |
-| Division by zero (total = 0) | Check in calcPercent() | Return 0.00 for all percentages |
-| NaN from parseInt | isNaN() check | Treat as 0 |
-| Clipboard API unavailable | navigator.clipboard check | Fallback to document.execCommand('copy') or show manual copy instructions |
-| sessionStorage unavailable | try/catch on setItem | Graceful degradation: session history disabled, warning displayed |
-| Key not in outCodes mapping | hasOwnProperty check | Ignore keypress silently |
+| templates.json load failure | `fetch()` response not ok or network error in `loadConfig()` | Display full-page error message with error details; all controls disabled |
+| Invalid JSON in templates.json | `response.json()` parse exception | Caught by `loadConfig()` try/catch; display error message; disable all controls |
+| Division by zero (total = 0) | Check in `updateCounterDisplay()` | Return `'0.00%'` for all percentages; subtotal percentages show em-dash |
+| M:E ratio denominator zero | Check in `computeMERatio()` | Return `'N/A'` string |
+| M:E ratio formula absent | Null check in `computeMERatio()` | Return `null`; M:E ratio row not rendered |
+| Decrement below zero | Check `state.counts[cellType] > 0` in `onKeyDown()` | Silently ignore; count floors at zero |
+| Clipboard API unavailable | `navigator.clipboard.writeText()` promise rejection | Fallback to `document.createRange()` + `document.execCommand('copy')` |
+| sessionStorage unavailable | try/catch on `getItem`/`setItem` | Graceful degradation: session history and theme persistence disabled; no error shown |
+| Key not in outCodes mapping | `hasOwnProperty` check in `onKeyDown()` | Ignore keypress silently |
+| Unmapped cell type in template | Regex replacement finds no match | Placeholder remains in output (no crash) |
 
 ---
 
@@ -736,9 +756,10 @@ function onKeyDown(event) {
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
-| A | 2026-02-18 | QMS | Initial draft - detailed design |
+| A | 2026-02-18 | QMS | Initial draft -- detailed design |
 | B | 2026-02-19 | QMS | Added session export design notes |
 | C | 2026-02-20 | QMS | Added theme toggle design notes |
+| D | 2026-02-24 | QMS | v2.0 -- Complete rewrite: replaced Backbone.js MVC with single-file vanilla JS IIFE; replaced 9-cell per-specimen-type tables with unified 14-cell two-row layout; removed Backbone models, collections, views, and router; replaced Handlebars templates with simple string replacement; added three-phase UI model; added M:E ratio computation; added resume counting; updated configuration schema with categories, formulas, and uppercase outCodes keys |
 
 ## 8. Approval Signatures
 

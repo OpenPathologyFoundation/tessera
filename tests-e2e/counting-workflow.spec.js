@@ -1,0 +1,275 @@
+/**
+ * E2E SUITE: Clinical Counting Workflow
+ * ======================================
+ * Traces to: URS-001..URS-006, URS-020..URS-028, URS-030..URS-036,
+ *            URS-040..URS-042, URS-050..URS-054, URS-060..URS-063
+ * VV Protocol: VV-SYS-001 onward
+ *
+ * System-level verification against the deployed application in a real
+ * browser. Validation scenario V1 (a complete bone marrow differential) is
+ * executed end to end.
+ */
+const { test, expect } = require('@playwright/test');
+
+/** Fresh browser state for every test — no carry-over between "patients". */
+// Playwright gives every test a fresh browser context, so localStorage and
+// sessionStorage already start empty. An addInitScript that clears them would
+// re-run on every navigation and wipe state the reload-based tests depend on.
+test.beforeEach(async ({ page }) => {
+    await page.goto('/counter.html');
+    await expect(page.locator('#phase-case-entry')).toBeVisible();
+});
+
+async function startCount(page, caseNumber = 'S25-1234') {
+    if (caseNumber) await page.fill('#caseNumber', caseNumber);
+    await page.click('#btnStartCount');
+    await expect(page.locator('#phase-counting')).toBeVisible();
+}
+
+/** Press a counting key n times against the document. */
+async function count(page, key, n) {
+    for (let i = 0; i < n; i++) await page.keyboard.press(key);
+}
+
+// ================================================================
+test.describe('Case entry and start', () => {
+
+    test('VV-SYS-001: Application loads and presents the case entry phase', async ({ page }) => {
+        await expect(page.locator('#caseNumber')).toBeVisible();
+        await expect(page.locator('#specimenType')).toBeVisible();
+        await expect(page.locator('#btnStartCount')).toBeVisible();
+        await expect(page.locator('#state-label')).toHaveText('Ready');
+    });
+
+    test('VV-SYS-002: Specimen selector is populated from the configuration profile', async ({ page }) => {
+        const options = await page.locator('#specimenType option').allTextContents();
+        expect(options).toContain('Bone Marrow');
+        expect(options).toContain('Peripheral Blood');
+    });
+
+    test('VV-SYS-003: Enter in the case field starts counting (barcode workflow, URS-006)', async ({ page }) => {
+        await page.fill('#caseNumber', 'S25-9999');
+        await page.press('#caseNumber', 'Enter');
+        await expect(page.locator('#phase-counting')).toBeVisible();
+
+        // The scanner leaves focus in the case field; counting must still work.
+        await count(page, 'x', 3);
+        await expect(page.locator('#val-grand-total')).toHaveText('3');
+    });
+
+    test('VV-SYS-004: Counting may begin without a case number (URS-004)', async ({ page }) => {
+        await page.click('#btnStartCount');
+        await expect(page.locator('#phase-counting')).toBeVisible();
+    });
+
+    test('VV-SYS-005: Active case number is displayed throughout counting (URS-002)', async ({ page }) => {
+        await startCount(page, 'S25-1234');
+        await expect(page.locator('#case-badge-number')).toHaveText('S25-1234');
+        await expect(page.locator('#case-badge-spec')).toHaveText('Bone Marrow');
+    });
+});
+
+// ================================================================
+test.describe('Keyboard counting', () => {
+
+    test('VV-SYS-010: Every configured key increments its own category (URS-020, URS-021)', async ({ page }) => {
+        await startCount(page);
+        const mapping = { x: 'blasts', f: 'poly', s: 'lymph', b: 'nrbc', a: 'mono' };
+        let expected = 0;
+        for (const [key, cell] of Object.entries(mapping)) {
+            await page.keyboard.press(key);
+            expected++;
+            await expect(page.locator(`#val-${cell}`)).toHaveText('1');
+        }
+        await expect(page.locator('#val-grand-total')).toHaveText(String(expected));
+    });
+
+    test('VV-SYS-011: Shift+key undoes and never passes zero (URS-025)', async ({ page }) => {
+        await startCount(page);
+        await count(page, 'x', 3);
+        await expect(page.locator('#val-blasts')).toHaveText('3');
+        await page.keyboard.press('Shift+X');
+        await expect(page.locator('#val-blasts')).toHaveText('2');
+        for (let i = 0; i < 5; i++) await page.keyboard.press('Shift+X');
+        await expect(page.locator('#val-blasts')).toHaveText('0');
+        await expect(page.locator('#val-grand-total')).toHaveText('0');
+    });
+
+    test('VV-SYS-012: Unmapped keys are ignored (URS-026)', async ({ page }) => {
+        await startCount(page);
+        for (const k of ['1', '9', '/', 'Tab', 'ArrowLeft']) await page.keyboard.press(k);
+        await expect(page.locator('#val-grand-total')).toHaveText('0');
+    });
+
+    test('VV-SYS-013: Key mapping is displayed for every category (URS-022)', async ({ page }) => {
+        await startCount(page);
+        const kbds = await page.locator('#counter-table-area kbd').allTextContents();
+        expect(kbds).toContain('X');
+        expect(kbds).toContain('F');
+        expect(kbds.filter(k => k === '?')).toHaveLength(0);
+    });
+
+    test('VV-SYS-014: Percentages update live and sum to 100.00 (URS-031, URS-034)', async ({ page }) => {
+        await startCount(page);
+        for (const k of ['x', 'f', 's', 'a', 'b', 'd', 'g']) await count(page, k, 7);
+
+        const pcts = await page.locator('#counter-table-area [id^="pct-"]:not([id^="pct-sub"])').allTextContents();
+        const sum = pcts.reduce((s, t) => s + parseFloat(t), 0);
+        expect(Number(sum.toFixed(2))).toBe(100);
+    });
+
+    test('VV-SYS-015: Typing in the comment field never counts (URS-070)', async ({ page }) => {
+        await startCount(page);
+        await page.locator('#phase-counting details summary').click();
+        await page.fill('#morphComments', 'xxxx ffff ssss');
+        await expect(page.locator('#val-grand-total')).toHaveText('0');
+        await expect(page.locator('#commentCharCount')).toContainText('14 / 500');
+    });
+
+    test('VV-SYS-016: Progress indicator tracks the target count (URS-024)', async ({ page }) => {
+        await startCount(page);
+        await expect(page.locator('#progress-label')).toHaveText('0 / 500 (target)');
+        await count(page, 'x', 10);
+        await expect(page.locator('#progress-label')).toHaveText('10 / 500 (target)');
+    });
+
+    test('VV-SYS-017: M:E ratio computes live and shows N/A with a zero denominator (URS-035)', async ({ page }) => {
+        await startCount(page);
+        await expect(page.locator('#val-me-ratio')).toHaveText('N/A');
+        await count(page, 'f', 100);
+        await expect(page.locator('#val-me-ratio')).toHaveText('N/A');  // no erythroid yet
+        await count(page, 'b', 50);
+        await expect(page.locator('#val-me-ratio')).toHaveText('2.0:1');
+    });
+});
+
+// ================================================================
+test.describe('Validation scenario V1 — complete bone marrow differential', () => {
+
+    test('VV-SYS-020: 500-cell differential counts, reports and exports consistently', async ({ page }) => {
+        await startCount(page, 'S25-0500');
+
+        const plan = { b: 150, f: 120, x: 45, d: 45, c: 40, s: 38, v: 35, a: 20, g: 7 };
+        let total = 0;
+        for (const [key, n] of Object.entries(plan)) {
+            await count(page, key, n);
+            total += n;
+        }
+        expect(total).toBe(500);
+        await expect(page.locator('#val-grand-total')).toHaveText('500');
+        await expect(page.locator('#progress-label')).toHaveText('500 / 500 (target)');
+
+        // M:E = (45+0+35+40+45+120+0+7+20) / 150 = 312/150 = 2.1
+        await expect(page.locator('#val-me-ratio')).toHaveText('2.1:1');
+
+        await page.click('#btnCountDone');
+        await expect(page.locator('#phase-results')).toBeVisible();
+
+        // Target reached: no low-count advisory
+        await expect(page.locator('#low-count-note')).toBeHidden();
+
+        // Traceability footer present (URS-052)
+        await expect(page.locator('#results-summary')).toContainText('consensus-14');
+        await expect(page.locator('#results-summary')).toContainText('v2.0');
+
+        // The report percentages must sum to 100
+        const panel = await page.locator('.tab-panel:not(.hidden)').innerText();
+        const reported = [...panel.matchAll(/(\d+)%/g)].map(m => Number(m[1]));
+        expect(reported.reduce((a, b) => a + b, 0)).toBe(100);
+    });
+
+    test('VV-SYS-021: Sub-target count completes with an advisory, never a block (URS-041)', async ({ page }) => {
+        await startCount(page, 'S25-0216');
+        await count(page, 'x', 216);
+        await page.click('#btnCountDone');
+        await expect(page.locator('#phase-results')).toBeVisible();
+        await expect(page.locator('#low-count-note')).toBeVisible();
+        await expect(page.locator('#low-count-note')).toContainText('216-cell count');
+    });
+});
+
+// ================================================================
+test.describe('Continue Counting and reset', () => {
+
+    test('VV-SYS-030: Continue Counting preserves the tally and extends it (URS-042)', async ({ page }) => {
+        await startCount(page, 'S25-1');
+        await count(page, 'x', 40);
+        await count(page, 'f', 160);
+        await page.click('#btnCountDone');
+        await expect(page.locator('#phase-results')).toBeVisible();
+
+        await page.click('#btnResumeCounting');
+        await expect(page.locator('#phase-counting')).toBeVisible();
+        await expect(page.locator('#val-grand-total')).toHaveText('200');
+
+        await count(page, 'x', 10);
+        await expect(page.locator('#val-blasts')).toHaveText('50');
+        await expect(page.locator('#val-grand-total')).toHaveText('210');
+    });
+
+    test('VV-SYS-031: Comments survive Count Done then Continue Counting (URS-073)', async ({ page }) => {
+        await startCount(page, 'S25-1');
+        await count(page, 'x', 5);
+        await page.locator('#phase-counting details summary').click();
+        await page.fill('#morphComments', 'Auer rods identified');
+        await page.click('#btnCountDone');
+        await page.click('#btnResumeCounting');
+        await expect(page.locator('#morphComments')).toHaveValue('Auer rods identified');
+    });
+
+    test('VV-SYS-032: Reset requires confirmation and then clears the count (URS-060, URS-061)', async ({ page }) => {
+        await startCount(page, 'S25-1');
+        await count(page, 'x', 12);
+        await page.click('#btnCountReset');
+        await expect(page.locator('#modal-overlay')).toBeVisible();
+
+        await page.click('#modal-cancel');
+        await expect(page.locator('#val-blasts')).toHaveText('12');
+
+        await page.click('#btnCountReset');
+        await page.click('#modal-confirm');
+        await expect(page.locator('#phase-case-entry')).toBeVisible();
+        await expect(page.locator('#caseNumber')).toHaveValue('');
+    });
+
+    test('VV-SYS-033: Keystrokes after completion cannot alter the count (HA-015)', async ({ page }) => {
+        await startCount(page, 'S25-1');
+        await count(page, 'x', 10);
+        await page.click('#btnCountDone');
+        await count(page, 'x', 5);
+        await page.click('#btnResumeCounting');
+        await expect(page.locator('#val-blasts')).toHaveText('10');
+    });
+});
+
+// ================================================================
+test.describe('Specimen type switching (URS-010, URS-013)', () => {
+
+    test('VV-SYS-040: The specimen switcher is available during counting', async ({ page }) => {
+        await startCount(page, 'S25-1');
+        await expect(page.locator('#specimen-switch-wrap')).toBeVisible();
+        await expect(page.locator('#specimenTypeCounting')).toBeEnabled();
+    });
+
+    test('VV-SYS-041: Switching mid-count saves the work to history first', async ({ page }) => {
+        await startCount(page, 'S25-1');
+        await count(page, 'x', 25);
+        await page.selectOption('#specimenTypeCounting', 'pb');
+        await expect(page.locator('#modal-overlay')).toBeVisible();
+        await expect(page.locator('#modal-message')).toContainText('saved to history');
+        await page.click('#modal-confirm');
+
+        await expect(page.locator('#val-grand-total')).toHaveText('0');
+        await expect(page.locator('#case-badge-spec')).toHaveText('Peripheral Blood');
+        await expect(page.locator('#history-count')).toHaveText('(1)');
+    });
+
+    test('VV-SYS-042: Cancelling a switch restores both the selector and the count', async ({ page }) => {
+        await startCount(page, 'S25-1');
+        await count(page, 'x', 25);
+        await page.selectOption('#specimenTypeCounting', 'pb');
+        await page.click('#modal-cancel');
+        await expect(page.locator('#specimenTypeCounting')).toHaveValue('bm');
+        await expect(page.locator('#val-blasts')).toHaveText('25');
+    });
+});

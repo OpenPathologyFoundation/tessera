@@ -29,9 +29,26 @@ describe('HTML Structure — File Integrity', () => {
         assert.ok(html.includes('lang="en"'), 'Must have lang="en"');
     });
 
-    it('HTML includes Tailwind CSS', () => {
-        assert.ok(html.includes('tailwindcss') || html.includes('cdn.tailwindcss.com'),
-            'Must include Tailwind CSS');
+    it('HTML includes Tailwind CSS from a local asset (URS-094)', () => {
+        assert.ok(html.includes('vendor/tailwind.js'), 'Must include the vendored Tailwind build');
+        assert.ok(fs.existsSync(path.join(__dirname, '..', 'web', 'vendor', 'tailwind.js')),
+            'the vendored Tailwind asset must be present in the repository');
+    });
+
+    it('No render-blocking asset is loaded from a third-party CDN (URS-094)', () => {
+        // Counting must work on a workstation with no internet access. Webfonts
+        // remain a progressive enhancement (the local font stack covers them),
+        // but stylesheet and script dependencies must be served locally.
+        assert.doesNotMatch(html, /<script[^>]+src="https?:\/\//,
+            'no script may be loaded from a remote origin');
+        assert.doesNotMatch(html, /cdn\.tailwindcss\.com/,
+            'Tailwind must not be loaded from the CDN');
+    });
+
+    it('Registers a service worker for offline operation (URS-094)', () => {
+        assert.ok(html.includes('serviceWorker'), 'must register a service worker');
+        assert.ok(fs.existsSync(path.join(__dirname, '..', 'web', 'sw.js')),
+            'sw.js must be present');
     });
 
     it('HTML includes the application script mdc-app.js', () => {
@@ -85,12 +102,12 @@ describe('HTML Structure — Specimen Type Selection (SYS-010)', () => {
 
 describe('HTML Structure — Control Buttons (SYS-050, SYS-080)', () => {
 
-    it('Start Count button exists and is initially disabled (SYS-003)', () => {
+    it('Start Count button exists and is enabled by default', () => {
         assert.ok(html.includes('id="btnStartCount"'), 'Must have Start Count button');
-        // Check that it has disabled attribute
+        // Start button should NOT have disabled attribute (case # is optional)
         const btnMatch = html.match(/id="btnStartCount"[^>]*>/);
         assert.ok(btnMatch, 'Start Count button must be found');
-        assert.ok(btnMatch[0].includes('disabled'), 'Start Count must be initially disabled');
+        assert.ok(!btnMatch[0].includes('disabled'), 'Start Count must NOT be initially disabled');
     });
 
     it('Count Done button exists (SYS-050)', () => {
@@ -107,6 +124,10 @@ describe('HTML Structure — Control Buttons (SYS-050, SYS-080)', () => {
 
     it('New Case button exists', () => {
         assert.ok(html.includes('id="btnNewCase"'), 'Must have New Case button');
+    });
+
+    it('Resume Counting button exists (btnResumeCounting)', () => {
+        assert.ok(html.includes('id="btnResumeCounting"'), 'Must have Resume Counting button');
     });
 });
 
@@ -228,5 +249,40 @@ describe('HTML Structure — Accessibility & Usability', () => {
     it('Keyboard hint text is present for users', () => {
         assert.ok(html.includes('Shift'), 'Must mention Shift key for undo');
         assert.ok(html.includes('undo'), 'Must mention undo functionality');
+    });
+
+    it('Audio toggle button exists (URS-027)', () => {
+        assert.ok(html.includes('id="btnToggleAudio"'), 'Must have audio toggle button');
+        assert.ok(html.includes('id="audioLabel"'), 'Must have audio label');
+    });
+
+    it('Print button exists in results phase (URS-054)', () => {
+        assert.ok(html.includes('id="btnPrintResults"'), 'Must have Print button');
+    });
+
+    it('Absolute count section exists in results phase (URS-036)', () => {
+        assert.ok(html.includes('id="absolute-count-section"'), 'Must have absolute count section');
+        assert.ok(html.includes('id="wbcTotal"'), 'Must have WBC total input');
+        assert.ok(html.includes('id="abs-results"'), 'Must have absolute results container');
+    });
+
+    it('Morphology checklist area exists (URS-072)', () => {
+        assert.ok(html.includes('id="morphChecklistArea"'), 'Must have morphology checklist area');
+    });
+
+    it('Config export button exists (URS-103)', () => {
+        assert.ok(html.includes('id="btnExportConfig"'), 'Must have config export button');
+    });
+
+    it('Config import file input exists (URS-103)', () => {
+        assert.ok(html.includes('id="configFileInput"'), 'Must have config file input');
+    });
+
+    it('Reset to Default Config button exists', () => {
+        assert.ok(html.includes('id="btnResetConfig"'), 'Must have reset config button');
+    });
+
+    it('Print media styles are defined (URS-054)', () => {
+        assert.ok(html.includes('@media print'), 'Must have print media styles');
     });
 });

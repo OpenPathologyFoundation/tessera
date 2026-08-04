@@ -1,0 +1,88 @@
+{
+    "version": "2.0",
+    "profileId": "legacy-9",
+    "profileName": "Legacy 9-Part",
+    "description": "Classic medical technology layout: segs, bands, lymphocytes, monocytes, eosinophils, basophils, blasts, metamyelocytes, myelocytes. Left-hand ergonomic key layout.",
+    "specimenTypes": [
+        {
+            "specimenType": "bm",
+            "specimenLabel": "Bone Marrow",
+            "targetCount": 500,
+            "requireCaseNumber": false,
+            "upperRowAbnormal": false,
+            "categories": {
+                "upper": ["nrbc", "blasts", "myelo", "meta"],
+                "lower": ["bands", "segs", "eos", "baso", "mono", "lymph"]
+            },
+            "outCodes": {
+                "F": "segs",
+                "D": "bands",
+                "S": "lymph",
+                "A": "mono",
+                "G": "eos",
+                "Z": "baso",
+                "X": "blasts",
+                "C": "myelo",
+                "V": "meta",
+                "B": "nrbc"
+            },
+            "formulas": {
+                "ME_ratio": {
+                    "label": "M:E Ratio",
+                    "numerator": ["blasts", "myelo", "meta", "bands", "segs", "baso", "eos", "mono"],
+                    "denominator": ["nrbc"],
+                    "precision": 1
+                }
+            },
+            "templates": [
+                {
+                    "tplCode": "std",
+                    "tplName": "Standard",
+                    "outSentence": "A {{total}}-cell count reveals {{blasts}}% blasts, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{bands}}% bands, {{segs}}% segmented neutrophils, {{eos}}% eosinophils, {{baso}}% basophils, {{mono}}% monocytes, {{lymph}}% lymphocytes, and {{nrbc}}% erythroid precursors. M:E ratio {{ME_ratio}}."
+                }
+            ],
+            "constituents": {},
+            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "autosave": true,
+            "absoluteCounts": "optional",
+            "handedness": "left",
+            "morphologyChecklist": []
+        },
+        {
+            "specimenType": "pb",
+            "specimenLabel": "Peripheral Blood",
+            "targetCount": 200,
+            "requireCaseNumber": false,
+            "upperRowAbnormal": true,
+            "categories": {
+                "upper": ["nrbc", "blasts", "myelo", "meta"],
+                "lower": ["bands", "segs", "eos", "baso", "mono", "lymph"]
+            },
+            "outCodes": {
+                "F": "segs",
+                "D": "bands",
+                "S": "lymph",
+                "A": "mono",
+                "G": "eos",
+                "Z": "baso",
+                "X": "blasts",
+                "C": "myelo",
+                "V": "meta",
+                "B": "nrbc"
+            },
+            "templates": [
+                {
+                    "tplCode": "std",
+                    "tplName": "Standard",
+                    "outSentence": "A {{total}}-cell differential count of peripheral blood reveals: {{segs}}% segmented neutrophils, {{bands}}% band forms, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{blasts}}% blasts, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, and {{nrbc}}% nucleated RBCs."
+                }
+            ],
+            "constituents": {},
+            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "autosave": true,
+            "absoluteCounts": "optional",
+            "handedness": "left",
+            "morphologyChecklist": []
+        }
+    ]
+}

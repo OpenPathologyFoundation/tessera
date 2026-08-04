@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WBC ΔΣ — Manual Differential Counter</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="vendor/tailwind.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -35,6 +35,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Optional webfonts: absent offline, the local font stacks in tailwind.config apply -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Franklin:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         /* Bauhaus principle: minimal, functional animation */
@@ -110,6 +111,23 @@
         body[data-theme="light"] .placeholder-slate-600::placeholder { color: #94a3b8 !important; }
         body[data-theme="light"] ::-webkit-scrollbar-track { background: #e2e8f0; }
         body[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+        /* Print styles (URS-054) */
+        @media print {
+            header, #session-history-section, .no-print,
+            #btnCopyOutput, #btnResumeCounting, #btnNewCase,
+            #btnCountDone, #btnCountReset, #btnPrintResults { display: none !important; }
+            /* Keep computed absolute counts on the printout — they are a
+               clinical result — but drop the entry control that produced them. */
+            #absolute-count-section label, #wbcTotal { display: none !important; }
+            #absolute-count-section:has(#abs-results:empty) { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .bg-slate-800, .bg-slate-800\/50 { background: #f3f4f6 !important; }
+            .border-slate-700, .border-slate-600 { border-color: #d1d5db !important; }
+            .text-slate-300, .text-slate-400, .text-slate-500, .text-accent {
+                color: #111827 !important;
+            }
+            .font-mono { font-family: 'Courier New', monospace !important; }
+        }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans min-h-screen antialiased">
@@ -120,16 +138,16 @@
     <header id="top-bar" class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50">
         <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
             <!-- Left: App identity (hidden during case-entry, shown during counting/results) -->
-            <div id="header-logo" class="flex items-center shrink-0 hidden" role="img" aria-label="WBC Delta Sigma — Manual Differential Counter">
+            <div id="header-logo" class="flex items-center shrink-0 hidden" role="img" aria-label="WBC Manual Differential Counter">
                 <svg width="28" height="28" viewBox="0 0 40 40" fill="none" class="text-slate-300 shrink-0" aria-hidden="true">
                     <g fill="currentColor"><rect x="3" y="5" width="8" height="8" rx="1"/><rect x="16" y="9" width="8" height="8" rx="1"/><rect x="29" y="5" width="8" height="8" rx="1"/></g>
                     <path d="M4 24 L36 24 M4 24 L20 30 L4 36 M4 36 L36 36" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" fill="none"/>
                 </svg>
                 <div class="flex flex-col ml-2.5 leading-tight">
-                    <span class="text-sm font-bold text-slate-300" style="font-family:'Libre Franklin',sans-serif;font-variant-caps:small-caps;">WBC&#8201;&#916;&#931;</span>
+                    <span class="text-sm font-bold text-slate-300" style="font-family:'Libre Franklin',sans-serif;font-variant-caps:small-caps;">WBC</span>
                     <span class="text-[9px] text-slate-500">Manual Differential Counter</span>
                 </div>
-                <h1 class="sr-only">WBC ΔΣ — Manual Differential Counter</h1>
+                <h1 class="sr-only">WBC Manual Differential Counter</h1>
             </div>
             <!-- Center: Case number (prominent) -->
             <div id="case-badge" class="hidden items-center gap-2 px-3 py-1 bg-slate-800 border border-slate-600 rounded-md">
@@ -138,8 +156,25 @@
                 <span class="text-xs text-slate-500">|</span>
                 <span id="case-badge-spec" class="text-xs text-slate-400 uppercase"></span>
             </div>
-            <!-- Right: State indicator -->
+            <!-- Right: State indicator + controls -->
             <div class="flex items-center gap-3 shrink-0">
+                <!-- Specimen switcher, live during counting (URS-010, URS-013) -->
+                <div id="specimen-switch-wrap" class="hidden items-center gap-2">
+                    <label for="specimenTypeCounting" class="text-[10px] text-slate-500 uppercase tracking-wider">Specimen</label>
+                    <select
+                        id="specimenTypeCounting"
+                        class="px-2 py-1 bg-slate-800 border border-slate-600 rounded-md text-[11px] text-slate-300 focus:border-accent focus:ring-1 focus:ring-accent transition-colors cursor-pointer"
+                    ></select>
+                </div>
+                <button
+                    id="btnToggleAudio"
+                    class="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md text-[11px] font-medium transition-colors"
+                    title="Toggle audio feedback"
+                    aria-pressed="true"
+                >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+                    <span id="audioLabel">Sound On</span>
+                </button>
                 <button
                     id="btnToggleTheme"
                     class="flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-md text-[11px] font-medium transition-colors"
@@ -165,13 +200,13 @@
         <section id="phase-case-entry" class="animate-in">
             <div class="max-w-md mx-auto mt-20">
                 <div class="flex justify-center mb-8">
-                    <div class="flex items-center gap-4" role="img" aria-label="WBC Delta Sigma — Manual Differential Counter">
+                    <div class="flex items-center gap-4" role="img" aria-label="WBC Manual Differential Counter">
                         <svg width="48" height="48" viewBox="0 0 40 40" fill="none" class="text-slate-300 shrink-0" aria-hidden="true">
                             <g fill="currentColor"><rect x="3" y="5" width="8" height="8" rx="1"/><rect x="16" y="9" width="8" height="8" rx="1"/><rect x="29" y="5" width="8" height="8" rx="1"/></g>
                             <path d="M4 24 L36 24 M4 24 L20 30 L4 36 M4 36 L36 36" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" fill="none"/>
                         </svg>
                         <div class="flex flex-col leading-tight">
-                            <span class="text-2xl font-bold text-slate-200" style="font-family:'Libre Franklin',sans-serif;font-variant-caps:small-caps;letter-spacing:0.02em;">WBC&#8201;&#916;&#931;</span>
+                            <span class="text-2xl font-bold text-slate-200" style="font-family:'Libre Franklin',sans-serif;font-variant-caps:small-caps;letter-spacing:0.02em;">WBC</span>
                             <span class="text-xs text-slate-500 mt-0.5">Manual Differential Counter</span>
                         </div>
                     </div>
@@ -180,7 +215,7 @@
                     <!-- Case number input -->
                     <div>
                         <label for="caseNumber" class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">
-                            Case / Accession #
+                            Case / Accession # <span class="normal-case tracking-normal font-normal text-slate-500">(optional)</span>
                         </label>
                         <input
                             type="text"
@@ -192,7 +227,7 @@
                             class="w-full px-4 py-3 bg-slate-800 border border-slate-600 rounded-lg text-lg font-mono text-slate-100 placeholder-slate-600 focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
                         />
                     </div>
-                    <!-- Specimen type -->
+                    <!-- Specimen type (populated dynamically from config) -->
                     <div>
                         <label for="specimenType" class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">
                             Specimen Type
@@ -208,16 +243,40 @@
                     <!-- Start button -->
                     <button
                         id="btnStartCount"
-                        disabled
-                        class="w-full mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-700 disabled:text-slate-500 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all duration-150 text-base"
+                        class="w-full mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition-all duration-150 text-base"
                     >
                         Start Count
                     </button>
-                    <div class="mt-3 text-center">
+                    <!-- Settings row -->
+                    <div class="mt-3 flex items-center justify-center gap-4">
                         <a href="help.html" target="_blank" rel="noopener" class="text-xs text-slate-500 hover:text-slate-400 transition-colors inline-flex items-center gap-1">
                             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.065 2.05-1.37 2.772-1.153.722.217 1.326.896 1.326 1.653 0 1.5-2.326 1.5-2.326 3m0 3h.01"/><circle cx="12" cy="12" r="10" stroke-width="2"/></svg>
                             Quick Start Guide
                         </a>
+                        <a href="editor.html" class="text-xs text-slate-500 hover:text-slate-400 transition-colors inline-flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3" stroke-width="2"/></svg>
+                            Configuration Editor
+                        </a>
+                        <span class="text-slate-700">|</span>
+                        <button id="btnPresetCatalog" class="text-xs text-slate-500 hover:text-slate-400 transition-colors inline-flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                            Preset Profiles
+                        </button>
+                        <span class="text-slate-700">|</span>
+                        <button id="btnExportConfig" class="text-xs text-slate-500 hover:text-slate-400 transition-colors inline-flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Export Config
+                        </button>
+                        <label class="text-xs text-slate-500 hover:text-slate-400 transition-colors inline-flex items-center gap-1 cursor-pointer">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                            Import Config
+                            <input type="file" id="configFileInput" accept=".json" class="hidden">
+                        </label>
+                        <span class="text-slate-700">|</span>
+                        <button id="btnResetConfig" class="text-xs text-slate-500 hover:text-slate-400 transition-colors inline-flex items-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            Reset to Default
+                        </button>
                     </div>
                 </div>
             </div>
@@ -239,6 +298,8 @@
                         <svg class="w-3 h-3 transition-transform group-open:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         Morphology Comments
                     </summary>
+                    <!-- Structured morphology checklist (populated by JS if defined in config) -->
+                    <div id="morphChecklistArea" class="mt-2"></div>
                     <textarea
                         id="morphComments"
                         rows="2"
@@ -286,6 +347,29 @@
                     <!-- Filled by JS: read-only table -->
                 </div>
 
+                <!-- Low count advisory (URS-041) — informational, never blocking -->
+                <p id="low-count-note" class="hidden mb-4 px-4 py-2 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-300" role="status"></p>
+
+                <!-- Absolute Counts (URS-036) -->
+                <div id="absolute-count-section" class="hidden mb-6 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <label for="wbcTotal" class="text-xs font-medium text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                            Total WBC (&times;10&#8313;/L):
+                        </label>
+                        <input
+                            type="number"
+                            id="wbcTotal"
+                            step="0.1"
+                            min="0"
+                            placeholder="e.g. 7.5"
+                            class="w-32 px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm font-mono text-slate-100 placeholder-slate-600 focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                        />
+                    </div>
+                    <div id="abs-results" class="mt-2">
+                        <!-- Absolute count badges injected by JS -->
+                    </div>
+                </div>
+
                 <!-- Output tabs -->
                 <div id="output-tabs" class="mb-4">
                     <div id="tab-nav" class="flex gap-1 border-b border-slate-700">
@@ -298,19 +382,36 @@
 
                 <!-- Actions -->
                 <div class="flex items-center justify-between mt-6">
-                    <button
-                        id="btnCopyOutput"
-                        class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium rounded-lg transition-all duration-150 text-sm"
-                    >
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                        <span id="copyBtnText">Copy to Clipboard</span>
-                    </button>
-                    <button
-                        id="btnNewCase"
-                        class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition-all duration-150 text-sm"
-                    >
-                        New Case
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <button
+                            id="btnCopyOutput"
+                            class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium rounded-lg transition-all duration-150 text-sm"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            <span id="copyBtnText">Copy to Clipboard</span>
+                        </button>
+                        <button
+                            id="btnPrintResults"
+                            class="flex items-center gap-2 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-slate-300 font-medium rounded-lg transition-all duration-150 text-sm no-print"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                            Print
+                        </button>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button
+                            id="btnResumeCounting"
+                            class="px-6 py-2 bg-amber-600 hover:bg-amber-500 text-white font-medium rounded-lg transition-all duration-150 text-sm"
+                        >
+                            Continue Counting
+                        </button>
+                        <button
+                            id="btnNewCase"
+                            class="px-6 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium rounded-lg transition-all duration-150 text-sm"
+                        >
+                            New Case
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -368,6 +469,25 @@
     </div>
 
     <!-- ============================================================ -->
+    <!-- MODAL: Preset Profile Catalogue (URS-101)                     -->
+    <!-- ============================================================ -->
+    <div id="preset-modal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-600 rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto p-6 animate-in">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-lg font-semibold text-slate-200">Preset Configuration Profiles</h3>
+                <button id="preset-modal-close" class="text-slate-500 hover:text-slate-300 transition-colors" aria-label="Close">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 mb-4">
+                Loading a preset replaces the active configuration and clears any count in progress.
+                You can adapt any preset afterwards in the Configuration Editor.
+            </p>
+            <div id="preset-list" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
     <!-- MODAL: History Entry Viewer                                   -->
     <!-- ============================================================ -->
     <div id="history-modal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
@@ -385,9 +505,26 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- APPLICATION SCRIPT                                            -->
+    <!-- APPLICATION SCRIPTS                                           -->
+    <!-- wbc-core.js holds every safety-critical computation and must   -->
+    <!-- load before mdc-app.js, which consumes it as window.WBCCore.   -->
+    <!-- All control wiring lives in mdc-app.js; nothing is bound here  -->
+    <!-- because module-private functions are not reachable from an     -->
+    <!-- inline script.                                                 -->
     <!-- ============================================================ -->
+    <script src="scripts/wbc-core.js"></script>
     <script src="scripts/mdc-app.js"></script>
+
+    <!-- Offline support (URS-094). Registration is best-effort: the service
+         worker is an availability enhancement and the counter must run without
+         it, including from a file:// URL where registration is unavailable. -->
+    <script>
+        if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('sw.js').catch(function () { /* non-fatal */ });
+            });
+        }
+    </script>
 
 </body>
 </html>

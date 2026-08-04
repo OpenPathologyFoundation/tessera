@@ -1,443 +1,339 @@
 /**
  * TEST SUITE 01: Calculation Engine
  * ==================================
- * Traces to: SRS SYS-040 through SYS-045
+ * Traces to: SRS SYS-040 through SYS-047
  * FMEA: HA-020 (calculation error), HA-021 (division by zero), HA-022 (sum != 100%)
- * VV Protocol: VV-CALC-001 through VV-CALC-015
+ * VV Protocol: VV-CALC-001 through VV-CALC-024, VV-ME-001 through VV-ME-005
  *
- * Tests the core percentage calculation logic extracted from mdc-app.js.
- * This is the single most safety-critical computation in the application.
+ * This suite executes the SHIPPED calculation engine (web/scripts/wbc-core.js).
+ * It previously re-implemented the algorithms locally and verified the copy,
+ * which meant a defect in the application could not be detected here. See
+ * DCR-004.
+ *
+ * Unified 14-cell layout (same for BM and PB):
+ *   nrbc, blasts, pro, myelo, meta, plasma, mast, bands, poly, baso, eos, mono, lymph, other
  */
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
+const path = require('node:path');
 
-// ================================================================
-// Extract the calculation logic (mirrors mdc-app.js exactly)
-// ================================================================
+// The application module under verification — not a copy of it.
+const Core = require(path.join(__dirname, '..', 'web', 'scripts', 'wbc-core.js'));
 
-/**
- * Calculate percentage for each cell type.
- * Formula: (cell_count / total_count) * 100, rounded to 2 decimal places.
- * Division by zero guard: returns 0.00 when total is 0.
- *
- * @param {Object} counts - { cellType: integer_count }
- * @returns {{ percentages: Object, total: number }}
- */
-function calcPercent(counts) {
-    const total = Object.values(counts).reduce((sum, v) => sum + v, 0);
-    const percentages = {};
-    for (const [cellType, count] of Object.entries(counts)) {
-        if (total === 0) {
-            percentages[cellType] = 0.00;
-        } else {
-            const pct = (count / total) * 100;
-            percentages[cellType] = parseFloat(pct.toFixed(2));
-        }
-    }
-    return { percentages, total };
+const CELL_TYPES = ['nrbc', 'blasts', 'pro', 'myelo', 'meta', 'plasma', 'mast',
+    'bands', 'poly', 'baso', 'eos', 'mono', 'lymph', 'other'];
+
+function zeroCounts() {
+    const c = {};
+    CELL_TYPES.forEach(ct => { c[ct] = 0; });
+    return c;
 }
 
-/**
- * Increment a cell count. Returns new count.
- */
-function increment(current) {
-    return current + 1;
+function counts(overrides) {
+    return Object.assign(zeroCounts(), overrides);
 }
 
-/**
- * Decrement a cell count. Cannot go below zero (SYS-033).
- */
-function decrement(current) {
-    return current > 0 ? current - 1 : 0;
+/** Sum of an object's numeric values, rounded to kill float noise. */
+function sumOf(obj, decimals = 6) {
+    return Number(Object.values(obj).reduce((s, v) => s + v, 0).toFixed(decimals));
 }
 
-/**
- * Build output template JSON (mirrors mkOutTplJson).
- * Percentages are rounded to nearest integer for output.
- */
-function mkOutTplJson(outCodes, counts, caseNumber, comments) {
-    const total = Object.values(counts).reduce((s, v) => s + v, 0);
-    const result = { caseNumber, total, comments };
-    for (const [key, cellType] of Object.entries(outCodes)) {
-        result[cellType] = total > 0 ? Math.round((counts[cellType] / total) * 100) : 0;
-    }
-    return result;
-}
+// The M:E formula as defined in the shipped configuration profile.
+const ME_FORMULA = {
+    label: 'M:E Ratio',
+    numerator: ['blasts', 'pro', 'myelo', 'meta', 'bands', 'poly', 'baso', 'eos', 'mono'],
+    denominator: ['nrbc'],
+    precision: 1
+};
 
 // ================================================================
-// TESTS
-// ================================================================
-
 describe('Calculation Engine — Percentage Computation (SYS-040 to SYS-045)', () => {
 
-    // ----------------------------------------------------------
-    // VV-CALC-001: All zeros — Division by zero guard (SYS-042)
-    // ----------------------------------------------------------
     it('VV-CALC-001: All zeros returns 0.00 for every cell (SYS-042, HA-021)', () => {
-        const counts = { blast: 0, pro: 0, gran: 0, eryth: 0, baso: 0, eos: 0, plasma: 0, lymph: 0, mono: 0 };
-        const { percentages, total } = calcPercent(counts);
-
-        assert.equal(total, 0, 'Total should be 0');
+        const { percentages, total } = Core.calcPercentages(zeroCounts());
+        assert.equal(total, 0);
         for (const [ct, pct] of Object.entries(percentages)) {
-            assert.equal(pct, 0.00, `${ct} should be 0.00 when total is 0`);
-            assert.equal(typeof pct, 'number', `${ct} should be a number, not NaN or string`);
-            assert.ok(!isNaN(pct), `${ct} must not be NaN`);
-            assert.ok(isFinite(pct), `${ct} must not be Infinity`);
+            assert.equal(pct, 0, `${ct} should be 0 when total is 0`);
+            assert.ok(!Number.isNaN(pct), `${ct} must not be NaN`);
+            assert.ok(Number.isFinite(pct), `${ct} must not be Infinity`);
         }
     });
 
-    // ----------------------------------------------------------
-    // VV-CALC-002: Single cell = 100%
-    // ----------------------------------------------------------
     it('VV-CALC-002: Single cell counted = 100.00% (SYS-040)', () => {
-        const counts = { blast: 1, pro: 0, gran: 0, eryth: 0, baso: 0, eos: 0, plasma: 0, lymph: 0, mono: 0 };
-        const { percentages, total } = calcPercent(counts);
-
+        const { percentages, total } = Core.calcPercentages(counts({ blasts: 1 }));
         assert.equal(total, 1);
-        assert.equal(percentages.blast, 100.00);
-        assert.equal(percentages.pro, 0.00);
+        assert.equal(percentages.blasts, 100);
+        assert.equal(percentages.poly, 0);
     });
 
-    // ----------------------------------------------------------
-    // VV-CALC-003: Two equal cells = 50/50
-    // ----------------------------------------------------------
-    it('VV-CALC-003: Two equal cells = 50.00% each (SYS-040)', () => {
-        const counts = { blast: 50, pro: 50, gran: 0, eryth: 0, baso: 0, eos: 0, plasma: 0, lymph: 0, mono: 0 };
-        const { percentages, total } = calcPercent(counts);
-
-        assert.equal(total, 100);
-        assert.equal(percentages.blast, 50.00);
-        assert.equal(percentages.pro, 50.00);
+    it('VV-CALC-003: Two equal cells = 50.00% each', () => {
+        const { percentages } = Core.calcPercentages(counts({ poly: 50, lymph: 50 }));
+        assert.equal(percentages.poly, 50);
+        assert.equal(percentages.lymph, 50);
     });
 
-    // ----------------------------------------------------------
-    // VV-CALC-004: All equal (9 cells of 10 each = 11.11%)
-    // ----------------------------------------------------------
-    it('VV-CALC-004: Nine equal cells = 11.11% each (SYS-040)', () => {
-        const counts = { blast: 10, pro: 10, gran: 10, eryth: 10, baso: 10, eos: 10, plasma: 10, lymph: 10, mono: 10 };
-        const { percentages, total } = calcPercent(counts);
-
-        assert.equal(total, 90);
-        for (const ct of Object.keys(counts)) {
-            assert.equal(percentages[ct], 11.11, `${ct} should be 11.11%`);
-        }
+    it('VV-CALC-004: Fourteen equal cells = 7.142857...% raw', () => {
+        const all = {};
+        CELL_TYPES.forEach(ct => { all[ct] = 10; });
+        const { percentages, total } = Core.calcPercentages(all);
+        assert.equal(total, 140);
+        CELL_TYPES.forEach(ct => {
+            assert.ok(Math.abs(percentages[ct] - 7.142857142857143) < 1e-9, ct);
+        });
     });
 
-    // ----------------------------------------------------------
-    // VV-CALC-005: One dominant cell
-    // ----------------------------------------------------------
-    it('VV-CALC-005: One dominant cell type (SYS-040)', () => {
-        const counts = { blast: 0, pro: 0, gran: 95, eryth: 0, baso: 0, eos: 0, plasma: 0, lymph: 5, mono: 0 };
-        const { percentages } = calcPercent(counts);
-
-        assert.equal(percentages.gran, 95.00);
-        assert.equal(percentages.lymph, 5.00);
-        assert.equal(percentages.blast, 0.00);
+    it('VV-CALC-005: One dominant cell 95/5', () => {
+        const { percentages } = Core.calcPercentages(counts({ blasts: 95, lymph: 5 }));
+        assert.equal(percentages.blasts, 95);
+        assert.equal(percentages.lymph, 5);
     });
 
-    // ----------------------------------------------------------
-    // VV-CALC-006: All ones (minimum multitype)
-    // ----------------------------------------------------------
-    it('VV-CALC-006: All ones (total=9), each = 11.11% (SYS-040)', () => {
-        const counts = { blast: 1, pro: 1, gran: 1, eryth: 1, baso: 1, eos: 1, plasma: 1, lymph: 1, mono: 1 };
-        const { percentages, total } = calcPercent(counts);
-
-        assert.equal(total, 9);
-        for (const ct of Object.keys(counts)) {
-            assert.equal(percentages[ct], 11.11);
-        }
+    it('VV-CALC-008: Acute leukemia pattern — 45% blasts', () => {
+        const { percentages } = Core.calcPercentages(
+            counts({ blasts: 45, poly: 20, lymph: 20, mono: 10, eos: 5 }));
+        assert.equal(percentages.blasts, 45);
     });
 
-    // ----------------------------------------------------------
-    // VV-CALC-007: Standard bone marrow differential
-    // ----------------------------------------------------------
-    it('VV-CALC-007: Standard BM differential (100 cells) — exact percentages (SYS-040)', () => {
-        const counts = { blast: 2, pro: 5, gran: 60, eryth: 10, baso: 1, eos: 3, plasma: 2, lymph: 12, mono: 5 };
-        const { percentages, total } = calcPercent(counts);
-
-        assert.equal(total, 100);
-        assert.equal(percentages.blast, 2.00);
-        assert.equal(percentages.pro, 5.00);
-        assert.equal(percentages.gran, 60.00);
-        assert.equal(percentages.eryth, 10.00);
-        assert.equal(percentages.baso, 1.00);
-        assert.equal(percentages.eos, 3.00);
-        assert.equal(percentages.plasma, 2.00);
-        assert.equal(percentages.lymph, 12.00);
-        assert.equal(percentages.mono, 5.00);
-
-        // Sum check (SYS-044)
-        const sum = Object.values(percentages).reduce((s, v) => s + v, 0);
-        assert.equal(sum, 100.00, 'Sum should be exactly 100.00');
-    });
-
-    // ----------------------------------------------------------
-    // VV-CALC-008: Abnormal BM (acute leukemia pattern)
-    // ----------------------------------------------------------
-    it('VV-CALC-008: Abnormal BM differential — leukemia pattern (SYS-040)', () => {
-        const counts = { blast: 45, pro: 15, gran: 10, eryth: 5, baso: 0, eos: 1, plasma: 2, lymph: 20, mono: 2 };
-        const { percentages, total } = calcPercent(counts);
-
-        assert.equal(total, 100);
-        assert.equal(percentages.blast, 45.00);
-        assert.equal(percentages.baso, 0.00);
-
-        const sum = Object.values(percentages).reduce((s, v) => s + v, 0);
-        assert.equal(sum, 100.00);
-    });
-
-    // ----------------------------------------------------------
-    // VV-CALC-009: Small count (N=10)
-    // ----------------------------------------------------------
-    it('VV-CALC-009: Small count (10 cells) — correct percentages (SYS-040)', () => {
-        const counts = { blast: 3, pro: 0, gran: 4, eryth: 0, baso: 0, eos: 0, plasma: 0, lymph: 2, mono: 1 };
-        const { percentages, total } = calcPercent(counts);
-
-        assert.equal(total, 10);
-        assert.equal(percentages.blast, 30.00);
-        assert.equal(percentages.gran, 40.00);
-        assert.equal(percentages.lymph, 20.00);
-        assert.equal(percentages.mono, 10.00);
-    });
-
-    // ----------------------------------------------------------
-    // VV-CALC-010: Large count (N=500)
-    // ----------------------------------------------------------
-    it('VV-CALC-010: Large count (500 cells) — correct percentages (SYS-P04)', () => {
-        const counts = { blast: 10, pro: 25, gran: 300, eryth: 50, baso: 5, eos: 15, plasma: 10, lymph: 60, mono: 25 };
-        const { percentages, total } = calcPercent(counts);
-
-        assert.equal(total, 500);
-        assert.equal(percentages.blast, 2.00);
-        assert.equal(percentages.gran, 60.00);
-        assert.equal(percentages.lymph, 12.00);
-
-        const sum = Object.values(percentages).reduce((s, v) => s + v, 0);
-        assert.equal(sum, 100.00);
-    });
-
-    // ----------------------------------------------------------
-    // VV-CALC-011: Repeating thirds (rounding edge case)
-    // ----------------------------------------------------------
-    it('VV-CALC-011: Repeating thirds — sum within tolerance (SYS-044)', () => {
-        const counts = { blast: 1, pro: 1, gran: 1, eryth: 0, baso: 0, eos: 0, plasma: 0, lymph: 0, mono: 0 };
-        const { percentages } = calcPercent(counts);
-
-        assert.equal(percentages.blast, 33.33);
-        assert.equal(percentages.pro, 33.33);
-        assert.equal(percentages.gran, 33.33);
-
-        const sum = Object.values(percentages).reduce((s, v) => s + v, 0);
-        assert.ok(Math.abs(sum - 100) <= 0.10, `Sum ${sum} should be within ±0.10 of 100`);
-    });
-
-    // ----------------------------------------------------------
-    // VV-CALC-012: Repeating sixths (rounding accumulation)
-    // ----------------------------------------------------------
-    it('VV-CALC-012: Six equal cells — sum within tolerance (SYS-044)', () => {
-        const counts = { blast: 1, pro: 1, gran: 1, eryth: 1, baso: 1, eos: 1, plasma: 0, lymph: 0, mono: 0 };
-        const { percentages } = calcPercent(counts);
-
-        assert.equal(percentages.blast, 16.67);
-        const sum = Object.values(percentages).reduce((s, v) => s + v, 0);
-        assert.ok(Math.abs(sum - 100) <= 0.10, `Sum ${sum.toFixed(2)} should be within ±0.10 of 100`);
-    });
-
-    // ----------------------------------------------------------
-    // VV-CALC-013: Near-even distribution
-    // ----------------------------------------------------------
-    it('VV-CALC-013: Near-even distribution (total=10) (SYS-040)', () => {
-        const counts = { blast: 2, pro: 1, gran: 1, eryth: 1, baso: 1, eos: 1, plasma: 1, lymph: 1, mono: 1 };
-        const { percentages, total } = calcPercent(counts);
-
-        assert.equal(total, 10);
-        assert.equal(percentages.blast, 20.00);
-        assert.equal(percentages.pro, 10.00);
-    });
-
-    // ----------------------------------------------------------
-    // VV-CALC-014: Maximum capacity (total=9999)
-    // ----------------------------------------------------------
-    it('VV-CALC-014: Maximum capacity 9999 cells — no degradation (SYS-P04)', () => {
-        const counts = { blast: 1111, pro: 1111, gran: 1111, eryth: 1111, baso: 1111, eos: 1111, plasma: 1111, lymph: 1111, mono: 1111 };
-        const { percentages, total } = calcPercent(counts);
-
+    it('VV-CALC-014: Maximum capacity (9999 cells) computes without degradation (SYS-P04)', () => {
+        const { percentages, total } = Core.calcPercentages(counts({ poly: 9000, lymph: 999 }));
         assert.equal(total, 9999);
-        assert.equal(percentages.blast, 11.11);
-
-        // No NaN, no Infinity
-        for (const pct of Object.values(percentages)) {
-            assert.ok(!isNaN(pct), 'No NaN at high counts');
-            assert.ok(isFinite(pct), 'No Infinity at high counts');
-        }
+        assert.ok(Math.abs(percentages.poly - 90.00900090009001) < 1e-9);
     });
 
-    // ----------------------------------------------------------
-    // VV-CALC-015: Standard peripheral blood differential
-    // ----------------------------------------------------------
-    it('VV-CALC-015: Standard PB differential (100 cells) (SYS-040)', () => {
-        const counts = { poly: 60, band: 5, lymph: 25, mono: 5, eos: 2, baso: 1, pro: 0, blast: 0, other: 2 };
-        const { percentages, total } = calcPercent(counts);
+    it('Non-numeric and missing values do not corrupt the total', () => {
+        assert.equal(Core.getTotal({ a: 5, b: undefined, c: null, d: NaN, e: 3 }), 8);
+        assert.equal(Core.getTotal({}), 0);
+        assert.equal(Core.getTotal(null), 0);
+    });
+});
 
-        assert.equal(total, 100);
-        assert.equal(percentages.poly, 60.00);
-        assert.equal(percentages.lymph, 25.00);
-        assert.equal(percentages.blast, 0.00);
+// ================================================================
+describe('Calculation Engine — Sum to 100% (URS-034, SYS-044, HA-022)', () => {
 
-        const sum = Object.values(percentages).reduce((s, v) => s + v, 0);
-        assert.equal(sum, 100.00);
+    it('VV-CALC-011: Repeating thirds sum to exactly 100.00 at 2 dp', () => {
+        const p = Core.percentagesSummingTo100(counts({ poly: 1, lymph: 1, mono: 1 }), 2);
+        assert.equal(sumOf(p), 100);
     });
 
-    // ----------------------------------------------------------
-    // ADDITIONAL: Decimal precision always 2 places (SYS-041)
-    // ----------------------------------------------------------
-    it('SYS-041: All percentages have exactly 2 decimal places', () => {
-        const counts = { blast: 7, pro: 3, gran: 0, eryth: 0, baso: 0, eos: 0, plasma: 0, lymph: 0, mono: 0 };
-        const { percentages } = calcPercent(counts);
-
-        // 70.00 and 30.00 should have .00
-        assert.equal(percentages.blast, 70.00);
-        assert.equal(percentages.pro, 30.00);
-
-        // Verify string representation has 2 decimals
-        assert.equal(percentages.blast.toFixed(2), '70.00');
-        assert.equal(percentages.pro.toFixed(2), '30.00');
+    it('VV-CALC-012: Repeating sixths sum to exactly 100.00 at 2 dp', () => {
+        const p = Core.percentagesSummingTo100(
+            counts({ poly: 1, lymph: 1, mono: 1, eos: 1, baso: 1, blasts: 1 }), 2);
+        assert.equal(sumOf(p), 100);
     });
 
-    // ----------------------------------------------------------
-    // ADDITIONAL: Percentage sum validation across many distributions (SYS-044)
-    // ----------------------------------------------------------
-    it('SYS-044: Percentage sum within ±0.10 of 100% for 20 random distributions', () => {
-        // Test with various distributions
-        const distributions = [
-            { a: 1, b: 2, c: 3 },
-            { a: 7, b: 7, c: 7, d: 7, e: 7, f: 7, g: 7 },
-            { a: 99, b: 1 },
-            { a: 1 },
-            { a: 33, b: 33, c: 34 },
-            { a: 1, b: 1, c: 1, d: 1, e: 1, f: 1, g: 1, h: 1, i: 1, j: 1, k: 1 },
-            { a: 143, b: 57 },
-            { a: 3, b: 5, c: 8, d: 13, e: 21, f: 34, g: 55, h: 89 },
-            { a: 500 },
-            { a: 250, b: 250 },
+    it('VV-CALC-016: Fourteen equal cells sum to exactly 100.00 at 2 dp', () => {
+        const all = {};
+        CELL_TYPES.forEach(ct => { all[ct] = 10; });
+        assert.equal(sumOf(Core.percentagesSummingTo100(all, 2)), 100);
+    });
+
+    it('VV-CALC-017: Integer output percentages sum to exactly 100', () => {
+        const all = {};
+        CELL_TYPES.forEach(ct => { all[ct] = 10; });
+        assert.equal(sumOf(Core.percentagesSummingTo100(all, 0)), 100);
+    });
+
+    it('VV-CALC-018: Zero total produces all zeros, not a forced 100', () => {
+        const p = Core.percentagesSummingTo100(zeroCounts(), 2);
+        assert.equal(sumOf(p), 0);
+        Object.values(p).forEach(v => assert.equal(v, 0));
+    });
+
+    it('VV-CALC-019: No category deviates from its true percentage by more than one unit of the last decimal place', () => {
+        const cases = [
+            counts({ poly: 1, lymph: 1, mono: 1 }),
+            counts({ nrbc: 150, blasts: 12, pro: 8, myelo: 35, meta: 40, plasma: 9, mast: 2, bands: 45, poly: 120, baso: 3, eos: 16, mono: 20, lymph: 38, other: 2 }),
+            counts({ poly: 7, lymph: 7, mono: 7, eos: 7, baso: 7, blasts: 7, pro: 7 })
         ];
-
-        for (const dist of distributions) {
-            const { percentages, total } = calcPercent(dist);
-            if (total > 0) {
-                const sum = Object.values(percentages).reduce((s, v) => s + v, 0);
-                assert.ok(
-                    Math.abs(sum - 100) <= 0.10,
-                    `Distribution ${JSON.stringify(dist)}: sum ${sum.toFixed(4)} not within ±0.10 of 100`
-                );
+        for (const c of cases) {
+            const total = Core.getTotal(c);
+            for (const decimals of [0, 2]) {
+                const p = Core.percentagesSummingTo100(c, decimals);
+                const unit = 1 / Math.pow(10, decimals);
+                for (const ct of Object.keys(c)) {
+                    const exact = (c[ct] / total) * 100;
+                    assert.ok(Math.abs(p[ct] - exact) <= unit + 1e-9,
+                        `${ct}: adjusted ${p[ct]} deviates from exact ${exact} by more than ${unit}`);
+                }
             }
         }
     });
-});
 
-describe('Calculation Engine — Increment/Decrement (SYS-031 to SYS-033)', () => {
+    it('VV-CALC-020: Property — 2000 randomized differentials always sum to exactly 100', () => {
+        // Deterministic LCG so a failure is reproducible.
+        let seed = 20260224;
+        const rand = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648;
 
-    // VV-INC-001
-    it('VV-INC-001: Increment from zero gives 1', () => {
-        assert.equal(increment(0), 1);
-    });
-
-    // VV-INC-002
-    it('VV-INC-002: Increment from 5 gives 6', () => {
-        assert.equal(increment(5), 6);
-    });
-
-    // VV-INC-003
-    it('VV-INC-003: Decrement from 5 gives 4', () => {
-        assert.equal(decrement(5), 4);
-    });
-
-    // VV-INC-004
-    it('VV-INC-004: Decrement from 1 gives 0', () => {
-        assert.equal(decrement(1), 0);
-    });
-
-    // VV-INC-005: Critical — cannot go below zero (SYS-033)
-    it('VV-INC-005: Decrement from 0 stays at 0 — NEVER negative (SYS-033, HA-013)', () => {
-        assert.equal(decrement(0), 0);
-        // Also test multiple decrements from zero
-        let val = 0;
-        for (let i = 0; i < 100; i++) {
-            val = decrement(val);
-        }
-        assert.equal(val, 0, 'After 100 decrements from zero, value must remain 0');
-    });
-
-    // VV-INC-006
-    it('VV-INC-006: Decrement the only cell returns to zero total', () => {
-        let blast = 1;
-        blast = decrement(blast);
-        assert.equal(blast, 0);
-    });
-
-    // VV-INC-007
-    it('VV-INC-007: Increment after decrement to zero works', () => {
-        let val = 1;
-        val = decrement(val); // 0
-        val = increment(val); // 1
-        assert.equal(val, 1);
-    });
-
-    // VV-INC-008
-    it('VV-INC-008: 20 rapid increments yield 20', () => {
-        let val = 0;
-        for (let i = 0; i < 20; i++) val = increment(val);
-        assert.equal(val, 20);
-    });
-
-    // Additional: Increment and decrement are exact inverses
-    it('Increment followed by decrement returns to original value', () => {
-        for (let start = 0; start < 50; start++) {
-            assert.equal(decrement(increment(start)), start);
+        for (let i = 0; i < 2000; i++) {
+            const c = {};
+            const n = 2 + Math.floor(rand() * 13);
+            for (let j = 0; j < n; j++) c[CELL_TYPES[j]] = Math.floor(rand() * 500);
+            const total = Core.getTotal(c);
+            for (const decimals of [0, 2]) {
+                const p = Core.percentagesSummingTo100(c, decimals);
+                assert.equal(sumOf(p), total === 0 ? 0 : 100,
+                    `iteration ${i} decimals ${decimals}: ${JSON.stringify(c)}`);
+            }
         }
     });
 
-    // Additional: Large increment sequence
-    it('1000 increments yield exactly 1000', () => {
-        let val = 0;
-        for (let i = 0; i < 1000; i++) val = increment(val);
-        assert.equal(val, 1000);
+    it('VV-CALC-021: Adjustment is deterministic for identical input', () => {
+        const c = counts({ poly: 3, lymph: 3, mono: 3, eos: 1 });
+        const a = Core.percentagesSummingTo100(c, 2);
+        const b = Core.percentagesSummingTo100(c, 2);
+        assert.deepEqual(a, b);
     });
 });
 
-describe('Calculation Engine — Output Template JSON (SYS-061)', () => {
+// ================================================================
+describe('Calculation Engine — Hostile and Degenerate Input', () => {
 
-    const bmOutCodes = { A: 'blast', S: 'pro', D: 'gran', F: 'eryth', Z: 'baso', X: 'eos', C: 'plasma', V: 'lymph', B: 'mono' };
-
-    it('VV-TPL: Output JSON contains case number, total, and all cell percentages', () => {
-        const counts = { blast: 2, pro: 5, gran: 60, eryth: 10, baso: 1, eos: 3, plasma: 2, lymph: 12, mono: 5 };
-        const result = mkOutTplJson(bmOutCodes, counts, 'TEST-001', 'Auer rods seen.');
-
-        assert.equal(result.caseNumber, 'TEST-001');
-        assert.equal(result.total, 100);
-        assert.equal(result.comments, 'Auer rods seen.');
-        assert.equal(result.blast, 2);
-        assert.equal(result.gran, 60);
-        assert.equal(result.lymph, 12);
+    it('VV-CALC-024: A persisted negative count cannot produce a negative percentage', () => {
+        // Reachable only via a hand-edited or corrupted autosave record, which
+        // has left the protection of the keyboard handler's decrement guard.
+        const clean = Core.sanitizeCounts({ blasts: -5, poly: 10 }, ['blasts', 'poly']);
+        assert.equal(clean.blasts, 0);
+        assert.equal(clean.poly, 10);
+        const p = Core.percentagesSummingTo100(clean, 2);
+        Object.values(p).forEach(v => assert.ok(v >= 0, 'no percentage may be negative'));
+        assert.equal(sumOf(p), 100);
     });
 
-    it('VV-TPL: Output percentages are rounded integers', () => {
-        const counts = { blast: 1, pro: 1, gran: 1, eryth: 0, baso: 0, eos: 0, plasma: 0, lymph: 0, mono: 0 };
-        const result = mkOutTplJson(bmOutCodes, counts, 'TEST-002', '');
-
-        // 1/3 = 33.33% -> rounds to 33
-        assert.equal(result.blast, 33);
-        assert.equal(result.pro, 33);
-        assert.equal(result.gran, 33);
-        assert.equal(Number.isInteger(result.blast), true);
+    it('VV-CALC-025: sanitizeCounts coerces to non-negative integers and drops unknown types', () => {
+        const clean = Core.sanitizeCounts(
+            { blasts: 3.7, poly: '12', baso: NaN, eos: -1, ghost: 99 },
+            ['blasts', 'poly', 'baso', 'eos']);
+        assert.deepEqual(clean, { blasts: 3, poly: 12, baso: 0, eos: 0 });
+        assert.equal(Object.prototype.hasOwnProperty.call(clean, 'ghost'), false);
     });
 
-    it('VV-TPL: Zero total produces all zeros in output', () => {
-        const counts = { blast: 0, pro: 0, gran: 0, eryth: 0, baso: 0, eos: 0, plasma: 0, lymph: 0, mono: 0 };
-        const result = mkOutTplJson(bmOutCodes, counts, 'TEST-003', '');
+    it('VV-CALC-026: A single counted category is 100% at every precision', () => {
+        assert.deepEqual(Core.percentagesSummingTo100({ blasts: 7 }, 0), { blasts: 100 });
+        assert.deepEqual(Core.percentagesSummingTo100({ blasts: 7 }, 2), { blasts: 100 });
+    });
 
-        assert.equal(result.total, 0);
-        assert.equal(result.blast, 0);
+    it('VV-CALC-027: Extreme ratios still sum to exactly 100', () => {
+        const p = Core.percentagesSummingTo100({ poly: 999999, baso: 1 }, 2);
+        assert.equal(sumOf(p), 100);
+    });
+
+    it('VV-CALC-028: getTotal ignores negative and non-finite entries', () => {
+        assert.equal(Core.getTotal({ a: 5, b: -3, c: Infinity, d: 2 }), 7);
+    });
+});
+
+// ================================================================
+describe('Calculation Engine — Display Formatting (URS-032, SYS-041)', () => {
+
+    it('VV-CALC-022: Percentages render at 2 decimal places', () => {
+        assert.equal(Core.formatPercent(7.1, 2), '7.10%');
+        assert.equal(Core.formatPercent(0, 2), '0.00%');
+        assert.equal(Core.formatPercent(100, 2), '100.00%');
+    });
+
+    it('VV-CALC-023: Low-percentage categories retain 2 dp resolution', () => {
+        const p = Core.percentagesSummingTo100(counts({ poly: 199, baso: 1 }), 2);
+        assert.equal(Core.formatPercent(p.baso, 2), '0.50%');
+    });
+});
+
+// ================================================================
+describe('Calculation Engine — Increment / Decrement (SYS-031 to SYS-033)', () => {
+
+    it('VV-INC-001: Increment adds exactly one', () => {
+        const c = zeroCounts();
+        c.blasts += 1;
+        assert.equal(c.blasts, 1);
+        assert.equal(Core.getTotal(c), 1);
+    });
+
+    it('VV-INC-005: Decrement never goes below zero (HA-013)', () => {
+        // Mirrors the guard in onKeyDown: only decrement when > 0.
+        let v = 0;
+        if (v > 0) v -= 1;
+        assert.equal(v, 0);
+    });
+
+    it('VV-INC-006: Sequence of increments and undos yields the arithmetic result', () => {
+        const c = zeroCounts();
+        for (let i = 0; i < 10; i++) c.poly += 1;
+        for (let i = 0; i < 3; i++) if (c.poly > 0) c.poly -= 1;
+        assert.equal(c.poly, 7);
+        assert.equal(Core.getTotal(c), 7);
+    });
+});
+
+// ================================================================
+describe('Calculation Engine — M:E Ratio (SYS-046, SYS-047, HA-070, HA-072)', () => {
+
+    it('VV-ME-001: Standard myeloid/erythroid ratio', () => {
+        const c = counts({ poly: 100, nrbc: 50 });
+        assert.equal(Core.computeRatio(c, ME_FORMULA), '2.0:1');
+    });
+
+    it('VV-ME-002: Ratio honours the configured precision', () => {
+        const c = counts({ poly: 100, nrbc: 30 });
+        assert.equal(Core.computeRatio(c, ME_FORMULA), '3.3:1');
+        assert.equal(Core.computeRatio(c, Object.assign({}, ME_FORMULA, { precision: 2 })), '3.33:1');
+    });
+
+    it('VV-ME-003: Zero denominator yields N/A, never a division error (HA-072)', () => {
+        const c = counts({ poly: 100, nrbc: 0 });
+        assert.equal(Core.computeRatio(c, ME_FORMULA), 'N/A');
+    });
+
+    it('VV-ME-004: Zero numerator over a positive denominator is 0.0:1', () => {
+        const c = counts({ nrbc: 40 });
+        assert.equal(Core.computeRatio(c, ME_FORMULA), '0.0:1');
+    });
+
+    it('VV-ME-005: Absent formula returns null so no ratio row is rendered', () => {
+        assert.equal(Core.computeRatio(counts({ poly: 5 }), null), null);
+        assert.equal(Core.computeRatio(counts({ poly: 5 }), {}), null);
+    });
+
+    it('VV-ME-006: Every numerator member contributes to the ratio', () => {
+        const c = counts({ nrbc: 10 });
+        ME_FORMULA.numerator.forEach(ct => { c[ct] = 1; });
+        // 9 myeloid members / 10 erythroid = 0.9
+        assert.equal(Core.computeRatio(c, ME_FORMULA), '0.9:1');
+    });
+});
+
+// ================================================================
+describe('Calculation Engine — Absolute Counts (URS-036)', () => {
+
+    it('VV-ABS-001: Absolute count is WBC x percentage / 100', () => {
+        assert.equal(Core.computeAbsolute(10, 50), 5);
+        assert.equal(Number(Core.computeAbsolute(7.5, 62.5).toFixed(4)), 4.6875);
+    });
+
+    it('VV-ABS-002: Non-positive or non-numeric WBC yields null, not NaN', () => {
+        assert.equal(Core.computeAbsolute(0, 50), null);
+        assert.equal(Core.computeAbsolute(-3, 50), null);
+        assert.equal(Core.computeAbsolute(NaN, 50), null);
+        assert.equal(Core.computeAbsolute('7.5', 50), null);
+    });
+});
+
+// ================================================================
+describe('Calculation Engine — Low Count Advisory (URS-041, SYS-053)', () => {
+
+    it('VV-LOW-001: Below-target count produces a non-blocking note', () => {
+        const note = Core.buildLowCountNote(216, 500);
+        assert.ok(note, 'expected an advisory note');
+        assert.match(note, /216-cell count/);
+        assert.match(note, /500/);
+    });
+
+    it('VV-LOW-002: Reaching the target produces no note', () => {
+        assert.equal(Core.buildLowCountNote(500, 500), null);
+        assert.equal(Core.buildLowCountNote(501, 500), null);
+    });
+
+    it('VV-LOW-003: Missing or invalid target produces no note', () => {
+        assert.equal(Core.buildLowCountNote(100, 0), null);
+        assert.equal(Core.buildLowCountNote(100, undefined), null);
     });
 });

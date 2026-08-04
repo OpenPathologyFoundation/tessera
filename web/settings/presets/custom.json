@@ -1,0 +1,33 @@
+{
+    "version": "2.0",
+    "profileId": "custom",
+    "profileName": "Custom (Template)",
+    "description": "Blank starting point for building a custom differential layout. Use the visual configuration editor to add cell types, assign keys, and set targets.",
+    "specimenTypes": [
+        {
+            "specimenType": "custom",
+            "specimenLabel": "Custom Specimen",
+            "targetCount": 200,
+            "requireCaseNumber": false,
+            "upperRowAbnormal": false,
+            "categories": {
+                "upper": [],
+                "lower": []
+            },
+            "outCodes": {},
+            "templates": [
+                {
+                    "tplCode": "std",
+                    "tplName": "Standard",
+                    "outSentence": "A {{total}}-cell differential count."
+                }
+            ],
+            "constituents": {},
+            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "autosave": true,
+            "absoluteCounts": "optional",
+            "handedness": "left",
+            "morphologyChecklist": []
+        }
+    ]
+}

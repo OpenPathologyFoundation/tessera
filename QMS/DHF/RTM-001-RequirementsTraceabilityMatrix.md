@@ -5,228 +5,309 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | RTM-001 |
-| **Version** | 1.0 |
-| **Product** | WBC ΔΣ |
+| **Version** | 3.0 |
+| **Product** | WBC ΔΣ v2.1.0 |
 | **Date Created** | 2026-02-18 |
+| **Date Revised** | 2026-08-04 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
+| **Requirement Baseline** | **URS-001 v2.0** (2026-02-24) |
+| **Change Record** | DCR-004 |
 
 ---
 
 ## 1. Purpose
 
-This Requirements Traceability Matrix (RTM) provides bidirectional traceability between:
-- User Requirements (URS-001) → System Requirements (SRS-001)
-- System Requirements (SRS-001) → Design (SAD-001, SDD-001)
-- System Requirements (SRS-001) → Risk Analysis (RA-001)
-- System Requirements (SRS-001) → Verification/Test Cases (TP-001, VV-001)
+This Requirements Traceability Matrix provides bidirectional traceability
+between:
 
-This ensures that every user need is addressed by system requirements, every system requirement is implemented in the design, every risk is mitigated, and every requirement is verified by testing.
+- User Requirements (**URS-001 v2.0**) → System Requirements (SRS-001 v2.1)
+- System Requirements → Design (SAD-001, SDD-001)
+- System Requirements → Risk Analysis (RA-001)
+- System Requirements → Verification (TP-001, VV-001, TR-001)
 
-## 2. Traceability Direction
+## 2. Baseline Correction Notice
+
+**RTM v2.0 was keyed to URS-001 v1.0 while DHF-001 controlled URS-001 v2.0.**
+Both documents were dated 2026-02-24 and both were labelled v2.0, but every URS
+identifier in the matrix matched the v1.0 text. Consequences included: "Full"
+coverage asserted for URS-043, which v2.0 had withdrawn; URS-013 described as
+"prevent specimen type change mid-count" when v2.0 requires a warn-and-save
+switch; URS-055, URS-056 and URS-110 cited although they do not exist in v2.0;
+and the visual configuration editor listed as deferred when v2.0 makes it
+URS-102, P0-Critical.
+
+This revision re-keys the entire matrix to URS-001 v2.0. Coverage claims are
+restated against verification that executes shipped application code — see §3
+of DCR-004 for why the previous claims could not be supported.
+
+## 3. Traceability Direction
 
 ```
-URS (User Need) → SRS (System Req) → SDD (Design) → TP/VV (Verification)
-                                    ↗
-                        RA (Risk) ──┘
+URS (User Need) -> SRS (System Req) -> SDD (Design) -> TP/VV (Verification)
+                                      /
+                        RA (Risk) ---+
 ```
+
+## 4. Verification Layer Key
+
+| Tag | Layer | Meaning |
+|-----|-------|---------|
+| **U** | Unit (`node --test`) | Calls `web/scripts/wbc-core.js` — the shipped engine — directly |
+| **B** | Behaviour (jsdom, suite 11) | Executes real `counter.html` + `wbc-core.js` + `mdc-app.js` in a DOM |
+| **S** | System (Playwright) | Drives the deployed application over HTTP in Chromium, Firefox and WebKit |
+| **I** | Inspection | Documented review, no automated test |
 
 ---
 
-## 3. Forward Traceability: URS → SRS → Design → Test
+## 5. Forward Traceability: URS v2.0 → SRS → Design → Verification
 
-### 3.1 Case Identification
+### 5.1 Case Identification (URS §5.1)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-001 | Mandatory case number before counting | SYS-001, SYS-003, SYS-005 | 3.4.1 CaseInputView | HA-001 | TC-001, TC-002, TC-003 | Full |
-| URS-002 | Case number displayed prominently | SYS-004 | 3.4.1 CaseInputView | HA-002 | TC-004 | Full |
-| URS-003 | Clear all data on new case entry | SYS-006, SYS-007, SYS-008 | 3.4.1, 3.9 Reset | HA-003 | TC-005, TC-006, TC-007 | Full |
-| URS-004 | Prevent counting without case number | SYS-003 | 3.4.1, 3.4.4 Buttons | HA-001 | TC-001, TC-002 | Full |
-| URS-005 | Accept alphanumeric case numbers | SYS-002 | 3.4.1 CaseInputView | - | TC-008, TC-009 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-001 | Case/accession number input field | SYS-001, SYS-002 | 3.4.1 | HA-001 | TC-B001, VV-SYS-001 | B, S | Full |
+| URS-002 | Case number displayed prominently during counting and on all output | SYS-004 | 3.4.1 | HA-002 | TC-B004, VV-SYS-005, VV-E2E-020 | U, B, S | Full |
+| URS-003 | Clear all count data on new case | SYS-006, SYS-007 | 3.9 | HA-003 | TC-B037, TC-B038, VV-SYS-032 | B, S | Full |
+| URS-004 | Case number requirement is profile-configurable; default not required | SYS-003 | 3.4.4 | HA-001 | TC-B005, TC-B020, TC-B021, VV-SYS-004 | B, S | Full |
+| URS-005 | Accept alphanumeric case numbers of variable length | SYS-002 | 3.4.1 | — | VV-E2E-033, VV-SYS-005 | U, S | Full |
+| URS-006 | Enter transitions to counting (barcode-scanner workflow) | SYS-009 | 3.4.1 | — | TC-B014, VV-SYS-003 | B, S | Full |
 
-### 3.2 Specimen Type Selection
+### 5.2 Specimen Type Selection (URS §5.2)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-010 | Select specimen type before counting | SYS-010, SYS-011 | 3.2 Specimen Type Controller | HA-014 | TC-010 | Full |
-| URS-011 | Support BM and PB | SYS-010, SYS-014, SYS-015 | 3.8 templates.json | - | TC-012, TC-013 | Full |
-| URS-012 | Display appropriate cell types | SYS-012, SYS-014, SYS-015 | 3.4.2 MakeTable, 3.8 | HA-010 | TC-011, TC-012, TC-013 | Full |
-| URS-013 | Prevent specimen type change mid-count | SYS-016, SYS-017 | 3.4.4 Buttons | HA-014 | TC-014, TC-015 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-010 | Select specimen type **before or during** counting | SYS-010, SYS-011, SYS-016 | 3.2, 3.4.4 | HA-014 | TC-B040, TC-B041, VV-SYS-040 | B, S | Full |
+| URS-011 | Support BM and PB; body fluids when a profile defines them | SYS-010, SYS-102, SYS-171 | 3.8 | — | VV-SYS-057, suite 09 | U, S | Full |
+| URS-012 | Display cell types appropriate to the specimen type | SYS-012, SYS-014, SYS-015 | 3.4.2 | HA-010 | TC-B003, VV-SYS-013 | B, S | Full |
+| URS-013 | Warn on mid-count switch; save to history if a case number is present, otherwise discard on confirmation | SYS-016, SYS-017 | 3.4.4 | HA-014 | TC-B042, TC-B043, TC-B044, VV-SYS-041, VV-SYS-042 | B, S | Full |
 
-### 3.3 Cell Counting
+### 5.3 Cell Counting (URS §5.3)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-020 | Increment via keyboard key | SYS-030, SYS-031 | 3.5.1 addToCell, 3.7 keydown | - | TC-020, TC-025 | Full |
-| URS-021 | Unique key per cell type | SYS-038, SYS-039 | 3.8 templates.json | HA-010 | TC-021, TC-022 | Full |
-| URS-022 | Display key mapping | SYS-023 | 3.4.2 MakeTable.mkKeyRow | - | TC-012, TC-013 | Full |
-| URS-023 | Real-time count display | SYS-022, SYS-024 | 3.4.2, 3.5.1 | HA-011 | TC-020, TC-032 | Full |
-| URS-024 | Running total displayed | SYS-021, SYS-025, SYS-034 | 3.4.2, 3.5.1 | HA-023 | TC-028, TC-029 | Full |
-| URS-025 | Undo/decrement mechanism | SYS-032 | 3.5.1, 3.7 | HA-013 | TC-026, TC-027 | Full |
-| URS-026 | No count below zero | SYS-033 | 3.5.1, 3.2.2 CellCount | - | TC-027, VV-INC-005 | Full |
-| URS-027 | Feedback on keypress | SYS-037 | 3.5.1 (flash) | HA-011 | TC-030 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-020 | Increment by single keypress | SYS-030, SYS-031 | 3.5.1, 3.7 | — | VV-E2E-001, TC-B010, VV-SYS-010 | U, B, S | Full |
+| URS-021 | Unique key per cell type; no two categories share a key | SYS-038, SYS-039, SYS-104 | 3.8 | HA-010, HA-062 | TC-B063, VV-SYS-052, suite 02 | U, B, S | Full |
+| URS-022 | Key mapping displayed at all times | SYS-023 | 3.4.2 | — | VV-SYS-013 | S | Full |
+| URS-023 | Real-time per-category count display | SYS-022, SYS-024 | 3.4.2 | HA-011 | TC-B010, VV-SYS-010 | B, S | Full |
+| URS-024 | Running total and progress toward target | SYS-021, SYS-025, SYS-120 | 3.4.2 | HA-023 | TC-B019, VV-SYS-016 | B, S | Full |
+| URS-025 | Shift+key decrement; never below zero | SYS-032, SYS-033 | 3.5.1 | HA-013 | VV-E2E-004, TC-B011, VV-SYS-011 | U, B, S | Full |
+| URS-026 | Silently ignore unassigned keys | SYS-035 | 3.7 | — | VV-E2E-003, TC-B012, VV-SYS-012 | U, B, S | Full |
+| URS-027 | Configurable audio feedback, distinct per event, independently togglable | SYS-140–SYS-144 | 3.12 | HA-011 | TC-B092, TC-B093, suite 06 | B | Full |
+| URS-028 | "Start Count" control marks the setup→counting boundary | SYS-009 | 3.4.4 | — | TC-B003, VV-SYS-001 | B, S | Full |
 
-### 3.4 Percentage Calculation
+### 5.4 Percentage Calculation and Derived Values (URS §5.4)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-030 | Auto-calculate percentages | SYS-040, SYS-045 | 3.5.2 calcPercent | HA-020 | VV-CALC-001 to 015, TC-043 | Full |
-| URS-031 | Real-time percentage updates | SYS-043 | 3.5.2 | - | TC-111 | Full |
-| URS-032 | Minimum 1 decimal precision | SYS-041 | 3.5.2 | - | TC-045 | Full |
-| URS-033 | Division by zero handling | SYS-042 | 3.5.2 | HA-021 | TC-040, VV-CALC-001 | Full |
-| URS-034 | Percentages sum to 100% | SYS-044 | 3.5.2 | HA-022 | TC-046, VV-CALC-011/012 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-030 | Auto-calculate per-category percentage | SYS-040, SYS-045 | 3.5.2 | HA-020 | VV-CALC-001..008 | U | Full |
+| URS-031 | Real-time percentage update | SYS-043 | 3.5.2 | — | TC-B018, VV-SYS-014 | B, S | Full |
+| URS-032 | Minimum 2 decimal places | SYS-041 | 3.5.2 | — | VV-CALC-022, VV-CALC-023 | U | Full |
+| URS-033 | Division-by-zero handled (0.00%, never NaN) | SYS-042 | 3.5.2 | HA-021 | VV-CALC-001, VV-CALC-018 | U | Full |
+| URS-034 | Reported percentages sum to exactly 100% by largest-remainder distribution; error bounded at one unit | SYS-044 | 3.5.2 | HA-022 | VV-CALC-011, 012, 016–021, VV-E2E-011, VV-SYS-014 | U, B, S | Full |
+| URS-035 | Config-defined derived formulas; "N/A" on zero denominator | SYS-046, SYS-047 | 3.5.4 | HA-070, HA-072 | VV-ME-001..006, VV-SYS-017 | U, S | Full |
+| URS-036 | Optional absolute counts from an analyser WBC; configurable | SYS-150–SYS-153 | 3.13 | HA-024 | VV-ABS-001, VV-ABS-002, TC-B085, TC-B086 | U, B | Full |
 
-### 3.5 Count Completion and Validation
+### 5.5 Count Completion and Resumption (URS §5.5)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-040 | "Count Done" function | SYS-050, SYS-051 | 3.4.4 Buttons.countDone | - | TC-050, TC-057 | Full |
-| URS-041 | Minimum cell count threshold | SYS-052, SYS-053 | 3.4.4, 3.11 config | HA-030 | TC-050, TC-051, TC-054 | Full |
-| URS-042 | Warning with override for low count | SYS-053 | 3.4.4 | HA-030 | TC-051, TC-052, TC-053 | Full |
-| URS-043 | Lock inputs after completion | SYS-054, SYS-055 | 3.4.2, 3.4.4 | HA-031 | TC-055, TC-056 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-040 | "Count Done" available at any total > 0 | SYS-050, SYS-051 | 3.4.4 | — | TC-B030, VV-SYS-020 | B, S | Full |
+| URS-041 | Non-blocking advisory note below target; never an enforced override | SYS-052, SYS-053 | 3.4.4 | HA-030 | VV-LOW-001..003, VV-E2E-023, TC-B081, TC-B082, VV-SYS-021 | U, B, S | Full |
+| URS-042 | "Continue Counting" preserves all tallies | SYS-057, SYS-058 | 3.4.4 | HA-071 | VV-E2E-050, TC-B032, VV-SYS-030 | U, B, S | Full |
+| URS-043 | *Withdrawn in URS v2.0* | — | — | — | — | — | n/a |
 
-### 3.6 Output and Reporting
+### 5.6 Output and Reporting (URS §5.6)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-050 | Generate formatted output | SYS-056, SYS-060, SYS-061 | 3.4.3, 3.5.3 | HA-050 | TC-060, TC-061 | Full |
-| URS-051 | Multiple institutional templates | SYS-060, SYS-062 | 3.4.3, 3.8 | HA-051 | TC-060, TC-067 | Full |
-| URS-052 | Case number in all output | SYS-067 | 3.5.3 | HA-004 | TC-062, VV-TPL-001 to 004 | Full |
-| URS-053 | Total count in output | SYS-061 | 3.5.3 | - | TC-063 | Full |
-| URS-054 | Percentages in output | SYS-061 | 3.5.3 | HA-024 | TC-064 | Full |
-| URS-055 | Copy to clipboard | SYS-064, SYS-065, SYS-066 | 3.4.3 | HA-042 | TC-065, TC-066 | Full |
-| URS-056 | Tabbed output interface | SYS-062, SYS-063 | 3.4.3 | - | TC-060, TC-067 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-050 | Formatted output on completion | SYS-056, SYS-060, SYS-061 | 3.5.3 | HA-050 | VV-E2E-012, VV-E2E-013 | U | Full |
+| URS-051 | Export as JSON, CSV and clipboard; templates configurable | SYS-062, SYS-096, SYS-097 | 3.4.3 | HA-051 | VV-E2E-021, VV-E2E-022, VV-SYS-070..072 | U, S | Full |
+| URS-052 | All output carries case no., specimen, total, counts, percentages, formulas, comments, **profile ID and version**, timestamp | SYS-067, SYS-160–SYS-163 | 3.5.3 | HA-004, HA-024 | VV-E2E-020, 021, 022, TC-B080, TC-B083, TC-B084, VV-SYS-071 | U, B, S | Full |
+| URS-053 | Copy formatted output to the system clipboard | SYS-064, SYS-065, SYS-066 | 3.4.3 | HA-042 | VV-SYS-070 | S | Full |
+| URS-054 | Print-friendly view / PDF export | SYS-130, SYS-131 | 3.4.8 | — | VV-SYS-074, suite 03 (print CSS) | S, I | Full |
 
-### 3.7 Reset and New Case
+### 5.7 Reset and New Case (URS §5.7)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-060 | Reset function | SYS-080, SYS-082, SYS-083 | 3.4.4, 3.9 | HA-040 | TC-082, TC-084 | Full |
-| URS-061 | Confirmation before reset | SYS-081 | 3.4.4 | HA-040 | TC-080, TC-081 | Full |
-| URS-062 | Auto-clear on new case | SYS-006 | 3.4.1 | HA-003 | TC-005 | Full |
-| URS-063 | Return to case input after reset | SYS-084 | 3.4.4, 3.9 | - | TC-083 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-060 | Reset clears all data and returns to the initial state | SYS-080, SYS-082, SYS-083 | 3.9 | HA-040 | TC-B036, VV-SYS-032 | B, S | Full |
+| URS-061 | Confirmation required when count data exists | SYS-081 | 3.4.4 | HA-040 | TC-B036, VV-SYS-032 | B, S | Full |
+| URS-062 | Auto-clear on new case | SYS-006 | 3.4.1 | HA-003 | TC-B037, TC-B038 | B | Full |
+| URS-063 | Reset preserves specimen type; case field cleared and focused | SYS-084 | 3.9 | — | TC-B037 | B | Full |
 
-### 3.8 Morphology Comments
+### 5.8 Morphology Comments (URS §5.8)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-070 | Morphology comment field | SYS-070, SYS-071, SYS-073 | 3.4.5 MorphologyCommentsView | HA-052 | TC-070, TC-071, TC-072 | Full |
-| URS-071 | Comments in output | SYS-072 | 3.4.5, 3.5.3 | HA-052 | TC-068, VV-TPL-005 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-070 | Collapsible free-text field that does not capture counting keystrokes | SYS-070, SYS-071, SYS-073 | 3.4.5 | HA-052 | TC-B015, TC-B016, VV-SYS-015 | B, S | Full |
+| URS-071 | Comments in all output formats | SYS-072 | 3.5.3 | HA-052 | VV-E2E-040, VV-E2E-041, TC-B035 | U, B | Full |
+| URS-072 | Optional structured/synoptic comment templates from the profile | SYS-075, SYS-076 | 3.4.5 | — | TC-B034, TC-B035 | B | Full |
+| URS-073 | Comments preserved across Count Done → Continue Counting | SYS-074 | 3.4.5 | — | TC-B033 (free text), TC-B034 (structured) | B, S | Full |
 
-### 3.9 Session History
+### 5.9 Session Data, History and Recovery (URS §5.9)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-080 | Retain completed counts in session | SYS-090, SYS-091, SYS-095 | 3.3.2, 3.4.6 | - | TC-090, TC-093 | Full |
-| URS-081 | Session history list | SYS-092 | 3.4.6 | - | TC-090 | Full |
-| URS-082 | Read-only history review | SYS-093 | 3.4.6 | - | TC-091 | Full |
-| URS-083 | Indicate temporary nature of data | SYS-094 | 3.4.6 | - | TC-094 | Full |
-| URS-084 | Export session history to local files | SYS-096, SYS-097 | 3.4.6 | - | TC-095, TC-096 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-080 | Retain completed counts for the browser session | SYS-090, SYS-091, SYS-095 | 3.3.2 | — | TC-B030, TC-B038 | B | Full |
+| URS-081 | Session history list | SYS-092 | 3.4.6 | — | TC-B088, VV-SYS-075 | B, S | Full |
+| URS-082 | Read-only retrieval of a completed count | SYS-093 | 3.4.6 | — | TC-B088, VV-SYS-075 | B, S | Full |
+| URS-083 | Indicate that session data is temporary | SYS-094 | 3.4.6 | — | suite 03 (disclosure text) | I | Full |
+| URS-084 | Export session history to local CSV and JSON | SYS-096, SYS-097 | 3.4.6 | — | TC-B083, TC-B084, VV-SYS-071, VV-SYS-072 | B, S | Full |
+| URS-085 | Auto-save after every keystroke; offer restore on relaunch; configurable | SYS-145–SYS-149 | 3.14 | HA-041 | TC-B050..TC-B055, VV-SYS-080..082, suite 07 | B, S | Full |
 
-### 3.10 Usability
+### 5.10 Usability, Accessibility and Sensory Feedback (URS §5.10)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-090 | Keyboard-only operation during counting | SYS-030, SYS-031, SYS-032 | 3.7 | - | TC-020 to TC-031 | Full |
-| URS-091 | Readable font size | SYS-026 | 3.5 CSS | - | Inspection | Full |
-| URS-092 | Clear instructions | SYS-070 (instructions) | 3.4.4 | - | Validation V1 | Full |
-| URS-093 | Cross-browser support | SYS-I01, SYS-I02, SYS-I03 | 5.1 Tech Stack | - | TC-100, TC-101, TC-102 | Full |
-| URS-094 | Offline operation after load | SYS-I04 | 5.1 | - | TC-103 | Full |
-| URS-095 | Theme toggle for ergonomic presentation | SYS-110, SYS-111, SYS-112 | 3.4.7 | - | TC-120, TC-121, TC-122 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-090 | Fully keyboard-operable during counting | SYS-030–SYS-033 | 3.7 | — | VV-SYS-010..017 | S | Full |
+| URS-091 | Readable at normal working distance | SYS-026 | 3.5 CSS | — | Inspection | I | Full |
+| URS-092 | Clear workflow instructions | SYS-077 | 3.4.4 | — | Inspection, `help.html` | I | Full |
+| URS-093 | Chrome/Firefox/Edge without plugins | SYS-I01–SYS-I03 | 5.1 | — | VV-SYS suite executed on Chromium, Firefox and WebKit | S | Full |
+| URS-094 | No internet connection required after initial load | SYS-I04, SYS-170–SYS-173 | 5.1, 3.15 | — | TC-B072, VV-SYS-090, VV-SYS-091, suite 03 | B, S | Full |
+| URS-095 | Light/Dark themes via control and keyboard shortcut | SYS-110–SYS-112 | 3.4.7 | — | TC-B090, TC-B091 | B | Full |
+| URS-096 | Aggregated categories show constituent cell types on hover | SYS-027 | 3.4.2 | — | suite 03, suite 08 (`constituents`) | U, I | Full |
+| URS-097 | Distinct audio for count, undo and text entry; independently togglable | SYS-140–SYS-144 | 3.12 | — | TC-B092, TC-B093, suite 06 | B | Full |
 
-### 3.11 Configuration
+### 5.11 Configuration and Personalisation (URS §5.11)
 
-| URS ID | URS Description | SRS ID(s) | SDD Section | FMEA ID | Test Case(s) | Coverage |
-|--------|----------------|-----------|-------------|---------|--------------|----------|
-| URS-100 | Cell types from config file | SYS-100, SYS-102 | 3.8 templates.json | HA-060, HA-061 | TC-060 | Full |
-| URS-101 | Templates from config file | SYS-100, SYS-102 | 3.8 | HA-061 | TC-060 | Full |
-| URS-102 | Configurable minimum count | SYS-103 | 3.8 | - | TC-050, TC-054 | Full |
+| URS ID | URS Description | SRS ID(s) | SDD | FMEA | Verification | Layer | Coverage |
+|--------|----------------|-----------|-----|------|--------------|-------|----------|
+| URS-100 | Load cell types, mappings, targets, formulas and display prefs from a JSON profile | SYS-100, SYS-102 | 3.8 | HA-060, HA-061 | suite 02, suite 08, TC-B001 | U, B | Full |
+| URS-101 | Catalogue of preset profiles | SYS-174–SYS-176 | 3.16 | — | VV-SYS-055, 056, 057, suite 09 | U, S | Full |
+| URS-102 | Visual configuration editor (view, select, arrange, aggregate, assign keys, set targets, define formulas, save) | SYS-177–SYS-179 | 3.17 | HA-061, HA-062 | VV-SYS-060, 061, 062, suite 10 | U, S | **Full for the shipped editor; drag-to-aggregate covered by inspection** |
+| URS-103 | Import and export a configuration profile | SYS-105, SYS-106 | 3.11 | HA-061 | TC-B060..B064, VV-SYS-050..053 | B, S | Full |
+| URS-104 | Left- and right-hand default key mappings | SYS-154, SYS-155 | 3.17 | — | suite 09 (`right-hand` preset), suite 10 (auto-assign) | U | Full |
+| URS-105 | Configurable target count per specimen type; evidence-based defaults | SYS-103 | 3.8 | — | suite 04 (default targets), TC-B019, VV-SYS-016 | U, B, S | Full |
+| URS-106 | Cache the active profile in localStorage; no network needed after first load | SYS-107, SYS-108 | 3.11 | HA-060 | TC-B070..B074, VV-SYS-054, VV-SYS-090 | B, S | Full |
+| URS-107 | Configurable output template definitions | SYS-100, SYS-102 | 3.8 | HA-051 | VV-E2E-012, VV-E2E-013, VV-SYS-051 | U, S | Full |
 
 ---
 
-## 4. Reverse Traceability: Orphan Check
+## 6. Reverse Traceability: Orphan Check
 
-### 4.1 SRS Requirements Without URS Parent (Orphans)
+### 6.1 SRS Requirements Without a URS Parent
 
 | SRS ID | Description | Justification |
 |--------|-------------|---------------|
 | SYS-S01 | No patient data transmission | Derived security requirement (regulatory) |
-| SYS-S02 | No cookies/localStorage for patient data | Derived security requirement (regulatory) |
-| SYS-S03 | sessionStorage auto-clear | Derived security requirement (privacy) |
-| SYS-S04 | Input sanitization for XSS | Derived security requirement (cybersecurity) |
-| SYS-P01 | Page load < 3 seconds | Derived performance requirement (usability) |
-| SYS-P02 | Keypress response < 50ms | Derived from URS-023 (real-time) |
-| SYS-P03 | Output render < 500ms | Derived performance requirement |
+| SYS-S02 | No persistent storage of patient identifiers beyond the session | Derived privacy requirement |
+| SYS-S03 | sessionStorage auto-clear on browser close | Derived privacy requirement |
+| SYS-S04 | Output sanitisation and export-injection defence | Derived cybersecurity requirement |
+| SYS-P01 | Page load < 3 s | Derived performance requirement |
+| SYS-P02 | Keypress response < 50 ms | Derived from URS-023 |
+| SYS-P03 | Output render < 500 ms | Derived performance requirement |
 | SYS-P04 | Support up to 9999 cells | Derived capacity requirement |
 
-All orphan SRS requirements are justified as derived requirements from regulatory, security, or performance considerations. **No unjustified orphan requirements exist.**
+All orphans are justified as derived regulatory, security, privacy or
+performance requirements. **No unjustified orphan requirements exist.**
 
-### 4.2 URS Requirements Without SRS Coverage (Gaps)
+### 6.2 URS Requirements Without SRS Coverage
 
-**None identified.** All 49 URS requirements have at least one corresponding SRS requirement.
+**None.** The seven items previously listed here as "Phase 2 — not yet
+implemented" (audio feedback, absolute counts, auto-save, visual configuration
+editor, body fluid panels) were in fact implemented and shipping without any
+system-level requirement behind them. SRS-001 has been extended with the
+SYS-140–SYS-179 series to close that gap; see DCR-004 §7.
 
-### 4.3 SRS Requirements Without Test Coverage (Untested)
+### 6.3 Implemented Behaviour Without a Requirement
 
-**None identified.** All SRS requirements are mapped to at least one test case or inspection activity.
+**None outstanding.** Identified and resolved during this revision:
 
----
+| Behaviour | Resolution |
+|-----------|------------|
+| Audio engine | Specified as SYS-140–SYS-144 (URS-027, URS-097) |
+| Autosave / crash recovery | Specified as SYS-145–SYS-149 (URS-085) |
+| Absolute counts | Specified as SYS-150–SYS-153 (URS-036) |
+| Handedness presets | Specified as SYS-154, SYS-155 (URS-104) |
+| Offline operation / service worker | Specified as SYS-170–SYS-173 (URS-094) |
+| Preset catalogue | Specified as SYS-174–SYS-176 (URS-101) |
+| Configuration editor | Specified as SYS-177–SYS-179 (URS-102) |
 
-## 5. Risk-to-Test Traceability
+### 6.4 SRS Requirements Without Verification
 
-| FMEA ID | Hazard | Pre-RPN | Mitigation SRS | Verification Test | Post-RPN |
-|---------|--------|---------|----------------|-------------------|----------|
-| HA-001 | No case number | 100 | SYS-003, SYS-004 | TC-001, TC-002, TC-003 | 5 |
-| HA-002 | Wrong case number | 45 | SYS-004 | TC-004 | 30 |
-| HA-003 | Data carryover | 60 | SYS-006, SYS-007, SYS-008 | TC-005, TC-006, TC-007 | 5 |
-| HA-004 | No case in output | 36 | SYS-067 | TC-062 | 4 |
-| HA-010 | Wrong key mapping | 24 | SYS-038, SYS-039 | TC-021, TC-022 | 4 |
-| HA-011 | Missed keypress | 36 | SYS-037, SYS-P02 | TC-030, TC-111 | 12 |
-| HA-012 | Double keypress | 27 | SYS-032 | TC-026 | 12 |
-| HA-013 | No undo capability | 20 | SYS-032, SYS-033 | TC-026, TC-027 | 4 |
-| HA-014 | Wrong specimen type | 30 | SYS-016 | TC-014 | 10 |
-| HA-015 | Count after intended stop | 36 | SYS-054, SYS-055 | TC-055, TC-056 | 6 |
-| HA-020 | Calculation error | 20 | SYS-040-045 | VV-CALC-001 to 015 | 5 |
-| HA-021 | Division by zero | 18 | SYS-042 | TC-040, VV-CALC-001 | 3 |
-| HA-022 | Pct sum != 100% | 16 | SYS-044, SYS-045 | TC-046, VV-CALC-011/012 | 8 |
-| HA-023 | Wrong total | 10 | SYS-025 | TC-028, TC-029 | 5 |
-| HA-024 | Output/table mismatch | 24 | SDD: same formula | VV-E2E Checkpoint 2 | 8 |
-| HA-030 | Insufficient cell count | 64 | SYS-052, SYS-053 | TC-050-054 | 16 |
-| HA-031 | Post-completion modification | 48 | SYS-054, SYS-055 | TC-055, TC-056 | 8 |
-| HA-040 | Accidental reset | 12 | SYS-081 | TC-080, TC-081 | 3 |
-| HA-041 | Browser close data loss | 9 | SYS-095 | TC-093 | 9 |
-| HA-042 | Output not copied | 27 | SYS-064, SYS-065 | TC-065 | 12 |
-| HA-050 | Template render error | 12 | SYS-100-102 | VV-TPL-001 to 004 | 3 |
-| HA-051 | Wrong template copied | 12 | SYS-063 | TC-067 | 12 |
-| HA-052 | Comments omitted | 27 | SYS-072 | TC-068, VV-TPL-005 | 6 |
-| HA-060 | Config load failure | 12 | SYS-101 | Manual test | 6 |
-| HA-061 | Invalid config data | 24 | SYS-102, SYS-103 | SDD review | 8 |
-| HA-062 | Duplicate key mapping | 15 | Schema validation | Config validation test | 5 |
+**None.** Every SRS requirement maps to at least one automated test or a
+recorded inspection. Requirements verified only by inspection are tagged **I**
+in §5 and are limited to: font legibility (URS-091), workflow instructions
+(URS-092), temporary-data disclosure (URS-083), and drag-to-aggregate in the
+editor (URS-102).
 
 ---
 
-## 6. Coverage Summary
+## 7. Risk-to-Verification Traceability
 
-| Dimension | Items | Covered | Coverage |
-|-----------|-------|---------|----------|
-| URS → SRS | 49 URS requirements | 49 | **100%** |
-| SRS → Test | 93 SRS requirements | 93 | **100%** |
-| FMEA → Test | 22 hazards | 22 | **100%** |
-| URS → Validation | 49 URS requirements | 49 (via validation scenarios + system tests) | **100%** |
-
-**Conclusion**: Full bidirectional traceability is established. No gaps, no orphans without justification, no untested requirements.
+| FMEA ID | Hazard | Mitigation SRS | Verification | Layer |
+|---------|--------|----------------|--------------|-------|
+| HA-001 | Counting without a case number | SYS-003, SYS-004 | TC-B005, TC-B020, TC-B021 | B |
+| HA-002 | Wrong case number displayed | SYS-004 | TC-B004, VV-SYS-005 | B, S |
+| HA-003 | Data carryover between patients | SYS-006–SYS-008 | TC-B037, TC-B038, VV-SYS-032 | B, S |
+| HA-004 | Output not traceable to its parameters | SYS-067, SYS-160–163 | VV-E2E-020..022, TC-B080 | U, B |
+| HA-010 | Wrong key mapping | SYS-038, SYS-039 | VV-E2E-001, VV-SYS-010, VV-SYS-013 | U, S |
+| HA-011 | Missed keypress | SYS-037, SYS-P02 | TC-B010, VV-SYS-010 | B, S |
+| HA-013 | No undo capability | SYS-032, SYS-033 | VV-E2E-004, TC-B011, VV-SYS-011 | U, B, S |
+| HA-014 | Wrong specimen type | SYS-016, SYS-017 | TC-B042..B044, VV-SYS-041, VV-SYS-042 | B, S |
+| HA-015 | Counting after intended stop | SYS-054, SYS-055 | TC-B031, VV-SYS-033 | B, S |
+| HA-020 | Calculation error | SYS-040–SYS-045 | VV-CALC-001..023 | U |
+| HA-021 | Division by zero | SYS-042 | VV-CALC-001, VV-CALC-018 | U |
+| HA-022 | Percentages do not sum to 100% | SYS-044 | VV-CALC-016..021, VV-E2E-011, VV-SYS-014 | U, B, S |
+| HA-023 | Wrong running total | SYS-025 | VV-E2E-005, TC-B010 | U, B |
+| HA-024 | Output disagrees with the table | SYS-061, SYS-152 | VV-E2E-010, TC-B085 | U, B |
+| HA-030 | Insufficient cell count (advisory) | SYS-052, SYS-053 | VV-LOW-001..003, VV-SYS-021 | U, S |
+| HA-031 | Post-completion modification | SYS-054, SYS-055 | TC-B031, VV-SYS-033 | B, S |
+| HA-040 | Accidental reset | SYS-081 | TC-B036, VV-SYS-032 | B, S |
+| HA-041 | Browser close data loss | SYS-145–SYS-149 | TC-B050..B055, VV-SYS-080..082 | B, S |
+| HA-042 | Output not copied | SYS-064, SYS-065 | VV-SYS-070 | S |
+| HA-050 | Template render error | SYS-100–SYS-102 | VV-E2E-012, VV-E2E-013 | U |
+| HA-051 | Wrong template copied | SYS-063 | VV-SYS-070 | S |
+| HA-052 | Comments omitted from output | SYS-072 | VV-E2E-040, TC-B035 | U, B |
+| HA-060 | Configuration load failure | SYS-101, SYS-107 | TC-B072, TC-B073, TC-B074 | B |
+| HA-061 | Invalid configuration accepted | SYS-102, SYS-104 | TC-B063, VV-SYS-052, VV-SYS-061 | B, S |
+| HA-062 | Duplicate or missing key mapping | SYS-104 | TC-B063, VV-SYS-052 | B, S |
+| HA-070 | Derived formula computation error | SYS-046, SYS-047 | VV-ME-001..006, VV-SYS-017 | U, S |
+| HA-071 | Continue Counting data integrity | SYS-057, SYS-058 | VV-E2E-050, TC-B032, VV-SYS-030 | U, B, S |
+| HA-072 | Formula denominator zero | SYS-046 | VV-ME-003, VV-SYS-017 | U, S |
+| HA-080 | Silent miscount from a hidden key-mapped category *(new)* | SYS-104 | TC-B063, VV-SYS-052 | B, S |
+| HA-081 | Operator input reinterpreted as markup or as a spreadsheet formula *(new)* | SYS-S04 | VV-E2E-030..034, TC-B087, VV-SYS-073 | U, B, S |
 
 ---
 
-## 7. Revision History
+## 8. Coverage Summary
+
+| Dimension | Items | Covered | Coverage | Notes |
+|-----------|-------|---------|----------|-------|
+| URS v2.0 → SRS | 52 active requirements (URS-043 withdrawn) | 52 | **100%** | No requirement is deferred |
+| SRS → Verification | 134 requirements | 134 | **100%** | 4 verified by inspection, tagged **I** in §5 |
+| FMEA → Verification | 30 hazards (2 new) | 30 | **100%** | |
+| URS → Validation | 52 | 52 | **100%** | Scenario V1 executed end to end as VV-SYS-020 |
+
+**Automated test totals**: 450 unit + behavioural, 132 system (44 x 3 browser
+engines), **579 executed, 0 failures, 3 documented skips** (see TR-001).
+
+### 8.1 Qualifications on the coverage claim
+
+These are stated explicitly rather than folded into the percentages above:
+
+1. **URS-093 (cross-browser)** is automated on Chromium, Firefox and WebKit.
+   Edge shares the Chromium engine and is covered by the Chromium project.
+2. **URS-034 has been amended** (URS-001 v2.0 Rev E, 2026-08-04) to specify the
+   largest-remainder method that is implemented. Implementation and requirement
+   are now aligned; no deviation remains. Rationale in DCR-004 §5.1.
+3. **URS-102** drag-to-aggregate is verified by inspection; the editor's
+   save/validate/round-trip path is automated.
+
+---
+
+## 9. Revision History
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
-| A | 2026-02-18 | QMS | Initial draft - complete RTM |
+| A | 2026-02-18 | QMS | Initial draft |
 | B | 2026-02-19 | QMS | Added session export traceability |
 | C | 2026-02-20 | QMS | Added theme toggle traceability |
+| D | 2026-02-24 | QMS | v2.0 — 14-cell model, M:E ratio, Continue Counting. **Keyed in error to URS-001 v1.0.** |
+| E | 2026-08-04 | QMS | v3.0 — Re-keyed to URS-001 v2.0 (DCR-004). Every URS identifier corrected. Phase-2 deferrals removed: the functionality was already implemented and is now specified as SYS-140–SYS-179. Verification layer tags added; coverage restated against tests that execute shipped code. HA-080 and HA-081 added. Qualifications on the coverage claim stated in §8.1. |
 
-## 8. Approval Signatures
+## 10. Approval Signatures
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|

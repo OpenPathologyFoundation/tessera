@@ -5,253 +5,322 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 1.0 |
-| **Product** | WBC ΔΣ v1.0 |
-| **Date Executed** | 2026-02-18 |
+| **Version** | 3.0 |
+| **Product** | WBC ΔΣ v2.1.0 |
+| **Date Executed** | 2026-08-04 (19:03:29 UTC) |
 | **Status** | **PASS** |
 | **Parent Document** | DHF-001 |
-| **Input Documents** | TP-001, VV-001, SRS-001 |
-| **Test Runner** | Node.js v22.22.0 built-in test runner |
-| **Platform** | macOS, Node.js v22.22.0 |
+| **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
+| **Change Record** | DCR-004 |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-04_150329_run/` |
+| **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
+| **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
 ---
 
 ## 1. Executive Summary
 
-**All 146 tests passed across 36 test suites with 0 failures.**
-
-**Note**: This report reflects the test run executed on 2026-02-18. After code or test changes, execute `npm run test:qms` to capture updated evidence and results.
+**579 tests passed across 3 verification layers and 3 browser engines, with
+0 failures and 3 documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Total Tests | **146** |
-| Passed | **146** |
+| Unit, static and behavioural tests | **450** |
+| System (browser) tests | **132** (44 x chromium, firefox, webkit) |
+| **Total executed** | **579** |
+| Passed | **579** |
 | Failed | **0** |
+| Skipped (documented, §6) | **3** |
 | Pass Rate | **100.00%** |
-| Total Suites | 36 |
-| Execution Time | 77.86 ms |
-| Skipped | 0 |
-| Cancelled | 0 |
+| Suites | 95 (Node) + 11 describe blocks x 3 engines (Playwright) |
+| Skipped / Cancelled / Todo | 0 |
+| Exit code | 0 |
+
+Command: `npm run test:all` (`npm test && npm run test:e2e`).
+Regenerate this evidence with `npm run test:qms`.
+
+### 1.1 Comparison with the v2.0 baseline
+
+| | v2.0 (2026-02-24) | v2.1.0 (this run) |
+|---|---|---|
+| Tests recorded | 191 | 579 |
+| Tests executing shipped application code | **0** | 579 |
+| Layers | Mirrored logic + static text assertions | Unit (shipped engine) + jsdom behaviour + browser system |
+| Browser engines | none | Chromium, Firefox, WebKit |
+
+This is not a like-for-like comparison. As recorded in DCR-004 §1, no test in
+the v2.0 baseline executed the application: the calculation suites
+re-implemented the algorithms locally and verified the copy, the remaining
+suites asserted on file text, and the two that called `new Function(jsCode)`
+performed a syntax check only. This run is the first in which a defect in the
+shipped code can cause a test to fail.
 
 ---
 
-## 2. Test Suite Breakdown
+## 2. Verification Layers
 
-### Suite 01: Calculation Engine (01-calculation-engine.test.js)
-
-**Purpose**: Verifies the core percentage calculation algorithm — the single most safety-critical computation in the application.
-
-| Category | Tests | Passed | Failed | SRS Trace | FMEA Trace |
-|----------|-------|--------|--------|-----------|------------|
-| Percentage Computation | 18 | 18 | 0 | SYS-040 to SYS-045 | HA-020, HA-021, HA-022 |
-| Increment / Decrement | 10 | 10 | 0 | SYS-031 to SYS-033 | HA-013 |
-| Output Template JSON | 3 | 3 | 0 | SYS-061 | HA-024 |
-| **Subtotal** | **31** | **31** | **0** | | |
-
-**Key Verification Vectors (VV-CALC series):**
-
-| VV ID | Description | Input Total | Result | Status |
-|-------|------------|-------------|--------|--------|
-| VV-CALC-001 | All zeros (division by zero) | 0 | All 0.00%, no NaN/Infinity | **PASS** |
-| VV-CALC-002 | Single cell | 1 | 100.00% | **PASS** |
-| VV-CALC-003 | Two equal cells | 100 | 50.00% each | **PASS** |
-| VV-CALC-004 | Nine equal cells | 90 | 11.11% each | **PASS** |
-| VV-CALC-005 | One dominant cell | 100 | 95.00% / 5.00% | **PASS** |
-| VV-CALC-006 | Minimum multitype | 9 | 11.11% each | **PASS** |
-| VV-CALC-007 | Standard BM differential | 100 | All correct, sum=100.00 | **PASS** |
-| VV-CALC-008 | Acute leukemia pattern | 100 | blast=45.00% | **PASS** |
-| VV-CALC-009 | Small count (N=10) | 10 | Correct to 2 decimal | **PASS** |
-| VV-CALC-010 | Large count (N=500) | 500 | All correct, sum=100.00 | **PASS** |
-| VV-CALC-011 | Repeating thirds | 3 | 33.33% each, sum within tolerance | **PASS** |
-| VV-CALC-012 | Repeating sixths | 6 | 16.67% each, sum within tolerance | **PASS** |
-| VV-CALC-013 | Near-even distribution | 10 | 20.00% / 10.00% | **PASS** |
-| VV-CALC-014 | Maximum capacity (9999) | 9999 | No degradation | **PASS** |
-| VV-CALC-015 | Standard PB differential | 100 | All correct | **PASS** |
-
-**Key Safety Verifications:**
-- VV-INC-005: Decrement from zero stays at 0 (100 iterations tested) — **PASS**
-- SYS-044: Percentage sum within ±0.10% of 100% across 10 distributions — **PASS**
-- SYS-041: 2-decimal-place precision confirmed — **PASS**
+| Layer | Runner | What it executes | Suites |
+|-------|--------|------------------|--------|
+| **Unit** | `node --test` | `web/scripts/wbc-core.js` called directly — the shipped calculation, template, sanitisation, serialisation and configuration engine | 01, 02, 05, 08, 09 |
+| **Behaviour** | `node --test` + jsdom 30 | Real `counter.html` + `wbc-core.js` + `mdc-app.js` executed in a DOM via `tests/helpers/app-harness.js` | 11 |
+| **Static** | `node --test` | Structure and integrity assertions on the shipped HTML/JS/JSON artefacts | 03, 04, 06, 07, 10 |
+| **System** | Playwright + Chromium / Firefox / WebKit | The application served by `serve.js` over HTTP in real browsers | `tests-e2e/` |
 
 ---
 
-### Suite 02: Configuration Validation (02-configuration.test.js)
+## 3. Node Suite Results (450 tests, 95 suites, 0 failures)
 
-**Purpose**: Validates templates.json schema, data integrity, key mappings, and template completeness.
+### Suite 01 — Calculation Engine
 
-| Category | Tests | Passed | Failed | SRS Trace | FMEA Trace |
-|----------|-------|--------|--------|-----------|------------|
-| File Loading | 3 | 3 | 0 | SYS-100, SYS-101 | HA-060 |
-| Schema Validation | 4 | 4 | 0 | SYS-102, SYS-103 | HA-061 |
-| outCodes Validation | 6 | 6 | 0 | SYS-038, SYS-039 | HA-062 |
-| Template Validation | 7 | 7 | 0 | SYS-060 | HA-050 |
-| Minimum Cell Count | 3 | 3 | 0 | SYS-052, SYS-103 | HA-030 |
-| Template Rendering | 4 | 4 | 0 | VV-TPL-001 to 004 | HA-050 |
-| **Subtotal** | **27** | **27** | **0** | | |
+Executes `wbc-core.js` directly. Safety-critical arithmetic.
 
-**Key Findings:**
-- BM key mapping verified: A=blast, S=pro, D=gran, F=eryth, Z=baso, X=eos, C=plasma, V=lymph, B=mono
-- PB key mapping verified: A=poly, S=band, D=lymph, F=mono, Z=eos, X=baso, C=pro, V=blast, B=other
-- No duplicate keys or cell type values detected
-- All 4 templates render with zero unresolved placeholders
-- BM minCellCount = 200, PB minCellCount = 100
+| Group | SRS Trace | FMEA Trace | Result |
+|-------|-----------|------------|--------|
+| Percentage Computation | SYS-040 to SYS-045 | HA-020, HA-021 | PASS |
+| Sum to 100% | SYS-044 | HA-022 | PASS |
+| Display Formatting | SYS-041 | — | PASS |
+| Increment / Decrement | SYS-031 to SYS-033 | HA-013 | PASS |
+| M:E Ratio | SYS-046, SYS-047 | HA-070, HA-072 | PASS |
+| Absolute Counts | SYS-150 to SYS-153 | HA-024 | PASS |
+| Low Count Advisory | SYS-052, SYS-053 | HA-030 | PASS |
 
----
+Key verification vectors:
 
-### Suite 03: HTML Structure & UI Elements (03-html-structure.test.js)
+| VV ID | Description | Result |
+|-------|------------|--------|
+| VV-CALC-001 | All zeros — division-by-zero guard, no NaN/Infinity | **PASS** |
+| VV-CALC-002 | Single cell = 100.00% | **PASS** |
+| VV-CALC-003 | Two equal cells = 50.00% each | **PASS** |
+| VV-CALC-004 | Fourteen equal cells — raw value 7.142857…% | **PASS** |
+| VV-CALC-005 | One dominant cell 95/5 | **PASS** |
+| VV-CALC-008 | Acute leukaemia pattern — 45% blasts | **PASS** |
+| VV-CALC-011 | Repeating thirds sum to exactly 100.00 | **PASS** |
+| VV-CALC-012 | Repeating sixths sum to exactly 100.00 | **PASS** |
+| VV-CALC-014 | Maximum capacity 9 999 cells, no degradation | **PASS** |
+| VV-CALC-016 | Fourteen equal cells sum to exactly 100.00 at 2 dp | **PASS** |
+| VV-CALC-017 | Integer report percentages sum to exactly 100 | **PASS** |
+| VV-CALC-018 | Zero total yields all zeros, not a forced 100 | **PASS** |
+| VV-CALC-019 | No category deviates from its true value by more than one unit of the last decimal place | **PASS** |
+| VV-CALC-020 | Property test — 2 000 randomised differentials × 2 precisions all sum to exactly 100 | **PASS** |
+| VV-CALC-021 | Adjustment is deterministic for identical input | **PASS** |
+| VV-CALC-022/023 | 2-decimal precision retained for low-percentage categories | **PASS** |
+| VV-ME-001 to 006 | M:E ratio; configured precision; zero-denominator "N/A"; absent formula; all numerator members contribute | **PASS** |
+| VV-ABS-001/002 | Absolute count arithmetic; non-positive WBC yields null, not NaN | **PASS** |
+| VV-LOW-001 to 003 | Sub-target advisory raised, suppressed at target, suppressed with no target configured | **PASS** |
 
-**Purpose**: Verifies all required UI elements exist in the HTML for the application to function.
+### Suite 05 — End-to-End Data Integrity
 
-| Category | Tests | Passed | Failed | SRS Trace | FMEA Trace |
-|----------|-------|--------|--------|-----------|------------|
-| File Integrity | 5 | 5 | 0 | - | - |
-| Case Identification | 4 | 4 | 0 | SYS-001 to SYS-004 | HA-001 |
-| Specimen Type | 3 | 3 | 0 | SYS-010 | HA-014 |
-| Control Buttons | 5 | 5 | 0 | SYS-050, SYS-080 | - |
-| Three-Phase Layout | 4 | 4 | 0 | - | - |
-| Morphology Comments | 3 | 3 | 0 | SYS-070, SYS-071 | - |
-| Output Area | 3 | 3 | 0 | SYS-062 | - |
-| Session History | 4 | 4 | 0 | SYS-092, SYS-094 | - |
-| Modal Dialogs | 2 | 2 | 0 | SYS-007, SYS-053, SYS-081 | - |
-| Accessibility | 3 | 3 | 0 | - | - |
-| **Subtotal** | **36** | **36** | **0** | | |
+Drives keypresses → counts → percentages → report → export through the shipped
+engine using the shipped configuration profile.
 
----
+| VV ID | Description | Result |
+|-------|------------|--------|
+| VV-E2E-001 | Every mapped key increments exactly one category by one | **PASS** |
+| VV-E2E-002 | Lowercase and uppercase count identically | **PASS** |
+| VV-E2E-003 | Unmapped keys ignored | **PASS** |
+| VV-E2E-004 | Shift+key undo; undo at zero is a no-op | **PASS** |
+| VV-E2E-005 | 500-keystroke bone marrow count totals exactly 500 | **PASS** |
+| VV-E2E-010 | Report percentages track displayed percentages within one point (HA-024) | **PASS** |
+| VV-E2E-011 | Displayed and reported differentials both sum to 100 | **PASS** |
+| VV-E2E-012 | No unresolved `{{token}}` survives rendering | **PASS** |
+| VV-E2E-013 | Every specimen type renders every template | **PASS** |
+| VV-E2E-014 | Reported M:E ratio matches the computed ratio | **PASS** |
+| VV-E2E-015 | PB profile defines no M:E ratio and reports none | **PASS** |
+| VV-E2E-020 | Session carries profile ID, name, version, target, timestamp | **PASS** |
+| VV-E2E-021 | CSV export carries every traceability column | **PASS** |
+| VV-E2E-022 | JSON export round-trips; report exported as plain text | **PASS** |
+| VV-E2E-023 | Low-count advisory recorded on the session | **PASS** |
+| VV-E2E-030 | Markup in the case number cannot escape into the report | **PASS** |
+| VV-E2E-031 | Replacement-pattern characters inserted literally | **PASS** |
+| VV-E2E-032 | Spreadsheet formula injection neutralised in CSV | **PASS** |
+| VV-E2E-033 | Ordinary accession formats not mangled by the CSV guard | **PASS** |
+| VV-E2E-034 | Event-handler attributes in a template are stripped | **PASS** |
+| VV-E2E-040/041 | Comments reach the report; survive CSV round-trip with commas and quotes | **PASS** |
+| VV-E2E-050 | Continue Counting extends rather than restarts the count | **PASS** |
 
-### Suite 04: JavaScript Application Integrity (04-javascript-integrity.test.js)
+### Suite 11 — Application Behaviour (jsdom)
 
-**Purpose**: Static analysis of mdc-app.js to verify safety mechanisms, state management, and security.
+**New in v2.1.** 62 tests executing the real application in a DOM. This layer
+had no predecessor in any prior baseline.
 
-| Category | Tests | Passed | Failed | SRS Trace | FMEA Trace |
-|----------|-------|--------|--------|-----------|------------|
-| File Integrity | 4 | 4 | 0 | - | - |
-| State Management | 3 | 3 | 0 | - | - |
-| Keyboard Safety | 7 | 7 | 0 | SYS-030 to SYS-036 | HA-010, HA-015 |
-| Decrement Safety | 3 | 3 | 0 | SYS-033 | HA-013 |
-| Division by Zero | 2 | 2 | 0 | SYS-042 | HA-021 |
-| Min Count Enforcement | 3 | 3 | 0 | SYS-052, SYS-053 | HA-030 |
-| Reset Confirmation | 2 | 2 | 0 | SYS-081 | HA-040 |
-| Copy to Clipboard | 3 | 3 | 0 | SYS-065, SYS-066 | HA-042 |
-| Session History | 3 | 3 | 0 | SYS-090, SYS-095 | - |
-| Security | 2 | 2 | 0 | SYS-S04 | - |
-| Config Loading | 3 | 3 | 0 | SYS-100, SYS-101, SYS-103 | HA-060 |
-| Flash Feedback | 2 | 2 | 0 | SYS-037 | HA-011 |
-| **Subtotal** | **37** | **37** | **0** | | |
+| Group | Trace | Tests | Result |
+|-------|-------|-------|--------|
+| Boot and Phase Machine | SYS-001, SYS-130 | 5 | PASS |
+| Keyboard Counting | SYS-030 to SYS-039 | 10 | PASS |
+| Required Case Number | SYS-003 | 2 | PASS |
+| Completion, Continue Counting, Reset | SYS-050 to SYS-058, SYS-080 to SYS-084 | 9 | PASS |
+| Specimen Type Switching | SYS-016, SYS-017 | 5 | PASS |
+| Autosave and Crash Recovery | SYS-145 to SYS-149 | 6 | PASS |
+| Configuration Controls | SYS-105, SYS-106 | 5 | PASS |
+| Config Resolution and Offline | SYS-107 to SYS-109 | 7 | PASS |
+| Results, Export and Absolute Counts | SYS-060 to SYS-067, SYS-150 to SYS-163 | 9 | PASS |
+| Theme and Audio | SYS-110 to SYS-112, SYS-140 to SYS-144 | 4 | PASS |
 
----
+Regressions this layer now guards against:
 
-### Suite 05: End-to-End Data Integrity (05-end-to-end-data-integrity.test.js)
+| Test | Defect it detects |
+|------|-------------------|
+| TC-B014 | Counting keystrokes lost when focus stays in the case field after the barcode Enter |
+| TC-B019 | Target styling not reverting when undo drops the count below target |
+| TC-B034 | Structured morphology selections cleared by Continue Counting (D-06) |
+| TC-B053 | Crash restoring an autosave whose specimen type is absent from the profile (D-10) |
+| TC-B060 to B064 | Configuration controls silently inert (D-01) |
+| TC-B063 | Profile accepted with a key-mapped but undisplayed category (D-11) |
+| TC-B070 | Corrected built-in profile unable to reach an installed browser (D-02) |
+| TC-B074 | Bad cached profile leaving the application unusable with no recovery (D-02) |
 
-**Purpose**: Simulates complete counting workflows and verifies data integrity from input through output.
+### Suites 02, 03, 04, 06, 07, 08, 09, 10 — Configuration and Artefact Integrity
 
-| Category | Tests | Passed | Failed | SRS Trace | FMEA Trace |
-|----------|-------|--------|--------|-----------|------------|
-| VV-E2E-001: Standard BM 100-cell | 8 | 8 | 0 | All | HA-020, HA-024 |
-| Undo/Correction Flow | 3 | 3 | 0 | SYS-032, SYS-033 | HA-013 |
-| PB Workflow | 1 | 1 | 0 | SYS-039 | - |
-| Unmapped Key Handling | 1 | 1 | 0 | SYS-035 | - |
-| Edge Cases | 3 | 3 | 0 | SYS-042, SYS-P04 | HA-021 |
-| **Subtotal** | **16** (incl. sub-assertions) | **16** | **0** | | |
-
-**VV-E2E-001 Checkpoint Results:**
-- Checkpoint 1 (counts): All 9 cell types correct — **PASS**
-- Checkpoint 1 (total): 100 — **PASS**
-- Checkpoint 1 (percentages): All 9 match expected — **PASS**
-- Checkpoint 1 (sum): 100.00% — **PASS**
-- Checkpoint 2 (Yale SOM output): Total present, percentages present — **PASS**
-- Checkpoint 2 (Precipio DX output): Populated, substantive — **PASS**
-- Checkpoint 2 (MGH output): Populated — **PASS**
-- Checkpoint 2 (no unresolved placeholders): All 3 templates clean — **PASS**
-
----
-
-## 3. FMEA Mitigation Verification
-
-Every FMEA hazard mitigation is covered by at least one passing test:
-
-| FMEA ID | Hazard | Pre-RPN | Mitigation Tested | Test Result |
-|---------|--------|---------|-------------------|-------------|
-| HA-001 | No case number | 100 | Start Count disabled when empty | **PASS** (TC-001 in Suite 03) |
-| HA-003 | Data carryover | 60 | Case badge, phase management | **PASS** (Suite 03, 04) |
-| HA-010 | Wrong key mapping | 24 | BM+PB key mapping verified | **PASS** (Suite 02) |
-| HA-011 | Missed keypress | 36 | Flash feedback present | **PASS** (Suite 04) |
-| HA-013 | No undo | 20 | Shift+key decrement, floor at 0 | **PASS** (Suite 01, 05) |
-| HA-015 | Count after stop | 36 | Keydown removal verified | **PASS** (Suite 04) |
-| HA-020 | Calculation error | 20 | 15 VV-CALC vectors pass | **PASS** (Suite 01) |
-| HA-021 | Division by zero | 18 | Zero-guard verified | **PASS** (Suite 01, 04, 05) |
-| HA-022 | Sum != 100% | 16 | ±0.10% tolerance verified | **PASS** (Suite 01) |
-| HA-024 | Output/table mismatch | 24 | E2E cross-check | **PASS** (Suite 05) |
-| HA-030 | Insufficient count | 64 | minCellCount enforcement | **PASS** (Suite 02, 04) |
-| HA-040 | Accidental reset | 12 | Confirmation dialog verified | **PASS** (Suite 04) |
-| HA-042 | Output not copied | 27 | Clipboard API + fallback | **PASS** (Suite 04) |
-| HA-050 | Template render error | 12 | All 4 templates verified | **PASS** (Suite 02) |
-| HA-052 | Comments omitted | 27 | Comments textarea verified | **PASS** (Suite 03) |
-| HA-060 | Config load failure | 12 | Error handling verified | **PASS** (Suite 04) |
-| HA-061 | Invalid config | 24 | Schema validated | **PASS** (Suite 02) |
-| HA-062 | Duplicate keys | 15 | Duplicate check passes | **PASS** (Suite 02) |
-
----
-
-## 4. Test Coverage by SRS Requirement
-
-| Coverage Area | SRS Requirements Covered | Test Count |
-|---------------|-------------------------|-----------|
-| Case Identification (SYS-001 to SYS-008) | 8 | 11 |
-| Specimen Type (SYS-010 to SYS-017) | 5 | 9 |
-| Keyboard Input (SYS-030 to SYS-039) | 10 | 18 |
-| Calculation (SYS-040 to SYS-045) | 6 | 20 |
-| Count Completion (SYS-050 to SYS-056) | 5 | 6 |
-| Output (SYS-060 to SYS-067) | 6 | 11 |
-| Morphology (SYS-070 to SYS-073) | 3 | 3 |
-| Reset (SYS-080 to SYS-084) | 4 | 5 |
-| Session History (SYS-090 to SYS-095) | 5 | 7 |
-| Configuration (SYS-100 to SYS-103) | 4 | 10 |
-| Performance (SYS-P01 to SYS-P04) | 2 | 2 |
-| Security (SYS-S01 to SYS-S04) | 2 | 5 |
-| **Total** | **60** | **107 unique assertions** |
+| Suite | Scope | Result |
+|-------|-------|--------|
+| 02 | Configuration loading, schema, categories, formulas, outCodes, templates, target counts, template rendering | PASS |
+| 03 | HTML structure, phase layout, controls, accessibility, local-asset and service-worker requirements | PASS |
+| 04 | Application JS integrity, keyboard-handler safety, decrement guard, escaping behaviour, script load order, absence of inline control wiring | PASS |
+| 06 | Audio engine structure, toggle state, integration points | PASS |
+| 07 | Autosave function presence, storage key, state shape, integration | PASS |
+| 08 | v2 schema fields; `normalizeConfig` behavioural round-trip for both legacy and v2 formats | PASS |
+| 09 | Preset catalogue — file existence, JSON validity, schema conformance, ergonomic zones | PASS |
+| 10 | Configuration editor structure, JS integrity, key assignment controls | PASS |
 
 ---
 
-## 5. Conclusion
+## 4. System Suite Results — Playwright (44 tests x 3 engines = 132, 0 failures)
 
-**WBC ΔΣ v1.0 PASSES all automated verification tests.**
+Each spec runs on Chromium, Firefox and WebKit. URS-093 names Chrome, Firefox
+and Edge; Edge shares the Chromium engine and is covered by the chromium
+project. WebKit is executed as additional assurance and is not a stated target.
 
-- All 146 tests pass with 0 failures
-- All 15 VV-CALC calculation vectors verified
-- All FMEA hazard mitigations confirmed by tests
-- Configuration schema validated
-- HTML structure verified for all required UI elements
-- JavaScript safety mechanisms confirmed via static analysis
-- End-to-end data integrity verified for BM and PB workflows
+### 4.1 `counting-workflow.spec.js` (22 tests)
 
-**Recommendation**: The software is ready for user acceptance testing (validation) per VV-001 Section 5.
+| Group | VV IDs | Result |
+|-------|--------|--------|
+| Case entry and start | VV-SYS-001 to 005 | PASS |
+| Keyboard counting | VV-SYS-010 to 017 | PASS |
+| Validation scenario V1 | VV-SYS-020, 021 | PASS |
+| Continue Counting and reset | VV-SYS-030 to 033 | PASS |
+| Specimen type switching | VV-SYS-040 to 042 | PASS |
+
+**VV-SYS-020 — Validation Scenario V1 (complete bone marrow differential)**
+
+A 500-cell differential entered by keyboard in a real browser:
+
+| Check | Expected | Result |
+|-------|----------|--------|
+| Total after 500 keystrokes | 500 | **PASS** |
+| Progress indicator | 500 / 500 (target) | **PASS** |
+| M:E ratio (312 myeloid / 150 erythroid) | 2.1:1 | **PASS** |
+| Low-count advisory | absent at target | **PASS** |
+| Traceability footer | `consensus-14`, `v2.0` | **PASS** |
+| Reported percentages | sum to exactly 100 | **PASS** |
+
+### 4.2 `config-and-offline.spec.js` (22 tests)
+
+| Group | VV IDs | Result |
+|-------|--------|--------|
+| Configuration controls | VV-SYS-050 to 054 | PASS |
+| Preset profile catalogue | VV-SYS-055 to 057 | PASS |
+| Configuration editor round-trip | VV-SYS-060 to 062 | PASS |
+| Output, export and printing | VV-SYS-070 to 075 | PASS |
+| Autosave and crash recovery | VV-SYS-080 to 082 | PASS |
+| Offline operation | VV-SYS-090, 091 | PASS |
+
+Capabilities verifiable only at this layer (real browser APIs):
+
+| VV ID | Capability |
+|-------|-----------|
+| VV-SYS-070 | Report placed on the real system clipboard and read back |
+| VV-SYS-071/072 | CSV and JSON downloads captured from disk and parsed |
+| VV-SYS-073 | Injected markup does not execute — `window.__pwned` remains undefined |
+| VV-SYS-080 | Interrupted count recovered across a genuine browser reload |
+| VV-SYS-090 | Application loads, counts and reports with the network disconnected |
+| VV-SYS-091 | No request is made to a third-party CDN |
 
 ---
 
-## 6. Raw Test Output
+## 5. Defect Detection Record
 
-Full TAP output is archived in `test-output-raw.txt` in this directory.
+| Defect | Found by | Now guarded by |
+|--------|----------|----------------|
+| D-01 inert configuration controls | Design review | TC-B060 to B064, VV-SYS-050 to 053 |
+| D-03 percentages not summing to 100 | Design review | VV-CALC-016 to 021 |
+| D-04 no profile traceability in output | Design review | VV-E2E-020 to 022, TC-B080 |
+| D-06 morphology selections lost on resume | Design review | TC-B034 |
+| D-11 undisplayed key-mapped category accepted | Design review | TC-B063, VV-SYS-052 |
+| Cancel button hidden on the Reset confirmation | **VV-SYS-032 (Playwright)** | VV-SYS-032, TC-B036 |
+| Counting keystrokes lost after the barcode Enter workflow | **TC-B014 (jsdom)** | TC-B014, VV-SYS-003 |
+| D-15 editor caching an unusable profile while reporting success | **VV-SYS-061 (Playwright)** | VV-SYS-061, VV-SYS-062 |
+| D-17 cell type shadowing a reserved template placeholder | Adversarial review | Suite 08 reserved-name tests |
+| D-18 config notice clobbering the crash-recovery prompt | Adversarial review | TC-B075 |
+| D-19 negative count restored from a corrupted autosave record | Adversarial review | VV-CALC-024/025/028, TC-B076 |
 
-**Future runs**: Use `npm run test:qms` to capture raw output and environment metadata under `QMS/DHF/TestEvidence/<timestamp>_run/`.
+The last three were introduced or exposed during remediation and were caught by
+the new layers before release — the behaviour the previous suite could not
+provide.
 
 ---
 
-## 7. Revision History
+## 6. Deviations and Qualifications
 
-| Rev | Date | Author | Description |
-|-----|------|--------|-------------|
-| A | 2026-02-18 | QMS | Initial test execution — 146/146 pass |
-| B | 2026-02-20 | QMS | Added test evidence capture reference |
-| C | 2026-02-20 | QMS | Clarified run date scope and update procedure |
+1. **URS-034 has been amended to match the implementation.** URS-001 v2.0
+   Rev E (2026-08-04) now specifies the largest-remainder method. No deviation
+   remains between requirement and implementation.
+2. **Three system tests are skipped on specific engines**, each documented in
+   DCR-004 §5.2: the clipboard read-back on Firefox and WebKit (the
+   `clipboard-read` permission is Chromium-only in Playwright — the copy
+   control itself is still exercised on all engines), and the offline reload on
+   WebKit (Playwright's WebKit build crashes its driver on offline navigation).
+   Neither is an application finding.
+3. **Four requirements are verified by inspection only** — URS-083, URS-091,
+   URS-092, and drag-to-aggregate within URS-102. These are tagged **I** in
+   RTM-001 §5.
+
+---
+
+## 7. Conclusion
+
+All 579 executed automated tests pass with no failures, across three browser
+engines. For the first time in this
+product's design history the verification evidence exercises the shipped
+application: the calculation engine is called directly, the application is
+executed in a DOM, and the deployed system is driven in a real browser.
+
+Subject to the three qualifications in §6, the v2.1.0 baseline meets its
+specified requirements as traced in RTM-001 v3.0.
+
+---
 
 ## 8. Approval Signatures
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| Test Lead | | | |
+| Test Engineer | | | |
 | Quality Assurance | | | |
+| Design Engineer | | | |
 
-## 8. Automated Run Log
+---
+
+## 9. Automated Run Log
+- Date (UTC): 2026-08-04T19:03:29.161Z
+- Command: `npm run test:all`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-04_150329_run/`
+
+- Date (UTC): 2026-08-04T18:45:36.637Z
+- Command: `npm run test:all`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-04_144536_run/`
+
+
+Appended by `npm run test:qms`; newest first.
+
+- Date (UTC): 2026-08-04T18:36:42.778Z
+- Command: `npm run test:all`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-04_143642_run/`
+
 - Date (UTC): 2026-02-22T14:57:42.658Z
 - Command: `npm test`
 - Exit Code: 0

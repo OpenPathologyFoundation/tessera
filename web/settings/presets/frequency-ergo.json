@@ -1,0 +1,96 @@
+{
+    "version": "2.0",
+    "profileId": "frequency-ergo",
+    "profileName": "Frequency-Ergonomic",
+    "description": "Cell types ordered by typical frequency, with the most common cells mapped to home-row keys for ergonomic efficiency. Optimized for speed during long counting sessions.",
+    "specimenTypes": [
+        {
+            "specimenType": "bm",
+            "specimenLabel": "Bone Marrow",
+            "targetCount": 500,
+            "requireCaseNumber": false,
+            "upperRowAbnormal": false,
+            "categories": {
+                "upper": ["nrbc", "myelo", "meta", "blasts", "pro", "plasma", "mast"],
+                "lower": ["poly", "bands", "lymph", "mono", "eos", "baso", "other"]
+            },
+            "outCodes": {
+                "F": "poly",
+                "D": "bands",
+                "S": "lymph",
+                "A": "nrbc",
+                "J": "myelo",
+                "K": "meta",
+                "L": "mono",
+                "R": "blasts",
+                "E": "eos",
+                "W": "baso",
+                "T": "pro",
+                "G": "plasma",
+                "H": "mast",
+                "V": "other"
+            },
+            "formulas": {
+                "ME_ratio": {
+                    "label": "M:E Ratio",
+                    "numerator": ["blasts", "pro", "myelo", "meta", "bands", "poly", "baso", "eos", "mono"],
+                    "denominator": ["nrbc"],
+                    "precision": 1
+                }
+            },
+            "templates": [
+                {
+                    "tplCode": "std",
+                    "tplName": "Standard",
+                    "outSentence": "A {{total}}-cell count reveals {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{bands}}% bands, {{poly}}% segmented neutrophils, {{eos}}% eosinophils, {{baso}}% basophils, {{mono}}% monocytes, {{lymph}}% lymphocytes, {{plasma}}% plasma cells, {{mast}}% mast cells, {{nrbc}}% erythroid precursors, and {{other}}% other cells. M:E ratio {{ME_ratio}}."
+                }
+            ],
+            "constituents": {},
+            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "autosave": true,
+            "absoluteCounts": "optional",
+            "handedness": "left",
+            "morphologyChecklist": []
+        },
+        {
+            "specimenType": "pb",
+            "specimenLabel": "Peripheral Blood",
+            "targetCount": 200,
+            "requireCaseNumber": false,
+            "upperRowAbnormal": true,
+            "categories": {
+                "upper": ["nrbc", "myelo", "meta", "blasts", "pro", "plasma", "mast"],
+                "lower": ["poly", "bands", "lymph", "mono", "eos", "baso", "other"]
+            },
+            "outCodes": {
+                "F": "poly",
+                "D": "bands",
+                "S": "lymph",
+                "A": "nrbc",
+                "J": "myelo",
+                "K": "meta",
+                "L": "mono",
+                "R": "blasts",
+                "E": "eos",
+                "W": "baso",
+                "T": "pro",
+                "G": "plasma",
+                "H": "mast",
+                "V": "other"
+            },
+            "templates": [
+                {
+                    "tplCode": "std",
+                    "tplName": "Standard",
+                    "outSentence": "A {{total}}-cell differential count of peripheral blood reveals: {{poly}}% segmented neutrophils, {{bands}}% band forms, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{nrbc}}% nucleated RBCs, {{plasma}}% plasma cells, {{mast}}% mast cells, and {{other}}% other cells."
+                }
+            ],
+            "constituents": {},
+            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "autosave": true,
+            "absoluteCounts": "optional",
+            "handedness": "left",
+            "morphologyChecklist": []
+        }
+    ]
+}

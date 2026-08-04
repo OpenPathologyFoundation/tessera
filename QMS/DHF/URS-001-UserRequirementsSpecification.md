@@ -6,10 +6,27 @@
 |-------|-------|
 | **Document ID** | URS-001 |
 | **Version** | 1.0 |
+| **Status** | **SUPERSEDED** |
+| **Superseded By** | URS-001 v2.0 (`URS-001_UserRequirementsSpecification_v2.0.md`), 2026-02-24 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
-| **Status** | Draft |
+| **Date Superseded** | 2026-02-24 (recorded 2026-08-04, DCR-004) |
 | **Parent Document** | DHF-001 |
+
+
+> **⚠ SUPERSEDED DOCUMENT — DO NOT USE AS A REQUIREMENT BASELINE**
+>
+> This is URS-001 **version 1.0**. It was replaced by **URS-001 v2.0**
+> (`URS-001_UserRequirementsSpecification_v2.0.md`) on 2026-02-24 and is retained
+> only for design-history traceability.
+>
+> The requirement numbering in this document **differs materially** from v2.0.
+> The same identifier means different things in the two versions — for example
+> URS-013, URS-032, URS-051 through URS-056, and URS-100 through URS-107 — and
+> URS-043 was withdrawn in v2.0. RTM-001 v2.0 was keyed to this document in
+> error; see DCR-004 and RTM-001 v3.0 §2.
+>
+> The controlled requirement baseline is **URS-001 v2.0**.
 
 ---
 

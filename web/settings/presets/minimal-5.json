@@ -1,0 +1,39 @@
+{
+    "version": "2.0",
+    "profileId": "minimal-5",
+    "profileName": "Minimal 5-Part",
+    "description": "Simplified 5-part differential matching automated analyzer categories: neutrophils, lymphocytes, monocytes, eosinophils, basophils. Home-row only ergonomic keys.",
+    "specimenTypes": [
+        {
+            "specimenType": "pb",
+            "specimenLabel": "Peripheral Blood",
+            "targetCount": 100,
+            "requireCaseNumber": false,
+            "upperRowAbnormal": false,
+            "categories": {
+                "upper": ["neut", "lymph", "mono"],
+                "lower": ["eos", "baso"]
+            },
+            "outCodes": {
+                "F": "neut",
+                "D": "lymph",
+                "S": "mono",
+                "A": "eos",
+                "G": "baso"
+            },
+            "templates": [
+                {
+                    "tplCode": "std",
+                    "tplName": "Standard",
+                    "outSentence": "A {{total}}-cell differential count reveals: {{neut}}% neutrophils, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, and {{baso}}% basophils."
+                }
+            ],
+            "constituents": {},
+            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "autosave": true,
+            "absoluteCounts": "optional",
+            "handedness": "left",
+            "morphologyChecklist": []
+        }
+    ]
+}

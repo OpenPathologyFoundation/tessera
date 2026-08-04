@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WBC ΔΣ — Quick Start Guide</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="vendor/tailwind.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -19,6 +19,7 @@
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Optional webfonts: absent offline, the local font stacks in tailwind.config apply -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Franklin:wght@400;500;700&display=swap" rel="stylesheet">
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans min-h-screen antialiased">
@@ -42,19 +43,31 @@
             <h2 class="text-lg font-semibold text-slate-100 mb-4 border-b border-slate-800 pb-2">Quick Start</h2>
             <ol class="space-y-3 text-sm text-slate-300 list-decimal list-inside">
                 <li><strong class="text-slate-200">Open the app</strong> in Chrome, Firefox, or Edge.</li>
-                <li><strong class="text-slate-200">Enter case/accession number</strong> (type or scan barcode) and press Enter or click Start Count.</li>
-                <li><strong class="text-slate-200">Pick specimen type</strong> &mdash; Bone Marrow or Peripheral Blood.</li>
-                <li><strong class="text-slate-200">Press keys to count</strong> &mdash; each key maps to a cell type (see tables below). The count and percentages update live.</li>
-                <li><strong class="text-slate-200">Click &ldquo;Count Done&rdquo;</strong> when you reach the minimum (200 BM / 100 PB), then copy the formatted output into your LIS/EMR.</li>
+                <li><strong class="text-slate-200">Enter case/accession number</strong> (optional &mdash; type or scan barcode) and pick specimen type, then press Enter or click Start Count.</li>
+                <li><strong class="text-slate-200">Press keys to count</strong> &mdash; the same 14 keys are used for both BM and PB (see table below). The upper row holds precursor cells, the lower row holds mature cells.</li>
+                <li><strong class="text-slate-200">Click &ldquo;Count Done&rdquo;</strong> when you reach the target (500 BM / 200 PB &mdash; advisory, not enforced), then copy the formatted output into your LIS/EMR.</li>
+                <li><strong class="text-slate-200">Continue Counting</strong> &mdash; if you need more cells after reviewing results, click &ldquo;Continue Counting&rdquo; to resume where you left off.</li>
             </ol>
         </section>
 
         <!-- Keyboard Map -->
         <section class="mb-10">
-            <h2 class="text-lg font-semibold text-slate-100 mb-4 border-b border-slate-800 pb-2">Keyboard Map</h2>
+            <h2 class="text-lg font-semibold text-slate-100 mb-4 border-b border-slate-800 pb-2">Keyboard Map &mdash; Ergonomic Left-Hand Layout</h2>
+            <p class="text-sm text-slate-400 mb-4">Keys cluster in the left-hand zone (ASDFG / ZXCVB / QWERT) so your right hand stays on the microscope. The same 14 keys are used for both Bone Marrow and Peripheral Blood. Target counts: <strong class="text-slate-300">500 BM / 200 PB</strong> (advisory &mdash; you can finish earlier or continue beyond).</p>
 
-            <!-- Bone Marrow -->
-            <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Bone Marrow <span class="text-slate-500 normal-case tracking-normal font-normal">(min 200 cells)</span></h3>
+            <!-- Visual keyboard layout -->
+            <div class="mb-6 p-4 bg-slate-900 border border-slate-700 rounded-lg font-mono text-xs">
+                <p class="text-slate-500 mb-2 text-[11px]">Left-hand ergonomic zone:</p>
+                <div class="space-y-1">
+                    <div class="flex gap-1"><kbd class="w-10 py-1 text-center bg-slate-800 border border-slate-600 rounded text-slate-400">Q<span class="text-[9px] block text-slate-600">other</span></kbd><kbd class="w-10 py-1 text-center bg-slate-800 border border-slate-600 rounded text-slate-400">W<span class="text-[9px] block text-slate-600">mast</span></kbd><kbd class="w-10 py-1 text-center bg-slate-800 border border-slate-600 rounded text-slate-400">E<span class="text-[9px] block text-slate-600">plasma</span></kbd><kbd class="w-10 py-1 text-center bg-slate-800 border border-slate-600 rounded text-slate-400">R<span class="text-[9px] block text-slate-600">pro</span></kbd><kbd class="w-10 py-1 text-center bg-slate-800 border border-slate-600 rounded text-slate-300">T</kbd></div>
+                    <div class="flex gap-1 ml-2"><kbd class="w-10 py-1 text-center bg-slate-700 border border-slate-500 rounded text-slate-200">A<span class="text-[9px] block text-slate-400">mono</span></kbd><kbd class="w-10 py-1 text-center bg-slate-700 border border-slate-500 rounded text-slate-200">S<span class="text-[9px] block text-slate-400">lymph</span></kbd><kbd class="w-10 py-1 text-center bg-slate-700 border border-slate-500 rounded text-slate-200">D<span class="text-[9px] block text-slate-400">bands</span></kbd><kbd class="w-10 py-1 text-center bg-slate-700 border border-slate-500 rounded text-slate-200">F<span class="text-[9px] block text-slate-400">poly</span></kbd><kbd class="w-10 py-1 text-center bg-slate-700 border border-slate-500 rounded text-slate-200">G<span class="text-[9px] block text-slate-400">eos</span></kbd></div>
+                    <div class="flex gap-1 ml-4"><kbd class="w-10 py-1 text-center bg-slate-800 border border-slate-600 rounded text-slate-400">Z<span class="text-[9px] block text-slate-600">baso</span></kbd><kbd class="w-10 py-1 text-center bg-slate-800 border border-slate-600 rounded text-slate-400">X<span class="text-[9px] block text-slate-600">blasts</span></kbd><kbd class="w-10 py-1 text-center bg-slate-800 border border-slate-600 rounded text-slate-400">C<span class="text-[9px] block text-slate-600">meta</span></kbd><kbd class="w-10 py-1 text-center bg-slate-800 border border-slate-600 rounded text-slate-400">V<span class="text-[9px] block text-slate-600">myelo</span></kbd><kbd class="w-10 py-1 text-center bg-slate-800 border border-slate-600 rounded text-slate-400">B<span class="text-[9px] block text-slate-600">nrbc</span></kbd></div>
+                </div>
+                <p class="text-slate-600 text-[10px] mt-2">Home row (strongest fingers) &rarr; most common cells. Top row &rarr; least common.</p>
+            </div>
+
+            <!-- Home Row -->
+            <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Home Row &mdash; Most Common</h3>
             <div class="overflow-x-auto mb-6">
                 <table class="w-full text-sm">
                     <thead>
@@ -65,21 +78,39 @@
                         </tr>
                     </thead>
                     <tbody class="text-slate-300">
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">A</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">blast</td><td class="py-2">Myeloblasts</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">S</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">pro</td><td class="py-2">Promyelocytes / Myelocytes</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">D</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">gran</td><td class="py-2">Maturing granulocytes</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">F</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">eryth</td><td class="py-2">Erythroid precursors</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">Z</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">baso</td><td class="py-2">Basophils / Mast cells</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">X</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">eos</td><td class="py-2">Eosinophils</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">C</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">plasma</td><td class="py-2">Plasma cells</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">V</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">lymph</td><td class="py-2">Lymphocytes</td></tr>
-                        <tr><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">B</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">mono</td><td class="py-2">Monocytes</td></tr>
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">F</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">poly</td><td class="py-2">Segmented neutrophils (index finger)</td></tr>
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">D</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">bands</td><td class="py-2">Band neutrophils</td></tr>
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">S</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">lymph</td><td class="py-2">Lymphocytes</td></tr>
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">A</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">mono</td><td class="py-2">Monocytes</td></tr>
+                        <tr><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">G</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">eos</td><td class="py-2">Eosinophils</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Peripheral Blood -->
-            <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Peripheral Blood <span class="text-slate-500 normal-case tracking-normal font-normal">(min 100 cells)</span></h3>
+            <!-- Bottom Row -->
+            <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Bottom Row &mdash; Precursors &amp; Less Common</h3>
+            <div class="overflow-x-auto mb-6">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-700">
+                            <th class="text-left py-2 pr-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-16">Key</th>
+                            <th class="text-left py-2 pr-4 text-xs font-semibold text-slate-400 uppercase tracking-wider w-28">Cell Type</th>
+                            <th class="text-left py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-slate-300">
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">V</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">myelo</td><td class="py-2">Myelocytes</td></tr>
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">C</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">meta</td><td class="py-2">Metamyelocytes</td></tr>
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">X</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">blasts</td><td class="py-2">Blasts</td></tr>
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">Z</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">baso</td><td class="py-2">Basophils</td></tr>
+                        <tr><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">B</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">nrbc</td><td class="py-2">Nucleated RBCs / Erythroid precursors</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Top Row -->
+            <h3 class="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-3">Top Row &mdash; Rare / Reach Keys</h3>
+            <p class="text-xs text-slate-500 mb-2">In PB mode, non-zero precursor cells (blasts, pro, myelo, meta, nrbc, plasma, mast) are visually flagged with an amber border.</p>
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
@@ -90,15 +121,10 @@
                         </tr>
                     </thead>
                     <tbody class="text-slate-300">
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">A</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">poly</td><td class="py-2">Segmented neutrophils</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">S</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">band</td><td class="py-2">Band neutrophils</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">D</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">lymph</td><td class="py-2">Lymphocytes</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">F</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">mono</td><td class="py-2">Monocytes</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">Z</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">eos</td><td class="py-2">Eosinophils</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">X</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">baso</td><td class="py-2">Basophils</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">C</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">pro</td><td class="py-2">Immature granulocytic precursors</td></tr>
-                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">V</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">blast</td><td class="py-2">Blasts</td></tr>
-                        <tr><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">B</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">other</td><td class="py-2">Other cells</td></tr>
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">R</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">pro</td><td class="py-2">Promyelocytes</td></tr>
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">E</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">plasma</td><td class="py-2">Plasma cells</td></tr>
+                        <tr class="border-b border-slate-800/50"><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">W</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">mast</td><td class="py-2">Mast cells</td></tr>
+                        <tr><td class="py-2 pr-4"><kbd class="px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-200">Q</kbd></td><td class="py-2 pr-4 font-mono text-slate-400">other</td><td class="py-2">Other cells</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -113,6 +139,12 @@
                 <li><strong class="text-slate-200">Theme toggle</strong> &mdash; press <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono">Ctrl+Shift+L</kbd> (or <kbd class="px-1.5 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono">Cmd+Shift+L</kbd> on Mac) to switch between dark and light mode.</li>
                 <li><strong class="text-slate-200">Session history</strong> &mdash; completed counts are listed at the bottom of the page for the current browser session. Export to CSV or JSON for a local record.</li>
                 <li><strong class="text-slate-200">Output templates</strong> &mdash; after completing a count, switch between institutional output formats using the tabs (e.g., Yale SOM, MGH, Precipio DX).</li>
+                <li><strong class="text-slate-200">Continue Counting</strong> &mdash; after reviewing results, click &ldquo;Continue Counting&rdquo; to resume from where you left off and add more cells.</li>
+                <li><strong class="text-slate-200">M:E Ratio</strong> &mdash; displayed live during BM counting (myeloid / erythroid). Not shown for PB.</li>
+                <li><strong class="text-slate-200">Preset Profiles</strong> &mdash; open the preset catalogue from the case-entry screen to switch between built-in layouts (full 14-part consensus, harmonized 9-part, legacy 9-part, minimal 5-part, body fluid, frequency-ergonomic, right-hand). Loading a preset replaces the active configuration and starts a clean case.</li>
+                <li><strong class="text-slate-200">Export/Import Config</strong> &mdash; use the links on the case-entry screen to export your current configuration as a JSON file, or import one from a colleague to share key layouts and templates. An imported profile is validated before it is applied; one that cannot be counted with is rejected with the reason shown.</li>
+                <li><strong class="text-slate-200">Configuration Editor</strong> &mdash; open the <a href="editor.html" class="text-blue-400 hover:text-blue-300 transition-colors">Configuration Editor</a> to visually customize cell layout, key assignments, and output templates. Click a cell card and press a key to assign it. Use &ldquo;Auto-Assign: Left Hand&rdquo; or &ldquo;Auto-Assign: Right Hand&rdquo; to quickly map all cells to an ergonomic zone.</li>
+                <li><strong class="text-slate-200">Left-handed operators</strong> &mdash; use the right-hand preset or auto-assign right-hand keys in the editor, so keys cluster on HJKL;/NM,./ while your left hand operates the microscope.</li>
             </ul>
         </section>
 

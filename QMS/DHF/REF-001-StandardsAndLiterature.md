@@ -125,12 +125,22 @@ ICSH §2.6:
 > threshold for disease stratification or to a low threshold (e.g. 5%) or when
 > the appearance suggests a patchy involvement of the BM with abnormal cells."
 
-**Not currently implemented.** This is the clinical need behind the stakeholder
-request that produced URS-042 (Continue Counting): *"an option, AFTER getting to
-the result tab, to have a button that allows us to go back to counting if we
-realize that the resulting percentages are borderline."* Continue Counting
-provides the mechanism; the system does not yet identify *when* it should be
-used. Recorded as a requirement gap — see §5.
+**Implemented under DCR-008 (URS-038).** This is the clinical need behind the
+stakeholder request that produced URS-042 (Continue Counting): *"an option,
+AFTER getting to the result tab, to have a button that allows us to go back to
+counting if we realize that the resulting percentages are borderline."*
+
+Continue Counting supplied the mechanism; the system now also identifies when it
+should be used. A profile defines diagnostic thresholds, and where the
+confidence interval for a quantity spans one, the results screen states so and
+points at the control. "Very close to a critical threshold" is given an
+operational meaning: the interval straddles it, so the count does not establish
+which side the true value lies on.
+
+The advisory is informational. ICSH describes extending the count as a
+recommendation, and URS-041 already established that this application does not
+block completion — a paucicellular aspirate may make an extended count
+impossible, and the operator is the one who knows that.
 
 ### 3.5 The M:E ratio definition
 
@@ -243,7 +253,7 @@ should be checked against the paper before any of them are quoted.
 
 | Gap | Source | Status |
 |-----|--------|--------|
-| No prompt to extend the count when an abnormal percentage sits near a diagnostic threshold | [S1] §2.6 | **Open** — candidate requirement, module M5 |
+| No prompt to extend the count when an abnormal percentage sits near a diagnostic threshold | [S1] §2.6 | **Closed** — URS-038, module M5, DCR-008 |
 | Target count rule is unconditional; ICSH makes 500 vs 300 depend on diagnostic intent | [S1] §2.6 | **Open** — profiles should offer both with the rule stated |
 | `other` category has no ICSH counterpart and may capture cells ICSH excludes | [S1] §2.6 | **Partially addressed** — guidance added; see RA-001 HA-090 |
 | Generic `blasts` category cannot distinguish myeloblasts for M:E purposes | [S1] §2.6 | **Documented limitation** — RA-001 HA-091 |
@@ -258,6 +268,7 @@ should be checked against the paper before any of them are quoted.
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| C | 2026-08-05 | QMS | §3.4 updated: the ICSH §2.6 near-threshold direction is implemented under URS-038 (DCR-008) and the gap is closed. §5 revised. |
 | B | 2026-08-05 | QMS | Added [S7] (Brown, Cai & DasGupta) as the basis for choosing Wilson over Wald. Added §3.7 sampling precision and §3.8 on what Rümke's warning actually concerns — ratios, not single percentages, which makes the M:E display the affected element. |
 | A | 2026-08-05 | QMS | Initial issue. ICSH 2008 [S1] verified against full text; counting model, M:E definition and target counts traced to source. Sources not held in full text explicitly marked. |
 

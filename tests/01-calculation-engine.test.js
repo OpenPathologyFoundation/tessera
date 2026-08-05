@@ -471,3 +471,200 @@ describe('Low Count Advisory — quantified (URS-041, HA-030)', () => {
         assert.match(Core.buildLowCountNote(216, 500, 0.99), /99% confidence interval/);
     });
 });
+
+// ================================================================
+describe('Subset percentage formulas (URS-039, DCR-008)', () => {
+
+    const NON_ERYTHROID = CELL_TYPES.filter(ct => ct !== 'nrbc');
+    const BLASTS_NE = {
+        type: 'percentage',
+        label: 'Blasts (% non-erythroid)',
+        numerator: ['blasts'],
+        denominator: NON_ERYTHROID,
+        precision: 1
+    };
+
+    it('VV-SUB-001: A subset percentage uses its own denominator', () => {
+        // Erythroid-rich marrow: the two conventions disagree materially.
+        const c = counts({ nrbc: 240, blasts: 18, poly: 80, myelo: 30, lymph: 32 });
+        const all = Core.percentagesSummingTo100(c, 1);
+        const sub = Core.computeSubsetPercentage(c, BLASTS_NE);
+
+        assert.equal(all.blasts, 4.5, 'blasts of all nucleated cells');
+        assert.equal(sub.numeratorCount, 18);
+        assert.equal(sub.denominatorCount, 160, 'erythroid precursors are excluded');
+        assert.equal(sub.display, '11.3%');
+        assert.ok(sub.value > all.blasts, 'excluding erythroid raises the blast percentage');
+    });
+
+    it('VV-SUB-002: The two conventions can fall on opposite sides of a threshold', () => {
+        // The case the pre-2022 WHO erythroleukaemia rule existed to catch.
+        const c = counts({ nrbc: 300, blasts: 45, poly: 90, myelo: 40, lymph: 25 });
+        const all = Core.percentagesSummingTo100(c, 1);
+        const sub = Core.computeSubsetPercentage(c, BLASTS_NE);
+        assert.ok(all.blasts < 20, `all-nucleated blasts ${all.blasts}% is below 20%`);
+        assert.ok(sub.value > 20, `non-erythroid blasts ${sub.value}% is above 20%`);
+    });
+
+    it('VV-SUB-003: A zero denominator yields null, not a division', () => {
+        assert.equal(Core.computeSubsetPercentage(counts({ nrbc: 50 }), BLASTS_NE), null);
+        assert.equal(Core.computeSubsetPercentage(zeroCounts(), BLASTS_NE), null);
+    });
+
+    it('VV-SUB-004: computeFormula dispatches on type and defaults to ratio', () => {
+        const c = counts({ poly: 100, nrbc: 50, blasts: 10 });
+        const asRatio = Core.computeFormula(c, ME_FORMULA);
+        assert.equal(asRatio.type, 'ratio');
+        assert.equal(asRatio.display, '2.2:1');
+
+        const asPct = Core.computeFormula(c, BLASTS_NE);
+        assert.equal(asPct.type, 'percentage');
+        assert.match(asPct.display, /%$/);
+
+        // A formula with no declared type is a ratio, so profiles written
+        // before subset percentages existed are unaffected.
+        const untyped = Object.assign({}, ME_FORMULA);
+        delete untyped.type;
+        assert.equal(Core.computeFormula(c, untyped).type, 'ratio');
+    });
+
+    it('VV-SUB-005: A subset percentage carries a confidence interval, as a ratio cannot', () => {
+        const c = counts({ nrbc: 300, blasts: 45, poly: 90, myelo: 40, lymph: 25 });
+        const sub = Core.computeSubsetPercentage(c, BLASTS_NE);
+        const ci = Core.wilsonInterval(sub.numeratorCount, sub.denominatorCount);
+        assert.ok(ci, 'a percentage has a real denominator and therefore an interval');
+        assert.ok(ci.lower < sub.value && sub.value < ci.upper);
+    });
+
+    it('VV-SUB-006: Validation rejects a numerator outside the denominator', () => {
+        const errs = Core.validateConfig([{
+            specimenType: 'bm', targetCount: 100,
+            categories: { upper: ['blasts'], lower: ['poly', 'nrbc'] },
+            outCodes: { X: 'blasts', F: 'poly', B: 'nrbc' },
+            templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }],
+            formulas: {
+                bad: { type: 'percentage', numerator: ['nrbc'], denominator: ['blasts', 'poly'] }
+            }
+        }]);
+        assert.ok(errs.some(e => /could exceed 100%/.test(e)), errs.join('; '));
+    });
+
+    it('VV-SUB-007: Validation rejects an unknown formula type', () => {
+        const errs = Core.validateConfig([{
+            specimenType: 'bm', targetCount: 100,
+            categories: { upper: ['blasts'], lower: ['poly'] },
+            outCodes: { X: 'blasts', F: 'poly' },
+            templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }],
+            formulas: { bad: { type: 'fraction', numerator: ['blasts'], denominator: ['poly'] } }
+        }]);
+        assert.ok(errs.some(e => /unknown type "fraction"/.test(e)), errs.join('; '));
+    });
+});
+
+// ================================================================
+describe('Diagnostic thresholds (URS-038, ICSH 2008 §2.6)', () => {
+
+    const SPEC = {
+        categories: { upper: CELL_TYPES.slice(0, 7), lower: CELL_TYPES.slice(7) },
+        thresholds: [
+            { target: 'blasts', value: 20, label: 'AML blast threshold', basis: 'WHO 2022' },
+            { target: 'blasts', value: 5, label: 'low blast threshold', basis: 'ICSH §2.6' }
+        ]
+    };
+
+    it('VV-THR-001: An interval spanning a threshold is flagged', () => {
+        // 40 of 200 = 20%; the interval is 15.0-26.1% and straddles the cutoff.
+        const c = counts({ blasts: 40, poly: 160 });
+        const results = Core.evaluateThresholds(c, SPEC);
+        const aml = results.find(r => r.value === 20);
+        assert.equal(aml.spans, true);
+        assert.equal(Number(aml.observed.toFixed(2)), 20);
+        assert.equal(aml.label, 'AML blast threshold');
+        assert.equal(aml.basis, 'WHO 2022');
+    });
+
+    it('VV-THR-002: A count clear of a threshold is not flagged', () => {
+        const c = counts({ blasts: 4, poly: 496 });   // 0.8%
+        const aml = Core.evaluateThresholds(c, SPEC).find(r => r.value === 20);
+        assert.equal(aml.spans, false);
+    });
+
+    it('VV-THR-003: More cells narrow the interval but need not resolve the threshold', () => {
+        const small = Core.evaluateThresholds(counts({ blasts: 40, poly: 160 }), SPEC)
+            .find(r => r.value === 20);
+        const large = Core.evaluateThresholds(counts({ blasts: 100, poly: 400 }), SPEC)
+            .find(r => r.value === 20);
+        const w = r => r.interval.upper - r.interval.lower;
+        assert.ok(w(large) < w(small), 'a larger count gives a narrower interval');
+        assert.equal(large.spans, true,
+            'an observation sitting exactly on the threshold still straddles it — ' +
+            'the tool must not imply that counting more will always settle the question');
+    });
+
+    it('VV-THR-004: A threshold may target a percentage formula', () => {
+        const spec = {
+            categories: SPEC.categories,
+            formulas: {
+                blasts_ne: {
+                    type: 'percentage', label: 'Blasts (% non-erythroid)',
+                    numerator: ['blasts'],
+                    denominator: CELL_TYPES.filter(ct => ct !== 'nrbc'), precision: 1
+                }
+            },
+            thresholds: [{ target: 'blasts_ne', value: 20, label: 'legacy rule' }]
+        };
+        const c = counts({ nrbc: 300, blasts: 45, poly: 90, myelo: 40, lymph: 25 });
+        const r = Core.evaluateThresholds(c, spec)[0];
+        assert.equal(r.targetLabel, 'Blasts (% non-erythroid)');
+        assert.equal(r.interval.n, 200, 'measured against the formula denominator');
+        assert.equal(r.spans, true);
+    });
+
+    it('VV-THR-005: A ratio formula cannot be a threshold target', () => {
+        const errs = Core.validateConfig([{
+            specimenType: 'bm', targetCount: 100,
+            categories: { upper: ['blasts'], lower: ['poly', 'nrbc'] },
+            outCodes: { X: 'blasts', F: 'poly', B: 'nrbc' },
+            templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }],
+            formulas: { me: { numerator: ['poly'], denominator: ['nrbc'] } },
+            thresholds: [{ target: 'me', value: 2 }]
+        }]);
+        assert.ok(errs.some(e => /ratio carries no confidence interval/.test(e)), errs.join('; '));
+    });
+
+    it('VV-THR-006: Validation rejects an unresolvable or out-of-range threshold', () => {
+        const base = {
+            specimenType: 'bm', targetCount: 100,
+            categories: { upper: ['blasts'], lower: ['poly'] },
+            outCodes: { X: 'blasts', F: 'poly' },
+            templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }]
+        };
+        assert.ok(Core.validateConfig([Object.assign({}, base,
+            { thresholds: [{ target: 'ghost', value: 20 }] })])
+            .some(e => /neither a displayed category nor a percentage formula/.test(e)));
+        assert.ok(Core.validateConfig([Object.assign({}, base,
+            { thresholds: [{ target: 'blasts', value: 150 }] })])
+            .some(e => /between 0 and 100/.test(e)));
+        assert.ok(Core.validateConfig([Object.assign({}, base,
+            { thresholds: 'nope' })]).some(e => /thresholds must be an array/.test(e)));
+    });
+
+    it('VV-THR-007: A category outside the differential cannot be a threshold target', () => {
+        const errs = Core.validateConfig([{
+            specimenType: 'pb', targetCount: 200,
+            categories: { upper: ['blasts'], lower: ['poly', 'nrbc'] },
+            outCodes: { X: 'blasts', F: 'poly', B: 'nrbc' },
+            templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }],
+            denominatorExcludes: ['nrbc'],
+            per100Reporting: { nrbc: { label: 'NRBC/100 WBC' } },
+            thresholds: [{ target: 'nrbc', value: 5 }]
+        }]);
+        assert.ok(errs.some(e => /outside the differential denominator/.test(e)), errs.join('; '));
+    });
+
+    it('VV-THR-008: No thresholds configured yields no evaluation', () => {
+        assert.deepEqual(Core.evaluateThresholds(counts({ blasts: 40, poly: 160 }), {}), []);
+        assert.deepEqual(Core.evaluateThresholds(zeroCounts(), SPEC), [],
+            'nothing counted, nothing to test');
+    });
+});

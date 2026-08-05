@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 2.3 |
+| **Version** | 2.4 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -219,6 +219,22 @@ Added in v2.3 under DCR-007.
 | SYS-195 | Intervals, the confidence level, the differential denominator and the exclusion list SHALL be carried in the session record and in CSV and JSON export, so that an archived result can be reconstructed. | URS-052, URS-084 |
 | SYS-196 | Where a derived ratio is displayed, the interface SHALL indicate that a ratio of two counted proportions is less precise than either (REF-001 §3.8). A computed interval for a ratio is not required by this revision. | URS-035 |
 
+### 4.13c Derived Quantities and Thresholds Module (URS-038, URS-039)
+
+Added in v2.4 under DCR-008.
+
+| ID | Requirement | Trace |
+|----|------------|-------|
+| SYS-200 | A formula SHALL declare a type of either `ratio` or `percentage`. Absent a type it SHALL be treated as a ratio, so profiles written before this revision are unaffected. | URS-039 |
+| SYS-201 | A `percentage` formula SHALL express its numerator categories as a percentage of its denominator categories, using that denominator rather than the differential denominator. | URS-039 |
+| SYS-202 | Validation SHALL reject a percentage formula whose numerator is not contained in its denominator, since the result could exceed 100%. | URS-039, URS-100 |
+| SYS-203 | The interface SHALL render every formula the profile defines, not a fixed set. | URS-039, URS-107 |
+| SYS-204 | A profile SHALL be able to define diagnostic thresholds, each naming a target, a percentage value, a label and a citable basis. A target SHALL be either a displayed category or a percentage formula. | URS-038 |
+| SYS-205 | A threshold SHALL NOT target a ratio formula, because no confidence interval is computed for a ratio (REF-001 §3.8, HA-093). Validation SHALL reject such a configuration. | URS-038 |
+| SYS-206 | Where a confidence interval spans a configured threshold, the system SHALL state which quantity, its interval, the threshold, and the basis; and SHALL direct the operator to the Continue Counting control. | URS-038, URS-042 |
+| SYS-207 | The near-threshold indication SHALL be informational and SHALL NOT prevent count completion. | URS-038, URS-041 |
+| SYS-208 | Threshold evaluations and all formula results SHALL be carried in the session record. | URS-052 |
+
 ### 4.14 Audio Feedback Module (URS-027, URS-097)
 
 Added in v2.1 under DCR-004. This functionality was implemented and shipping in
@@ -397,6 +413,7 @@ Phase 2 item.
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
 | B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
 | C | 2026-02-20 | QMS | Added theme toggle requirements |
+| H | 2026-08-05 | QMS | v2.4 (DCR-008): added SYS-200–SYS-208, derived quantities and thresholds. Formula rendering generalized from the hardcoded M:E ratio to every formula the profile defines. |
 | G | 2026-08-05 | QMS | v2.3 (DCR-007): added SYS-190–SYS-196, the sampling precision module. Every reported percentage carries a Wilson confidence interval; the sub-target advisory is quantified; a derived ratio carries an imprecision advisory. |
 | F | 2026-08-05 | QMS | v2.2 (DCR-006): added SYS-180–SYS-185, the differential denominator module. A category may be counted without belonging to the percentage denominator, and is reported per 100 of it instead — the peripheral blood NRBC convention. |
 | E | 2026-08-04 | QMS | v2.1 (DCR-004): added SYS-140–SYS-179 for audio feedback, autosave/recovery, absolute counts, handedness, output traceability, offline operation, preset catalogue and the configuration editor — all implemented and shipping in v2.0 with no system requirement behind them. Added SYS-104–SYS-109 for configuration validation and resolution, and SYS-S04–SYS-S07 for output/export safety. |

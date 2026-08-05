@@ -5,14 +5,14 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 3.2 |
-| **Product** | WBC ΔΣ v2.3.0 |
-| **Date Executed** | 2026-08-05 (14:54:02 UTC) |
+| **Version** | 3.3 |
+| **Product** | WBC ΔΣ v2.4.0 |
+| **Date Executed** | 2026-08-05 (17:28:30 UTC) |
 | **Status** | **PASS** |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_105402_run/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_132830_run/` |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
@@ -20,14 +20,14 @@
 
 ## 1. Executive Summary
 
-**646 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 3 documented skips.**
+**684 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 3 documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **499** |
-| System (browser) tests | **147** (50 specs x chromium, firefox, webkit, less 3 skips) |
-| **Total executed** | **646** |
-| Passed | **646** |
+| Unit, static and behavioural tests | **522** |
+| System (browser) tests | **162** (55 specs x chromium, firefox, webkit, less 3 skips) |
+| **Total executed** | **684** |
+| Passed | **684** |
 | Failed | **0** |
 | Skipped (documented, §6) | **3** |
 | Pass Rate | **100.00%** |
@@ -42,8 +42,8 @@ Regenerate this evidence with `npm run test:qms`.
 
 | | v2.0 (2026-02-24) | v2.1.0 (this run) |
 |---|---|---|
-| Tests recorded | 191 | 646 |
-| Tests executing shipped application code | **0** | 646 |
+| Tests recorded | 191 | 684 |
+| Tests executing shipped application code | **0** | 684 |
 | Layers | Mirrored logic + static text assertions | Unit (shipped engine) + jsdom behaviour + browser system |
 | Browser engines | none | Chromium, Firefox, WebKit |
 
@@ -67,7 +67,7 @@ shipped code can cause a test to fail.
 
 ---
 
-## 3. Node Suite Results (499 tests, 102 suites, 0 failures)
+## 3. Node Suite Results (522 tests, 104 suites, 0 failures)
 
 ### Suite 01 — Calculation Engine
 
@@ -236,6 +236,23 @@ Capabilities verifiable only at this layer (real browser APIs):
 
 ---
 
+### 4.5 Derived quantities and thresholds (added v2.4)
+
+| Suite | Scope | Result |
+|-------|-------|--------|
+| 01 VV-SUB-001..007 | Subset percentages: own denominator, the two blast conventions falling on opposite sides of 20%, zero-denominator guard, type dispatch and ratio default, interval eligibility, validation of numerator containment and unknown types | PASS |
+| 01 VV-THR-001..008 | Threshold evaluation: spanning detected, clear counts not flagged, larger counts narrow but need not resolve, formula targets, ratio targets rejected, unresolvable and out-of-range targets rejected | PASS |
+| 11 TC-B120..B127 | Advisory in the DOM, never blocking, cleared when the count moves clear, Continue Counting preserved, all formulas rendered, formula-target thresholds, session archival | PASS |
+| E2E VV-SYS-120..123, 125 | Advisory in three real browsers; the `legacy-9` preset reporting blasts against both denominators | PASS |
+
+**A test-suite defect was found by the layers disagreeing.** The E2E assertions
+compared `innerText` against source-case label text; a real browser applies the
+`uppercase` CSS transform to `innerText` while jsdom does not, so the same
+assertion passed at the behaviour layer and failed at the system layer. Fixed in
+the tests. Having both layers is what surfaced it.
+
+---
+
 ### 4.4 Sampling precision coverage (added v2.3)
 
 | Suite | Scope | Result |
@@ -283,6 +300,8 @@ see DCR-007 §5.1 and §5.2.
 | HA-092 NRBC diluting the peripheral blood differential | **Standards review (DCR-006)** | VV-DEN-001..006, TC-B100..107, VV-SYS-100..102 |
 | CSV omitted the differential denominator (URS-052) | **Writing VV-CI tests (DCR-007)** | TC-B115 |
 | Saturated interval bound showed float noise | **VV-CI-004 (DCR-007)** | VV-CI-004 |
+| HA-094 count accepted as settling a question it cannot settle | **Standards review (DCR-008)** | VV-THR-001..008, TC-B120..127, VV-SYS-120..123 |
+| E2E assertions ignored CSS text-transform in innerText | **Layer disagreement (DCR-008)** | VV-SYS-125 |
 
 The last three were introduced or exposed during remediation and were caught by
 the new layers before release — the behaviour the previous suite could not
@@ -309,7 +328,7 @@ provide.
 
 ## 7. Conclusion
 
-All 646 executed automated tests pass with no failures, across three browser
+All 684 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -331,6 +350,12 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-05T17:28:30.653Z
+- Command: `npm run test:all`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-05_132830_run/`
+
 - Date (UTC): 2026-08-05T14:54:02.430Z
 - Command: `npm run test:all`
 - Exit Code: 0

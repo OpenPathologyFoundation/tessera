@@ -1007,6 +1007,29 @@
         return Core.computeRatio(state.counts, specConfig.formulas.ME_ratio);
     }
 
+    // Rümke's warning (REF-001 §3.8) concerns ratios specifically: a ratio of
+    // two counted proportions carries the sampling error of both.
+    var RATIO_IMPRECISION_NOTE = 'A ratio of two counted proportions carries the ' +
+        'sampling error of both, and is therefore substantially less precise than ' +
+        'either percentage alone (Rumke 1985). Interpret alongside cellularity and ' +
+        'the trephine biopsy; treat small differences between successive ratios with caution.';
+
+    /** Every configured formula evaluated against the current counts. */
+    function computeFormulaResults(specConfig) {
+        var defs = (specConfig && specConfig.formulas) || {};
+        var out = {};
+        Object.keys(defs).forEach(function (fname) {
+            var r = Core.computeFormula(state.counts, defs[fname]);
+            if (r) out[fname] = { label: defs[fname].label || fname, type: r.type, display: r.display, value: r.value };
+        });
+        return out;
+    }
+
+    /** DOM id for a configured formula's value element. */
+    function formulaElId(name) {
+        return 'val-formula-' + String(name).replace(/[^A-Za-z0-9_-]/g, '-');
+    }
+
     /** Categories counted but outside the differential denominator (URS-030). */
     function denominatorExcludes() {
         var sc = getSpecConfig();
@@ -1090,16 +1113,24 @@
         html += '<span class="text-2xl font-mono font-bold text-accent" id="val-grand-total">0</span>';
         html += '</div>';
 
-        // --- M:E RATIO ---
-        if (specConfig.formulas && specConfig.formulas.ME_ratio) {
-            var meLabel = specConfig.formulas.ME_ratio.label || 'M:E Ratio';
+        // --- DERIVED FORMULAS ---
+        // Every formula the profile defines is rendered, not just M:E. The
+        // configuration is the element that carries institutional practice, so
+        // the display must follow it rather than a fixed list.
+        var formulas = specConfig.formulas || {};
+        Object.keys(formulas).forEach(function (fname) {
+            var f = formulas[fname];
+            var isRatio = (f.type || 'ratio') === 'ratio';
+            var tip = isRatio ? RATIO_IMPRECISION_NOTE : (f.basis || '');
             html += '<div class="mt-2 flex items-center justify-between px-2">';
-            html += '<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider" ' +
-                'title="' + Core.escapeAttr('A ratio of two counted proportions carries the sampling error of both, and is therefore substantially less precise than either percentage alone (Rumke 1985). Interpret alongside cellularity and the trephine biopsy; treat small differences between successive ratios with caution.') + '">' +
-                Core.escapeHtml(meLabel) + ' <span class="text-[9px] text-slate-500">&#9662;</span></span>';
-            html += '<span class="text-lg font-mono font-semibold text-slate-300" id="val-me-ratio">N/A</span>';
+            html += '<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider"' +
+                (tip ? ' title="' + Core.escapeAttr(tip) + '"' : '') + '>' +
+                Core.escapeHtml(f.label || fname) +
+                (tip ? ' <span class="text-[9px] text-slate-500">&#9662;</span>' : '') + '</span>';
+            html += '<span class="text-lg font-mono font-semibold text-slate-300" id="' +
+                formulaElId(fname) + '">N/A</span>';
             html += '</div>';
-        }
+        });
 
         // --- PROGRESS BAR (toward target count) ---
         html += '<div class="mt-4">';
@@ -1337,9 +1368,14 @@
                   ' counted outside it (' + excl.join(', ') + ')';
         }
 
-        // M:E ratio
-        var meRatioEl = el('val-me-ratio');
-        if (meRatioEl) meRatioEl.textContent = computeMERatio(specConfig) || 'N/A';
+        // Derived formulas
+        var formulaDefs = specConfig.formulas || {};
+        Object.keys(formulaDefs).forEach(function (fname) {
+            var node = el(formulaElId(fname));
+            if (!node) return;
+            var r = Core.computeFormula(state.counts, formulaDefs[fname]);
+            node.textContent = (r && r.display) || 'N/A';
+        });
 
         // Progress bar — against the differential, matching the target's meaning
         var targetCount = specConfig.targetCount;
@@ -1413,6 +1449,9 @@
             counts: Object.assign({}, state.counts),
             percentages: percentages,
             meRatio: computeMERatio(specConfig),
+            formulaResults: computeFormulaResults(specConfig),
+            thresholds: Core.evaluateThresholds(state.counts, specConfig,
+                (specConfig.confidenceIntervals && specConfig.confidenceIntervals.level) || 0.95),
             morphologyComments: buildMorphologyOutput(),
             // The advisory target counts classified cells, so it is measured
             // against the differential rather than the overall tally.
@@ -1526,11 +1565,22 @@
         });
         summaryHtml += '</div>';
 
-        if (session.meRatio) {
-            summaryHtml += '<div class="mt-3 text-sm text-slate-300 border-t border-slate-700/50 pt-2">';
-            summaryHtml += '<span class="text-slate-500 text-xs font-medium uppercase" ' +
-                'title="' + Core.escapeAttr('A ratio of two counted proportions carries the sampling error of both, and is therefore substantially less precise than either percentage alone (Rumke 1985). Interpret alongside cellularity and the trephine biopsy; treat small differences between successive ratios with caution.') + '">M:E Ratio:</span> ';
-            summaryHtml += '<span class="font-mono font-semibold">' + Core.escapeHtml(session.meRatio) + '</span>';
+        var fr = session.formulaResults || {};
+        var frNames = Object.keys(fr);
+        if (frNames.length) {
+            summaryHtml += '<div class="mt-3 text-sm text-slate-300 border-t border-slate-700/50 pt-2 ' +
+                'flex flex-wrap gap-x-5 gap-y-1">';
+            frNames.forEach(function (fname) {
+                var r = fr[fname];
+                var tip = r.type === 'ratio' ? RATIO_IMPRECISION_NOTE : '';
+                summaryHtml += '<span>';
+                summaryHtml += '<span class="text-slate-500 text-xs font-medium uppercase"' +
+                    (tip ? ' title="' + Core.escapeAttr(tip) + '"' : '') + '>' +
+                    Core.escapeHtml(r.label) + ':</span> ';
+                summaryHtml += '<span class="font-mono font-semibold">' +
+                    Core.escapeHtml(r.display) + '</span>';
+                summaryHtml += '</span>';
+            });
             summaryHtml += '</div>';
         }
 
@@ -1561,6 +1611,9 @@
                 noteEl.classList.add('hidden');
             }
         }
+
+        // --- Near-threshold advisory (URS-038) ---
+        renderThresholdNote(session);
 
         // --- Absolute Counts (URS-036) ---
         renderAbsoluteCountsSection(session);
@@ -1611,6 +1664,50 @@
                 if (panel) panel.classList.remove('hidden');
             });
         });
+    }
+
+    // ================================================================
+    // NEAR-THRESHOLD ADVISORY (URS-038, ICSH 2008 §2.6)
+    // ================================================================
+
+    /**
+     * Warn when the count does not settle a question it is being used to
+     * answer: the confidence interval for a category spans a configured
+     * diagnostic threshold, so the observed value sits on one side while the
+     * count does not establish which side the true value lies on.
+     *
+     * Advisory only. URS-041 establishes that this application does not block
+     * completion, and the same reasoning applies here — a paucicellular
+     * aspirate may make an extended count impossible, and the operator is the
+     * one who knows that.
+     */
+    function renderThresholdNote(session) {
+        var box = el('threshold-note');
+        var body = el('threshold-note-body');
+        if (!box || !body) return;
+
+        var spanning = (session.thresholds || []).filter(function (t) { return t.spans; });
+        if (spanning.length === 0) {
+            box.classList.add('hidden');
+            body.innerHTML = '';
+            return;
+        }
+
+        var html = '';
+        spanning.forEach(function (t) {
+            html += '<p>';
+            html += 'The ' + Math.round((session.confidenceLevel || 0.95) * 100) +
+                '% interval for <strong>' + Core.escapeHtml(t.targetLabel) + '</strong> (' +
+                Core.escapeHtml(Core.formatInterval(t.interval, 1)) + ', observed ' +
+                t.observed.toFixed(1) + '% of ' + t.interval.n + ' cells) spans the ' +
+                t.value + '% ' + Core.escapeHtml(t.label || 'threshold') + '.';
+            if (t.basis) {
+                html += ' <span class="text-amber-200/60">' + Core.escapeHtml(t.basis) + '</span>';
+            }
+            html += '</p>';
+        });
+        body.innerHTML = html;
+        box.classList.remove('hidden');
     }
 
     // ================================================================

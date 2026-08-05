@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | RA-001 |
-| **Version** | 2.4 |
+| **Version** | 2.5 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-04 |
@@ -163,6 +163,8 @@ primary text against the shipped configuration.
 
 | HA-093 | The M:E ratio is displayed to a precision the count does not support | A ratio of two counted proportions carries the sampling error of both and is substantially less precise than either. Displaying "2.1:1" invites comparison between successive marrow examinations at a resolution the counts cannot sustain, potentially reading a change in disease where only sampling noise exists | 2 | The ratio is rendered at the precision the configuration specifies, with nothing stated about its uncertainty | 3 | **None** | 3 | **18** | **Medium** | The M:E display carries an advisory that the ratio inherits the imprecision of both percentages (Rümke 1985, REF-001 [S4] and §3.8), directing that it be read alongside cellularity and the trephine biopsy. A computed interval for a ratio requires Fieller's theorem or a bootstrap and is deferred. | 2x3x2 = **12** (Low). **Residual accepted pending a ratio interval.** The M:E ratio is a secondary parameter interpreted in context, never a threshold test, which bounds the consequence. |
 
+| HA-094 | A count is accepted as settling a diagnostic question it cannot settle | The observed percentage sits on one side of a diagnostic threshold while the count leaves the true value genuinely uncertain. An observed 20% blasts at 200 cells carries a 95% interval of 15.0–26.1%: the case may be reported as meeting the AML threshold on a count that does not establish it. The consequence is a classification the count does not support, in either direction | 4 | The point estimate is reported without reference to any threshold; the operator must recognise the situation unaided and recall the ICSH guidance | 3 | **None** — the reported figure looks equally definite whether the interval is narrow or wide | 4 | **48** | **Medium** | SYS-204–208: profiles define diagnostic thresholds with a citable basis, and where the confidence interval spans one the results screen names the quantity, its interval, the threshold and the basis, and directs the operator to Continue Counting. Implements the ICSH 2008 §2.6 direction to extend the count near a critical threshold. Informational only, per URS-041. | 4x3x1 = **12** (Low). Occurrence is unchanged — whether to extend the count remains a clinical judgement, and a paucicellular aspirate may make it impossible — but detection improves from Low to Certain: the condition is now stated rather than left to be recognised. Verified by VV-THR-001 to 008, TC-B120 to B127, VV-SYS-120 to 123. |
+
 ### 4.10 Hazards Identified in the v2.1 Design Review (DCR-004)
 
 | # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
@@ -180,10 +182,10 @@ primary text against the shipped configuration.
 |-----------|-------|-----------|
 | Critical (75-125) | 1 | HA-001 |
 | High (50-74) | 4 | HA-003, HA-030, HA-080, HA-092 |
-| Medium (16-49) | 24 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
+| Medium (16-49) | 25 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
 | Low (1-15) | 9 | HA-023, HA-040, HA-041, HA-050, HA-051, HA-060, HA-062, HA-070, HA-072 |
 
-Total: **38** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
+Total: **39** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
 
 _Two counting errors in the v2.0 table are corrected here: the Medium row was
 labelled 14 against a list of 16 entries and the Low row 8 against a list of 10,
@@ -197,7 +199,7 @@ Every RPN in section 4 has been recomputed from its S, O and D values._
 | Critical (75-125) | **0** |
 | High (50-74) | **0** |
 | Medium (16-49) | **2** (HA-001 RPN=45, HA-002 RPN=30) |
-| Low (1-15) | **36** |
+| Low (1-15) | **37** |
 
 All three residual Medium risks are accepted by design and unchanged from v2.0;
 their rationale is in section 5.3. No residual risk sits above Medium.
@@ -312,6 +314,7 @@ residual scores above to be treated as evidence rather than intent.
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete FMEA |
 | B | 2026-02-24 | QMS | v2.0 update: optional case number (HA-001), advisory target count replacing blocking dialog (HA-030), unified key mappings (HA-010), new hazards for M:E ratio (HA-070, HA-072) and Continue Counting (HA-071), updated risk summary |
+| G | 2026-08-05 | QMS | v2.5 (DCR-008): HA-094 added — a count accepted as settling a diagnostic question it cannot settle. Pre-RPN 48, residual 12. Mitigated by the near-threshold advisory, which implements the ICSH §2.6 direction the design review had recorded as an open gap. |
 | F | 2026-08-05 | QMS | v2.4 (DCR-007): HA-093 added — the M:E ratio is displayed at a precision the count does not support, which is the imprecision Rümke's paper actually concerns. HA-030 re-scored 24 → 12: the sub-target advisory now states a computed confidence interval rather than a general caution, so detection improves from Low to Certain. Residual Medium risks reduce from 3 to 2. |
 | E | 2026-08-05 | QMS | v2.3 (DCR-006): HA-092 added — a category outside the differential included in its percentage denominator. Pre-RPN 64 (High), residual 8. This was live in the shipped peripheral blood profile: NRBC sat in the denominator, understating every leucocyte percentage. |
 | D | 2026-08-05 | QMS | v2.2 (DCR-005): HA-090 and HA-091 added from the ICSH standards review. |

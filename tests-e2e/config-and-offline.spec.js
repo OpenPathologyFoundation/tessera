@@ -227,6 +227,49 @@ test.describe('Preset profile catalogue (URS-101)', () => {
 });
 
 // ================================================================
+test.describe('Subset percentage formulas (URS-039)', () => {
+
+    test('VV-SYS-125: The legacy preset reports blasts against both denominators', async ({ page }) => {
+        await page.goto('/counter.html');
+        await page.click('#btnPresetCatalog');
+        await page.locator('#preset-list button[data-preset-name="Legacy 9-Part"]').click();
+        await expect(page.locator('#modal-title')).toHaveText('Preset Loaded');
+        await page.click('#modal-confirm');
+        await waitForAppReady(page);
+
+        await page.fill('#caseNumber', 'S25-ERY');
+        await page.click('#btnStartCount');
+
+        // Erythroid-rich marrow: the two conventions disagree across the
+        // 20% line, which is what the pre-2022 WHO rule existed to catch.
+        const keys = await page.evaluate(() => {
+            const oc = window.__wbcTestHooks.getSpecConfig().outCodes;
+            const inv = {};
+            Object.keys(oc).forEach(k => { inv[oc[k]] = k; });
+            return inv;
+        });
+        for (let i = 0; i < 45; i++) await page.keyboard.press(keys.blasts.toLowerCase());
+        for (let i = 0; i < 300; i++) await page.keyboard.press(keys.nrbc.toLowerCase());
+        for (let i = 0; i < 155; i++) await page.keyboard.press(keys.segs.toLowerCase());
+
+        // 45 of 500 all-nucleated = 9%; 45 of 200 non-erythroid = 22.5%.
+        await expect(page.locator('#val-formula-blasts_non_erythroid')).toHaveText('22.5%');
+        await expect(page.locator('#pct-blasts')).toHaveText('9.00%');
+
+        await page.click('#btnCountDone');
+        // innerText returns CSS-transformed text and the label carries
+        // `uppercase`, so match case-insensitively.
+        const summary = await page.locator('#results-summary').innerText();
+        expect(summary).toMatch(/blasts \(% non-erythroid\)/i);
+        expect(summary).toContain('22.5%');
+
+        // Only the legacy rule straddles its threshold.
+        const body = await page.locator('#threshold-note-body').innerText();
+        expect(body).toMatch(/non-erythroid/i);
+    });
+});
+
+// ================================================================
 test.describe('Configuration editor round-trip (URS-102)', () => {
 
     test('VV-SYS-060: The editor is reachable from the counter', async ({ page }) => {

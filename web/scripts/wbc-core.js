@@ -442,6 +442,133 @@
     }
 
     /**
+     * One group of categories expressed as a percentage of another.
+     *
+     * The governing case is "blasts as a percentage of non-erythroid cells" —
+     * the pre-2022 WHO erythroleukaemia rule. WHO 2022 withdrew it in favour of
+     * counting blasts against all nucleated cells, but laboratories still
+     * report it when comparing against historical results, and the two figures
+     * can differ enough to move a case across a diagnostic boundary in a marrow
+     * with expanded erythropoiesis.
+     *
+     * Unlike a ratio, this has a real denominator count, so it carries a
+     * binomial confidence interval in the way a ratio cannot (REF-001 §3.8).
+     *
+     * @returns {{value:number, numeratorCount:number, denominatorCount:number,
+     *            display:string}|null} null when the denominator is zero
+     */
+    function computeSubsetPercentage(counts, formula) {
+        if (!formula || !Array.isArray(formula.numerator) || !Array.isArray(formula.denominator)) {
+            return null;
+        }
+        var num = 0;
+        formula.numerator.forEach(function (ct) { num += ((counts && counts[ct]) || 0); });
+        var den = 0;
+        formula.denominator.forEach(function (ct) { den += ((counts && counts[ct]) || 0); });
+        if (den === 0) return null;
+
+        var precision = typeof formula.precision === 'number' ? formula.precision : 1;
+        var value = (num / den) * 100;
+        return {
+            value: value,
+            numeratorCount: num,
+            denominatorCount: den,
+            display: value.toFixed(precision) + '%'
+        };
+    }
+
+    /**
+     * Evaluate a configured formula, dispatching on its type.
+     * Absent `type` means "ratio", so profiles written before subset
+     * percentages existed behave exactly as before.
+     */
+    function computeFormula(counts, formula) {
+        if (!formula) return null;
+        var type = formula.type || 'ratio';
+
+        if (type === 'percentage') {
+            var r = computeSubsetPercentage(counts, formula);
+            if (!r) {
+                return {
+                    type: 'percentage', display: 'N/A', value: null,
+                    numeratorCount: 0, denominatorCount: 0
+                };
+            }
+            r.type = 'percentage';
+            return r;
+        }
+
+        var display = computeRatio(counts, formula);
+        if (display === null) return null;
+        return { type: 'ratio', display: display, value: null };
+    }
+
+    /**
+     * Test each configured diagnostic threshold against the count.
+     *
+     * ICSH 2008 §2.6 directs that the count be extended "if the abnormal cell
+     * count is very close to a critical threshold for disease stratification or
+     * to a low threshold (e.g. 5%)". A confidence interval straddling the
+     * threshold is the operational form of that condition: the observed value
+     * sits on one side, but the count does not establish which side the true
+     * value lies on.
+     *
+     * A threshold may target a cell type — measured against the differential
+     * denominator — or a percentage formula, measured against that formula's
+     * own denominator. Ratios are not eligible: no interval is computed for
+     * them (REF-001 §3.8, HA-093).
+     *
+     * @returns {Array} one entry per evaluable threshold, each carrying its
+     *          interval and whether it straddles the threshold
+     */
+    function evaluateThresholds(counts, spec, level) {
+        var list = (spec && spec.thresholds) || [];
+        if (!Array.isArray(list) || list.length === 0) return [];
+
+        var exclude = (spec && spec.denominatorExcludes) || [];
+        var diffTotal = getDenominator(counts, exclude);
+        var formulas = (spec && spec.formulas) || {};
+        var out = [];
+
+        list.forEach(function (t) {
+            if (!t || !t.target || typeof t.value !== 'number') return;
+
+            var num, den, targetLabel;
+            if (hasOwn(formulas, t.target)) {
+                var f = formulas[t.target];
+                if ((f.type || 'ratio') !== 'percentage') return;
+                var r = computeSubsetPercentage(counts, f);
+                if (!r) return;
+                num = r.numeratorCount;
+                den = r.denominatorCount;
+                targetLabel = f.label || t.target;
+            } else {
+                // A category outside the differential has no percentage of it.
+                if (exclude.indexOf(t.target) !== -1) return;
+                num = (counts && counts[t.target]) || 0;
+                den = diffTotal;
+                targetLabel = t.target;
+            }
+            if (den === 0) return;
+
+            var ci = wilsonInterval(num, den, level);
+            if (!ci) return;
+
+            out.push({
+                target: t.target,
+                targetLabel: targetLabel,
+                label: t.label || '',
+                basis: t.basis || '',
+                value: t.value,
+                observed: ci.point,
+                interval: ci,
+                spans: intervalSpans(ci, t.value)
+            });
+        });
+        return out;
+    }
+
+    /**
      * Absolute count for a cell type given an analyser WBC (URS-036).
      * WBC x percentage / 100.
      */
@@ -858,19 +985,76 @@
                 }
             }
 
+            var formulaNames = {};
             if (spec.formulas) {
                 Object.keys(spec.formulas).forEach(function (fname) {
+                    formulaNames[fname] = spec.formulas[fname];
                     var f = spec.formulas[fname];
                     if (!f || !Array.isArray(f.numerator) || !Array.isArray(f.denominator)) {
                         errors.push(name + ': formula "' + fname + '" needs numerator and denominator arrays');
                         return;
+                    }
+                    var ftype = f.type || 'ratio';
+                    if (ftype !== 'ratio' && ftype !== 'percentage') {
+                        errors.push(name + ': formula "' + fname + '" has unknown type "' + ftype +
+                            '" (expected "ratio" or "percentage")');
                     }
                     f.numerator.concat(f.denominator).forEach(function (ct) {
                         if (!mappedSet[ct]) {
                             errors.push(name + ': formula "' + fname + '" references unknown cell type "' + ct + '"');
                         }
                     });
+                    if (ftype === 'percentage') {
+                        if (f.denominator.length === 0) {
+                            errors.push(name + ': percentage formula "' + fname + '" has an empty denominator');
+                        }
+                        // A percentage of a subset requires the numerator to be
+                        // part of that subset; otherwise it can exceed 100%.
+                        f.numerator.forEach(function (ct) {
+                            if (f.denominator.indexOf(ct) === -1) {
+                                errors.push(name + ': percentage formula "' + fname + '" has "' + ct +
+                                    '" in the numerator but not the denominator, so it could exceed 100%');
+                            }
+                        });
+                    }
                 });
+            }
+
+            // Diagnostic thresholds (URS-038).
+            if (spec.thresholds !== undefined) {
+                if (!Array.isArray(spec.thresholds)) {
+                    errors.push(name + ': thresholds must be an array');
+                } else {
+                    spec.thresholds.forEach(function (t, tIdx) {
+                        var where = name + ': threshold ' + tIdx;
+                        if (!t || typeof t !== 'object') {
+                            errors.push(where + ' is not an object');
+                            return;
+                        }
+                        if (typeof t.value !== 'number' || t.value < 0 || t.value > 100) {
+                            errors.push(where + ': value must be a percentage between 0 and 100');
+                        }
+                        if (!t.target) {
+                            errors.push(where + ': missing target');
+                            return;
+                        }
+                        if (hasOwn(formulaNames, t.target)) {
+                            var tf = formulaNames[t.target];
+                            if ((tf.type || 'ratio') !== 'percentage') {
+                                errors.push(where + ': target "' + t.target + '" is a ratio formula. ' +
+                                    'A ratio carries no confidence interval, so it cannot be tested ' +
+                                    'against a threshold');
+                            }
+                        } else if (!displayedSet[t.target]) {
+                            errors.push(where + ': target "' + t.target +
+                                '" is neither a displayed category nor a percentage formula');
+                        } else if (spec.denominatorExcludes &&
+                                   spec.denominatorExcludes.indexOf(t.target) !== -1) {
+                            errors.push(where + ': target "' + t.target + '" is outside the differential ' +
+                                'denominator and has no percentage to test');
+                        }
+                    });
+                }
             }
         });
 
@@ -924,6 +1108,9 @@
         intervalSpans: intervalSpans,
         cellsForPrecision: cellsForPrecision,
         computeRatio: computeRatio,
+        computeSubsetPercentage: computeSubsetPercentage,
+        computeFormula: computeFormula,
+        evaluateThresholds: evaluateThresholds,
         computeAbsolute: computeAbsolute,
         renderTemplate: renderTemplate,
         buildTemplateValues: buildTemplateValues,

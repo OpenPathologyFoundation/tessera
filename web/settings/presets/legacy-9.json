@@ -1,5 +1,5 @@
 {
-    "version": "2.0",
+    "version": "2.1",
     "profileId": "legacy-9",
     "profileName": "Legacy 9-Part",
     "description": "Classic medical technology layout: segs, bands, lymphocytes, monocytes, eosinophils, basophils, blasts, metamyelocytes, myelocytes. Left-hand ergonomic key layout.",
@@ -11,8 +11,20 @@
             "requireCaseNumber": false,
             "upperRowAbnormal": false,
             "categories": {
-                "upper": ["nrbc", "blasts", "myelo", "meta"],
-                "lower": ["bands", "segs", "eos", "baso", "mono", "lymph"]
+                "upper": [
+                    "nrbc",
+                    "blasts",
+                    "myelo",
+                    "meta"
+                ],
+                "lower": [
+                    "bands",
+                    "segs",
+                    "eos",
+                    "baso",
+                    "mono",
+                    "lymph"
+                ]
             },
             "outCodes": {
                 "F": "segs",
@@ -29,9 +41,40 @@
             "formulas": {
                 "ME_ratio": {
                     "label": "M:E Ratio",
-                    "numerator": ["blasts", "myelo", "meta", "bands", "segs", "baso", "eos", "mono"],
-                    "denominator": ["nrbc"],
+                    "numerator": [
+                        "blasts",
+                        "myelo",
+                        "meta",
+                        "bands",
+                        "segs",
+                        "baso",
+                        "eos",
+                        "mono"
+                    ],
+                    "denominator": [
+                        "nrbc"
+                    ],
                     "precision": 1
+                },
+                "blasts_non_erythroid": {
+                    "type": "percentage",
+                    "label": "Blasts (% non-erythroid)",
+                    "numerator": [
+                        "blasts"
+                    ],
+                    "denominator": [
+                        "blasts",
+                        "myelo",
+                        "meta",
+                        "bands",
+                        "segs",
+                        "eos",
+                        "baso",
+                        "mono",
+                        "lymph"
+                    ],
+                    "precision": 1,
+                    "basis": "Pre-2022 WHO erythroleukaemia rule: blasts expressed as a percentage of non-erythroid cells. WHO 2022 withdrew this in favour of counting blasts against all nucleated cells. Retained here for comparison with historical reports; it is not the current diagnostic convention."
                 }
             },
             "templates": [
@@ -42,11 +85,31 @@
                 }
             ],
             "constituents": {},
-            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "audio": {
+                "enabled": true,
+                "countSound": "click",
+                "undoSound": "undo",
+                "targetSound": "chime",
+                "typewriterSound": "typewriter"
+            },
             "autosave": true,
             "absoluteCounts": "optional",
             "handedness": "left",
-            "morphologyChecklist": []
+            "morphologyChecklist": [],
+            "thresholds": [
+                {
+                    "target": "blasts",
+                    "value": 20,
+                    "label": "AML blast threshold (all nucleated cells)",
+                    "basis": "WHO 2022 / ICC 2022 — the current convention."
+                },
+                {
+                    "target": "blasts_non_erythroid",
+                    "value": 20,
+                    "label": "legacy non-erythroid blast threshold",
+                    "basis": "Pre-2022 WHO rule, shown for comparison only."
+                }
+            ]
         },
         {
             "specimenType": "pb",
@@ -55,8 +118,20 @@
             "requireCaseNumber": false,
             "upperRowAbnormal": true,
             "categories": {
-                "upper": ["nrbc", "blasts", "myelo", "meta"],
-                "lower": ["bands", "segs", "eos", "baso", "mono", "lymph"]
+                "upper": [
+                    "nrbc",
+                    "blasts",
+                    "myelo",
+                    "meta"
+                ],
+                "lower": [
+                    "bands",
+                    "segs",
+                    "eos",
+                    "baso",
+                    "mono",
+                    "lymph"
+                ]
             },
             "outCodes": {
                 "F": "segs",
@@ -78,7 +153,13 @@
                 }
             ],
             "constituents": {},
-            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "audio": {
+                "enabled": true,
+                "countSound": "click",
+                "undoSound": "undo",
+                "targetSound": "chime",
+                "typewriterSound": "typewriter"
+            },
             "autosave": true,
             "absoluteCounts": "optional",
             "handedness": "left",

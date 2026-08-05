@@ -1011,3 +1011,144 @@ describe('Behaviour — Confidence intervals (URS-037, HA-030)', () => {
         h.close();
     });
 });
+
+// ================================================================
+describe('Behaviour — Thresholds and subset formulas (URS-038, URS-039)', () => {
+
+    it('TC-B120: A count straddling a threshold raises the advisory', async () => {
+        const h = await counting({ caseNumber: 'S25-THR' });
+        h.press('X', 40);    // blasts
+        h.press('F', 160);   // segs  -> 20% of 200, CI 15.0-26.1%
+        h.click('btnCountDone');
+
+        assert.ok(h.visible('threshold-note'), 'advisory must be shown');
+        const body = h.el('threshold-note-body').textContent;
+        assert.match(body, /blasts/);
+        assert.match(body, /15\.0–26\.1%/);
+        assert.match(body, /20% AML blast threshold/);
+        h.close();
+    });
+
+    it('TC-B121: The advisory never blocks completion (URS-041 philosophy)', async () => {
+        const h = await counting({ caseNumber: 'S25-THR' });
+        h.press('X', 40);
+        h.press('F', 160);
+        h.click('btnCountDone');
+        // Results are reached and the modal is not raised.
+        assert.equal(h.hooks.state.phase, 'results');
+        assert.equal(h.modal().open, false);
+        h.close();
+    });
+
+    it('TC-B122: A count clear of every threshold shows no advisory', async () => {
+        const h = await counting({ caseNumber: 'S25-CLEAR' });
+        h.press('F', 500);   // 100% segs; blasts 0%, well clear of 5% and 20%
+        h.click('btnCountDone');
+        assert.ok(!h.visible('threshold-note'));
+        h.close();
+    });
+
+    it('TC-B123: Continue Counting remains the offered remedy', async () => {
+        const h = await counting({ caseNumber: 'S25-THR' });
+        h.press('X', 40);
+        h.press('F', 160);
+        h.click('btnCountDone');
+        assert.ok(h.visible('threshold-note'));
+        assert.ok(h.el('btnResumeCounting'), 'the advisory points at a control that exists');
+
+        h.click('btnResumeCounting');
+        assert.equal(h.hooks.state.phase, 'counting');
+        assert.equal(h.text('val-grand-total'), '200', 'tallies preserved');
+        h.close();
+    });
+
+    it('TC-B124: Extending the count re-evaluates the advisory', async () => {
+        const cfg = clone(DEFAULT_CONFIG);
+        cfg.specimenTypes[0].thresholds = [
+            { target: 'blasts', value: 20, label: 'AML blast threshold' }
+        ];
+        const h = await counting({ config: cfg, caseNumber: 'S25-EXT' });
+        h.press('X', 40);
+        h.press('F', 160);
+        h.click('btnCountDone');
+        assert.ok(h.visible('threshold-note'));
+
+        // Add cells that move the observed value well clear of the threshold.
+        h.click('btnResumeCounting');
+        h.press('F', 300);
+        h.click('btnCountDone');
+        assert.ok(!h.visible('threshold-note'),
+            'the advisory clears once the interval no longer spans the threshold');
+        h.close();
+    });
+
+    it('TC-B125: All configured formulas render, not just M:E', async () => {
+        const cfg = clone(DEFAULT_CONFIG);
+        const cells = cfg.specimenTypes[0].categories.upper
+            .concat(cfg.specimenTypes[0].categories.lower);
+        cfg.specimenTypes[0].formulas.blasts_ne = {
+            type: 'percentage', label: 'Blasts (% non-erythroid)',
+            numerator: ['blasts'],
+            denominator: cells.filter(c => c !== 'nrbc'), precision: 1
+        };
+        const h = await counting({ config: cfg, caseNumber: 'S25-F' });
+        h.press('X', 45);    // blasts
+        h.press('B', 300);   // nrbc
+        h.press('F', 155);
+
+        assert.ok(h.el('val-formula-ME_ratio'), 'the ratio still renders');
+        assert.ok(h.el('val-formula-blasts_ne'), 'the subset percentage renders too');
+        // 45 blasts of 200 non-erythroid = 22.5%
+        assert.equal(h.text('val-formula-blasts_ne'), '22.5%');
+
+        h.click('btnCountDone');
+        const summary = h.el('results-summary').textContent;
+        assert.match(summary, /Blasts \(% non-erythroid\)/);
+        assert.match(summary, /22\.5%/);
+        h.close();
+    });
+
+    it('TC-B126: A threshold on a subset formula is evaluated against its own denominator', async () => {
+        const cfg = clone(DEFAULT_CONFIG);
+        const cells = cfg.specimenTypes[0].categories.upper
+            .concat(cfg.specimenTypes[0].categories.lower);
+        cfg.specimenTypes[0].formulas.blasts_ne = {
+            type: 'percentage', label: 'Blasts (% non-erythroid)',
+            numerator: ['blasts'],
+            denominator: cells.filter(c => c !== 'nrbc'), precision: 1
+        };
+        cfg.specimenTypes[0].thresholds = [
+            { target: 'blasts', value: 20, label: 'AML threshold (all nucleated)' },
+            { target: 'blasts_ne', value: 20, label: 'legacy non-erythroid threshold' }
+        ];
+        const h = await counting({ config: cfg, caseNumber: 'S25-NE' });
+        h.press('X', 45);
+        h.press('B', 300);
+        h.press('F', 155);
+        h.click('btnCountDone');
+
+        const session = h.hooks.state.sessionHistory[0];
+        const byTarget = Object.fromEntries(session.thresholds.map(t => [t.target, t]));
+        // 45 of 500 = 9% on all nucleated cells: clear of 20%.
+        assert.equal(byTarget.blasts.spans, false);
+        // 45 of 200 non-erythroid = 22.5%: straddles 20%.
+        assert.equal(byTarget.blasts_ne.spans, true);
+        assert.equal(byTarget.blasts_ne.interval.n, 200);
+
+        assert.match(h.el('threshold-note-body').textContent, /non-erythroid/);
+        h.close();
+    });
+
+    it('TC-B127: Threshold results are archived on the session', async () => {
+        const h = await counting({ caseNumber: 'S25-ARCH' });
+        h.press('X', 40);
+        h.press('F', 160);
+        h.click('btnCountDone');
+        const session = h.hooks.state.sessionHistory[0];
+        assert.ok(Array.isArray(session.thresholds));
+        const aml = session.thresholds.find(t => t.value === 20);
+        assert.equal(aml.spans, true);
+        assert.ok(aml.interval.lower < 20 && aml.interval.upper > 20);
+        h.close();
+    });
+});

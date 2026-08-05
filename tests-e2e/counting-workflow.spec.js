@@ -143,11 +143,11 @@ test.describe('Keyboard counting', () => {
 
     test('VV-SYS-017: M:E ratio computes live and shows N/A with a zero denominator (URS-035)', async ({ page }) => {
         await startCount(page);
-        await expect(page.locator('#val-me-ratio')).toHaveText('N/A');
+        await expect(page.locator('#val-formula-ME_ratio')).toHaveText('N/A');
         await count(page, 'f', 100);
-        await expect(page.locator('#val-me-ratio')).toHaveText('N/A');  // no erythroid yet
+        await expect(page.locator('#val-formula-ME_ratio')).toHaveText('N/A');  // no erythroid yet
         await count(page, 'b', 50);
-        await expect(page.locator('#val-me-ratio')).toHaveText('2.0:1');
+        await expect(page.locator('#val-formula-ME_ratio')).toHaveText('2.0:1');
     });
 });
 
@@ -168,7 +168,7 @@ test.describe('Validation scenario V1 — complete bone marrow differential', ()
         await expect(page.locator('#progress-label')).toHaveText('500 / 500 (target)');
 
         // M:E = (45+0+35+40+45+120+0+7+20) / 150 = 312/150 = 2.1
-        await expect(page.locator('#val-me-ratio')).toHaveText('2.1:1');
+        await expect(page.locator('#val-formula-ME_ratio')).toHaveText('2.1:1');
 
         await page.click('#btnCountDone');
         await expect(page.locator('#phase-results')).toBeVisible();
@@ -373,5 +373,62 @@ test.describe('Sampling precision (URS-037, HA-030)', () => {
         expect(ci.lower).toBe(0);
         expect(ci.upper).toBeGreaterThan(0);
         expect(ci.upper).toBeLessThan(2.5);
+    });
+});
+
+// ================================================================
+test.describe('Near-threshold advisory (URS-038, ICSH 2008 §2.6)', () => {
+
+    test('VV-SYS-120: A count straddling the AML threshold raises the advisory', async ({ page }) => {
+        await startCount(page, 'S25-THR');
+        await count(page, 'x', 40);    // blasts
+        await count(page, 'f', 160);   // segs -> 20% of 200
+        await page.click('#btnCountDone');
+
+        await expect(page.locator('#threshold-note')).toBeVisible();
+        const body = await page.locator('#threshold-note-body').innerText();
+        expect(body).toContain('blasts');
+        expect(body).toContain('15.0–26.1%');
+        expect(body).toContain('20% AML blast threshold');
+
+        // ICSH is cited as the basis for the recommendation.
+        const box = await page.locator('#threshold-note').innerText();
+        expect(box).toContain('ICSH 2008');
+        expect(box).toContain('Continue Counting');
+    });
+
+    test('VV-SYS-121: The advisory is informational and never blocks', async ({ page }) => {
+        await startCount(page, 'S25-THR2');
+        await count(page, 'x', 40);
+        await count(page, 'f', 160);
+        await page.click('#btnCountDone');
+
+        await expect(page.locator('#phase-results')).toBeVisible();
+        await expect(page.locator('#modal-overlay')).toBeHidden();
+        // The report is fully available regardless.
+        await expect(page.locator('.tab-panel:not(.hidden)')).toBeVisible();
+    });
+
+    test('VV-SYS-122: Extending the count re-evaluates the advisory', async ({ page }) => {
+        await startCount(page, 'S25-EXT');
+        await count(page, 'x', 40);
+        await count(page, 'f', 160);
+        await page.click('#btnCountDone');
+        await expect(page.locator('#threshold-note')).toBeVisible();
+
+        await page.click('#btnResumeCounting');
+        await expect(page.locator('#val-grand-total')).toHaveText('200');
+        await count(page, 'f', 300);
+        await page.click('#btnCountDone');
+
+        // 40 of 500 = 8%, clear of the 20% threshold.
+        await expect(page.locator('#threshold-note')).toBeHidden();
+    });
+
+    test('VV-SYS-123: A clean count shows no advisory', async ({ page }) => {
+        await startCount(page, 'S25-CLEAN');
+        await count(page, 'f', 500);
+        await page.click('#btnCountDone');
+        await expect(page.locator('#threshold-note')).toBeHidden();
     });
 });

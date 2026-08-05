@@ -135,6 +135,7 @@ requires the classification to be reassessed before release.
 | RTM-001 | Requirements Traceability Matrix v3.0 | Traceability | Draft |
 | **REF-001** | **Standards and Literature Basis v1.0 (Rev D)** | Reference | Draft |
 | MAL-001 | Methods and Limitations, operator-facing (`web/methods.html`) | Instructions for Use | Draft |
+| CRB-001 | Clinical Review Brief (`CLINICAL-REVIEW-BRIEF.md`) — the request put to reviewing haematopathologists | Review Record | Issued |
 | TR-001 | Test Execution Results v3.1 | Evidence | Draft |
 | SOP-001 | Standard Operating Procedure | Procedure | Draft |
 | SOP-002 | Deployment Procedure | Procedure | Draft |

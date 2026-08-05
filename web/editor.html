@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WBC ΔΣ — Configuration Editor</title>
+    <script src="vendor/tailwind.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#172033', 950: '#0c1220' },
+                        accent: { DEFAULT: '#60a5fa', dim: '#3b82f6', bright: '#93c5fd' },
+                        surface: { DEFAULT: '#1e293b', light: '#334155', lighter: '#475569' }
+                    },
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'SF Mono', 'Fira Code', 'monospace'],
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Optional webfonts: absent offline, the local font stacks in tailwind.config apply -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Franklin:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        *:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+        .drop-zone { min-height: 48px; transition: background-color 150ms; }
+        .drop-zone.drag-over { background-color: rgba(96, 165, 250, 0.15); border-color: #60a5fa; }
+        .cell-chip { cursor: grab; user-select: none; }
+        .cell-chip:active { cursor: grabbing; }
+        .cell-chip.dragging { opacity: 0.5; }
+        .key-listening { border-color: #60a5fa !important; box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.4); animation: pulse-ring 1.5s ease-in-out infinite; }
+        @keyframes pulse-ring { 0%, 100% { box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.4); } 50% { box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2); } }
+        body[data-theme="light"] { background-color: #f8fafc; color: #0f172a; }
+        body[data-theme="light"] .bg-slate-950 { background-color: #f8fafc !important; }
+        body[data-theme="light"] .bg-slate-900 { background-color: #f1f5f9 !important; }
+        body[data-theme="light"] .bg-slate-800 { background-color: #e2e8f0 !important; }
+        body[data-theme="light"] .bg-slate-700 { background-color: #cbd5e1 !important; }
+        body[data-theme="light"] .border-slate-700 { border-color: #cbd5e1 !important; }
+        body[data-theme="light"] .border-slate-600 { border-color: #94a3b8 !important; }
+        body[data-theme="light"] .text-slate-100, body[data-theme="light"] .text-slate-200 { color: #0f172a !important; }
+        body[data-theme="light"] .text-slate-300 { color: #1e293b !important; }
+        body[data-theme="light"] .text-slate-400 { color: #334155 !important; }
+        body[data-theme="light"] .text-slate-500 { color: #475569 !important; }
+        body[data-theme="light"] .text-accent { color: #2563eb !important; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-200 font-sans min-h-screen antialiased">
+
+    <!-- TOP BAR -->
+    <header class="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-700/50">
+        <div class="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <a href="counter.html" class="text-slate-500 hover:text-slate-300 transition-colors" title="Back to Counter">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                </a>
+                <div class="flex items-center gap-2" role="img" aria-label="WBC Delta Sigma Configuration Editor">
+                    <svg width="24" height="24" viewBox="0 0 40 40" fill="none" class="text-slate-300" aria-hidden="true">
+                        <g fill="currentColor"><rect x="3" y="5" width="8" height="8" rx="1"/><rect x="16" y="9" width="8" height="8" rx="1"/><rect x="29" y="5" width="8" height="8" rx="1"/></g>
+                        <path d="M4 24 L36 24 M4 24 L20 30 L4 36 M4 36 L36 36" stroke="currentColor" stroke-width="2.5" stroke-linecap="square" fill="none"/>
+                    </svg>
+                    <span class="text-sm font-bold text-slate-300" style="font-family:'Libre Franklin',sans-serif;font-variant-caps:small-caps;">Configuration Editor</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button id="btnSaveProfile" class="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium rounded-lg transition-colors">
+                    Save Profile
+                </button>
+                <button id="btnLoadProfile" class="px-4 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-sm font-medium rounded-lg transition-colors">
+                    Load Profile
+                </button>
+                <input type="file" id="profileFileInput" accept=".json" class="hidden">
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-4 pt-20 pb-12">
+
+        <!-- Save/load feedback. A profile that fails validation is downloaded
+             as a draft but never made active, so the message must say which
+             happened rather than always reporting success. -->
+        <div id="save-status" class="hidden" role="status" aria-live="polite"></div>
+
+        <div class="grid grid-cols-12 gap-6">
+
+            <!-- LEFT PANEL: Cell Reference -->
+            <div class="col-span-3">
+                <div class="sticky top-20">
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Cell Reference</h2>
+                    <p class="text-[11px] text-slate-600 mb-3">Drag cells to the layout panels on the right.</p>
+                    <div id="cell-reference" class="space-y-1">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: Layout + Settings -->
+            <div class="col-span-9 space-y-6">
+
+                <!-- Specimen Type Tabs -->
+                <div>
+                    <div id="specimen-tabs" class="flex gap-2 mb-4">
+                        <!-- Populated by JS -->
+                    </div>
+                    <button id="btnAddSpecimen" class="text-xs text-slate-500 hover:text-slate-400 transition-colors">+ Add specimen type</button>
+                </div>
+
+                <!-- Layout Panels -->
+                <div>
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Your Layout</h2>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="text-[11px] text-slate-500 mb-1">Upper Row (Precursors)</div>
+                            <div id="drop-upper" class="drop-zone flex flex-wrap gap-2 p-3 border-2 border-dashed border-slate-700 rounded-lg min-h-[56px]">
+                                <!-- Cell chips dropped here -->
+                            </div>
+                        </div>
+                        <div>
+                            <div class="text-[11px] text-slate-500 mb-1">Lower Row (Mature)</div>
+                            <div id="drop-lower" class="drop-zone flex flex-wrap gap-2 p-3 border-2 border-dashed border-slate-700 rounded-lg min-h-[56px]">
+                                <!-- Cell chips dropped here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Assignment -->
+                <div>
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Key Assignment</h2>
+                    <p class="text-[11px] text-slate-600 mb-3">Click a cell card, then press a key to assign it.</p>
+                    <div class="flex gap-2 mb-3">
+                        <button id="btnResetKeys" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-colors">
+                            Reset All Keys
+                        </button>
+                        <button id="btnAutoLeft" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-colors">
+                            Auto-Assign: Left Hand
+                        </button>
+                        <button id="btnAutoRight" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 text-xs font-medium rounded-lg transition-colors">
+                            Auto-Assign: Right Hand
+                        </button>
+                    </div>
+                    <div id="key-assignment" class="grid grid-cols-2 gap-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Settings -->
+                <div>
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Settings</h2>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[11px] text-slate-500 mb-1">Profile Name</label>
+                            <input type="text" id="profileName" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-100" value="Custom">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-500 mb-1">Profile ID</label>
+                            <input type="text" id="profileId" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-100 font-mono" value="custom">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-500 mb-1">Target Count (BM)</label>
+                            <input type="number" id="targetBm" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-100 font-mono" value="500" min="1">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-500 mb-1">Target Count (PB)</label>
+                            <input type="number" id="targetPb" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-100 font-mono" value="200" min="1">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-500 mb-1">Handedness</label>
+                            <select id="handedness" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-100">
+                                <option value="left">Left-hand (default)</option>
+                                <option value="right">Right-hand</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-500 mb-1">Absolute Counts</label>
+                            <select id="absoluteCounts" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-100">
+                                <option value="optional">Optional (default)</option>
+                                <option value="always">Always show</option>
+                                <option value="disabled">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="inline-flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                                <input type="checkbox" id="audioEnabled" checked class="accent-accent">
+                                Audio Feedback
+                            </label>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <label class="inline-flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+                                <input type="checkbox" id="autosaveEnabled" checked class="accent-accent">
+                                Autosave
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Output Template Editor -->
+                <div>
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Output Template</h2>
+                    <div id="template-editor" class="space-y-3">
+                        <!-- Populated by JS -->
+                    </div>
+                    <div class="mt-2">
+                        <button id="btnAddTemplate" class="text-xs text-slate-500 hover:text-slate-400 transition-colors">+ Add template</button>
+                    </div>
+                    <div class="mt-2">
+                        <span class="text-[11px] text-slate-600">Available placeholders: </span>
+                        <span id="placeholderList" class="text-[11px] font-mono text-slate-500"></span>
+                    </div>
+                </div>
+
+                <!-- Morphology Checklist Editor -->
+                <div>
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Morphology Checklist</h2>
+                    <div id="morph-checklist-editor" class="space-y-1">
+                        <!-- Populated by JS -->
+                    </div>
+                    <button id="btnAddMorphItem" class="mt-2 text-xs text-slate-500 hover:text-slate-400 transition-colors">+ Add item</button>
+                </div>
+
+                <!-- Live Preview -->
+                <div>
+                    <h2 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Live Preview</h2>
+                    <div id="live-preview" class="p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+                        <p class="text-xs text-slate-500 italic">Preview will show here as you configure the layout.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Shared validation engine: the editor must reject a profile the counter
+         would refuse, rather than caching one that silently never applies. -->
+    <script src="scripts/wbc-core.js"></script>
+    <script src="scripts/config-editor.js"></script>
+
+</body>
+</html>

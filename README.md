@@ -15,8 +15,8 @@ WBC ΔΣ enables medical technologists and pathologists to perform manual differ
 | Feature | Description |
 |---------|-------------|
 | **Case Identification** | Mandatory case/accession number before counting can begin. Displayed persistently. |
-| **Two Specimen Types** | Bone Marrow (9 cell types) and Peripheral Blood (9 cell types) |
-| **Keyboard Counting** | Single-key increment: A, S, D, F, Z, X, C, V, B |
+| **Two Specimen Types** | Bone Marrow and Peripheral Blood (14 cell types each, configurable) |
+| **Keyboard Counting** | Single-key increment, ergonomic left-hand zone: home row ASDFG, bottom ZXCVB, top QWERT |
 | **Undo/Correction** | Shift + key decrements by 1 (cannot go below zero) |
 | **Real-Time Percentages** | Auto-calculated with 2 decimal precision as you count |
 | **Visual Feedback** | Green flash on increment, amber flash on decrement |
@@ -33,37 +33,42 @@ WBC ΔΣ enables medical technologists and pathologists to perform manual differ
 
 ---
 
-## Keyboard Mappings
+## Keyboard Mappings — Ergonomic Left-Hand Layout
 
-### Bone Marrow
+The default Consensus-14 profile maps all 14 cell types to the **left-hand ergonomic zone** (ASDFG / ZXCVB / QWERT). The same keys are used for both Bone Marrow and Peripheral Blood.
 
-| Key | Cell Type | Description |
-|-----|-----------|-------------|
-| A | blast | Myeloblasts |
-| S | pro | Promyelocytes / Myelocytes |
-| D | gran | Maturing granulocytes |
-| F | eryth | Erythroid precursors |
-| Z | baso | Basophils / Mast cells |
-| X | eos | Eosinophils |
-| C | plasma | Plasma cells |
-| V | lymph | Lymphocytes |
-| B | mono | Monocytes |
-
-### Peripheral Blood
+### Home Row (most common cells)
 
 | Key | Cell Type | Description |
 |-----|-----------|-------------|
-| A | poly | Segmented neutrophils |
-| S | band | Band neutrophils |
-| D | lymph | Lymphocytes |
-| F | mono | Monocytes |
-| Z | eos | Eosinophils |
-| X | baso | Basophils |
-| C | pro | Immature granulocytic precursors |
-| V | blast | Blasts |
-| B | other | Other cells |
+| F | poly | Segmented neutrophils |
+| D | bands | Band neutrophils |
+| S | lymph | Lymphocytes |
+| A | mono | Monocytes |
+| G | eos | Eosinophils |
+
+### Bottom Row (precursors & less common)
+
+| Key | Cell Type | Description |
+|-----|-----------|-------------|
+| V | myelo | Myelocytes |
+| C | meta | Metamyelocytes |
+| X | blasts | Blasts |
+| Z | baso | Basophils |
+| B | nrbc | Nucleated RBCs / Erythroid precursors |
+
+### Top Row (rare / reach keys)
+
+| Key | Cell Type | Description |
+|-----|-----------|-------------|
+| R | pro | Promyelocytes |
+| E | plasma | Plasma cells |
+| W | mast | Mast cells |
+| Q | other | Other cells |
 
 **Shift + key** = undo (decrement by 1)
+
+A **right-hand** preset is also available (HJKL; / NM,./ / YUIOP) for left-handed operators. Key mappings are fully customizable via the [Configuration Editor](web/editor.html) or by editing `templates.json`.
 
 ---
 
@@ -220,13 +225,14 @@ Available placeholders: `{{total}}`, `{{caseNumber}}`, `{{comments}}`, and any c
 
 ```json
 "outCodes": {
-    "A": "blast",
-    "S": "pro",
+    "F": "poly",
+    "D": "bands",
+    "S": "lymph",
     ...
 }
 ```
 
-Keys must be single uppercase letters. Values must be unique within a specimen type.
+Keys must be single characters (letters or punctuation like `;`, `,`, `.`, `/`). Values must be unique within a specimen type. Use the [Configuration Editor](web/editor.html) for a visual click-to-assign experience.
 
 ---
 
@@ -257,15 +263,26 @@ Keys must be single uppercase letters. Values must be unique within a specimen t
 
 ### Running the Tests
 
-The test suite uses Node.js built-in test runner. **No npm install required.**
+Verification runs in three layers. The governing rule is that **no layer
+verifies a copy of the implementation** — every test executes shipped code.
 
 ```bash
-# Run all tests (using npm script — recommended)
-npm test
+npm install          # jsdom + Playwright (dev dependencies only)
+npx playwright install chromium firefox webkit
 
-# Or run directly with node
-node --test 'tests/*.test.js'
+npm test             # unit + behavioural (Node runner + jsdom)
+npm run test:e2e     # system tests in a real browser (Playwright)
+npm run test:all     # both
 ```
+
+| Layer | Runner | What it executes |
+|-------|--------|------------------|
+| **Unit** | `node --test` | `web/scripts/wbc-core.js` called directly — the shipped calculation, template, sanitisation and configuration engine |
+| **Behaviour** | `node --test` + jsdom | The real `counter.html` + `wbc-core.js` + `mdc-app.js` in a DOM: phase machine, keyboard handler, autosave, Continue Counting, configuration controls |
+| **System** | Playwright + Chromium / Firefox / WebKit | The deployed application over HTTP: downloads, system clipboard, service worker and offline reload, printing, editor round-trip |
+
+The application ships with no runtime dependencies; jsdom and Playwright are
+development dependencies used only by the test suite.
 
 ### QMS Test Evidence (Required for Release)
 
@@ -293,14 +310,24 @@ CI can run `npm test` for quick feedback, but **QMS evidence requires `npm run t
 
 ### Test Suite Overview
 
-| Suite | File | Tests | What It Verifies |
+| Suite | File | Layer | What It Verifies |
 |-------|------|-------|-----------------|
-| 01 | `01-calculation-engine.test.js` | 30 | Percentage calculation (15 VV-CALC vectors), increment/decrement logic, output JSON generation |
-| 02 | `02-configuration.test.js` | 25 | templates.json schema, key mappings, template placeholders, min cell counts |
-| 03 | `03-html-structure.test.js` | 39 | All required HTML elements, phases, modals, accessibility labels |
-| 04 | `04-javascript-integrity.test.js` | 42 | Safety mechanisms (keyboard guards, division-by-zero, XSS escape, clipboard), state management |
-| 05 | `05-end-to-end-data-integrity.test.js` | 17 | Full BM/PB counting workflows, undo/correction, edge cases, output rendering |
-| **Total** | | **153** | |
+| 01 | `tests/01-calculation-engine.test.js` | Unit | Percentages, sum-to-100 (URS-034) incl. a 2 000-case property test, M:E ratio, absolute counts, low-count advisory, hostile input |
+| 02 | `tests/02-configuration.test.js` | Unit | templates.json schema, key mappings, template placeholders, target counts |
+| 03 | `tests/03-html-structure.test.js` | Static | Required elements, phases, modals, accessibility, local-asset and service-worker requirements |
+| 04 | `tests/04-javascript-integrity.test.js` | Static + Unit | Keyboard guards, division-by-zero, escaping behaviour, script load order, no inline control wiring |
+| 05 | `tests/05-end-to-end-data-integrity.test.js` | Unit | Keypresses → counts → percentages → report → export, through the shipped engine |
+| 06 | `tests/06-audio-engine.test.js` | Static | Audio engine structure and integration points |
+| 07 | `tests/07-autosave.test.js` | Static | Autosave function presence, storage key, state shape |
+| 08 | `tests/08-config-schema-v2.test.js` | Unit | v2 schema; `normalizeConfig` round-trip; reserved placeholder names |
+| 09 | `tests/09-preset-catalog.test.js` | Unit | Preset catalogue integrity and ergonomic zones |
+| 10 | `tests/10-config-editor.test.js` | Static | Editor structure, JS integrity, key assignment controls |
+| 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 62 tests |
+| E2E | `tests-e2e/*.spec.js` | **System** | The deployed application in Chromium, Firefox and WebKit — 44 specs x 3 engines |
+| **Total** | | | **579 executed** (450 Node + 132 browser, 3 documented skips) |
+
+See `QMS/DHF/DCR/DCR-004-Verification-Integrity-Remediation.md` for why the
+suite was restructured: prior to it, no test executed the application at all.
 
 ### Test Traceability
 

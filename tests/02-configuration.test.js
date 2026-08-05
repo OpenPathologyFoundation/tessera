@@ -15,8 +15,15 @@ const path = require('node:path');
 
 const CONFIG_PATH = path.join(__dirname, '..', 'web', 'settings', 'templates.json');
 
-// Load config once
+// Load config once — supports both legacy array and v2 object format
 let config;
+let rawConfig;
+
+function normalizeConfig(raw) {
+    if (Array.isArray(raw)) return raw;
+    if (raw && Array.isArray(raw.specimenTypes)) return raw.specimenTypes;
+    throw new Error('Invalid config format');
+}
 
 describe('Configuration — File Loading (SYS-100, SYS-101)', () => {
 
@@ -27,25 +34,38 @@ describe('Configuration — File Loading (SYS-100, SYS-101)', () => {
     it('templates.json contains valid JSON', () => {
         const raw = fs.readFileSync(CONFIG_PATH, 'utf-8');
         assert.doesNotThrow(() => {
-            config = JSON.parse(raw);
+            rawConfig = JSON.parse(raw);
+            config = normalizeConfig(rawConfig);
         }, 'templates.json must be valid JSON');
     });
 
-    it('Configuration is an array with at least 1 specimen type (SYS-102)', () => {
-        assert.ok(Array.isArray(config), 'Root must be an array');
+    it('Configuration has at least 1 specimen type (SYS-102)', () => {
+        assert.ok(Array.isArray(config), 'Normalized config must be an array');
         assert.ok(config.length >= 1, 'Must have at least 1 specimen type');
+    });
+
+    it('V2 config has version and profileId fields', () => {
+        if (!Array.isArray(rawConfig)) {
+            assert.ok(typeof rawConfig.version === 'string', 'V2 config must have version');
+            assert.ok(typeof rawConfig.profileId === 'string', 'V2 config must have profileId');
+            assert.ok(typeof rawConfig.profileName === 'string', 'V2 config must have profileName');
+        }
     });
 });
 
 describe('Configuration — Schema Validation (SYS-102, SYS-103)', () => {
 
-    it('Each entry has required fields: specimenType, outCodes, templates', () => {
+    it('Each entry has required fields: specimenType, targetCount, categories, outCodes, templates', () => {
         for (const entry of config) {
             assert.ok(typeof entry.specimenType === 'string', 'specimenType must be a string');
             assert.ok(entry.specimenType.length > 0, 'specimenType must not be empty');
-            assert.ok(typeof entry.outCodes === 'object', 'outCodes must be an object');
-            assert.ok(Array.isArray(entry.templates), 'templates must be an array');
+            assert.ok(typeof entry.targetCount === 'number', `${entry.specimenType}: targetCount must be a number`);
+            assert.ok(typeof entry.categories === 'object', `${entry.specimenType}: categories must be an object`);
+            assert.ok(typeof entry.outCodes === 'object', `${entry.specimenType}: outCodes must be an object`);
+            assert.ok(Array.isArray(entry.templates), `${entry.specimenType}: templates must be an array`);
             assert.ok(entry.templates.length >= 1, `${entry.specimenType} must have at least 1 template`);
+            assert.ok(typeof entry.upperRowAbnormal === 'boolean',
+                `${entry.specimenType}: upperRowAbnormal must be a boolean`);
         }
     });
 
@@ -66,13 +86,125 @@ describe('Configuration — Schema Validation (SYS-102, SYS-103)', () => {
     });
 });
 
+describe('Configuration — Categories Validation (SYS-102)', () => {
+
+    it('Each entry has categories with upper and lower arrays', () => {
+        for (const entry of config) {
+            assert.ok(Array.isArray(entry.categories.upper),
+                `${entry.specimenType}: categories.upper must be an array`);
+            assert.ok(Array.isArray(entry.categories.lower),
+                `${entry.specimenType}: categories.lower must be an array`);
+            assert.ok(entry.categories.upper.length > 0,
+                `${entry.specimenType}: categories.upper must not be empty`);
+            assert.ok(entry.categories.lower.length > 0,
+                `${entry.specimenType}: categories.lower must not be empty`);
+        }
+    });
+
+    it('All category cell types exist in outCodes values', () => {
+        for (const entry of config) {
+            const outValues = new Set(Object.values(entry.outCodes));
+            const allCats = [...entry.categories.upper, ...entry.categories.lower];
+            for (const ct of allCats) {
+                assert.ok(outValues.has(ct),
+                    `${entry.specimenType}: category cell type "${ct}" not found in outCodes values`);
+            }
+        }
+    });
+
+    it('Categories cover all outCodes values (no orphaned cell types)', () => {
+        for (const entry of config) {
+            const catSet = new Set([...entry.categories.upper, ...entry.categories.lower]);
+            for (const val of Object.values(entry.outCodes)) {
+                assert.ok(catSet.has(val),
+                    `${entry.specimenType}: outCodes cell type "${val}" not in any category`);
+            }
+        }
+    });
+
+    it('BM categories: 7 upper, 7 lower', () => {
+        const bm = config.find(e => e.specimenType === 'bm');
+        assert.equal(bm.categories.upper.length, 7, 'BM must have 7 upper row cell types');
+        assert.equal(bm.categories.lower.length, 7, 'BM must have 7 lower row cell types');
+    });
+
+    it('PB categories: 7 upper, 7 lower', () => {
+        const pb = config.find(e => e.specimenType === 'pb');
+        assert.equal(pb.categories.upper.length, 7, 'PB must have 7 upper row cell types');
+        assert.equal(pb.categories.lower.length, 7, 'PB must have 7 lower row cell types');
+    });
+
+    it('BM upperRowAbnormal is false', () => {
+        const bm = config.find(e => e.specimenType === 'bm');
+        assert.equal(bm.upperRowAbnormal, false, 'BM upperRowAbnormal must be false');
+    });
+
+    it('PB upperRowAbnormal is true', () => {
+        const pb = config.find(e => e.specimenType === 'pb');
+        assert.equal(pb.upperRowAbnormal, true, 'PB upperRowAbnormal must be true');
+    });
+});
+
+describe('Configuration — Formulas Validation (SYS-102)', () => {
+
+    it('BM has a formulas object with ME_ratio', () => {
+        const bm = config.find(e => e.specimenType === 'bm');
+        assert.ok(typeof bm.formulas === 'object', 'BM must have a formulas object');
+        assert.ok(typeof bm.formulas.ME_ratio === 'object', 'BM must have ME_ratio formula');
+    });
+
+    it('ME_ratio has required fields: label, numerator, denominator, precision', () => {
+        const bm = config.find(e => e.specimenType === 'bm');
+        const me = bm.formulas.ME_ratio;
+        assert.ok(typeof me.label === 'string' && me.label.length > 0, 'ME_ratio must have a label');
+        assert.ok(Array.isArray(me.numerator) && me.numerator.length > 0, 'ME_ratio must have numerator array');
+        assert.ok(Array.isArray(me.denominator) && me.denominator.length > 0, 'ME_ratio must have denominator array');
+        assert.ok(typeof me.precision === 'number' && Number.isInteger(me.precision),
+            'ME_ratio precision must be an integer');
+    });
+
+    it('ME_ratio numerator and denominator reference valid outCodes cell types', () => {
+        const bm = config.find(e => e.specimenType === 'bm');
+        const me = bm.formulas.ME_ratio;
+        const outValues = new Set(Object.values(bm.outCodes));
+        for (const ct of me.numerator) {
+            assert.ok(outValues.has(ct), `ME_ratio numerator cell type "${ct}" not in outCodes`);
+        }
+        for (const ct of me.denominator) {
+            assert.ok(outValues.has(ct), `ME_ratio denominator cell type "${ct}" not in outCodes`);
+        }
+    });
+
+    it('ME_ratio numerator contains myeloid lineage cells', () => {
+        const bm = config.find(e => e.specimenType === 'bm');
+        const me = bm.formulas.ME_ratio;
+        const expected = ['blasts', 'pro', 'myelo', 'meta', 'bands', 'poly', 'baso', 'eos', 'mono'];
+        assert.deepEqual(me.numerator.sort(), expected.sort(),
+            'ME_ratio numerator must contain the 9 myeloid lineage cell types');
+    });
+
+    it('ME_ratio denominator contains erythroid precursors', () => {
+        const bm = config.find(e => e.specimenType === 'bm');
+        const me = bm.formulas.ME_ratio;
+        assert.deepEqual(me.denominator, ['nrbc'],
+            'ME_ratio denominator must be ["nrbc"]');
+    });
+
+    it('PB does not have formulas (or formulas is absent)', () => {
+        const pb = config.find(e => e.specimenType === 'pb');
+        assert.ok(pb.formulas === undefined || pb.formulas === null ||
+            Object.keys(pb.formulas || {}).length === 0,
+            'PB should not have formulas defined');
+    });
+});
+
 describe('Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)', () => {
 
-    it('outCodes keys are single uppercase letters', () => {
+    it('outCodes keys are single characters (letters or punctuation)', () => {
         for (const entry of config) {
             for (const key of Object.keys(entry.outCodes)) {
-                assert.ok(/^[A-Z]$/.test(key),
-                    `${entry.specimenType}: outCode key "${key}" must be a single uppercase letter`);
+                assert.ok(key.length === 1,
+                    `${entry.specimenType}: outCode key "${key}" must be a single character`);
             }
         }
     });
@@ -104,36 +236,53 @@ describe('Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)', () 
         }
     });
 
-    it('BM has exactly 9 cell types mapped to correct keys (SYS-014, SYS-038)', () => {
+    it('BM has exactly 14 cell types mapped to ergonomic left-hand keys (SYS-014, SYS-038)', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         const codes = bm.outCodes;
 
-        assert.equal(Object.keys(codes).length, 9, 'BM must have 9 key mappings');
-        assert.equal(codes.A, 'blast');
-        assert.equal(codes.S, 'pro');
-        assert.equal(codes.D, 'gran');
-        assert.equal(codes.F, 'eryth');
+        assert.equal(Object.keys(codes).length, 14, 'BM must have 14 key mappings');
+        assert.equal(codes.B, 'nrbc');
+        assert.equal(codes.X, 'blasts');
+        assert.equal(codes.R, 'pro');
+        assert.equal(codes.V, 'myelo');
+        assert.equal(codes.C, 'meta');
+        assert.equal(codes.E, 'plasma');
+        assert.equal(codes.W, 'mast');
+        assert.equal(codes.D, 'bands');
+        assert.equal(codes.F, 'poly');
         assert.equal(codes.Z, 'baso');
-        assert.equal(codes.X, 'eos');
-        assert.equal(codes.C, 'plasma');
-        assert.equal(codes.V, 'lymph');
-        assert.equal(codes.B, 'mono');
+        assert.equal(codes.G, 'eos');
+        assert.equal(codes.A, 'mono');
+        assert.equal(codes.S, 'lymph');
+        assert.equal(codes.Q, 'other');
     });
 
-    it('PB has exactly 9 cell types mapped to correct keys (SYS-015, SYS-039)', () => {
+    it('PB has exactly 14 cell types mapped to ergonomic left-hand keys (SYS-015, SYS-039)', () => {
         const pb = config.find(e => e.specimenType === 'pb');
         const codes = pb.outCodes;
 
-        assert.equal(Object.keys(codes).length, 9, 'PB must have 9 key mappings');
-        assert.equal(codes.A, 'poly');
-        assert.equal(codes.S, 'band');
-        assert.equal(codes.D, 'lymph');
-        assert.equal(codes.F, 'mono');
-        assert.equal(codes.Z, 'eos');
-        assert.equal(codes.X, 'baso');
-        assert.equal(codes.C, 'pro');
-        assert.equal(codes.V, 'blast');
-        assert.equal(codes.B, 'other');
+        assert.equal(Object.keys(codes).length, 14, 'PB must have 14 key mappings');
+        assert.equal(codes.B, 'nrbc');
+        assert.equal(codes.X, 'blasts');
+        assert.equal(codes.R, 'pro');
+        assert.equal(codes.V, 'myelo');
+        assert.equal(codes.C, 'meta');
+        assert.equal(codes.E, 'plasma');
+        assert.equal(codes.W, 'mast');
+        assert.equal(codes.D, 'bands');
+        assert.equal(codes.F, 'poly');
+        assert.equal(codes.Z, 'baso');
+        assert.equal(codes.G, 'eos');
+        assert.equal(codes.A, 'mono');
+        assert.equal(codes.S, 'lymph');
+        assert.equal(codes.Q, 'other');
+    });
+
+    it('BM and PB outCodes are identical', () => {
+        const bm = config.find(e => e.specimenType === 'bm');
+        const pb = config.find(e => e.specimenType === 'pb');
+        assert.deepEqual(bm.outCodes, pb.outCodes,
+            'BM and PB must have identical outCodes mappings');
     });
 });
 
@@ -161,15 +310,48 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
         }
     });
 
-    it('Every template contains all cell type placeholders for its specimen type', () => {
+    it('Every template reports every cell type, in its correct form', () => {
+        // A category inside the differential is reported as a percentage,
+        // {{ct}}. A category the profile excludes from the denominator has no
+        // percentage of the differential and is reported per 100 of it,
+        // {{ct_per100}} — the NRBC convention in peripheral blood.
         for (const entry of config) {
-            const cellTypes = Object.values(entry.outCodes);
+            const excluded = entry.denominatorExcludes || [];
             for (const tpl of entry.templates) {
-                for (const ct of cellTypes) {
-                    assert.ok(tpl.outSentence.includes('{{' + ct + '}}'),
-                        `${entry.specimenType}/${tpl.tplCode}: missing placeholder {{${ct}}}`);
+                for (const ct of Object.values(entry.outCodes)) {
+                    const token = excluded.includes(ct) ? `{{${ct}_per100}}` : `{{${ct}}}`;
+                    assert.ok(tpl.outSentence.includes(token),
+                        `${entry.specimenType}/${tpl.tplCode}: missing placeholder ${token}`);
                 }
             }
+        }
+    });
+
+    it('A category outside the differential is not also reported as a percentage', () => {
+        for (const entry of config) {
+            for (const ct of (entry.denominatorExcludes || [])) {
+                for (const tpl of entry.templates) {
+                    assert.ok(!tpl.outSentence.includes(`{{${ct}}}`),
+                        `${entry.specimenType}/${tpl.tplCode}: {{${ct}}} is outside the ` +
+                        `differential and must not be reported as a percentage of it`);
+                }
+            }
+        }
+    });
+
+    it('BM templates contain {{ME_ratio}} placeholder', () => {
+        const bm = config.find(e => e.specimenType === 'bm');
+        for (const tpl of bm.templates) {
+            assert.ok(tpl.outSentence.includes('{{ME_ratio}}'),
+                `bm/${tpl.tplCode}: BM template must contain {{ME_ratio}} placeholder`);
+        }
+    });
+
+    it('PB templates do not contain {{ME_ratio}} placeholder', () => {
+        const pb = config.find(e => e.specimenType === 'pb');
+        for (const tpl of pb.templates) {
+            assert.ok(!tpl.outSentence.includes('{{ME_ratio}}'),
+                `pb/${tpl.tplCode}: PB template must not contain {{ME_ratio}} placeholder`);
         }
     });
 
@@ -188,40 +370,62 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
     });
 });
 
-describe('Configuration — Minimum Cell Count (SYS-052, SYS-103)', () => {
+describe('Configuration — Target Count (SYS-052, SYS-103)', () => {
 
-    it('BM minCellCount is 200', () => {
+    it('BM targetCount is 500', () => {
         const bm = config.find(e => e.specimenType === 'bm');
-        assert.equal(bm.minCellCount, 200);
+        assert.equal(bm.targetCount, 500);
     });
 
-    it('PB minCellCount is 100', () => {
+    it('PB targetCount is 200', () => {
         const pb = config.find(e => e.specimenType === 'pb');
-        assert.equal(pb.minCellCount, 100);
+        assert.equal(pb.targetCount, 200);
     });
 
-    it('minCellCount values are positive integers', () => {
+    it('targetCount values are positive integers', () => {
         for (const entry of config) {
-            if (entry.minCellCount !== undefined) {
-                assert.ok(Number.isInteger(entry.minCellCount), `${entry.specimenType}: minCellCount must be integer`);
-                assert.ok(entry.minCellCount > 0, `${entry.specimenType}: minCellCount must be positive`);
-            }
+            assert.ok(Number.isInteger(entry.targetCount),
+                `${entry.specimenType}: targetCount must be integer`);
+            assert.ok(entry.targetCount > 0,
+                `${entry.specimenType}: targetCount must be positive`);
         }
     });
 });
 
 describe('Configuration — Template Rendering (VV-TPL-001 to VV-TPL-004)', () => {
 
+    /**
+     * Helper: resolve all placeholders in a template outSentence.
+     * Substitutes {{total}}, all 14 cell type placeholders, and any formula
+     * placeholders (e.g., {{ME_ratio}}) for the given specimen entry.
+     */
+    function resolveTemplate(entry, tpl) {
+        let text = tpl.outSentence;
+
+        // Substitute {{total}}
+        text = text.replace(/\{\{total\}\}/g, '500');
+
+        // Substitute all cell type placeholders, in whichever form the profile
+        // reports them
+        Object.values(entry.outCodes).forEach(ct => {
+            text = text.replace(new RegExp('\\{\\{' + ct + '_per100\\}\\}', 'g'), '11.1');
+            text = text.replace(new RegExp('\\{\\{' + ct + '\\}\\}', 'g'), '7');
+        });
+
+        // Substitute formula placeholders (e.g., {{ME_ratio}})
+        if (entry.formulas) {
+            for (const formulaKey of Object.keys(entry.formulas)) {
+                text = text.replace(new RegExp('\\{\\{' + formulaKey + '\\}\\}', 'g'), '3.5');
+            }
+        }
+
+        return text;
+    }
+
     it('VV-TPL-001: Yale SOM template renders with no unresolved placeholders', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         const tpl = bm.templates.find(t => t.tplCode === 'ysm');
-        let text = tpl.outSentence;
-
-        // Substitute all
-        text = text.replace(/\{\{total\}\}/g, '100');
-        Object.values(bm.outCodes).forEach(ct => {
-            text = text.replace(new RegExp('\\{\\{' + ct + '\\}\\}', 'g'), '10');
-        });
+        const text = resolveTemplate(bm, tpl);
 
         const unresolved = text.match(/\{\{[^}]+\}\}/g);
         assert.equal(unresolved, null, 'Unresolved placeholders: ' + JSON.stringify(unresolved));
@@ -230,12 +434,7 @@ describe('Configuration — Template Rendering (VV-TPL-001 to VV-TPL-004)', () =
     it('VV-TPL-002: Precipio DX template renders with no unresolved placeholders', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         const tpl = bm.templates.find(t => t.tplCode === 'pdx');
-        let text = tpl.outSentence;
-
-        text = text.replace(/\{\{total\}\}/g, '100');
-        Object.values(bm.outCodes).forEach(ct => {
-            text = text.replace(new RegExp('\\{\\{' + ct + '\\}\\}', 'g'), '10');
-        });
+        const text = resolveTemplate(bm, tpl);
 
         const unresolved = text.match(/\{\{[^}]+\}\}/g);
         assert.equal(unresolved, null, 'Unresolved placeholders: ' + JSON.stringify(unresolved));
@@ -244,12 +443,7 @@ describe('Configuration — Template Rendering (VV-TPL-001 to VV-TPL-004)', () =
     it('VV-TPL-003: MGH BM template renders with no unresolved placeholders', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         const tpl = bm.templates.find(t => t.tplCode === 'mgh');
-        let text = tpl.outSentence;
-
-        text = text.replace(/\{\{total\}\}/g, '100');
-        Object.values(bm.outCodes).forEach(ct => {
-            text = text.replace(new RegExp('\\{\\{' + ct + '\\}\\}', 'g'), '10');
-        });
+        const text = resolveTemplate(bm, tpl);
 
         const unresolved = text.match(/\{\{[^}]+\}\}/g);
         assert.equal(unresolved, null, 'Unresolved placeholders: ' + JSON.stringify(unresolved));
@@ -258,14 +452,23 @@ describe('Configuration — Template Rendering (VV-TPL-001 to VV-TPL-004)', () =
     it('VV-TPL-004: MGH PB template renders with no unresolved placeholders', () => {
         const pb = config.find(e => e.specimenType === 'pb');
         const tpl = pb.templates.find(t => t.tplCode === 'mgh');
-        let text = tpl.outSentence;
-
-        text = text.replace(/\{\{total\}\}/g, '100');
-        Object.values(pb.outCodes).forEach(ct => {
-            text = text.replace(new RegExp('\\{\\{' + ct + '\\}\\}', 'g'), '10');
-        });
+        const text = resolveTemplate(pb, tpl);
 
         const unresolved = text.match(/\{\{[^}]+\}\}/g);
         assert.equal(unresolved, null, 'Unresolved placeholders: ' + JSON.stringify(unresolved));
+    });
+
+    it('VV-TPL-005: BM template {{ME_ratio}} placeholder is resolved by formula key', () => {
+        const bm = config.find(e => e.specimenType === 'bm');
+        for (const tpl of bm.templates) {
+            // Verify the raw template contains {{ME_ratio}}
+            assert.ok(tpl.outSentence.includes('{{ME_ratio}}'),
+                `bm/${tpl.tplCode}: raw template must contain {{ME_ratio}}`);
+
+            // Verify it resolves cleanly
+            const text = resolveTemplate(bm, tpl);
+            assert.ok(!text.includes('{{ME_ratio}}'),
+                `bm/${tpl.tplCode}: {{ME_ratio}} must be resolved after substitution`);
+        }
     });
 });

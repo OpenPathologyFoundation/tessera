@@ -22,11 +22,21 @@ const MIME = {
 };
 
 const server = http.createServer((req, res) => {
-  const url  = req.url.split('?')[0];
-  const file = path.join(ROOT, url === '/' ? '/counter.html' : url);
+  let url = req.url.split('?')[0];
+  try {
+    url = decodeURIComponent(url);
+  } catch (e) {
+    res.writeHead(400);
+    res.end('Bad request');
+    return;
+  }
 
-  // Prevent path traversal
-  if (!file.startsWith(ROOT)) {
+  const file = path.resolve(ROOT, '.' + (url === '/' ? '/counter.html' : url));
+
+  // Prevent path traversal. Comparing against ROOT alone would also admit a
+  // sibling directory whose name merely begins with ROOT (e.g. "web-backup"),
+  // so the separator must be part of the prefix.
+  if (file !== ROOT && !file.startsWith(ROOT + path.sep)) {
     res.writeHead(403);
     res.end('Forbidden');
     return;

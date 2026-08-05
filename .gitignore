@@ -51,3 +51,15 @@ web/WEB-INF/lib/
 
 # IntelliJ/Tomcat WAR tracking
 web/META-INF/war-tracker
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Reference literature held locally for review.
+# NOT committed: these are publisher-copyrighted articles and this is a public
+# repository. REF-001 cites them by author, title, journal and DOI, which is how
+# a Design History File should reference literature. See DCR-009.
+sources/

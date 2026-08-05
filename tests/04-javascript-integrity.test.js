@@ -13,6 +13,9 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
+// The shipped calculation/config engine under verification.
+const Core = require(path.join(__dirname, '..', 'web', 'scripts', 'wbc-core.js'));
+
 const JS_PATH = path.join(__dirname, '..', 'web', 'scripts', 'mdc-app.js');
 let jsCode;
 
@@ -119,20 +122,34 @@ describe('JavaScript — Division by Zero Guard (SYS-042, HA-021)', () => {
     });
 });
 
-describe('JavaScript — Minimum Cell Count Enforcement (SYS-052, SYS-053, HA-030)', () => {
+describe('JavaScript — Target Count Reference', () => {
 
-    it('References minCellCount from config', () => {
-        assert.ok(jsCode.includes('minCellCount'), 'Must reference minCellCount');
+    it('References targetCount from config', () => {
+        assert.ok(jsCode.includes('targetCount'), 'Must reference targetCount');
     });
 
-    it('Compares total against minimum before completion', () => {
-        assert.ok(jsCode.includes('total < minCount') || jsCode.includes('total < min'),
-            'Must compare total against minimum threshold');
+    // Behavioural, not textual: the default-target fallback now lives in
+    // wbc-core.js and is verified by calling it (DCR-004).
+    it('Applies the evidence-based default target when a profile omits it (URS-105)', () => {
+        const norm = Core.normalizeConfig({
+            version: '2.0', profileId: 'p', specimenTypes: [
+                { specimenType: 'bm', categories: { upper: [], lower: [] }, outCodes: {}, templates: [] },
+                { specimenType: 'pb', categories: { upper: [], lower: [] }, outCodes: {}, templates: [] },
+                { specimenType: 'xx', categories: { upper: [], lower: [] }, outCodes: {}, templates: [] }
+            ]
+        });
+        assert.equal(norm.specimenTypes[0].targetCount, 500, 'BM default is 500 (CAP)');
+        assert.equal(norm.specimenTypes[1].targetCount, 200, 'PB default is 200 (CLSI H20-A2)');
+        assert.equal(norm.specimenTypes[2].targetCount, 200, 'unknown types fall back to 200');
     });
 
-    it('Shows modal/dialog for low count warning', () => {
-        assert.ok(jsCode.includes('Low Cell Count') || jsCode.includes('below the minimum'),
-            'Must warn about low cell count');
+    it('An explicit targetCount is never overridden by the default', () => {
+        const norm = Core.normalizeConfig({
+            version: '2.0', profileId: 'p', specimenTypes: [
+                { specimenType: 'bm', targetCount: 300, categories: { upper: [], lower: [] }, outCodes: {}, templates: [] }
+            ]
+        });
+        assert.equal(norm.specimenTypes[0].targetCount, 300);
     });
 });
 
@@ -195,11 +212,15 @@ describe('JavaScript — Enter Key Starts Count (SYS-009)', () => {
 
 describe('JavaScript — Session History (SYS-090, SYS-095)', () => {
 
-    it('Uses sessionStorage (not localStorage) for history (SYS-095)', () => {
+    it('Uses sessionStorage for history (SYS-095)', () => {
         assert.ok(jsCode.includes('sessionStorage'), 'Must use sessionStorage');
-        // Should NOT use localStorage for patient-adjacent data
-        const localStorageUsage = jsCode.match(/localStorage/g);
-        assert.equal(localStorageUsage, null, 'Must NOT use localStorage for session data');
+        assert.ok(jsCode.includes('wbcds_history'), 'Must use wbcds_history key in sessionStorage');
+    });
+
+    it('Uses localStorage for config caching and autosave (URS-106, URS-085)', () => {
+        assert.ok(jsCode.includes('localStorage'), 'Must use localStorage for config caching and autosave');
+        assert.ok(jsCode.includes('wbcds_config'), 'Must use wbcds_config key for config cache');
+        assert.ok(jsCode.includes('wbcds_autosave'), 'Must use wbcds_autosave key for autosave');
     });
 
     it('Saves to sessionStorage with a key prefix', () => {
@@ -250,13 +271,24 @@ describe('JavaScript — Theme Toggle', () => {
 describe('JavaScript — Security (SYS-S04)', () => {
 
     it('Escapes HTML in user-provided content (XSS prevention)', () => {
-        assert.ok(jsCode.includes('escHtml') || jsCode.includes('textContent'),
+        assert.ok(jsCode.includes('escapeHtml') || jsCode.includes('textContent'),
             'Must sanitize user input for display');
     });
 
-    it('Has HTML escape function defined', () => {
-        assert.ok(jsCode.includes('function escHtml') || jsCode.includes('escHtml ='),
-            'Must define HTML escape utility');
+    // Behavioural: exercise the escaper rather than grepping for its name.
+    it('The HTML escaper neutralizes every markup-significant character', () => {
+        assert.equal(Core.escapeHtml('<img src=x onerror="a">'),
+            '&lt;img src=x onerror=&quot;a&quot;&gt;');
+        assert.equal(Core.escapeHtml("it's & <b>"), 'it&#39;s &amp; &lt;b&gt;');
+        // Ampersand must be escaped first or the other entities double-escape.
+        assert.equal(Core.escapeHtml('&lt;'), '&amp;lt;');
+    });
+
+    it('Template sanitization keeps formatting tags and drops everything else', () => {
+        assert.equal(Core.sanitizeTemplateHtml('a<br>b'), 'a<br>b');
+        assert.equal(Core.sanitizeTemplateHtml('<strong>x</strong>'), '<strong>x</strong>');
+        assert.match(Core.sanitizeTemplateHtml('<img src=x onerror=y>'), /^&lt;img/);
+        assert.match(Core.sanitizeTemplateHtml('<a href="#">l</a>'), /^&lt;a/);
     });
 });
 
@@ -271,9 +303,24 @@ describe('JavaScript — Configuration Loading (SYS-100, SYS-101)', () => {
             'Must display error on config load failure');
     });
 
-    it('Applies default minCellCount when missing from config (SYS-103)', () => {
-        assert.ok(jsCode.includes('DEFAULT_MIN') || jsCode.includes('default'),
-            'Must apply default minCellCount');
+    it('Loads wbc-core.js before mdc-app.js so the engine is available', () => {
+        const html = fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'counter.html'), 'utf-8');
+        const corePos = html.indexOf('scripts/wbc-core.js');
+        const appPos = html.indexOf('scripts/mdc-app.js');
+        assert.ok(corePos > -1, 'counter.html must load wbc-core.js');
+        assert.ok(appPos > -1, 'counter.html must load mdc-app.js');
+        assert.ok(corePos < appPos, 'wbc-core.js must load first');
+    });
+
+    it('No control is wired from an inline script outside the app module', () => {
+        // The inline handlers previously used here referenced IIFE-private
+        // functions, so their typeof guards silently disabled Export Config,
+        // Import Config and Reset to Default. See DCR-004.
+        const html = fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'counter.html'), 'utf-8');
+        assert.doesNotMatch(html, /typeof\s+(exportConfig|importConfig|resetConfigToDefault)/,
+            'config controls must be wired inside mdc-app.js, not by an inline script');
     });
 });
 
@@ -289,5 +336,172 @@ describe('JavaScript — Flash Feedback (SYS-037)', () => {
             'Must have increment visual state');
         assert.ok(jsCode.includes('flash-decrement') || jsCode.includes('decrement'),
             'Must have decrement visual state');
+    });
+});
+
+describe('JavaScript — Resume Counting', () => {
+
+    it('Defines resumeCounting function', () => {
+        assert.ok(jsCode.includes('resumeCounting'),
+            'Must define resumeCounting function');
+    });
+
+    it('References btnResumeCounting button', () => {
+        assert.ok(jsCode.includes('btnResumeCounting'),
+            'Must reference btnResumeCounting button element');
+    });
+});
+
+describe('JavaScript — M:E Ratio', () => {
+
+    it('Defines computeMERatio function', () => {
+        assert.ok(jsCode.includes('computeMERatio'),
+            'Must define computeMERatio function');
+    });
+
+    it('Handles ME_ratio placeholder in templates', () => {
+        assert.ok(jsCode.includes('ME_ratio'),
+            'Must handle ME_ratio placeholder substitution');
+    });
+});
+
+describe('JavaScript — Audio Engine (URS-027)', () => {
+
+    it('Defines AudioEngine object', () => {
+        assert.ok(jsCode.includes('var AudioEngine'), 'Must define AudioEngine');
+    });
+
+    it('AudioEngine has all required sound methods', () => {
+        assert.ok(jsCode.includes('playClick'), 'Must have playClick');
+        assert.ok(jsCode.includes('playUndo'), 'Must have playUndo');
+        assert.ok(jsCode.includes('playChime'), 'Must have playChime');
+        assert.ok(jsCode.includes('playTypewriter'), 'Must have playTypewriter');
+    });
+});
+
+describe('JavaScript — Autosave (URS-085)', () => {
+
+    it('Defines autosave functions', () => {
+        assert.ok(jsCode.includes('saveAutosaveState'), 'Must define saveAutosaveState');
+        assert.ok(jsCode.includes('loadAutosaveState'), 'Must define loadAutosaveState');
+        assert.ok(jsCode.includes('clearAutosaveState'), 'Must define clearAutosaveState');
+    });
+
+    it('Defines recovery modal function', () => {
+        assert.ok(jsCode.includes('showRecoveryModal'), 'Must define showRecoveryModal');
+    });
+});
+
+describe('JavaScript — Specimen Type Switching (URS-013)', () => {
+
+    it('Defines switchSpecimenType function', () => {
+        assert.ok(jsCode.includes('switchSpecimenType'), 'Must define switchSpecimenType');
+    });
+});
+
+describe('JavaScript — Config Caching (URS-106)', () => {
+
+    it('Defines config cache functions', () => {
+        assert.ok(jsCode.includes('cacheConfig'), 'Must define cacheConfig');
+        assert.ok(jsCode.includes('loadCachedConfig'), 'Must define loadCachedConfig');
+    });
+
+    it('Uses wbcds_config localStorage key', () => {
+        assert.ok(jsCode.includes('wbcds_config'), 'Must reference config cache key');
+    });
+
+    it('loadConfig uses cache-first strategy (user config persists)', () => {
+        // Cache-first: loadCachedConfig must be called BEFORE fetch
+        const loadConfigBody = jsCode.match(/async function loadConfig\(\)\s*\{[\s\S]*?\n    \}/);
+        assert.ok(loadConfigBody, 'Must have loadConfig function');
+        const body = loadConfigBody[0];
+        const cacheIdx = body.indexOf('loadCachedConfig');
+        const fetchIdx = body.indexOf('fetch(');
+        assert.ok(cacheIdx !== -1, 'loadConfig must call loadCachedConfig');
+        assert.ok(fetchIdx !== -1, 'loadConfig must call fetch');
+        assert.ok(cacheIdx < fetchIdx,
+            'loadConfig must try cache BEFORE fetch (cache-first strategy)');
+    });
+
+    it('Defines resetConfigToDefault function', () => {
+        assert.ok(jsCode.includes('function resetConfigToDefault'),
+            'Must define resetConfigToDefault to let users reset to built-in defaults');
+    });
+
+    it('resetConfigToDefault removes cache and reloads', () => {
+        assert.ok(jsCode.includes('removeItem(CONFIG_CACHE_KEY)') || jsCode.includes("removeItem('wbcds_config')"),
+            'resetConfigToDefault must remove cached config');
+        assert.ok(jsCode.includes('location.reload'),
+            'resetConfigToDefault must reload the page');
+    });
+
+    it('importConfig caches the imported config', () => {
+        const importBody = jsCode.match(/function importConfig[\s\S]*?reader\.readAsText/);
+        assert.ok(importBody, 'Must have importConfig function');
+        assert.ok(importBody[0].includes('cacheConfig'),
+            'importConfig must call cacheConfig to persist imported config');
+    });
+});
+
+describe('JavaScript — Config Normalization', () => {
+
+    it('Defines normalizeConfig function for backward compat', () => {
+        assert.ok(jsCode.includes('normalizeConfig'), 'Must define normalizeConfig');
+    });
+
+    it('Handles both array and object config formats', () => {
+        const coreSrc = fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'scripts', 'wbc-core.js'), 'utf-8');
+        assert.ok(coreSrc.includes('Array.isArray(raw)'), 'Must check for array format');
+        assert.ok(coreSrc.includes('raw.specimenTypes'), 'Must handle v2 object format');
+    });
+});
+
+describe('JavaScript — Config Import/Export (URS-103)', () => {
+
+    it('Defines export and import functions', () => {
+        assert.ok(jsCode.includes('exportConfig'), 'Must define exportConfig');
+        assert.ok(jsCode.includes('importConfig'), 'Must define importConfig');
+    });
+
+    it('Defines validateConfig function', () => {
+        assert.ok(jsCode.includes('validateConfig'), 'Must define validateConfig');
+    });
+});
+
+describe('JavaScript — Dynamic Specimen Select', () => {
+
+    it('Defines populateSpecimenSelect function', () => {
+        assert.ok(jsCode.includes('populateSpecimenSelect'), 'Must define populateSpecimenSelect');
+    });
+
+    it('Uses specimenLabel from config', () => {
+        assert.ok(jsCode.includes('specimenLabel'), 'Must reference specimenLabel');
+    });
+});
+
+describe('JavaScript — Absolute Counts (URS-036)', () => {
+
+    it('Defines renderAbsoluteCountsSection function', () => {
+        assert.ok(jsCode.includes('renderAbsoluteCountsSection'), 'Must define absolute counts rendering');
+    });
+});
+
+describe('JavaScript — Morphology Checklist (URS-072)', () => {
+
+    it('Defines renderMorphologyChecklist function', () => {
+        assert.ok(jsCode.includes('renderMorphologyChecklist'), 'Must define morphology checklist rendering');
+    });
+
+    it('Defines buildMorphologyOutput function', () => {
+        assert.ok(jsCode.includes('buildMorphologyOutput'), 'Must define buildMorphologyOutput');
+    });
+});
+
+describe('JavaScript — Print Support (URS-054)', () => {
+
+    it('Defines printResults function', () => {
+        assert.ok(jsCode.includes('printResults') || jsCode.includes('window.print'),
+            'Must have print support');
     });
 });

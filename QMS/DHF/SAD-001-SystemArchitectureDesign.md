@@ -5,12 +5,13 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SAD-001 |
-| **Version** | 1.0 |
+| **Version** | 2.0 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
+| **Date Revised** | 2026-02-24 |
 | **Status** | Draft |
 | **Parent Document** | DHF-001 |
-| **Input Documents** | URS-001, SRS-001 |
+| **Input Documents** | URS-001 v2.0, SRS-001 v2.0 |
 
 ---
 
@@ -20,43 +21,57 @@ This document describes the high-level system architecture of the WBC ΔΣ appli
 
 ## 2. Architecture Overview
 
-WBC ΔΣ is a single-page web application (SPA) implemented as a client-side MVC application using Backbone.js. All business logic, calculation, and rendering execute in the browser. There is no application server, database, or network API. The web server (Java Servlet container) serves static assets only.
+WBC ΔΣ is a single-page web application (SPA) implemented as a vanilla JavaScript IIFE (Immediately Invoked Function Expression) in a single file (`mdc-app.js`). All business logic, calculation, and rendering execute in the browser. There is no application framework, database, or network API. A Node.js static file server (`serve.js`) serves the HTML, JavaScript, JSON, and font assets.
 
 ### 2.1 Architecture Pattern
 
-**Client-Side MVC (Model-View-Controller) via Backbone.js**
+**Client-Side IIFE with Closure-Based State Management**
 
 ```
 +-------------------------------------------------------------------+
 |                        BROWSER CLIENT                              |
 |                                                                    |
-|  +------------------+  +-----------------+  +-------------------+  |
-|  |    VIEWS         |  |    MODELS       |  |    UTILITIES      |  |
-|  |  (Backbone.View) |  | (Backbone.Model)|  |  (app.tools,     |  |
-|  |                  |  |                 |  |   app.utils)      |  |
-|  |  - MakeTable     |  |  - CounterTable |  |                   |  |
-|  |  - CreateOutput  |  |  - TabbedOutput |  |  - addToCell()    |  |
-|  |  - Buttons       |  |                 |  |  - calcPercent()  |  |
-|  |                  |  |                 |  |  - mkOutTplJson() |  |
-|  +--------+---------+  +-------+---------+  +--------+----------+  |
-|           |                    |                      |            |
-|           v                    v                      v            |
+|  +-----------------------------------------------------------+    |
+|  |                   mdc-app.js (IIFE)                        |    |
+|  |                                                            |    |
+|  |  +------------------+  +-----------------+                 |    |
+|  |  | CLOSURE STATE    |  | EVENT LISTENERS |                 |    |
+|  |  | - phase          |  | - keydown       |                 |    |
+|  |  | - counts {}      |  | - click         |                 |    |
+|  |  | - caseNumber     |  | - focus/blur    |                 |    |
+|  |  | - specimenType   |  | - change        |                 |    |
+|  |  | - config         |  |                 |                 |    |
+|  |  | - sessionHistory |  |                 |                 |    |
+|  |  +--------+---------+  +-------+---------+                 |    |
+|  |           |                    |                            |    |
+|  |           v                    v                            |    |
+|  |  +------------------+  +-------------------+               |    |
+|  |  | DOM RENDERING    |  | UTILITIES         |               |    |
+|  |  | - Native DOM API |  | - calcPercent()   |               |    |
+|  |  | - innerHTML      |  | - compileTemplate |               |    |
+|  |  | - classList      |  | - computeFormula  |               |    |
+|  |  +--------+---------+  +--------+----------+               |    |
+|  |           |                      |                          |    |
+|  +-----------------------------------------------------------+    |
+|              |                                                     |
+|              v                                                     |
 |  +-------------------------------------------------------------------+
-|  |                       DOM (index.jsp)                              |
-|  |  - Counter Table  - Output Tabs  - Buttons  - Case Input          |
+|  |                       DOM (counter.html)                           |
+|  |  - Case Entry  - Counting Table  - Results  - History             |
 |  +-------------------------------------------------------------------+
-|           |                                                        |
-|           v                                                        |
+|              |                                                     |
+|              v                                                     |
 |  +-------------------+                                             |
 |  |  CONFIGURATION    |                                             |
 |  |  templates.json   |                                             |
 |  +-------------------+                                             |
 +-------------------------------------------------------------------+
            |
-           v (HTTP GET - static assets only)
+           v (HTTP GET — static assets only)
 +-------------------------------------------------------------------+
-|                     WEB SERVER (Servlet Container)                  |
-|  Serves: index.jsp, *.js, *.css, *.json, images, fonts           |
+|                     NODE.JS STATIC FILE SERVER                      |
+|  serve.js on port 8089                                             |
+|  Serves: counter.html, *.js, *.json, fonts, images                |
 |  No dynamic server logic                                           |
 +-------------------------------------------------------------------+
 ```
@@ -66,11 +81,13 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a client-side MVC
 | Decision | Rationale |
 |----------|-----------|
 | Client-side only | Eliminates server dependencies, network latency, and data privacy concerns. All patient data remains in the browser. |
-| Backbone.js MVC | Provides structured code organization without heavy framework overhead. Appropriate for a focused single-purpose application. |
-| JSON configuration | Cell types, key mappings, and templates are externalized, allowing customization without code changes. |
-| Handlebars templates | Separates output format from logic. New institutional templates can be added to the JSON file. |
+| Vanilla JS IIFE | Zero framework overhead, zero dependencies. A single self-contained file is easy to audit, deploy, and maintain. Closure-based state prevents global namespace pollution. |
+| JSON configuration | Cell types, key mappings, formulas, and output templates are externalized in `templates.json`, allowing customization without code changes. |
+| `{{placeholder}}` templates | Simple string replacement is sufficient for output formatting. No template engine dependency needed. |
 | No database | The tool is a counting aid, not a system of record. Session-only data eliminates PHI storage concerns. |
 | Keyboard-driven input | Matches clinical workflow where operator's eyes are on the microscope. |
+| Tailwind CSS via CDN | Utility-first styling eliminates custom CSS maintenance. CDN delivery avoids local build steps. |
+| Node.js static server | Minimal footprint. No servlet container, no WAR file, no Java dependency. A single `npm start` command launches the server. |
 
 ---
 
@@ -85,49 +102,68 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a client-side MVC
 |  +-----------------------+     +------------------------------+    |
 |  | CASE IDENTIFICATION   |     | SPECIMEN TYPE CONTROLLER     |    |
 |  | - Case number input   |     | - BM/PB selector            |    |
-|  | - Validation          |     | - Table toggle               |    |
-|  | - Auto-clear trigger  |     | - Lock after start           |    |
+|  | - Optional (not       |     | - Both use identical         |    |
+|  |   mandatory)          |     |   14-cell layout             |    |
+|  | - Start Count always  |     | - Lock after start           |    |
+|  |   enabled             |     |                              |    |
 |  +-----------+-----------+     +-------------+----------------+    |
 |              |                               |                     |
 |              v                               v                     |
 |  +-----------------------+     +------------------------------+    |
 |  | COUNTING ENGINE       |     | COUNTING TABLE RENDERER      |    |
-|  | - Keydown listener    |     | - Header row (cell names)    |    |
-|  | - Key-to-cell mapping |     | - Count row (inputs)         |    |
-|  | - Increment/Decrement |     | - Percentage row             |    |
-|  | - Total calculation   |     | - Key mapping row            |    |
-|  | - Visual feedback     |     | - Total column               |    |
+|  | - Document keydown    |     | - Upper row (7 precursors    |    |
+|  |   listener            |     |   + subtotal)                |    |
+|  | - Unified 14-key map  |     | - Lower row (7 mature       |    |
+|  | - Increment/Decrement |     |   + subtotal)                |    |
+|  | - Visual feedback     |     | - Grand total                |    |
+|  | - M:E ratio update    |     | - Amber border on upper row  |    |
+|  |   on every keypress   |     |   when upperRowAbnormal=true |    |
 |  +-----------+-----------+     +-------------+----------------+    |
 |              |                               |                     |
 |              v                               v                     |
 |  +-----------------------+     +------------------------------+    |
 |  | CALCULATION ENGINE    |     | MORPHOLOGY COMMENTS          |    |
-|  | - Percentage calc     |     | - Free-text input            |    |
+|  | - Percentage calc     |     | - Collapsible text area      |    |
 |  | - Division by zero    |     | - Keyboard isolation         |    |
-|  | - Rounding            |     | - Output integration         |    |
-|  | - Sum validation      |     +------------------------------+    |
-|  +-----------+-----------+                                         |
-|              |                                                     |
-|              v                                                     |
-|  +-----------------------+     +------------------------------+    |
-|  | COUNT COMPLETION      |     | OUTPUT GENERATOR             |    |
-|  | - Min count check     |     | - Template compilation       |    |
-|  | - Lock controls       |     | - Tabbed display             |    |
-|  | - Trigger output      |     | - Copy to clipboard          |    |
+|  | - Rounding            |     | - Preserved across resume    |    |
+|  | - M:E ratio from      |     |   cycles                     |    |
+|  |   config formulas     |     | - Output integration         |    |
 |  +-----------+-----------+     +------------------------------+    |
 |              |                                                     |
 |              v                                                     |
 |  +-----------------------+     +------------------------------+    |
-|  | RESET CONTROLLER      |     | SESSION HISTORY              |    |
-|  | - Confirmation dialog |     | - In-memory store            |    |
-|  | - State clearing      |     | - sessionStorage backup      |    |
-|  | - Focus management    |     | - Read-only review           |    |
+|  | COUNT COMPLETION      |     | OUTPUT GENERATOR             |    |
+|  | - Direct finalization |     | - {{placeholder}} template   |    |
+|  |   (no blocking modal) |     |   compilation                |    |
+|  | - Non-blocking note   |     | - {{ME_ratio}} support       |    |
+|  |   if below target     |     | - Tabbed display             |    |
+|  | - Detach keydown      |     | - Copy to clipboard          |    |
+|  +-----------+-----------+     +------------------------------+    |
+|              |                                                     |
+|              v                                                     |
+|  +-----------------------+     +------------------------------+    |
+|  | COUNT RESUMPTION      |     | SESSION HISTORY MANAGER      |    |
+|  | - Continue Counting   |     | - sessionStorage-based       |    |
+|  |   from results phase  |     | - CSV/JSON export            |    |
+|  | - Preserve all tallies|     | - Read-only review           |    |
+|  | - Re-attach keydown   |     +------------------------------+    |
+|  +-----------+-----------+                                         |
+|              |                                                     |
+|              v                                                     |
+|  +-----------------------+     +------------------------------+    |
+|  | RESET CONTROLLER      |     | PROGRESS INDICATOR           |    |
+|  | - Confirmation dialog |     | - "N / target" format        |    |
+|  | - State clearing      |     | - Updates live on each       |    |
+|  | - Focus management    |     |   keypress                   |    |
 |  +-----------------------+     +------------------------------+    |
 |                                                                    |
 |  +-----------------------+                                         |
 |  | CONFIGURATION LOADER  |                                         |
-|  | - Fetch templates.json|                                         |
-|  | - Parse & validate    |                                         |
+|  | - fetch() to          |                                         |
+|  |   templates.json      |                                         |
+|  | - Schema: categories, |                                         |
+|  |   formulas, targetCount,                                        |
+|  |   upperRowAbnormal    |                                         |
 |  | - Error handling      |                                         |
 |  +-----------------------+                                         |
 +-------------------------------------------------------------------+
@@ -136,72 +172,84 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a client-side MVC
 ### 3.2 Component Descriptions
 
 #### 3.2.1 Case Identification Component
-- **Responsibility**: Manages the case/accession number lifecycle
+- **Responsibility**: Manages the case/accession number input. Case number is optional; "Start Count" is always enabled regardless of whether a case number is provided.
 - **Inputs**: User keyboard input in the case number text field
-- **Outputs**: Validated case number string; clear-data trigger signal
+- **Outputs**: Case number string (may be empty); transition to counting phase
 - **SRS Trace**: SYS-001 through SYS-008
 
 #### 3.2.2 Specimen Type Controller
-- **Responsibility**: Manages BM/PB selection and table visibility toggling
-- **Inputs**: Dropdown selection change event
-- **Outputs**: Active specimen type identifier; show/hide signals to table and output components
+- **Responsibility**: Manages BM/PB selection. Both specimen types use an identical 14-cell layout with the same key mappings. Locked once counting begins.
+- **Inputs**: Radio button or selector change event
+- **Outputs**: Active specimen type identifier (`bm` or `pb`); configuration selection including target count, formula availability, and `upperRowAbnormal` flag
 - **SRS Trace**: SYS-010 through SYS-017
 
 #### 3.2.3 Counting Engine
-- **Responsibility**: Captures keyboard input and dispatches count changes
+- **Responsibility**: Captures keyboard input and dispatches count changes. Uses a unified 14-key mapping: R=nrbc, L=blasts, O=pro, M=myelo, T=meta, C=plasma, S=mast, B=bands, P=poly, A=baso, E=eos, N=mono, Y=lymph, X=other. Triggers M:E ratio recalculation on every keypress.
 - **Inputs**: Document-level keydown events
-- **Outputs**: Increment/decrement signals to specific cell types
+- **Outputs**: Increment/decrement signals to specific cell types; updated M:E ratio
 - **SRS Trace**: SYS-030 through SYS-039
 
 #### 3.2.4 Counting Table Renderer
-- **Responsibility**: Renders and updates the visual counting table
+- **Responsibility**: Renders and updates the visual counting table in a two-row layout. Upper row contains 7 precursor cell types plus a subtotal; lower row contains 7 mature cell types plus a subtotal. A grand total is displayed below. When the active specimen type has `upperRowAbnormal: true` (PB mode), the upper row is flagged with an amber border to highlight abnormal precursor presence.
 - **Inputs**: Cell type definitions from configuration; count values from Counting Engine
-- **Outputs**: Rendered HTML table with counts, percentages, and key labels
+- **Outputs**: Rendered HTML table with counts, percentages, key labels, subtotals, and grand total
 - **SRS Trace**: SYS-020 through SYS-026
 
 #### 3.2.5 Calculation Engine
-- **Responsibility**: Computes differential percentages from raw counts
-- **Inputs**: Cell count values (integers), total count
-- **Outputs**: Percentage values (2 decimal places)
-- **Algorithm**: `percentage = (cell_count / total_count) * 100`, rounded to 2 decimal places
-- **Edge Cases**: Division by zero returns 0.00
+- **Responsibility**: Computes differential percentages from raw counts and M:E ratio from configuration formulas
+- **Inputs**: Cell count values (integers), total count, formula definitions from configuration
+- **Outputs**: Percentage values (2 decimal places); M:E ratio (1 decimal place, from config formula `numerator` / `denominator` cell groups)
+- **Algorithm**: `percentage = (cell_count / total_count) * 100`, rounded to 2 decimal places. M:E ratio computed as `sum(numerator cells) / sum(denominator cells)`.
+- **Edge Cases**: Division by zero returns 0.00 for percentages, "N/A" for M:E ratio
 - **SRS Trace**: SYS-040 through SYS-045
 
 #### 3.2.6 Morphology Comments Component
-- **Responsibility**: Captures and manages free-text morphology observations
-- **Inputs**: User text input in comment textarea
+- **Responsibility**: Captures and manages free-text morphology observations. Implemented as a collapsible text area. When focused, keyboard counting is suspended (keyboard isolation). Comments are preserved across resume counting cycles.
+- **Inputs**: User text input in comment textarea; focus/blur events
 - **Outputs**: Comment text for inclusion in output
 - **SRS Trace**: SYS-070 through SYS-073
 
 #### 3.2.7 Count Completion Controller
-- **Responsibility**: Manages the transition from counting to result output
+- **Responsibility**: Manages the transition from counting to results phase. Direct finalization without a blocking modal. If the total count is below the advisory target (BM=500, PB=200), a non-blocking informational note is displayed but does not prevent completion.
 - **Inputs**: "Count Done" button click
-- **Outputs**: Lock signal; output generation trigger
+- **Outputs**: Phase transition to COMPLETED; output generation trigger; detach keydown listener
 - **SRS Trace**: SYS-050 through SYS-056
 
-#### 3.2.8 Output Generator
-- **Responsibility**: Compiles templates with count data and renders tabbed output
-- **Inputs**: Template definitions, count data, case number, morphology comments
+#### 3.2.8 Count Resumption Controller
+- **Responsibility**: Allows the user to return from the results phase to the counting phase. Preserves all existing tallies, case number, specimen type, and morphology comments. Re-attaches the document keydown listener so counting can continue from where it left off.
+- **Inputs**: "Continue Counting" button click from the results phase
+- **Outputs**: Phase transition from COMPLETED back to COUNTING with preserved state
+- **SRS Trace**: SYS-055 through SYS-056
+
+#### 3.2.9 Output Generator
+- **Responsibility**: Compiles output templates with count data using `{{placeholder}}` string replacement syntax, including `{{ME_ratio}}` for the M:E ratio. Renders output in tabbed panels (one tab per template defined in configuration).
+- **Inputs**: Template definitions from configuration, count data, case number, morphology comments, computed M:E ratio
 - **Outputs**: Rendered HTML in tabbed panels; clipboard-ready text
 - **SRS Trace**: SYS-060 through SYS-067
 
-#### 3.2.9 Reset Controller
+#### 3.2.10 Reset Controller
 - **Responsibility**: Manages the reset workflow including confirmation and state clearing
-- **Inputs**: "Reset" button click; new case number entry
-- **Outputs**: Clear signal to all components; focus management
+- **Inputs**: "Reset" button click
+- **Outputs**: Clear signal to all state; phase transition to IDLE; focus management
 - **SRS Trace**: SYS-080 through SYS-084
 
-#### 3.2.10 Session History Manager
-- **Responsibility**: Stores and retrieves completed count sessions
+#### 3.2.11 Session History Manager
+- **Responsibility**: Stores completed count sessions in sessionStorage and provides CSV/JSON export
 - **Inputs**: Completed count data from Count Completion Controller
-- **Outputs**: Read-only session data for review
+- **Outputs**: Read-only session data for review; downloadable CSV and JSON files
 - **SRS Trace**: SYS-090 through SYS-095
 
-#### 3.2.11 Configuration Loader
-- **Responsibility**: Fetches and validates the templates.json configuration
-- **Inputs**: HTTP GET to settings/templates.json
-- **Outputs**: Parsed configuration objects; error state if load fails
+#### 3.2.12 Configuration Loader
+- **Responsibility**: Fetches and validates the `templates.json` configuration via `fetch()`. Configuration schema includes `categories` (upper/lower cell groups), `outCodes` (key mappings), `formulas` (M:E ratio definition), `targetCount`, `upperRowAbnormal` flag, and `templates` (output format definitions).
+- **Inputs**: HTTP GET to `settings/templates.json`
+- **Outputs**: Parsed configuration objects; error state if load fails (full-page error message displayed)
 - **SRS Trace**: SYS-100 through SYS-103
+
+#### 3.2.13 Progress Indicator
+- **Responsibility**: Displays live counting progress in "N / target (target)" format. Updates on every keypress to show how close the operator is to the advisory target count for the active specimen type.
+- **Inputs**: Current total count; target count from configuration
+- **Outputs**: Rendered progress text in the counting UI
+- **SRS Trace**: SYS-040
 
 ---
 
@@ -216,7 +264,12 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a client-side MVC
 [Document keydown event]
        |
        v
-[Counting Engine: map key to cell type]
+[Comment field focused?] --Yes--> [Key goes to textarea; counting suspended]
+       |
+       No
+       |
+       v
+[Counting Engine: map key to cell type via outCodes]
        |
        +---> [Is Shift held?]
        |         |
@@ -228,16 +281,22 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a client-side MVC
        +----+----+
             |
             v
-  [Update cell count in DOM]
+  [Update cell count in closure state]
             |
             v
-  [Update total count]
+  [Update total count + subtotals]
             |
             v
   [Calculation Engine: recalculate all percentages]
             |
             v
-  [Update percentage display cells]
+  [Calculation Engine: recalculate M:E ratio from formula]
+            |
+            v
+  [Update DOM: cell counts, percentages, subtotals, grand total, M:E ratio]
+            |
+            v
+  [Update progress indicator: "N / target"]
             |
             v
   [Visual feedback flash on affected cell]
@@ -249,46 +308,67 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a client-side MVC
 [User clicks "Count Done"]
        |
        v
-[Check total >= minimum threshold]
+[Total below advisory target?]
        |
-       +---> [Below minimum?]
-       |         |
-       |    Yes  |  No
-       |         |
+  Yes  |  No
+       |
        v         |
-  [Warning dialog] |
-       |         |
-  [User confirms?] |
-       |         |
-  No:  |  Yes:   |
-  [Abort] |      |
-       +----+----+
-            |
-            v
+[Display non-blocking   |
+ informational note]    |
+       |                |
+       +-------+--------+
+               |
+               v
   [Detach keydown listener]
-            |
-            v
-  [Set inputs to read-only]
-            |
-            v
+               |
+               v
+  [Set phase to COMPLETED]
+               |
+               v
   [For each output template:]
-  [  Compile Handlebars template with:]
-  [    - case number                  ]
-  [    - total count                  ]
-  [    - per-cell percentages         ]
-  [    - morphology comments          ]
-            |
-            v
+  [  Compile {{placeholder}} template with:]
+  [    - case number                       ]
+  [    - total count                       ]
+  [    - per-cell percentages              ]
+  [    - morphology comments               ]
+  [    - M:E ratio                         ]
+               |
+               v
   [Render tabbed output display]
-            |
-            v
-  [Save to session history]
+               |
+               v
+  [Save to session history (sessionStorage)]
 ```
 
-### 4.3 Reset / New Case Data Flow
+### 4.3 Resume Counting Data Flow
 
 ```
-[User clicks "Reset" OR enters new case number]
+[User clicks "Continue Counting" from results phase]
+       |
+       v
+[Set phase to COUNTING]
+       |
+       v
+[Preserve all existing state:]
+[  - cell counts (unchanged)  ]
+[  - case number (unchanged)  ]
+[  - specimen type (unchanged)]
+[  - morphology comments      ]
+       |
+       v
+[Re-attach document keydown listener]
+       |
+       v
+[Re-render counting table with current data]
+       |
+       v
+[User resumes keyboard counting]
+```
+
+### 4.4 Reset / New Case Data Flow
+
+```
+[User clicks "Reset"]
        |
        v
 [Any count data > 0?]
@@ -301,7 +381,7 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a client-side MVC
 [User confirms?]       |
        |               |
   No:  |  Yes:         |
-[Abort/Restore] |      |
+[Abort] |              |
        +--------+------+
                 |
                 v
@@ -310,8 +390,8 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a client-side MVC
   [Clear total to 0]
   [Clear output text]
   [Clear morphology comments]
-  [Clear case number (if reset)]
-  [Disable Start Count]
+  [Clear case number]
+  [Set phase to IDLE (case-entry)]
   [Enable specimen type selector]
   [Focus case number input]
 ```
@@ -322,54 +402,36 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a client-side MVC
 
 ### 5.1 Runtime Environment
 
-| Layer | Technology | Version | Purpose |
-|-------|-----------|---------|---------|
-| Server | Java Servlet Container (Tomcat/Jetty) | 3.1+ | Static asset serving |
-| Page Engine | JSP | 2.3 | Initial HTML rendering |
-| MVC Framework | Backbone.js | 1.2.0 | Client-side MVC structure |
-| DOM Manipulation | jQuery | 2.1.4 | Cross-browser DOM API |
-| Templating | Handlebars.js | 3.0.3 | Output template rendering |
-| Utilities | Underscore.js | 1.8.3 | Collection/array utilities |
-| UI Components | jQuery UI | 1.11.4 | CSS only (spinner styling) |
+| Layer | Technology | Purpose |
+|-------|-----------|---------|
+| Server | Node.js static file server (`serve.js`) | Static asset serving on port 8089 |
+| Page Engine | Plain HTML (`counter.html`) | SPA entry point |
+| Framework | None — vanilla JavaScript IIFE (`mdc-app.js`) | Complete application logic |
+| DOM Manipulation | Native DOM API | Element creation, updates, event handling |
+| Templating | `{{placeholder}}` string replacement | Output template rendering |
+| Styling | Tailwind CSS via CDN + inline styles | Utility-first responsive styling |
+| Fonts | Google Fonts (Inter, JetBrains Mono, Libre Franklin) | Typography |
 
 ### 5.2 File Organization
 
 ```
 web/
-├── index.jsp                    # Main SPA entry point
-├── backbone-min.js              # Backbone.js library
+├── counter.html              # Main SPA entry point
+├── help.html                 # Quick start guide
+├── logo-showcase.html        # Logo showcase
 ├── settings/
-│   └── templates.json           # Configuration (cell types, templates)
-├── scripts/
-│   ├── defines.js               # Namespace initialization
-│   ├── models.js                # Backbone models
-│   ├── collections.js           # Backbone collections
-│   ├── views.js                 # Backbone views (UI components)
-│   ├── app.js                   # Business logic utilities
-│   └── routes.js                # Backbone router (page init)
-├── styles/
-│   ├── counter.css              # Counter table and output styles
-│   └── landing-style.css        # Page layout and header styles
-├── fonts/                       # Custom fonts
-├── images/                      # Favicons, textures, backgrounds
-├── libraries/                   # jQuery UI CSS
-└── library/                     # Handlebars.js
+│   └── templates.json        # Configuration (14 cell types, unified keys, formulas, templates)
+└── scripts/
+    └── mdc-app.js            # Complete application logic (single IIFE)
 ```
 
-### 5.3 Script Loading Order
+### 5.3 Script Loading
 
-The following load order is mandatory due to dependencies:
+A single `<script>` tag loads `mdc-app.js`. The IIFE executes immediately, calling `fetch()` to load `settings/templates.json` asynchronously before initializing the application. There are no framework libraries to load, no dependency ordering concerns, and no module bundler.
 
-1. jQuery (CDN) - DOM foundation
-2. Handlebars.js (local) - Template engine
-3. Underscore.js (CDN) - Backbone dependency
-4. Backbone.js (local) - MVC framework
-5. defines.js - Namespace setup (depends on nothing)
-6. collections.js - Collection definitions (depends on Backbone)
-7. models.js - Model definitions (depends on Backbone)
-8. views.js - View definitions (depends on Backbone, jQuery, Handlebars)
-9. app.js - Business logic (depends on jQuery)
-10. routes.js - Router initialization (depends on all above)
+External resources loaded via CDN:
+1. Tailwind CSS (`cdn.tailwindcss.com`) — utility-first CSS framework
+2. Google Fonts (Inter, JetBrains Mono, Libre Franklin) — typography
 
 ---
 
@@ -378,32 +440,36 @@ The following load order is mandatory due to dependencies:
 ### 6.1 Application States
 
 ```
-[IDLE] ──(enter case #)──> [CASE_ENTERED] ──(Start Count)──> [COUNTING]
-                                                                  |
-                                                          (Count Done)
-                                                                  |
-                                                                  v
-[IDLE] <──(Reset)───────── [COMPLETED] <──(confirm)──── [COUNT_REVIEW]
+                                  +---(Continue Counting)---+
+                                  |                         |
+                                  v                         |
+[IDLE] ──(Start Count)──> [COUNTING] ──(Count Done)──> [COMPLETED]
+  ^                                                         |
+  |                                                         |
+  +──────────────────(Reset)────────────────────────────────+
 ```
 
-| State | Description | Active Controls |
-|-------|-------------|-----------------|
-| IDLE | No case loaded; waiting for input | Case number input, specimen type selector |
-| CASE_ENTERED | Case number provided; ready to count | Start Count button, specimen type selector |
-| COUNTING | Active keydown listener; counting in progress | Keyboard input, Count Done, Reset |
-| COUNT_REVIEW | Minimum count check; confirmation | Warning dialog (if below threshold) |
-| COMPLETED | Count locked; output displayed | Output tabs, Copy to Clipboard, Reset, New Case |
+| State | Phase Value | Description | Active Controls |
+|-------|-------------|-------------|-----------------|
+| IDLE | `case-entry` | Welcome screen; case number input (optional), specimen type selector | Case number input, specimen type selector, Start Count button |
+| COUNTING | `counting` | Active keydown listener; counting in progress | Keyboard input, Count Done, Reset, Morphology Comments |
+| COMPLETED | `results` | Count finalized; output displayed | Output tabs, Copy to Clipboard, Continue Counting, Reset, Session History |
+
+Note: There is no separate CASE_ENTERED state. The case number is optional, and Start Count is always enabled. The COMPLETED state allows transition back to COUNTING via the "Continue Counting" button.
 
 ### 6.2 Data in Memory
 
 | Data Item | Type | Scope | Persistence |
 |-----------|------|-------|-------------|
-| Cell counts | Integer array | Per counting session | In-memory, lost on page close |
-| Percentages | Float array | Per counting session | Calculated, not stored independently |
-| Case number | String | Per counting session | In-memory |
-| Morphology comments | String | Per counting session | In-memory |
-| Template configuration | JSON object | Application lifetime | Loaded from file on page load |
-| Session history | Array of objects | Browser session | sessionStorage |
+| Cell counts | Object `{ cellType: number }` | Per counting session | Closure state, lost on page close |
+| Percentages | Computed on the fly | Per counting session | Calculated from counts, not stored independently |
+| Case number | String | Per counting session | Closure state |
+| Specimen type | String (`bm` or `pb`) | Per counting session | Closure state |
+| Morphology comments | String | Per counting session | Closure state; preserved across resume cycles |
+| Application phase | String (`case-entry`, `counting`, `results`) | Application lifetime | Closure state |
+| Template configuration | JSON array | Application lifetime | Loaded from file via `fetch()` on page load |
+| Session history | Array of objects | Browser session | sessionStorage (`wbcds_history`) |
+| Theme preference | String (`dark` or `light`) | Browser session | sessionStorage (`wbcds_theme`) |
 
 ---
 
@@ -413,19 +479,19 @@ The following load order is mandatory due to dependencies:
 
 | Concern | Mitigation |
 |---------|-----------|
-| Patient data transmission | No network transmission of patient data. All processing is client-side. |
-| Data at rest | sessionStorage only; cleared on tab/window close. No localStorage, no cookies. |
-| Cross-site scripting (XSS) | Handlebars auto-escapes HTML entities. Case number and comment inputs are sanitized. |
-| Server-side data exposure | No server-side processing of patient data. Server serves static assets only. |
+| Patient data transmission | No network transmission of patient data. All processing is client-side. The server serves static assets only. |
+| Data at rest | sessionStorage only; cleared on tab/window close. No localStorage, no cookies, no IndexedDB. |
+| Cross-site scripting (XSS) | Output templates use string replacement without `innerHTML` injection of user input. Case number and comment inputs are escaped on output. |
+| Server-side data exposure | No server-side processing of patient data. Node.js server serves static files only with path traversal protection. |
 
 ### 7.2 Input Validation
 
 | Input | Validation Rule |
 |-------|----------------|
-| Case number | Alphanumeric + hyphens + slashes, max 30 characters, trimmed |
-| Keyboard input | Only mapped keys processed; all others ignored |
-| Morphology comments | Free text, HTML entities escaped on output |
-| Configuration JSON | Schema validated on load; malformed data prevents application start |
+| Case number | Free text, optional. Trimmed before use. |
+| Keyboard input | Only mapped keys (R, L, O, M, T, C, S, B, P, A, E, N, Y, X) are processed; all others ignored. Shift modifier triggers decrement. |
+| Morphology comments | Free text. Keyboard isolation prevents counting keypresses from being captured while textarea is focused. |
+| Configuration JSON | Loaded via `fetch()`. Application displays a full-page error if the configuration fails to load. |
 
 ---
 
@@ -433,13 +499,12 @@ The following load order is mandatory due to dependencies:
 
 ```
 +-------------------+          +----------------------------+
-|  Lab Workstation   |  HTTP    |  Application Server        |
-|  (Browser)         | <------> |  (Tomcat/Jetty)            |
+|  Lab Workstation   |  HTTP    |  Node.js Server            |
+|  (Browser)         | <------> |  (serve.js on port 8089)   |
 |                    |          |                            |
 |  - Chrome/FF/Edge  |          |  /web/                     |
-|  - All logic runs  |          |    index.jsp               |
-|    client-side     |          |    scripts/*.js            |
-|                    |          |    styles/*.css             |
+|  - All logic runs  |          |    counter.html            |
+|    client-side     |          |    scripts/mdc-app.js      |
 |                    |          |    settings/templates.json  |
 +-------------------+          +----------------------------+
 ```
@@ -447,7 +512,9 @@ The following load order is mandatory due to dependencies:
 - No external service dependencies
 - No database
 - No API endpoints
-- Single deployment artifact (WAR file)
+- No WAR file, no servlet container
+- Deployment: `npm start` launches `serve.js` on port 8089
+- Single static file directory (`web/`) contains all application assets
 
 ---
 
@@ -455,7 +522,10 @@ The following load order is mandatory due to dependencies:
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
-| A | 2026-02-18 | QMS | Initial draft - architecture defined |
+| A | 2026-02-18 | QMS | Initial draft — architecture defined |
+| B | 2026-02-19 | QMS | Component descriptions refined |
+| C | 2026-02-20 | QMS | Data flow diagrams updated |
+| D | 2026-02-24 | QMS | v2.0 — Complete rewrite for vanilla JS IIFE architecture. Removed Backbone.js, jQuery, Handlebars, Underscore, JSP, Tomcat. Added Node.js static server, Tailwind CSS, closure-based state, Continue Counting flow, M:E ratio, Progress Indicator, two-row table layout with upper-row abnormal flagging. |
 
 ## 10. Approval Signatures
 

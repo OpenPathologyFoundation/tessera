@@ -408,7 +408,7 @@ function updateDcrEvidence(dcrFile, relativeEvidencePath) {
 function appendTrRunLog(relativeEvidencePath, statusText, exitCode, cmdText) {
     if (!fs.existsSync(trPath)) return false;
     const content = fs.readFileSync(trPath, 'utf8');
-    const logHeader = '## 8. Automated Run Log';
+    const logHeader = '## 9. Automated Run Log';
     const entry = [
         '',
         `- Date (UTC): ${now.toISOString()}`,

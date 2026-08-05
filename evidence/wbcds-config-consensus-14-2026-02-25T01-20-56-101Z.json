@@ -1,0 +1,137 @@
+{
+  "version": "2.0",
+  "profileId": "consensus-14",
+  "profileName": "Full 14-Part Consensus",
+  "specimenTypes": [
+    {
+      "specimenType": "bm",
+      "specimenLabel": "Bone Marrow",
+      "targetCount": 500,
+      "requireCaseNumber": false,
+      "upperRowAbnormal": false,
+      "categories": {
+        "upper": [
+          "nrbc",
+          "blasts",
+          "pro",
+          "myelo",
+          "meta",
+          "plasma",
+          "mast"
+        ],
+        "lower": [
+          "bands",
+          "poly",
+          "baso",
+          "eos",
+          "mono",
+          "lymph",
+          "other"
+        ]
+      },
+      "outCodes": {
+        "X": "blasts",
+        "R": "pro",
+        "V": "myelo",
+        "C": "meta",
+        "E": "plasma",
+        "W": "mast",
+        "D": "bands",
+        "F": "poly",
+        "Z": "baso",
+        "G": "eos",
+        "A": "mono",
+        "S": "lymph",
+        "Q": "nrbc"
+      },
+      "formulas": {},
+      "templates": [
+        {
+          "tplCode": "ysm",
+          "tplName": "Yale SOM",
+          "outSentence": "A {{total}}-cell count reveals {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{bands}}% bands, {{poly}}% segmented neutrophils, {{eos}}% eosinophils, {{baso}}% basophils, {{mono}}% monocytes, {{lymph}}% lymphocytes, {{plasma}}% plasma cells, {{mast}}% mast cells, {{nrbc}}% erythroid precursors, and {{other}}% other cells. M:E ratio {{ME_ratio}}."
+        },
+        {
+          "tplCode": "mgh",
+          "tplName": "MGH",
+          "outSentence": "A {{total}}-cell differential count reveals {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{bands}}% bands, {{poly}}% segmented neutrophils, {{eos}}% eosinophils, {{baso}}% basophils, {{mono}}% monocytes, {{lymph}}% lymphocytes, {{plasma}}% plasma cells, {{mast}}% mast cells, {{nrbc}}% erythroid precursors, and {{other}}% other cells. M:E ratio {{ME_ratio}}."
+        }
+      ],
+      "constituents": {},
+      "audio": {
+        "enabled": true,
+        "countSound": "click",
+        "undoSound": "undo",
+        "targetSound": "chime",
+        "typewriterSound": "typewriter"
+      },
+      "autosave": true,
+      "absoluteCounts": "optional",
+      "handedness": "left",
+      "morphologyChecklist": []
+    },
+    {
+      "specimenType": "pb",
+      "specimenLabel": "Peripheral Blood",
+      "targetCount": 200,
+      "requireCaseNumber": false,
+      "upperRowAbnormal": true,
+      "categories": {
+        "upper": [
+          "nrbc",
+          "blasts",
+          "pro",
+          "myelo",
+          "meta",
+          "plasma",
+          "mast"
+        ],
+        "lower": [
+          "bands",
+          "poly",
+          "baso",
+          "eos",
+          "mono",
+          "lymph",
+          "other"
+        ]
+      },
+      "outCodes": {
+        "B": "nrbc",
+        "X": "blasts",
+        "R": "pro",
+        "V": "myelo",
+        "C": "meta",
+        "E": "plasma",
+        "W": "mast",
+        "D": "bands",
+        "F": "poly",
+        "Z": "baso",
+        "G": "eos",
+        "A": "mono",
+        "S": "lymph",
+        "Q": "other"
+      },
+      "formulas": {},
+      "templates": [
+        {
+          "tplCode": "mgh",
+          "tplName": "MGH",
+          "outSentence": "A {{total}}-cell differential count of peripheral blood reveals: {{poly}}% segmented neutrophils, {{bands}}% band forms, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{nrbc}}% nucleated RBCs, {{plasma}}% plasma cells, {{mast}}% mast cells, and {{other}}% other cells."
+        }
+      ],
+      "constituents": {},
+      "audio": {
+        "enabled": true,
+        "countSound": "click",
+        "undoSound": "undo",
+        "targetSound": "chime",
+        "typewriterSound": "typewriter"
+      },
+      "autosave": true,
+      "absoluteCounts": "optional",
+      "handedness": "left",
+      "morphologyChecklist": []
+    }
+  ]
+}

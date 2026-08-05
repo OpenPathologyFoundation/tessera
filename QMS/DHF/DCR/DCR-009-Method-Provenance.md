@@ -130,16 +130,19 @@ This completes the five modules opened after the literature review.
 
 ## 7. Open Items Carried Forward
 
-| Item | Note |
-|------|------|
-| **CLSI H20-A2 not held** | The peripheral blood denominator convention (DCR-006) rests on secondary sources. Should be re-verified when obtained. |
-| **CLSI H56-A not held** | Body fluid profile rests on secondary sources. |
-| **Rümke primary text not held** | The Wilson method does not depend on it; his tabulated values should not be quoted until read. |
-| Interval for the M:E ratio | Needs Fieller or bootstrap. HA-093 accepted meanwhile. |
-| Safety class sign-off | DHF-001 §3.1 is an engineering assessment resting on clinical judgements. |
-| Severity ratings unreviewed | RA-001 §6.3 — S values are clinical judgements and are unchanged throughout. |
+Status as at 2026-08-05, after the sign-offs and source acquisition recorded in
+DHF-001 revision K.
 
----
+| Item | Status |
+|------|--------|
+| IEC 62304 safety class sign-off | **Closed.** Class A confirmed by the Document Owner; DHF-001 §3.1.4. Boundary conditions in §3.1.2 remain binding. |
+| RA-001 severity ratings unreviewed | **Closed.** Reviewed and accepted unchanged; RA-001 §6.4. |
+| CLSI H20-A2 not held | **Closed without purchase.** Its specification is quoted verbatim in REF-001 [S8] and its scope described in [S9], both open access and held. See REF-001 §2.1. Purchase would only be required to claim conformance to the reference method itself. |
+| NRBC reporting convention (DCR-006) | **Open.** Not stated in [S8] or [S9]. [S8] supports the underlying principle — nucleated red cells are a population distinct from leucocytes — but not the reporting rule. Rests on laboratory haematology practice literature. |
+| CLSI H56-A not held | **Open.** Body fluid profile rests on secondary sources. Affects the `body-fluid` preset only. |
+| Rümke primary text not held | **Open, non-blocking.** The Wilson method does not depend on it. His tabulated values must not be quoted until the paper is read. |
+| Interval for the M:E ratio | **Open.** Requires Fieller's theorem or a bootstrap. HA-093 accepted meanwhile, with an advisory on the display. |
+| RA-001 and the DHF remain in Draft | **Open.** Signature blocks unsigned. This is the remaining barrier to a released baseline, not to end-user evaluation. |
 
 ## 8. Approval Signatures
 

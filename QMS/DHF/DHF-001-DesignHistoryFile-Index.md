@@ -46,7 +46,7 @@ WBC ΔΣ is intended to be used by trained clinical laboratory personnel (medica
 | SRS-001 | System Requirements Specification v2.1 | Requirements | Draft |
 | SAD-001 | System Architecture Design v2.0 | Design | Draft |
 | SDD-001 | Software Detailed Design v2.0 | Design | Draft |
-| RA-001 | Risk Analysis (FMEA) v2.0 | Risk Management | Draft |
+| RA-001 | Risk Analysis (FMEA) v2.1 | Risk Management | Draft |
 | TP-001 | Test Plan v2.0 | Verification | Draft |
 | VV-001 | Verification & Validation Protocol v2.0 | V&V | Draft |
 | RTM-001 | Requirements Traceability Matrix v3.0 | Traceability | Draft |
@@ -73,7 +73,7 @@ superseded banner and RTM-001 v3.0 is re-keyed to v2.0.
 | B | 2026-02-20 | QMS | Added test evidence archive entry |
 | C | 2026-02-20 | QMS | Added design change record entry |
 | D | 2026-02-24 | QMS | Updated to v2.0: 14-cell unified layout, advisory targets, M:E ratio, Continue Counting |
-| E | 2026-08-04 | QMS | v2.1.0 (DCR-004): verification integrity remediation. Test suite re-pointed at shipped code (unit + jsdom behaviour + Playwright system layers across Chromium/Firefox/WebKit, 579 tests). RTM-001 re-keyed to URS-001 v2.0. SRS-001 extended with SYS-140–SYS-179. URS-034 amended to the largest-remainder method (URS Rev E). URS-001 v1.0 marked superseded. DCR-002/003/004 and SOP-002/003 added to this index. |
+| E | 2026-08-04 | QMS | v2.1.0 (DCR-004): verification integrity remediation. Test suite re-pointed at shipped code (unit + jsdom behaviour + Playwright system layers across Chromium/Firefox/WebKit, 579 tests). RTM-001 re-keyed to URS-001 v2.0. SRS-001 extended with SYS-140–SYS-179. URS-034 amended to the largest-remainder method (URS Rev E). URS-001 v1.0 marked superseded. RA-001 re-scored: 5 hazards added, 4 residual RPNs corrected. DCR-002/003/004 and SOP-002/003 added to this index. |
 
 ## 7. Approval Signatures
 

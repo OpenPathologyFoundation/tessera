@@ -240,8 +240,13 @@ lowers residual risk against existing hazards:
 | HA-041 (browser close data loss) | Autosave verified behaviourally and through a real browser reload. |
 | HA-004 (no case in output) | Superseded by full profile/version traceability in every export. |
 
-RA-001 should be updated to reflect the revised residual RPNs at the next
-revision.
+**RA-001 was updated under this change record (v2.1, Rev C).** Five hazards were
+added — HA-080 (hidden key-mapped category, pre-RPN 50, the only new High),
+HA-063, HA-043, HA-081, HA-064 — and four residual RPNs were corrected where
+the v2.0 score credited a control that was absent from the code: HA-022 (8→4),
+HA-041 (9→3), HA-060 (6→3), HA-061 (8→4). HA-062 keeps its score of 5 but was
+similarly unsupported and is now implemented. Severity ratings are unchanged
+throughout and are flagged in RA-001 §6.3 as requiring clinical sign-off.
 
 ---
 

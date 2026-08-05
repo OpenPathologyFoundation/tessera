@@ -266,8 +266,11 @@ editor (URS-102).
 | HA-070 | Derived formula computation error | SYS-046, SYS-047 | VV-ME-001..006, VV-SYS-017 | U, S |
 | HA-071 | Continue Counting data integrity | SYS-057, SYS-058 | VV-E2E-050, TC-B032, VV-SYS-030 | U, B, S |
 | HA-072 | Formula denominator zero | SYS-046 | VV-ME-003, VV-SYS-017 | U, S |
+| HA-043 | Corrupted autosave record restored *(new)* | SYS-149 | VV-CALC-024/025/028, TC-B053, TC-B076 | U, B |
+| HA-063 | Superseded profile stays in use after a fix is published *(new)* | SYS-108, SYS-160–163 | TC-B070, TC-B071, VV-SYS-054 | B, S |
+| HA-064 | Cell type name shadows a report placeholder *(new)* | SYS-104 | Suite 08 reserved-name tests | U |
 | HA-080 | Silent miscount from a hidden key-mapped category *(new)* | SYS-104 | TC-B063, VV-SYS-052 | B, S |
-| HA-081 | Operator input reinterpreted as markup or as a spreadsheet formula *(new)* | SYS-S04 | VV-E2E-030..034, TC-B087, VV-SYS-073 | U, B, S |
+| HA-081 | Operator input reinterpreted as markup or as a spreadsheet formula *(new)* | SYS-S04, SYS-S05, SYS-S06 | VV-E2E-030..034, TC-B087, VV-SYS-073 | U, B, S |
 
 ---
 
@@ -277,7 +280,7 @@ editor (URS-102).
 |-----------|-------|---------|----------|-------|
 | URS v2.0 → SRS | 52 active requirements (URS-043 withdrawn) | 52 | **100%** | No requirement is deferred |
 | SRS → Verification | 134 requirements | 134 | **100%** | 4 verified by inspection, tagged **I** in §5 |
-| FMEA → Verification | 30 hazards (2 new) | 30 | **100%** | |
+| FMEA → Verification | 34 hazards (5 new in RA-001 v2.1) | 34 | **100%** | RA-001 v2.1 re-scored under DCR-004; see RA-001 §5.2.1 |
 | URS → Validation | 52 | 52 | **100%** | Scenario V1 executed end to end as VV-SYS-020 |
 
 **Automated test totals**: 450 unit + behavioural, 132 system (44 x 3 browser

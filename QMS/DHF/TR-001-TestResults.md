@@ -7,12 +7,12 @@
 | **Document ID** | TR-001 |
 | **Version** | 3.2 |
 | **Product** | WBC ΔΣ v2.3.0 |
-| **Date Executed** | 2026-08-04 (19:03:29 UTC) |
+| **Date Executed** | 2026-08-05 (14:54:02 UTC) |
 | **Status** | **PASS** |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-04_150329_run/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_105402_run/` |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 

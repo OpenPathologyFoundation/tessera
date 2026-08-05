@@ -519,3 +519,73 @@ test.describe('Offline operation (URS-094)', () => {
         expect(remote).toHaveLength(0);
     });
 });
+
+// ================================================================
+test.describe('Methods and limitations documentation (URS-092, URS-055)', () => {
+
+    test('VV-SYS-140: The methods page is reachable and renders', async ({ page }) => {
+        await page.goto('/counter.html');
+        await page.locator('a[href="methods.html"]').first().click();
+        await expect(page).toHaveURL(/methods\.html$/);
+        await expect(page.locator('h1')).toContainText('calculates');
+
+        // The sections a user needs in order to interpret a report.
+        const body = await page.locator('main').innerText();
+        for (const heading of ['How percentages are calculated', 'The M:E ratio',
+            'What the confidence interval means', 'Limitations of manual differential counting',
+            'Which cells belong in the count', 'How many cells to count']) {
+            expect(body).toContain(heading);
+        }
+    });
+
+    test('VV-SYS-141: The worked figures on the page match what the counter produces', async ({ page }) => {
+        // Count the page's own peripheral blood example and confirm the
+        // application reproduces the numbers the documentation claims.
+        await page.goto('/counter.html');
+        await page.fill('#caseNumber', 'S25-DOC');
+        await page.selectOption('#specimenType', 'pb');
+        await page.click('#btnStartCount');
+        for (let i = 0; i < 120; i++) await page.keyboard.press('f');
+        for (let i = 0; i < 40; i++) await page.keyboard.press('s');
+        for (let i = 0; i < 15; i++) await page.keyboard.press('a');
+        for (let i = 0; i < 5; i++) await page.keyboard.press('g');
+        for (let i = 0; i < 20; i++) await page.keyboard.press('b');
+
+        await expect(page.locator('#val-grand-total')).toHaveText('180 + 20');
+        await expect(page.locator('#pct-nrbc')).toHaveText('11.1/100');
+        await page.click('#btnCountDone');
+        const panel = await page.locator('.tab-panel:not(.hidden)').innerText();
+        expect(panel).toContain('180-cell differential');
+        expect(panel).toContain('11.1 per 100 WBC');
+    });
+
+    test('VV-SYS-142: The results screen links to the methods page', async ({ page }) => {
+        await page.goto('/counter.html');
+        await page.fill('#caseNumber', 'S25-LINK');
+        await page.click('#btnStartCount');
+        for (let i = 0; i < 20; i++) await page.keyboard.press('x');
+        await page.click('#btnCountDone');
+
+        await page.locator('#results-summary summary').click();
+        const link = page.locator('#results-summary a[href="methods.html"]');
+        await expect(link).toBeVisible();
+        await expect(link).toContainText('limitations');
+    });
+
+    test('VV-SYS-143: The methods page works offline', async ({ page, context, browserName }) => {
+        test.skip(browserName === 'webkit',
+            'Playwright WebKit cannot navigate while offline');
+        await page.goto('/counter.html');
+        await page.evaluate(async () => {
+            if (navigator.serviceWorker) await navigator.serviceWorker.ready;
+        });
+        await page.goto('/methods.html');
+        await expect(page.locator('h1')).toBeVisible();
+
+        await context.setOffline(true);
+        await page.reload();
+        await expect(page.locator('h1')).toBeVisible();
+        await expect(page.locator('main')).toContainText('Limitations');
+        await context.setOffline(false);
+    });
+});

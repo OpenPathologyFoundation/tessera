@@ -5,14 +5,14 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 3.4 |
-| **Product** | WBC ΔΣ v2.5.0 |
-| **Date Executed** | 2026-08-05 (18:54:31 UTC) |
+| **Version** | 3.5 |
+| **Product** | WBC ΔΣ v2.6.0 |
+| **Date Executed** | 2026-08-05 (20:42:45 UTC) |
 | **Status** | **PASS** |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_145431_run/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_164245_run/` |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
@@ -20,16 +20,16 @@
 
 ## 1. Executive Summary
 
-**706 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 5 documented skips.**
+**731 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 6 documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **540** |
-| System (browser) tests | **166** (57 specs x chromium, firefox, webkit, less 5 skips) |
-| **Total executed** | **706** |
-| Passed | **706** |
+| Unit, static and behavioural tests | **554** |
+| System (browser) tests | **177** (61 specs x chromium, firefox, webkit, less 6 skips) |
+| **Total executed** | **731** |
+| Passed | **731** |
 | Failed | **0** |
-| Skipped (documented, §6) | **5** |
+| Skipped (documented, §6) | **6** |
 | Pass Rate | **100.00%** |
 | Suites | 95 (Node) + 11 describe blocks x 3 engines (Playwright) |
 | Skipped / Cancelled / Todo | 0 |
@@ -42,8 +42,8 @@ Regenerate this evidence with `npm run test:qms`.
 
 | | v2.0 (2026-02-24) | v2.1.0 (this run) |
 |---|---|---|
-| Tests recorded | 191 | 706 |
-| Tests executing shipped application code | **0** | 706 |
+| Tests recorded | 191 | 731 |
+| Tests executing shipped application code | **0** | 731 |
 | Layers | Mirrored logic + static text assertions | Unit (shipped engine) + jsdom behaviour + browser system |
 | Browser engines | none | Chromium, Firefox, WebKit |
 
@@ -67,7 +67,7 @@ shipped code can cause a test to fail.
 
 ---
 
-## 3. Node Suite Results (540 tests, 106 suites, 0 failures)
+## 3. Node Suite Results (554 tests, 111 suites, 0 failures)
 
 ### Suite 01 — Calculation Engine
 
@@ -236,6 +236,28 @@ Capabilities verifiable only at this layer (real browser APIs):
 
 ---
 
+### 4.7 Operator documentation (added v2.6)
+
+| Suite | Scope | Result |
+|-------|-------|--------|
+| 13 UD-001..004 | USER-GUIDE.md keys, target counts and cross-references verified against the shipped profile | PASS |
+| 13 UD-010..019 | Every confidence interval, worked example and convention quoted in `methods.html` recomputed from the shipped engine; ICSH exclusion list complete; limitations cited; page reachable and free of third-party scripts | PASS |
+| E2E VV-SYS-140..143 | Page renders and is reachable from the counter, its worked figures reproduced by counting them in the application, results-screen link, offline availability | PASS |
+
+**A live documentation defect was found**: `USER-GUIDE.md` described a
+nine-category layout with keyboard keys and target counts that no longer
+existed. An operator following it would have pressed keys mapped to different
+cell types than documented. Recorded as HA-097 (pre-RPN 36, residual 4) and
+closed; suite 13 now fails the build if documentation and configuration
+diverge.
+
+UD-011 deserves note: rather than checking that quoted intervals *look* right,
+it recomputes every interval the engine can produce at realistic counts and
+asserts each quoted figure is among them — so a hand-edited plausible-but-wrong
+number fails.
+
+---
+
 ### 4.6 Method provenance (added v2.5)
 
 | Suite | Scope | Result |
@@ -321,6 +343,7 @@ see DCR-007 §5.1 and §5.2.
 | E2E assertions ignored CSS text-transform in innerText | **Layer disagreement (DCR-008)** | VV-SYS-125 |
 | HA-096 clipboard output carried no profile attribution (URS-052) | **Wiring provenance (DCR-009)** | TC-B131, VV-SYS-130 |
 | `totalCounted` / `denominator` placeholders were never reserved | **VV-PROV-008 (DCR-009)** | VV-PROV-008 |
+| HA-097 USER-GUIDE.md documented a superseded nine-category layout | **Writing operator documentation** | UD-001, UD-002, UD-003 |
 
 The last three were introduced or exposed during remediation and were caught by
 the new layers before release — the behaviour the previous suite could not
@@ -347,7 +370,7 @@ provide.
 
 ## 7. Conclusion
 
-All 706 executed automated tests pass with no failures, across three browser
+All 731 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -369,6 +392,12 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-05T20:42:45.861Z
+- Command: `npm run test:all`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-05_164245_run/`
+
 - Date (UTC): 2026-08-05T18:54:31.403Z
 - Command: `npm run test:all`
 - Exit Code: 0

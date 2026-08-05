@@ -1615,7 +1615,10 @@
                     Core.escapeHtml(e.label) + ':</dt> <dd class="inline">' +
                     Core.escapeHtml(e.text) + '</dd></div>';
             });
-            summaryHtml += '</dl></details>';
+            summaryHtml += '</dl>';
+            summaryHtml += '<p class="mt-2"><a href="methods.html" target="_blank" rel="noopener" ' +
+                'class="text-accent hover:underline">How these figures are calculated, and their limitations &rarr;</a></p>';
+            summaryHtml += '</details>';
         }
 
         el('results-summary').innerHTML = summaryHtml;

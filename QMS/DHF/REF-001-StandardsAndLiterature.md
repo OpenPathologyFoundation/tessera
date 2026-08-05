@@ -34,17 +34,53 @@ solving it.
 | Ref | Source | Access status | Used for |
 |-----|--------|---------------|----------|
 | **[S1]** | Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the International Council for Standardization in Hematology. **ICSH guidelines for the standardization of bone marrow specimens and reports.** *Int J Lab Hematol* 2008;30(5):349–364. doi:10.1111/j.1751-553X.2008.01100.x | **Full text held** (`sources/`) | BM cell categories, target counts, M:E ratio definition, NDC exclusions, near-threshold recount |
-| **[S2]** | CLSI **H20-A2**: *Reference Leukocyte (WBC) Differential Count (Proportional) and Evaluation of Instrumental Methods*, 2nd ed. Wayne PA: Clinical and Laboratory Standards Institute; 2007. | **Not held — summaries only** | PB target count (200), reference method, NRBC convention |
+| **[S2]** | CLSI **H20-A2**: *Reference Leukocyte (WBC) Differential Count (Proportional) and Evaluation of Instrumental Methods*, 2nd ed. Wayne PA: Clinical and Laboratory Standards Institute; 2007. | **Not held (paid standard).** Its specification is quoted in [S8] and its scope described in [S9], both open access and both held in full text. | PB target count (200), reference method |
 | **[S3]** | CLSI **H56-A**: *Body Fluid Analysis for Cellular Composition; Approved Guideline*. Wayne PA: CLSI; 2006. | **Not held — summaries only** | Body fluid categories, reporting when <100 cells counted |
 | **[S4]** | Rümke CL. The imprecision of the ratio of two percentages observed in differential white blood cell counts: a warning. *Blood Cells* 1985;11(1):137–140. PMID 4074888 | **Not held — abstract only** | Binomial confidence intervals for differential percentages |
 | **[S5]** | Is a 500-Cell Count Necessary for Bone Marrow Differentials? *Am J Clin Pathol* 2018;150(1):84–89. | Summary read | Evidence that 300-cell counts are diagnostically non-inferior |
 | **[S6]** | WHO Classification of Haematolymphoid Tumours, 5th ed. (2022) and International Consensus Classification (2022). | Secondary sources | Blast percentage denominator; diagnostic thresholds |
 | **[S7]** | Brown LD, Cai TT, DasGupta A. **Interval estimation for a binomial proportion.** *Statist Sci* 2001;16(2):101–133. | Summary read | Choice of the Wilson score interval over the Wald approximation |
+| **[S8]** | Hedley BD, Keeney M, Gambell P, Qu C, Mao J, Davis BH, Wood BL. **White Blood Cell Enumeration and Differential by Flow Cytometry: The ICSH WBC Reference Method.** *Int J Lab Hematol* 2026;48(1):93–101. doi:10.1111/ijlh.14553. **Open access.** | **Full text held** (`sources/`) | The CLSI H20-A2 reference method specification; quantified limitations of manual differential counting |
+| **[S9]** | Comar SR, Malvezzi M, Pasquini R. **To follow or not to follow the recommendations regarding microscopic analysis of the CLSI H20-A2 to validate the criteria for blood smear review?** *Rev Bras Hematol Hemoter* 2015;37(1):69–70. **Open access.** | **Full text held** (`sources/`) | Scope of CLSI H20-A2; laboratory-specific criteria |
 
 **Sources not held in full text are marked as such deliberately.** Where a
-requirement rests on [S2], [S3], [S4] or [S6], the citation in URS-001 or
-SRS-001 carries the same qualification. These should be obtained before the DHF
-leaves Draft.
+requirement rests on [S3], [S4] or [S6], the citation in URS-001 or SRS-001
+carries the same qualification.
+
+### 2.1 CLSI H20-A2: resolved without purchase
+
+H20-A2 is a paid standard and was previously recorded as a blocking open item.
+It is no longer one. The specification this project depends on is stated
+verbatim in [S8], an open-access ICSH paper whose authors include the ICSH
+Board's working group:
+
+> "The current reference method is manual smear review performed by two
+> reviewers counting 200 cells each, as outlined in CLSI H20-A2, first approved
+> in 1992 and revised in 2007 with a 2023 revision recently reviewed." — [S8] §1
+
+[S9] independently describes its scope: "The CLSI H20-A2 ... is a reference
+document to evaluate hematology analyzers that perform automated leukocyte
+differential counts and consider the visual leukocyte differential count as the
+gold standard."
+
+**Assessment.** The 200-cell peripheral blood target (URS-105) now rests on a
+held, open-access, peer-reviewed primary citation rather than on general
+secondary summaries. H20-A2's own scope is the evaluation of analysers, with
+the manual differential as the reference method it is measured against; this
+application is a manual counting aid and is not an instrument H20-A2 governs.
+
+**Purchasing H20-A2 is therefore not required for the current requirement set.**
+It would become necessary if the project were to claim conformance to the
+reference method itself — for example if the two-observer workflow deferred in
+URS §6 were implemented — because the procedural detail of that method is not
+reproduced in [S8].
+
+**One item remains genuinely unresolved:** the NRBC reporting convention
+implemented under DCR-006 is not stated in either [S8] or [S9]. It rests on
+laboratory haematology practice literature. [S8] supports the underlying
+principle — nucleated red cells are identified as a population distinct from
+leucocytes, by absence of CD45 and low forward scatter — but does not state the
+reporting rule. See §3.9.
 
 ---
 
@@ -251,6 +287,39 @@ should be checked against the paper before any of them are quoted.
 
 ---
 
+### 3.9 Quantified limitations of manual differential counting ([S8])
+
+[S8] compared manual morphology against flow cytometry and hematology
+analysers across four institutions and 616 samples. Its findings are the
+strongest evidence base available to this project for what a manual
+differential can and cannot resolve, and they are the substance of the
+user-facing limitations documentation (`web/methods.html`).
+
+| Finding | Quotation |
+|---------|-----------|
+| Rare populations are imprecise by morphology | "Blasts or progenitors correlated well by both morphology and flow cytometry when large populations were present (> 10% or > 1 cell/μL), but **below this level suffer from the large degree of imprecision primarily with morphology due to the small number of cells counted**." |
+| Blast reproducibility | "blast cells showing the largest value at just over 15%" coefficient of variation |
+| Immature granulocytes are definitionally unstable | "Immature granulocytes showed greatest variability between all three methods... and **the lack of a traceable standard for what are arbitrary morphologic features**." |
+| Band vs segmented is observer-dependent | "the relatively small number of immature granulocytes counted by morphology and possibly the **high variation between morphologists in differentiating band and segmented neutrophils**" |
+| Basophils correlate poorly | "very poor correlation, in part due to the relatively small number of basophils counted by morphology" |
+| Manual review remains the clinical method | The flow reference method's "intended use... is not that of clinical practice, as it presents significant cost barriers." |
+
+These are limitations of *manual differential counting as a method*, not of this
+application. The application's contribution is to make them visible — the
+confidence intervals added under DCR-007 quantify precisely the imprecision
+[S8] describes for low-frequency populations, and the near-threshold advisory
+added under DCR-008 flags when that imprecision leaves a diagnostic question
+unresolved.
+
+**Design consequence.** [S8] confirms that the band/segmented distinction and
+the immature granulocyte categories carry observer-dependent variability that no
+counting aid can remove. This is stated to the user rather than left implicit,
+and it is an argument for the aggregated-category support already in the schema:
+a laboratory that does not trust the band/segmented split can configure a single
+combined category and count what it can reliably distinguish.
+
+---
+
 | Gap | Source | Status |
 |-----|--------|--------|
 | No prompt to extend the count when an abnormal percentage sits near a diagnostic threshold | [S1] §2.6 | **Closed** — URS-038, module M5, DCR-008 |
@@ -268,6 +337,7 @@ should be checked against the paper before any of them are quoted.
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| D | 2026-08-05 | QMS | Added [S8] (Hedley 2025, ICSH WBC reference method) and [S9], both open access and held in full text. §2.1 added: CLSI H20-A2 resolved without purchase — its specification is quoted in [S8]. §3.9 added: quantified limitations of manual differential counting, for user-facing documentation. |
 | C | 2026-08-05 | QMS | §3.4 updated: the ICSH §2.6 near-threshold direction is implemented under URS-038 (DCR-008) and the gap is closed. §5 revised. |
 | B | 2026-08-05 | QMS | Added [S7] (Brown, Cai & DasGupta) as the basis for choosing Wilson over Wald. Added §3.7 sampling precision and §3.8 on what Rümke's warning actually concerns — ratios, not single percentages, which makes the M:E display the affected element. |
 | A | 2026-08-05 | QMS | Initial issue. ICSH 2008 [S1] verified against full text; counting model, M:E definition and target counts traced to source. Sources not held in full text explicitly marked. |

@@ -6,10 +6,10 @@
 |-------|-------------------------------------------------------------------------------------------------------------------------|
 | **Document ID** | DHF-001                                                                                                                 |
 | **Product Name** | WBC ΔΣ                                                                                                                 |
-| **Product Version** | 2.5.0                                                                                                                     |
+| **Product Version** | 2.6.0                                                                                                                     |
 | **Classification** | Clinical Laboratory Aid - Software                                                                                      |
 | **Intended Use** | Keyboard-driven manual differential white blood cell counting tool for hematology laboratory personnel                  |
-| **Software Safety Class** | **Class A** (IEC 62304 §4.3) — see §3.1; requires sign-off |
+| **Software Safety Class** | **Class A** (IEC 62304 §4.3) — confirmed 2026-08-05, see §3.1 |
 | **Regulatory Framework** | 21 CFR Part 820 (Quality System Regulation), IEC 62304 (Medical Device Software Lifecycle), ISO 14971 (Risk Management) |
 | **Date Created** | 2026-02-18                                                                                                              |
 | **Document Owner** | Quality Management                                                                                                      |
@@ -90,11 +90,24 @@ verification is the one control that is under the manufacturer's control.
 
 ### 3.1.4 Status
 
-**This classification requires clinical and regulatory sign-off before the DHF
-leaves Draft.** It is an engineering assessment resting on clinical judgments
-about measures E1–E5. It is recorded here so that it is explicit and reviewable
-rather than assumed — no software safety class was stated in any prior revision
-of this DHF, despite IEC 62304 being cited as a governing framework.
+**Signed off 2026-08-05 by the Document Owner: Class A, on the basis stated in §3.1.1.**
+
+The classification was proposed as an engineering assessment resting on clinical
+judgements about the external risk control measures E1–E5. Those judgements have
+been reviewed and accepted: the differential count produced by this tool is one
+input among several, is interpreted by a qualified operator who has identified
+every cell counted, and is reviewed before release under the laboratory's
+quality system.
+
+The boundary conditions in §3.1.2 remain binding. In particular, extending the
+software to perform automated cell recognition would remove measure E2 and
+requires the classification to be reassessed before release.
+
+| Role | Decision | Date |
+|------|----------|------|
+| Document Owner | **Class A confirmed** | 2026-08-05 |
+| Clinical Reviewer | | |
+| Regulatory Affairs | | |
 
 ---
 
@@ -113,14 +126,15 @@ of this DHF, despite IEC 62304 being cited as a governing framework.
 | **URS-001** | **User Requirements Specification v2.0** (`URS-001_UserRequirementsSpecification_v2.0.md`) — **controlled requirement baseline** | Requirements | Draft |
 | URS-001 | User Requirements Specification v1.0 (`URS-001-UserRequirementsSpecification.md`) | Requirements | **Superseded by v2.0** |
 | SPC-001 | Use Case Specification v1.2 (`SPC-001_UseCase_Specification_v1.2.docx`) | Requirements | Draft |
-| SRS-001 | System Requirements Specification v2.5 | Requirements | Draft |
+| SRS-001 | System Requirements Specification v2.6 | Requirements | Draft |
 | SAD-001 | System Architecture Design v2.0 | Design | Draft |
 | SDD-001 | Software Detailed Design v2.0 | Design | Draft |
-| RA-001 | Risk Analysis (FMEA) v2.6 | Risk Management | Draft |
+| RA-001 | Risk Analysis (FMEA) v2.8 | Risk Management | Draft |
 | TP-001 | Test Plan v2.0 | Verification | Draft |
 | VV-001 | Verification & Validation Protocol v2.0 | V&V | Draft |
 | RTM-001 | Requirements Traceability Matrix v3.0 | Traceability | Draft |
-| **REF-001** | **Standards and Literature Basis v1.0** | Reference | Draft |
+| **REF-001** | **Standards and Literature Basis v1.0 (Rev D)** | Reference | Draft |
+| MAL-001 | Methods and Limitations, operator-facing (`web/methods.html`) | Instructions for Use | Draft |
 | TR-001 | Test Execution Results v3.1 | Evidence | Draft |
 | SOP-001 | Standard Operating Procedure | Procedure | Draft |
 | SOP-002 | Deployment Procedure | Procedure | Draft |
@@ -149,6 +163,7 @@ superseded banner and RTM-001 v3.0 is re-keyed to v2.0.
 | B | 2026-02-20 | QMS | Added test evidence archive entry |
 | C | 2026-02-20 | QMS | Added design change record entry |
 | D | 2026-02-24 | QMS | Updated to v2.0: 14-cell unified layout, advisory targets, M:E ratio, Continue Counting |
+| K | 2026-08-05 | QMS | v2.6.0: **IEC 62304 Class A confirmed** and **RA-001 severity ratings reviewed and accepted** by the Document Owner, closing the two open sign-offs. CLSI H20-A2 resolved without purchase — its specification is quoted in Hedley 2025 (REF-001 §2.1). Operator-facing Methods and Limitations page added and pinned to the shipped configuration by test suite 13. HA-097 added: USER-GUIDE.md was found describing a superseded nine-category layout. |
 | J | 2026-08-05 | QMS | v2.5.0 (DCR-009): method provenance. A result now states the conventions that produced it, not only which profile did. Closes a URS-052 gap — the clipboard path, the primary route into the LIS, carried no profile attribution while file export did (HA-096). Completes the five-module standards-review plan. |
 | I | 2026-08-05 | QMS | v2.4.0 (DCR-008): subset-percentage formulas and the near-threshold advisory. Closes the ICSH §2.6 gap recorded under DCR-005: where a confidence interval spans a configured diagnostic threshold, the count does not settle the question and the system now says so. HA-094 added. |
 | H | 2026-08-05 | QMS | v2.3.0 (DCR-007): sampling precision. Every reported percentage carries a Wilson confidence interval and the sub-target advisory is quantified. HA-030 residual 24 → 12. HA-093 added — the M:E ratio implies a precision the count does not support, which is what Rümke's paper actually warns about. |

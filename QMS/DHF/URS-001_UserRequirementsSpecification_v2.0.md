@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | URS-001 |
-| **Version** | 2.0 (Rev J) |
+| **Version** | 2.0 (Rev K) |
 | **Product** | WBC ΔΣ (Eukrasia) |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-05 |
@@ -155,7 +155,7 @@ This URS covers all user-facing functionality of WBC ΔΣ including specimen ide
 |----|------------|----------|-----------|
 | URS-090 | The system SHALL be operable entirely via keyboard during counting (no mouse required). | **P0 – Critical** | Operator's hands are on microscope controls and keyboard. |
 | URS-091 | The system SHALL display cell type labels, counts, and percentages in a font size readable from normal working distance (~24 inches / 60 cm). | **P1 – High** | Operator glances at screen while looking through the microscope. |
-| URS-092 | The system SHALL provide clear instructions guiding the user through the counting workflow. | **P1 – High** | Reduces training time and prevents procedural errors. |
+| URS-092 | The system SHALL provide clear instructions guiding the user through the counting workflow, and SHALL document for the operator how each reported figure is calculated, the published standard it follows, and the limitations of manual differential counting. | **P1 – High** | _Expanded 2026-08-05 (Rev K)._ Reduces training time and prevents procedural errors. The second clause is a safety requirement, not a usability one: a percentage on screen looks equally confident whether the count behind it was 500 cells or 50, and a laboratory adopting this tool must be able to see which conventions its numbers follow and what those numbers cannot establish. Limitations of manual counting are quantified in REF-001 §3.9 from [S8]. |
 | URS-093 | The system SHALL be compatible with standard web browsers (Chrome, Firefox, Edge) without plugins or installation. | **P1 – High** | Institutional IT policies restrict software installation. |
 | URS-094 | The system SHALL not require an internet connection for counting operations after initial configuration load. | **P1 – High** | _Upgraded from P2._ Laboratory workstations often have restricted internet. Offline operation after config load is essential for reliability. |
 | URS-095 | The system SHALL provide Light and Dark presentation themes switchable via on-screen control and a keyboard shortcut that does not interfere with counting. | **P1 – High** | Microscopy rooms often have controlled lighting. Theme switching improves ergonomics. |
@@ -261,6 +261,7 @@ The tool is given into the hands of the user. Governance of configuration profil
 | A | 2026-02-18 | QMS | Initial draft — complete user requirements defined |
 | B | 2026-02-19 | QMS | Added session export requirement |
 | C | 2026-02-20 | QMS | Added theme switch requirement |
+| K | 2026-08-05 | QMS | URS-092 expanded: operator-facing documentation must state how figures are calculated, on what basis, and the limitations of manual differential counting. |
 | J | 2026-08-05 | QMS | URS-055 added: state the conventions that produced a result, not only which profile produced it. URS-052 amended to make explicit that "all output" includes the clipboard — the pasted record previously carried no profile attribution. |
 | I | 2026-08-05 | QMS | URS-038 and URS-039 added: a near-threshold advisory when a confidence interval spans a configured diagnostic threshold, closing the ICSH §2.6 gap recorded in REF-001; and subset-percentage formulas, so both the current and the pre-2022 blast conventions can be expressed. |
 | H | 2026-08-05 | QMS | URS-037 added: report the sampling uncertainty of each differential percentage as a configurable confidence interval. Quantifies what URS-041's advisory previously only alluded to. |

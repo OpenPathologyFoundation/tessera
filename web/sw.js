@@ -28,6 +28,7 @@ const SHELL_ASSETS = [
     './counter.html',
     './editor.html',
     './help.html',
+    './methods.html',
     './vendor/tailwind.js',
     './scripts/wbc-core.js',
     './scripts/mdc-app.js',

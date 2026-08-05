@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 2.5 |
+| **Version** | 2.6 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -247,6 +247,18 @@ Added in v2.5 under DCR-009.
 | SYS-213 | The method statement SHALL be available to output templates as `{{methodNotes}}`, presented on the results screen, and carried in the session record and CSV/JSON export. | URS-055, URS-084 |
 | SYS-214 | Text copied to the clipboard SHALL carry the configuration profile ID, version and timestamp, independently of whether the active template references them. | URS-052 |
 
+### 4.13e Operator Documentation Module (URS-092)
+
+Added in v2.6.
+
+| ID | Requirement | Trace |
+|----|------------|-------|
+| SYS-220 | The application SHALL provide an operator-facing Methods and Limitations page covering: the percentage denominator per specimen type, the rounding method, the derived formula conventions, the meaning of the confidence interval, the near-threshold advisory, the cell types excluded from the differential, and the target counts with their basis. | URS-092, URS-055 |
+| SYS-221 | The page SHALL state the limitations of manual differential counting with their evidence, including the imprecision of low-frequency populations, observer variability in the band/segmented distinction and immature granulocyte definitions, and basophil imprecision. | URS-092 |
+| SYS-222 | The page SHALL state that the software performs no cell identification and makes no diagnostic decision. | URS-092, DHF-001 §3.1 |
+| SYS-223 | The page SHALL be reachable from the case-entry screen, the quick start guide and the results screen, and SHALL be available offline. | URS-092, URS-094 |
+| SYS-224 | Operator documentation SHALL be verified against the shipped configuration and the shipped calculation engine, so that a configuration change cannot leave it stating figures the software does not produce. | URS-092 |
+
 ### 4.14 Audio Feedback Module (URS-027, URS-097)
 
 Added in v2.1 under DCR-004. This functionality was implemented and shipping in
@@ -425,6 +437,7 @@ Phase 2 item.
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
 | B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
 | C | 2026-02-20 | QMS | Added theme toggle requirements |
+| J | 2026-08-05 | QMS | v2.6: added SYS-220–SYS-224, operator documentation, verified against the shipped configuration and engine (suite 13). |
 | I | 2026-08-05 | QMS | v2.5 (DCR-009): added SYS-210–SYS-214, method provenance. SYS-214 closes a URS-052 gap: the clipboard path carried no profile attribution. |
 | H | 2026-08-05 | QMS | v2.4 (DCR-008): added SYS-200–SYS-208, derived quantities and thresholds. Formula rendering generalized from the hardcoded M:E ratio to every formula the profile defines. |
 | G | 2026-08-05 | QMS | v2.3 (DCR-007): added SYS-190–SYS-196, the sampling precision module. Every reported percentage carries a Wilson confidence interval; the sub-target advisory is quantified; a derived ratio carries an imprecision advisory. |

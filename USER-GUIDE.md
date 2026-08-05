@@ -1,57 +1,135 @@
-# WBC ΔΣ — Quick Start Guide
+# WBC ΔΣ — User Guide
 
-## Quick Start
+A keyboard-driven manual differential counter for haematology. Counting happens
+entirely in your browser; no patient data leaves the machine.
 
-1. **Open the app** in Chrome, Firefox, or Edge.
-2. **Enter case/accession number** (type or scan barcode) and press Enter or click Start Count.
-3. **Pick specimen type** — Bone Marrow or Peripheral Blood.
-4. **Press keys to count** — each key maps to a cell type (see tables below). The count and percentages update live.
-5. **Click "Count Done"** when you reach the minimum (200 BM / 100 PB), then copy the formatted output into your LIS/EMR.
-
----
-
-## Keyboard Map
-
-### Bone Marrow (min 200 cells)
-
-| Key | Cell Type | Description |
-|-----|-----------|-------------|
-| A | blast | Myeloblasts |
-| S | pro | Promyelocytes / Myelocytes |
-| D | gran | Maturing granulocytes |
-| F | eryth | Erythroid precursors |
-| Z | baso | Basophils / Mast cells |
-| X | eos | Eosinophils |
-| C | plasma | Plasma cells |
-| V | lymph | Lymphocytes |
-| B | mono | Monocytes |
-
-### Peripheral Blood (min 100 cells)
-
-| Key | Cell Type | Description |
-|-----|-----------|-------------|
-| A | poly | Segmented neutrophils |
-| S | band | Band neutrophils |
-| D | lymph | Lymphocytes |
-| F | mono | Monocytes |
-| Z | eos | Eosinophils |
-| X | baso | Basophils |
-| C | pro | Immature granulocytic precursors |
-| V | blast | Blasts |
-| B | other | Other cells |
+> **Before relying on the numbers**, read
+> [Methods and Limitations](web/methods.html) — how percentages, the M:E ratio
+> and confidence intervals are calculated, which published standards they
+> follow, and what a manual differential count can and cannot establish.
 
 ---
 
-## Tips
+## Quick start
 
-- **Undo a miscount** — hold `Shift` + the key you want to correct (decrements by 1).
-- **Morphology comments** — expand the comments field during counting to note findings (500 char limit). Typing in the field won't trigger counts.
-- **Theme toggle** — press `Ctrl+Shift+L` (or `Cmd+Shift+L` on Mac) to switch between dark and light mode.
-- **Session history** — completed counts are listed at the bottom of the page for the current browser session. Export to CSV or JSON for a local record.
-- **Output templates** — after completing a count, switch between institutional output formats using the tabs (e.g., Yale SOM, MGH, Precipio DX).
+1. **Open the counter** in Chrome, Firefox or Edge. No installation.
+2. **Enter the case/accession number** — type it or scan a barcode. The scanner's
+   Enter keystroke starts the count. The field is optional by default; a profile
+   may require it.
+3. **Choose the specimen type.**
+4. **Press keys to count.** Each key maps to a cell type; the mapping is shown
+   under every column on screen. Counts and percentages update as you go.
+5. **Shift + key** removes a cell if you miscount. It will not go below zero.
+6. **Count Done** when you are finished — at any count, not only at target.
+7. **Copy to Clipboard** pastes the formatted report into your LIS.
+
+**Continue Counting** on the results screen returns you to counting with the
+tally intact, so you can add cells after seeing the result. Use it when the
+counter warns that a confidence interval spans a diagnostic threshold.
 
 ---
 
-## Data & Privacy
+## Keyboard map
 
-All data stays in your browser. Nothing is transmitted to any server. Session history is cleared when you close the tab.
+The mapping below is the shipped default profile. **Keys are configurable**, so
+if your laboratory uses its own profile these may differ — the authoritative
+mapping is always the one displayed beneath each column while counting.
+
+
+### Bone Marrow — target 500 cells
+
+| Key | Cell type |
+|-----|-----------|
+| B | Erythroid precursors (NRBC) |
+| X | Blasts |
+| R | Promyelocytes |
+| V | Myelocytes |
+| C | Metamyelocytes |
+| E | Plasma cells |
+| W | Mast cells |
+| D | Band forms |
+| F | Segmented neutrophils |
+| Z | Basophils |
+| G | Eosinophils |
+| A | Monocytes |
+| S | Lymphocytes |
+| Q | Other (see note) |
+
+### Peripheral Blood — target 200 cells
+
+| Key | Cell type |
+|-----|-----------|
+| B | Erythroid precursors (NRBC) |
+| X | Blasts |
+| R | Promyelocytes |
+| V | Myelocytes |
+| C | Metamyelocytes |
+| E | Plasma cells |
+| W | Mast cells |
+| D | Band forms |
+| F | Segmented neutrophils |
+| Z | Basophils |
+| G | Eosinophils |
+| A | Monocytes |
+| S | Lymphocytes |
+| Q | Other (see note) |
+
+Left-handed by default, so the right hand stays on the microscope. A right-hand
+mapping ships as a preset, and the Configuration Editor can assign any layout.
+
+**On "Other":** count only unclassifiable haemopoietic cells here. Megakaryocytes,
+macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells and
+metastatic tumour cells are excluded from the differential by ICSH 2008 §2.6 —
+counting them in lowers every reported percentage. Record them in the morphology
+comment instead.
+
+---
+
+## What you will see on screen
+
+| Element | Meaning |
+|---------|---------|
+| **Grand total** | Cells in the differential. Peripheral blood shows `180 + 20` when cells are counted outside it, such as NRBC. |
+| **Progress bar** | Toward the configured target. Advisory — never blocks finishing. |
+| **M:E ratio** | Live, per ICSH 2008 §2.6. Hover for the convention and its caveat. |
+| **Percentage under each cell** | Of the differential denominator. Peripheral blood NRBC show as `11.1/100` — per 100 WBC, not a percentage. |
+| **Interval on the results screen** | 95% confidence interval, e.g. `15.0–26.1%`. The precision your cell count achieved. |
+| **Amber threshold warning** | The interval spans a diagnostic threshold: the count does not establish which side the true value is on. |
+
+---
+
+## Configuration
+
+Everything clinical is configurable without touching the software: cell
+categories, keys, target counts, derived formulas, diagnostic thresholds and
+report wording.
+
+- **Preset Profiles** — full 14-part consensus, harmonized 9-part, legacy 9-part,
+  minimal 5-part, body fluid, frequency-ergonomic, right-hand.
+- **Configuration Editor** — build or adapt a profile visually.
+- **Export / Import Config** — share a profile between workstations or colleagues.
+
+A profile that cannot be counted with is rejected with the reason given, rather
+than silently accepted.
+
+Every report names the profile and version that produced it. If two reports
+disagree, check that first.
+
+---
+
+## Data and privacy
+
+- Counting is local to your browser. Nothing is transmitted.
+- Completed counts last for the browser session only, unless exported to CSV or JSON.
+- An in-progress count is saved locally and offered for recovery if the browser
+  closes unexpectedly; it is cleared when you finish or reset.
+- Works offline once loaded.
+
+---
+
+## Scope
+
+This is a counting and calculation aid for trained laboratory personnel. It
+performs no cell identification and makes no diagnostic decision — every
+classification is yours. Results should be reviewed and released under your
+laboratory's quality management system.

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methods and Limitations — WBC ΔΣ</title>
+    <script src="vendor/tailwind.js"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { colors: { accent: { DEFAULT: '#60a5fa' } },
+                fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'] } } }
+        };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Optional webfonts: absent offline, the local font stacks apply -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body[data-theme="light"] { background-color: #f8fafc; color: #0f172a; }
+        body[data-theme="light"] .bg-slate-950 { background-color: #f8fafc !important; }
+        body[data-theme="light"] .bg-slate-900 { background-color: #f1f5f9 !important; }
+        body[data-theme="light"] .bg-slate-800\/50 { background-color: rgba(226,232,240,.7) !important; }
+        body[data-theme="light"] .text-slate-200 { color: #0f172a !important; }
+        body[data-theme="light"] .text-slate-300 { color: #1e293b !important; }
+        body[data-theme="light"] .text-slate-400 { color: #334155 !important; }
+        body[data-theme="light"] .border-slate-700 { border-color: #cbd5e1 !important; }
+        body[data-theme="light"] .border-slate-800 { border-color: #e2e8f0 !important; }
+        @media print { nav, .no-print { display: none !important; }
+            body { background: #fff !important; color: #000 !important; } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-300 font-sans min-h-screen antialiased">
+
+<nav class="border-b border-slate-800 bg-slate-900/60 no-print">
+    <div class="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
+        <span class="text-sm font-semibold text-slate-200">Methods &amp; Limitations</span>
+        <div class="flex items-center gap-4 text-xs">
+            <a href="counter.html" class="text-accent hover:underline">&larr; Back to counter</a>
+            <a href="help.html" class="text-slate-500 hover:text-slate-300">Quick start</a>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-3xl mx-auto px-6 py-10 leading-relaxed">
+
+    <h1 class="text-2xl font-bold text-slate-100">How this counter calculates, and what it cannot tell you</h1>
+    <p class="mt-3 text-sm text-slate-400">
+        This page is for the people using the counter at the microscope and the people
+        reading its reports. It explains where every number on screen comes from, what
+        published standard it follows, and — just as importantly — the limits of what a
+        manual differential count can establish. Nothing here is specific to this
+        software; most of it is true of any manual differential, and is stated so that
+        the numbers are read for what they are.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">1. What the software does, and does not do</h2>
+
+    <p class="mt-4 text-sm">
+        <strong class="text-slate-200">It counts what you tell it to count.</strong>
+        Every cell classification is yours. The software performs no image analysis, no
+        cell recognition, and makes no diagnostic decision. It is the digital equivalent
+        of a mechanical tally counter, with arithmetic and report formatting attached.
+    </p>
+    <p class="mt-3 text-sm">
+        If you press the wrong key, the software will faithfully record the wrong cell.
+        Nothing in it can detect that. The accuracy of a differential produced here is
+        the accuracy of your morphological identification, plus the counting
+        imprecision described in §5, and nothing else.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">2. How percentages are calculated</h2>
+
+    <p class="mt-4 text-sm">
+        Each category is expressed as a percentage of the <strong class="text-slate-200">differential
+        denominator</strong> — the number of cells that belong to the differential, which
+        is not always the same as the number of cells you counted.
+    </p>
+
+    <h3 class="mt-5 text-sm font-semibold text-slate-200">Bone marrow</h3>
+    <p class="mt-2 text-sm">
+        The denominator is every cell counted. Erythroid precursors are part of the
+        nucleated differential count, so they appear as a percentage alongside the
+        myeloid categories. This follows ICSH 2008 §2.6.
+    </p>
+
+    <h3 class="mt-5 text-sm font-semibold text-slate-200">Peripheral blood</h3>
+    <p class="mt-2 text-sm">
+        Nucleated red cells are <strong class="text-slate-200">counted but excluded from the
+        denominator</strong>, and reported separately as NRBC per 100 WBC. They are not
+        leucocytes, so including them would understate every leucocyte percentage.
+    </p>
+    <div class="mt-3 p-4 bg-slate-800/50 border border-slate-700 rounded-lg text-xs">
+        <p class="font-semibold text-slate-300">Worked example — 180 leucocytes and 20 NRBC</p>
+        <table class="mt-2 w-full">
+            <tr class="text-slate-500"><td class="py-1">Segmented neutrophils, 120 counted</td><td class="text-right font-mono">120 / 180 = <span class="text-slate-200">66.7%</span></td></tr>
+            <tr class="text-slate-500"><td class="py-1">Nucleated red cells, 20 counted</td><td class="text-right font-mono"><span class="text-slate-200">11.1 per 100 WBC</span></td></tr>
+            <tr class="text-slate-500 border-t border-slate-700"><td class="pt-2">Report opens</td><td class="text-right font-mono pt-2 text-slate-200">"A 180-cell differential count…"</td></tr>
+        </table>
+        <p class="mt-2 text-slate-500">The counting grid shows this as <span class="font-mono">180 + 20</span> — the
+        differential, then the cells counted outside it.</p>
+    </div>
+
+    <h3 class="mt-5 text-sm font-semibold text-slate-200">Rounding</h3>
+    <p class="mt-2 text-sm">
+        Percentages are made to total exactly 100% using the largest-remainder method:
+        each value is truncated, and the leftover units go to the categories with the
+        largest remainders. No category is ever moved by more than one unit of the last
+        decimal shown. The simpler approach — putting the whole rounding difference on
+        the largest category — can shift a single number by two percentage points or
+        more in a report, so it is not used here.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">3. The M:E ratio</h2>
+
+    <p class="mt-4 text-sm">
+        Calculated per ICSH 2008 §2.6: all granulocytes and monocytes and their
+        precursors — myeloblasts, promyelocytes, myelocytes, metamyelocytes, bands,
+        segmented neutrophils, eosinophils, basophils, promonocytes and monocytes —
+        divided by erythroblasts at all stages. Lymphocytes, plasma cells and mast
+        cells take no part.
+    </p>
+    <div class="mt-3 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg text-xs text-amber-200/90">
+        <p class="font-semibold text-amber-300">A competing convention exists</p>
+        <p class="mt-1">
+            Some laboratories exclude monocytes from the numerator. The same counts then
+            give a different ratio. If you are comparing an M:E ratio against one from
+            another laboratory, or from your own laboratory before a configuration
+            change, check that both used the same convention. Every report from this
+            counter states which convention produced it.
+        </p>
+    </div>
+    <p class="mt-3 text-sm">
+        A ratio of two counted proportions carries the sampling error of
+        <em>both</em>, so it is substantially less precise than either percentage on its
+        own. Treat small differences between successive ratios with caution, and read
+        the ratio alongside cellularity and the trephine biopsy.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">4. What the confidence interval means</h2>
+
+    <p class="mt-4 text-sm">
+        Beside each percentage the results screen shows a range, for example
+        <span class="font-mono text-slate-200">15.0–26.1%</span>. A differential is a
+        <em>sample</em>: you classified 200 or 500 cells from a smear containing far
+        more. Had you counted a different 200 cells from the same slide, you would have
+        got a somewhat different answer. The interval is the range of true values
+        consistent with what you observed.
+    </p>
+    <p class="mt-3 text-sm">
+        It is <strong class="text-slate-200">not</strong> a measure of whether you identified
+        the cells correctly. It is the arithmetic consequence of counting a finite
+        number of cells, and it would apply equally to a perfect observer.
+    </p>
+
+    <div class="mt-4 overflow-x-auto">
+        <table class="w-full text-xs border-collapse">
+            <thead>
+                <tr class="text-slate-500 border-b border-slate-700">
+                    <th class="text-left py-2 font-medium">Observed</th>
+                    <th class="text-left py-2 font-medium">At 100 cells</th>
+                    <th class="text-left py-2 font-medium">At 200 cells</th>
+                    <th class="text-left py-2 font-medium">At 500 cells</th>
+                </tr>
+            </thead>
+            <tbody class="font-mono">
+                <tr class="border-b border-slate-800"><td class="py-2 text-slate-300">5%</td><td class="py-2">2.2–11.2%</td><td class="py-2">2.7–9.0%</td><td class="py-2">3.4–7.3%</td></tr>
+                <tr class="border-b border-slate-800"><td class="py-2 text-slate-300">20%</td><td class="py-2">13.3–28.9%</td><td class="py-2">15.0–26.1%</td><td class="py-2">16.7–23.7%</td></tr>
+                <tr><td class="py-2 text-slate-300">0%</td><td class="py-2">0–3.7%</td><td class="py-2">0–1.9%</td><td class="py-2">0–0.8%</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <p class="mt-3 text-xs text-slate-500">
+        95% intervals, Wilson score method. The bottom row matters: counting zero blasts
+        in 200 cells does not exclude blasts — it places them below roughly 1.9%.
+    </p>
+
+    <h3 class="mt-5 text-sm font-semibold text-slate-200">The threshold warning</h3>
+    <p class="mt-2 text-sm">
+        When an interval spans a diagnostic threshold your laboratory has configured,
+        the results screen says so. An observed 20% blasts at 200 cells has an interval
+        of 15.0–26.1% — it straddles the 20% AML boundary, so
+        <strong class="text-slate-200">the count does not establish which side of that line the
+        true value falls on.</strong> ICSH 2008 §2.6 recommends extending the count in
+        this situation, and "Continue Counting" adds cells to the existing tally
+        without losing it.
+    </p>
+    <p class="mt-3 text-sm">
+        Counting more cells narrows the interval, but it will not always resolve the
+        question: a true value sitting exactly on the threshold straddles it at any
+        count. The warning tells you what the count has and has not settled. It never
+        blocks you from finishing — a paucicellular aspirate may make a longer count
+        impossible, and you are the one who knows that.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">5. Limitations of manual differential counting</h2>
+
+    <p class="mt-4 text-sm">
+        These are limitations of the method, not of this software. They are stated
+        because a number on a screen looks equally confident whether or not it is
+        reliable. The quantified findings below come from a four-institution ICSH study
+        of 616 samples comparing manual morphology against flow cytometry and
+        haematology analysers (Hedley et al., 2026).
+    </p>
+
+    <ul class="mt-4 space-y-4 text-sm">
+        <li>
+            <strong class="text-slate-200">Rare populations are the least reliable.</strong>
+            Blasts correlated well between methods when present above roughly 10%, but
+            below that level suffered "a large degree of imprecision primarily with
+            morphology due to the small number of cells counted". Blast counts showed
+            the largest reproducibility variation of any category, just over 15%. This
+            is precisely the range in which diagnostic thresholds sit, which is why the
+            counter shows an interval rather than a bare percentage.
+        </li>
+        <li>
+            <strong class="text-slate-200">Band versus segmented neutrophil is observer-dependent.</strong>
+            The study attributes variability in immature granulocytes partly to "high
+            variation between morphologists in differentiating band and segmented
+            neutrophils". If your laboratory does not rely on that distinction, it can
+            be configured as a single combined category — counting what can be
+            distinguished reliably is better than splitting what cannot.
+        </li>
+        <li>
+            <strong class="text-slate-200">Immature granulocyte categories lack a traceable standard.</strong>
+            The study notes "the lack of a traceable standard for what are arbitrary
+            morphologic features". Two competent morphologists may legitimately disagree.
+        </li>
+        <li>
+            <strong class="text-slate-200">Basophils are counted in numbers too small to be precise.</strong>
+            Correlation between methods was poor, "in part due to the relatively small
+            number of basophils counted by morphology".
+        </li>
+        <li>
+            <strong class="text-slate-200">The smear itself is a source of error.</strong>
+            Non-uniform cell distribution, staining quality and dysplastic features
+            affecting identification all contribute before any counting begins. ICSH
+            recommends counting across at least two smears where a precise abnormal
+            percentage matters.
+        </li>
+    </ul>
+
+    <!-- ============================================================ -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">6. Which cells belong in the count</h2>
+
+    <p class="mt-4 text-sm">
+        For bone marrow, ICSH 2008 §2.6 defines the nucleated differential count as
+        blast cells, promyelocytes, myelocytes, metamyelocytes, band forms, segmented
+        neutrophils, eosinophils, basophils, mast cells, promonocytes and monocytes,
+        lymphocytes, plasma cells and erythroblasts.
+    </p>
+    <div class="mt-3 p-4 bg-slate-800/50 border border-slate-700 rounded-lg text-xs">
+        <p class="font-semibold text-slate-300">Do not count these into any category</p>
+        <p class="mt-1 text-slate-400">
+            Megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells,
+            smudged cells, and non-haemopoietic cells such as metastatic tumour cells.
+            ICSH excludes them from the differential. Counting one into a general
+            category puts it into the denominator, which lowers every reported
+            percentage — including the blast percentage compared against diagnostic
+            thresholds.
+        </p>
+        <p class="mt-2 text-slate-400">
+            Record such findings in the <strong class="text-slate-300">morphology comment</strong>,
+            which is reproduced in the report. Lymphoid aggregates likewise should be
+            commented on rather than tallied.
+        </p>
+    </div>
+
+    <!-- ============================================================ -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">7. How many cells to count</h2>
+
+    <p class="mt-4 text-sm">
+        The target shown on the progress bar comes from your configuration profile. The
+        shipped defaults follow published guidance:
+    </p>
+    <ul class="mt-3 space-y-2 text-sm">
+        <li><strong class="text-slate-200">Bone marrow — 500 cells.</strong> ICSH 2008 §2.6: at
+            least 500 across at least two smears when a precise percentage of an
+            abnormal cell type is required for diagnosis; at least 300 when the
+            differential is not essential to it. A 2018 study of 165 cases found
+            300-cell counts diagnostically equivalent to 500, including 100%
+            sensitivity at the 20% blast threshold.</li>
+        <li><strong class="text-slate-200">Peripheral blood — 200 cells.</strong> The CLSI H20-A2
+            reference method is two reviewers counting 200 cells each.</li>
+    </ul>
+    <p class="mt-3 text-sm">
+        The target is <strong class="text-slate-200">advisory and never enforced</strong>. You can
+        finish at any count above zero. Finishing below target produces a note stating
+        the interval your count achieved, so the reduced precision is on the record
+        rather than left to be inferred.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">8. Configuration, and why reports name it</h2>
+
+    <p class="mt-4 text-sm">
+        Cell categories, keyboard mappings, target counts, derived formulas, diagnostic
+        thresholds and report wording all come from a configuration profile, editable
+        without changing the software. This is deliberate: differential counting
+        practice varies legitimately between institutions, and a tool that hard-codes
+        one practice is wrong everywhere else.
+    </p>
+    <p class="mt-3 text-sm">
+        Because practice varies, <strong class="text-slate-200">a percentage is not
+        self-explanatory</strong>. Every report therefore carries the profile it was
+        produced under and its version, and the results screen has a
+        <em>Method</em> section stating the conventions in force. If two reports
+        disagree, that is where to look first.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">9. Data handling</h2>
+
+    <p class="mt-4 text-sm">
+        Counting happens entirely in your browser. No patient data is transmitted
+        anywhere. Completed counts persist only for the browser session and are lost
+        when it closes unless exported. An in-progress count is saved locally so it can
+        be recovered if the browser closes unexpectedly; it is cleared when the count
+        is finished or reset.
+    </p>
+
+    <!-- ============================================================ -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">References</h2>
+    <ol class="mt-4 space-y-2 text-xs text-slate-400 list-decimal list-inside">
+        <li>Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the International
+            Council for Standardization in Haematology. ICSH guidelines for the
+            standardization of bone marrow specimens and reports.
+            <em>Int J Lab Hematol</em> 2008;30(5):349–364.</li>
+        <li>Hedley BD, Keeney M, Gambell P, Qu C, Mao J, Davis BH, Wood BL. White Blood
+            Cell Enumeration and Differential by Flow Cytometry: The ICSH WBC Reference
+            Method. <em>Int J Lab Hematol</em> 2026;48(1):93–101. Open access.</li>
+        <li>CLSI H20-A2. Reference Leukocyte (WBC) Differential Count (Proportional) and
+            Evaluation of Instrumental Methods, 2nd ed. Wayne PA: CLSI; 2007.</li>
+        <li>Rümke CL. The imprecision of the ratio of two percentages observed in
+            differential white blood cell counts: a warning. <em>Blood Cells</em>
+            1985;11(1):137–140.</li>
+        <li>Brown LD, Cai TT, DasGupta A. Interval estimation for a binomial proportion.
+            <em>Statist Sci</em> 2001;16(2):101–133.</li>
+        <li>Is a 500-Cell Count Necessary for Bone Marrow Differentials?
+            <em>Am J Clin Pathol</em> 2018;150(1):84–89.</li>
+        <li>WHO Classification of Haematolymphoid Tumours, 5th ed., 2022; and the
+            International Consensus Classification, 2022.</li>
+    </ol>
+
+    <p class="mt-10 pt-4 border-t border-slate-800 text-xs text-slate-500">
+        This counter is a counting and calculation aid for trained laboratory personnel.
+        It does not perform cell identification and does not make diagnostic decisions.
+        Every differential it produces should be reviewed and released under your
+        laboratory's quality management system.
+    </p>
+
+</main>
+
+<script>
+    // Follow the theme chosen in the counter.
+    try {
+        var t = sessionStorage.getItem('wbcds_theme');
+        if (t) document.body.setAttribute('data-theme', t);
+    } catch (e) { /* default theme */ }
+</script>
+
+</body>
+</html>

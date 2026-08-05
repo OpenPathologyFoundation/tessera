@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | RA-001 |
-| **Version** | 2.6 |
+| **Version** | 2.8 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-04 |
@@ -168,6 +168,8 @@ primary text against the shipped configuration.
 | HA-095 | A result is interpreted without knowing the convention that produced it | Differential figures are compared across laboratories, or against the same laboratory's earlier results, when the underlying conventions differ. Identical counts give a materially different M:E ratio depending on whether monocytes are in the numerator, and a materially different blast percentage depending on whether erythroid precursors are in the denominator; both conventions are in current use. A trend read across a profile change may reflect the change rather than the patient | 3 | The report states figures without stating the conventions behind them; the reader has no way to know a competing convention exists | 4 | **None** | 4 | **48** | **Medium** | SYS-210–213: profiles declare their provenance, formulas their convention and target counts their basis; the system assembles a method statement presented with the result, available to templates, and carried in every export. The shipped profile records that a competing M:E convention exists rather than implying there is only one. | 3x2x2 = **12** (Low). Occurrence falls because the convention travels with the result; detection improves because a reader who sees two differing figures can now identify why. Residual reflects that a reader may still not consult the statement. |
 | HA-096 | The record reaching the LIS cannot be traced to its counting parameters | Clipboard text is the primary route into the patient record. It previously carried the rendered template alone — no profile, no version, no timestamp — so the reported differential could not be tied to the configuration that produced it. URS-052 exists to prevent exactly this, and was met for file export but not for the path most used | 4 | The copy control copies the rendered report panel, which did not include attribution | 4 | **None** | 3 | **48** | **Medium** | SYS-214: the copied text carries profile ID, version and timestamp independently of the active template, so a laboratory cannot lose attribution by editing its templates. | 4x1x2 = **8** (Low). Verified by TC-B131 and VV-SYS-130, the latter reading the real system clipboard. |
 
+| HA-097 | Operator documentation describes software that no longer exists | An operator follows a documented key mapping or target count that the configuration has since changed. USER-GUIDE.md described a nine-category layout with keys and targets that had been superseded; an operator relying on it would have pressed keys mapped to different cell types than the document stated | 4 | Documentation is maintained by hand and nothing verified it against the configuration | 3 | **None** | 3 | **36** | **Medium** | SYS-224: test suite 13 verifies every documented key, target count and quoted figure against the shipped profile and the shipped calculation engine, so documentation drift fails the build. The guide also directs the operator to the on-screen key display as authoritative, since keys are configurable. | 4x1x1 = **4** (Low). Verified by UD-001 to UD-003 (keys and targets), UD-010 to UD-014 (quoted figures recomputed from the engine). |
+
 ### 4.10 Hazards Identified in the v2.1 Design Review (DCR-004)
 
 | # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
@@ -185,10 +187,10 @@ primary text against the shipped configuration.
 |-----------|-------|-----------|
 | Critical (75-125) | 1 | HA-001 |
 | High (50-74) | 4 | HA-003, HA-030, HA-080, HA-092 |
-| Medium (16-49) | 27 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
+| Medium (16-49) | 28 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
 | Low (1-15) | 9 | HA-023, HA-040, HA-041, HA-050, HA-051, HA-060, HA-062, HA-070, HA-072 |
 
-Total: **41** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
+Total: **42** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
 
 _Two counting errors in the v2.0 table are corrected here: the Medium row was
 labelled 14 against a list of 16 entries and the Low row 8 against a list of 10,
@@ -202,7 +204,7 @@ Every RPN in section 4 has been recomputed from its S, O and D values._
 | Critical (75-125) | **0** |
 | High (50-74) | **0** |
 | Medium (16-49) | **2** (HA-001 RPN=45, HA-002 RPN=30) |
-| Low (1-15) | **39** |
+| Low (1-15) | **40** |
 
 All three residual Medium risks are accepted by design and unchanged from v2.0;
 their rationale is in section 5.3. No residual risk sits above Medium.
@@ -303,11 +305,31 @@ residual scores above to be treated as evidence rather than intent.
 
 ### 6.3 Open Risk Management Actions
 
-| Action | Owner | Note |
-|--------|-------|------|
-| Clinical review and sign-off of the revised S/O/D ratings | Clinical Reviewer | The ratings in section 4 are an engineering assessment. The Severity values in particular are clinical judgments and are unchanged from v2.0; they should be confirmed rather than assumed. |
-| Confirm acceptance of the three residual Medium risks | Risk Manager, Clinical Reviewer | HA-001, HA-002, HA-030 — all accepted by design, rationale in section 5.3 |
-| Approve this document (all signature blocks are empty) | All | RA-001 remains in Draft |
+| Action | Owner | Status |
+|--------|-------|--------|
+| Clinical review and sign-off of the S/O/D ratings | Document Owner | **Closed 2026-08-05.** Reviewed and accepted as they stand. See §6.4. |
+| Confirm acceptance of the residual Medium risks | Document Owner | **Closed 2026-08-05.** HA-001 and HA-002 accepted by design; rationale in §5.3. |
+| Approve this document | All signatories | Open — RA-001 remains in Draft pending the signature block in §8 |
+
+### 6.4 Severity Rating Review (2026-08-05)
+
+The Severity values throughout §4 are clinical judgements about the consequence
+of a failure reaching a patient. They were carried unchanged through revisions
+B to H so that the engineering changes to Occurrence and Detection could be
+reviewed against a stable baseline.
+
+**They have now been reviewed by the Document Owner and are accepted as they
+stand.** No Severity value is revised. The basis is the same reasoning that
+supports the IEC 62304 Class A classification recorded in DHF-001 §3.1: the
+differential count is one input among several, it is produced by a qualified
+operator who has identified every cell counted, and it is reviewed before
+release under the laboratory's quality system. Those external controls bound
+the consequence of any single failure of this software, which is what the
+Severity column expresses.
+
+This closes the open action recorded in revisions D through H. The Occurrence
+and Detection values, which were revised on engineering grounds across DCR-004
+to DCR-009, are unaffected by this review.
 
 ---
 
@@ -317,6 +339,8 @@ residual scores above to be treated as evidence rather than intent.
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete FMEA |
 | B | 2026-02-24 | QMS | v2.0 update: optional case number (HA-001), advisory target count replacing blocking dialog (HA-030), unified key mappings (HA-010), new hazards for M:E ratio (HA-070, HA-072) and Continue Counting (HA-071), updated risk summary |
+| J | 2026-08-05 | QMS | v2.8: HA-097 added — operator documentation describing superseded software. Found live: USER-GUIDE.md documented a nine-category layout with keys and targets that no longer existed. Pre-RPN 36, residual 4. |
+| I | 2026-08-05 | QMS | v2.7: Severity ratings reviewed by the Document Owner and accepted unchanged; the open action carried since revision D is closed (§6.4). Residual Medium risks HA-001 and HA-002 accepted by design. |
 | H | 2026-08-05 | QMS | v2.6 (DCR-009): HA-095 (a result interpreted without its convention) and HA-096 (the LIS record untraceable to its counting parameters) added, both pre-RPN 48. HA-096 was a live URS-052 gap — the clipboard path carried no profile attribution while file export did. |
 | G | 2026-08-05 | QMS | v2.5 (DCR-008): HA-094 added — a count accepted as settling a diagnostic question it cannot settle. Pre-RPN 48, residual 12. Mitigated by the near-threshold advisory, which implements the ICSH §2.6 direction the design review had recorded as an open gap. |
 | F | 2026-08-05 | QMS | v2.4 (DCR-007): HA-093 added — the M:E ratio is displayed at a precision the count does not support, which is the imprecision Rümke's paper actually concerns. HA-030 re-scored 24 → 12: the sub-target advisory now states a computed confidence interval rather than a general caution, so detection improves from Low to Certain. Residual Medium risks reduce from 3 to 2. |

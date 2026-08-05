@@ -13,7 +13,7 @@
 | **Regulatory Framework** | 21 CFR Part 820 (Quality System Regulation), IEC 62304 (Medical Device Software Lifecycle), ISO 14971 (Risk Management) |
 | **Date Created** | 2026-02-18                                                                                                              |
 | **Document Owner** | Quality Management                                                                                                      |
-| **Status** | Draft                                                                                                                   |
+| **Status** | **In Review** — engineering approvals complete; clinical approval outstanding (§7) |
 
 ---
 
@@ -171,11 +171,65 @@ superseded banner and RTM-001 v3.0 is re-keyed to v2.0.
 | F | 2026-08-05 | QMS | v2.1.0 (DCR-005): standards grounding. ICSH 2008 verified against full text; IEC 62304 Class A declared with justification; REF-001 bibliography issued; HA-090/091 added. |
 | E | 2026-08-04 | QMS | v2.1.0 (DCR-004): verification integrity remediation. Test suite re-pointed at shipped code (unit + jsdom behaviour + Playwright system layers across Chromium/Firefox/WebKit, 579 tests). RTM-001 re-keyed to URS-001 v2.0. SRS-001 extended with SYS-140–SYS-179. URS-034 amended to the largest-remainder method (URS Rev E). URS-001 v1.0 marked superseded. RA-001 re-scored: 5 hazards added, 4 residual RPNs corrected. DCR-002/003/004 and SOP-002/003 added to this index. |
 
-## 7. Approval Signatures
+## 7. Approval State and Roles
+
+### 7.1 Combined roles
+
+In this organisation the **Design Engineer, Quality Assurance, Regulatory
+Affairs, Systems Engineer, Software Architect, Software Engineer, Test Lead,
+V&V Lead and Risk Manager** functions are all discharged by the same
+individual, Peter Gershkovich, M.D., M.H.A.
+
+Roles are recorded separately throughout this DHF to identify **which function
+is being discharged**, not to imply that independent reviewers examined the
+work. This is stated explicitly so that the signature blocks are read
+correctly.
+
+### 7.2 What is approved, and what is not
+
+| State | Documents | Meaning |
+|-------|-----------|---------|
+| **Approved** | RTM-001, SAD-001, SDD-001, SRS-001, TP-001, TR-001, DCR-001, DCR-002, DCR-003 | Every required signatory has signed. These are engineering and verification artefacts with no clinical signatory. |
+| **In Review** | DHF-001 (this document), URS-001 v2.0, RA-001, REF-001, VV-001, DCR-004 to DCR-009 | Engineering approvals complete. **A clinical signature is outstanding** and these are not a released baseline until it is obtained. |
+| **Issued for local adoption** | SOP-001 | Signatories are the adopting laboratory's Laboratory Director, Quality Manager and Clinical User Representative, not the manufacturer's. |
+| **Superseded** | URS-001 v1.0 | Retained for design history only. Not to be signed. |
+
+### 7.3 Brief for clinical reviewers
+
+Clinical sign-off is sought from practising haematopathologists after
+hands-on evaluation. A reviewer signing as **Clinical Reviewer** or **Clinical
+User Representative** is attesting to the clinical content, not the software
+engineering. Specifically:
+
+| Document | What the clinical signature attests to |
+|----------|----------------------------------------|
+| **URS-001 v2.0** | That the user requirements describe what a haematopathologist actually needs, and that the workflow decisions — optional case number, advisory rather than enforced target counts, Continue Counting — match clinical practice. |
+| **RA-001** | That the **Severity** ratings correctly express the clinical consequence of each failure, and that the residual risks accepted in §5.3 are acceptable. §6.4 records that these were reviewed by the Document Owner; an independent clinical view is the point of this signature. |
+| **REF-001** | That the standards are interpreted correctly — in particular the ICSH §2.6 nucleated differential count, the M:E convention including monocytes, and the limitations stated in §3.9. |
+| **DCR-006** | **The change with the most direct effect on reported patient values.** Nucleated red cells were removed from the peripheral blood percentage denominator. Every leucocyte percentage this tool reports for peripheral blood changed as a result. |
+| **DCR-007** | That reporting confidence intervals alongside percentages is appropriate, and that the interval shown is interpreted correctly by a reader. |
+| **DCR-008** | That the shipped diagnostic thresholds and the near-threshold advisory are clinically sound, and that advisory-not-blocking is the right behaviour. |
+| **DCR-004, DCR-005, DCR-009** | Supporting: verification approach, standards grounding, and method provenance in reports. |
+
+Reviewers should also read `web/methods.html`, the operator-facing Methods and
+Limitations page, since that is what end users will rely on to interpret the
+numbers.
+
+### 7.4 Outstanding items for a released baseline
+
+1. Clinical signatures on the eleven documents listed as In Review.
+2. The NRBC reporting convention (DCR-006) is not stated in a held primary
+   source — see REF-001 §2.1.
+3. CLSI H56-A is not held; affects the `body-fluid` preset only.
+4. No interval is computed for the M:E ratio (HA-093).
+
+---
+
+## 8. Approval Signatures
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| Design Engineer | | | |
-| Quality Assurance | | | |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
 | Clinical Reviewer | | | |
-| Regulatory Affairs | | | |
+| Regulatory Affairs | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |

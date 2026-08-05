@@ -9,7 +9,7 @@
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
-| **Status** | Draft |
+| **Status** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | URS-001 v2.0, SRS-001 v2.0, SDD-001 v2.0, RA-001 v2.0 |
 
@@ -303,6 +303,6 @@ All other tests are **Priority 3**.
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| Test Lead | | | |
-| Design Engineer | | | |
-| Quality Assurance | | | |
+| Test Lead | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |

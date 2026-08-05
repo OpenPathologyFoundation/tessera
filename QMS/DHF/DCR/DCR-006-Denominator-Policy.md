@@ -7,7 +7,7 @@
 | **Document ID** | DCR-006 |
 | **Version** | 1.0 |
 | **Date Created** | 2026-08-05 |
-| **Status** | Draft |
+| **Status** | **In Review** — engineering approvals complete; clinical approval outstanding |
 | **Parent Document** | DHF-001 |
 | **Module** | M1 of the standards-review plan |
 | **Profile Version** | consensus-14 2.0 → 2.1 |
@@ -147,6 +147,6 @@ leucocyte percentages. This belongs in the release notes and in SOP-001.
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
 | Clinical Reviewer | | | |
-| Design Engineer | | | |
-| Quality Assurance | | | |
-| Regulatory Affairs | | | |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Regulatory Affairs | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |

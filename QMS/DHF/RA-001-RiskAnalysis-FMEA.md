@@ -9,7 +9,7 @@
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-04 |
-| **Status** | Draft |
+| **Status** | **In Review** — engineering approvals complete; clinical approval outstanding |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | URS-001 v2.0 Rev E, SRS-001 v2.1, SAD-001 v2.0, SDD-001 v2.0 |
 | **Change Record** | DCR-004 |
@@ -352,7 +352,7 @@ to DCR-009, are unaffected by this review.
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| Risk Manager | | | |
+| Risk Manager | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
 | Clinical Reviewer | | | |
-| Design Engineer | | | |
-| Quality Assurance | | | |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |

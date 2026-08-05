@@ -8,7 +8,8 @@
 | **Version** | 3.5 |
 | **Product** | WBC ΔΣ v2.6.0 |
 | **Date Executed** | 2026-08-05 (20:42:45 UTC) |
-| **Status** | **PASS** |
+| **Status** | **PASS** (test outcome) |
+| **Approval State** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
@@ -385,9 +386,9 @@ specified requirements as traced in RTM-001 v3.0.
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| Test Engineer | | | |
-| Quality Assurance | | | |
-| Design Engineer | | | |
+| Test Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
 
 ---
 

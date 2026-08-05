@@ -9,7 +9,7 @@
 | **Product** | WBC ΔΣ (Eukrasia) |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-05 |
-| **Status** | Draft |
+| **Status** | **In Review** — engineering approvals complete; clinical approval outstanding |
 | **Parent Document** | DHF-001 |
 | **Companion Document** | SPC-001 (Use Case Specification v1.2) |
 | **Standards Basis** | REF-001 (Standards and Literature) |
@@ -275,6 +275,6 @@ The tool is given into the hands of the user. Governance of configuration profil
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
 | Clinical User Representative | | | |
-| Design Engineer | | | |
-| Quality Assurance | | | |
-| Regulatory Affairs | | | |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Regulatory Affairs | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |

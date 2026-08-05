@@ -8,7 +8,7 @@
 | **Version** | 1.0 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
-| **Status** | Draft |
+| **Status** | **Issued for local adoption** — to be reviewed and signed by the adopting laboratory |
 | **Parent Document** | DHF-001 |
 | **Effective Date** | TBD (upon validation completion) |
 

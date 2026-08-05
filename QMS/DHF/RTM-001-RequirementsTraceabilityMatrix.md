@@ -9,7 +9,7 @@
 | **Product** | WBC ΔΣ v2.1.0 |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-04 |
-| **Status** | Draft |
+| **Status** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
 | **Requirement Baseline** | **URS-001 v2.0** (2026-02-24) |
 | **Change Record** | DCR-004 |
@@ -314,6 +314,6 @@ These are stated explicitly rather than folded into the percentages above:
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| Systems Engineer | | | |
-| Quality Assurance | | | |
-| Regulatory Affairs | | | |
+| Systems Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Regulatory Affairs | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |

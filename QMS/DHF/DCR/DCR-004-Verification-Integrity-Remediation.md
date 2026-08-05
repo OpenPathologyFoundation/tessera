@@ -7,7 +7,7 @@
 | **Document ID** | DCR-004 |
 | **Version** | 1.0 |
 | **Date Created** | 2026-08-04 |
-| **Status** | Draft |
+| **Status** | **In Review** — engineering approvals complete; clinical approval outstanding |
 | **Parent Document** | DHF-001 |
 | **Related PR** | N/A |
 | **Product Version** | 2.0 → 2.1.0 |
@@ -271,7 +271,7 @@ this record on future runs.
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| Design Engineer | | | |
-| Quality Assurance | | | |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
 | Clinical Reviewer | | | |
-| Regulatory Affairs | | | |
+| Regulatory Affairs | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |

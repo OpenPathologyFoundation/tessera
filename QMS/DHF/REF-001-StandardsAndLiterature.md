@@ -8,7 +8,7 @@
 | **Version** | 1.0 |
 | **Product** | WBC ΔΣ v2.1.0 |
 | **Date Created** | 2026-08-05 |
-| **Status** | Draft |
+| **Status** | **In Review** — engineering approvals complete; clinical approval outstanding |
 | **Parent Document** | DHF-001 |
 | **Change Record** | DCR-005 |
 
@@ -347,5 +347,5 @@ combined category and count what it can reliably distinguish.
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
 | Clinical Reviewer | | | |
-| Design Engineer | | | |
-| Quality Assurance | | | |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |

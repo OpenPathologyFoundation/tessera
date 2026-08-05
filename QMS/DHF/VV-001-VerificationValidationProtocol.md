@@ -9,7 +9,7 @@
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
-| **Status** | Draft |
+| **Status** | **In Review** — engineering approvals complete; clinical approval outstanding |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | URS-001 v2.0, SRS-001 v2.0, SDD-001 v2.0, TP-001 v2.0, RA-001 v2.0 |
 
@@ -479,7 +479,7 @@ Demonstrate that WBC ΔΣ v2.0 meets user needs as defined in URS-001 v2.0 when 
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| V&V Lead | | | |
+| V&V Lead | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
 | Clinical Reviewer | | | |
-| Quality Assurance | | | |
-| Regulatory Affairs | | | |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Regulatory Affairs | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |

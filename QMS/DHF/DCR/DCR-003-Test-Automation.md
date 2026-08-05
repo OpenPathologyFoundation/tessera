@@ -7,7 +7,7 @@
 | **Document ID** | DCR-003 |
 | **Version** | 1.0 |
 | **Date Created** | 2026-02-22 |
-| **Status** | Draft |
+| **Status** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
 | **Related PR** | N/A |
 
@@ -93,6 +93,6 @@ No new hazards identified. Review RA-001 if scope changes.
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| Design Engineer | | | |
-| Quality Assurance | | | |
-| Regulatory Affairs | | | |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |
+| Regulatory Affairs | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-05 |

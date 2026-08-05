@@ -333,3 +333,45 @@ test.describe('Denominator policy — NRBC in peripheral blood (URS-030, DCR-006
         await expect(page.locator('#val-grand-total')).toHaveText('200');
     });
 });
+
+// ================================================================
+test.describe('Sampling precision (URS-037, HA-030)', () => {
+
+    test('VV-SYS-110: The report states a confidence interval for each percentage', async ({ page }) => {
+        await startCount(page, 'S25-CI');
+        await count(page, 'x', 40);    // blasts
+        await count(page, 'f', 160);   // segs
+        await page.click('#btnCountDone');
+
+        const summary = await page.locator('#results-summary').innerText();
+        expect(summary).toContain('20.00%');
+        // 40 of 200 = 20%; Wilson 95% interval 15.0-26.1%
+        expect(summary).toContain('15.0–26.1%');
+    });
+
+    test('VV-SYS-111: A sub-target count carries a quantified advisory', async ({ page }) => {
+        await startCount(page, 'S25-LOW');
+        await count(page, 'x', 100);
+        await page.click('#btnCountDone');
+
+        await expect(page.locator('#low-count-note')).toBeVisible();
+        const note = await page.locator('#low-count-note').innerText();
+        expect(note).toContain('100-cell count');
+        expect(note).toContain('95% confidence interval');
+        // The vague wording it replaced said only "confidence reduced".
+        expect(note).toMatch(/\d+\.\d–\d+\.\d%/);
+    });
+
+    test('VV-SYS-112: A zero count is reported as bounded, not absent', async ({ page }) => {
+        await startCount(page, 'S25-ZERO');
+        await count(page, 'f', 200);   // no blasts counted
+        await page.click('#btnCountDone');
+
+        const ci = await page.evaluate(() =>
+            window.__wbcTestHooks.state.sessionHistory[0].confidenceIntervals.blasts);
+        expect(ci.point).toBe(0);
+        expect(ci.lower).toBe(0);
+        expect(ci.upper).toBeGreaterThan(0);
+        expect(ci.upper).toBeLessThan(2.5);
+    });
+});

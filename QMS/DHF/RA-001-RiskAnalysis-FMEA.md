@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | RA-001 |
-| **Version** | 2.3 |
+| **Version** | 2.4 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-04 |
@@ -110,7 +110,7 @@ This FMEA covers all software functionality described in the SRS and SDD, focusi
 
 | # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
 |---|-------------|-----------------|---|-------|---|-----------------|---|-----|-----------|----------------------------|-------------|
-| HA-030 | Count finalized with too few cells | Statistically invalid differential; misleading percentages | 4 | Operator clicks Count Done prematurely; inadequate specimen | 4 | **None (current design has no minimum check)** | 4 | **64** | **High** | SYS-052/053: Advisory target count (BM=500, PB=200) displayed via progress indicator. Non-blocking informational note when below target. SYS-120/121: Progress indicator shows current/target in real time. SYS-057/058: Continue Counting allows adding more cells after reviewing interim results. | 4x3x2 = **24** (Medium). **Accepted** — pathologists know when specimens are paucicellular; advisory approach matches clinical workflow. |
+| HA-030 | Count finalized with too few cells | Statistically invalid differential; misleading percentages | 4 | Operator clicks Count Done prematurely; inadequate specimen | 4 | **None (current design has no minimum check)** | 4 | **64** | **High** | SYS-052/053: advisory target count displayed via progress indicator, non-blocking note below target. SYS-120/121: progress shown in real time. SYS-057/058: Continue Counting adds cells after reviewing interim results. **SYS-190–195 (v2.3):** every reported percentage now carries a binomial confidence interval, and the sub-target advisory states a computed interval rather than a general caution. | 4x3x1 = **12** (Low). **Re-scored under DCR-007.** Detection improves from Low to Certain: the imprecision is no longer something the operator must infer from the cell count, it is printed beside each percentage. Occurrence is unchanged — the target remains advisory by design, per URS-041. |
 | HA-031 | Count modified after finalization | Reported result no longer matches output | 4 | Inputs remain editable after Count Done | 3 | **None (current design does not lock inputs)** | 4 | **48** | **Medium** | SYS-055: Set all inputs to readonly after Count Done. SYS-054: Detach keydown listener. | 4x1x2 = **8** (Low) |
 
 ### 4.5 Data Loss Hazards
@@ -161,6 +161,8 @@ primary text against the shipped configuration.
 
 | HA-092 | A category that is not part of the differential is included in its percentage denominator | Every reported percentage in that differential is depressed. In peripheral blood, nucleated red cells are enumerated with the leucocytes but are not leucocytes; counting them into the denominator understates every leucocyte percentage in proportion to how many are present. With 20 NRBC among 200 cells a true 66.7% neutrophil proportion reports as 60.0%. The error is largest in exactly the conditions that produce NRBC — haemolysis, myelophthisis, marrow infiltration, neonatal samples — and is invisible in the output, since the percentages remain internally consistent and sum to 100 | 4 | The profile schema had no way to express that a counted category sits outside the differential; every counted cell entered the denominator | 4 | **None** — the differential is self-consistent and gives the reviewer nothing to notice | 4 | **64** | **High** | SYS-180–SYS-185: a profile designates categories excluded from the denominator and reports them per 100 of it. The shipped peripheral blood profile excludes NRBC and reports NRBC per 100 WBC. Bone marrow is unchanged: ICSH 2008 §2.6 places erythroblasts inside the nucleated differential count. Validation rejects a profile that excludes every category or that reports a category both ways. | 4x1x2 = **8** (Low). Verified at all three layers: VV-DEN-001 to 006, TC-B100 to B107, VV-SYS-100 to 102. Detection improves because the counting grid and the report now state the differential denominator and the overall tally separately, so a discrepancy is visible. |
 
+| HA-093 | The M:E ratio is displayed to a precision the count does not support | A ratio of two counted proportions carries the sampling error of both and is substantially less precise than either. Displaying "2.1:1" invites comparison between successive marrow examinations at a resolution the counts cannot sustain, potentially reading a change in disease where only sampling noise exists | 2 | The ratio is rendered at the precision the configuration specifies, with nothing stated about its uncertainty | 3 | **None** | 3 | **18** | **Medium** | The M:E display carries an advisory that the ratio inherits the imprecision of both percentages (Rümke 1985, REF-001 [S4] and §3.8), directing that it be read alongside cellularity and the trephine biopsy. A computed interval for a ratio requires Fieller's theorem or a bootstrap and is deferred. | 2x3x2 = **12** (Low). **Residual accepted pending a ratio interval.** The M:E ratio is a secondary parameter interpreted in context, never a threshold test, which bounds the consequence. |
+
 ### 4.10 Hazards Identified in the v2.1 Design Review (DCR-004)
 
 | # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
@@ -178,10 +180,10 @@ primary text against the shipped configuration.
 |-----------|-------|-----------|
 | Critical (75-125) | 1 | HA-001 |
 | High (50-74) | 4 | HA-003, HA-030, HA-080, HA-092 |
-| Medium (16-49) | 23 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
+| Medium (16-49) | 24 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
 | Low (1-15) | 9 | HA-023, HA-040, HA-041, HA-050, HA-051, HA-060, HA-062, HA-070, HA-072 |
 
-Total: **37** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
+Total: **38** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
 
 _Two counting errors in the v2.0 table are corrected here: the Medium row was
 labelled 14 against a list of 16 entries and the Low row 8 against a list of 10,
@@ -194,8 +196,8 @@ Every RPN in section 4 has been recomputed from its S, O and D values._
 |-----------|-------|
 | Critical (75-125) | **0** |
 | High (50-74) | **0** |
-| Medium (16-49) | **3** (HA-001 RPN=45, HA-002 RPN=30, HA-030 RPN=24) |
-| Low (1-15) | **34** |
+| Medium (16-49) | **2** (HA-001 RPN=45, HA-002 RPN=30) |
+| Low (1-15) | **36** |
 
 All three residual Medium risks are accepted by design and unchanged from v2.0;
 their rationale is in section 5.3. No residual risk sits above Medium.
@@ -238,7 +240,7 @@ editor and was not caught by any validation.
 After implementation of all defined mitigations:
 - **HA-001** (count without case number) remains Medium (RPN=45) because case number is optional by design. Physical context at the microscope identifies the specimen. Institutions requiring traceability can enable `requireCaseNumber: true` in their profile. **Accepted** by design — stakeholder feedback confirms physical context identifies specimen; forcing case number kills adoption.
 - **HA-002** (wrong case number entered) remains Medium (RPN=30) because this is fundamentally a human transcription error that cannot be fully prevented by software. Mitigation reduces probability through persistent display but cannot eliminate the root cause. **Accepted** with SOP mitigation (verification against slide label).
-- **HA-030** (insufficient cell count) remains Medium (RPN=24) because the advisory approach intentionally allows subthreshold counts for paucicellular specimens. The progress indicator makes the target visible at all times, and Continue Counting enables recovery without restarting. **Accepted** — pathologists know when specimens are paucicellular; advisory approach matches clinical workflow.
+- **HA-030** (insufficient cell count) is reduced to Low (RPN=12) under DCR-007. The advisory approach still intentionally allows subthreshold counts for paucicellular specimens, so occurrence is unchanged; but the consequence is now visible rather than inferred, because each reported percentage carries a confidence interval and the sub-target note states a computed one. **Accepted** — pathologists know when specimens are paucicellular, and the interval tells them what that costs in precision.
 
 ### 5.4 Verification of mitigations
 
@@ -310,6 +312,7 @@ residual scores above to be treated as evidence rather than intent.
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete FMEA |
 | B | 2026-02-24 | QMS | v2.0 update: optional case number (HA-001), advisory target count replacing blocking dialog (HA-030), unified key mappings (HA-010), new hazards for M:E ratio (HA-070, HA-072) and Continue Counting (HA-071), updated risk summary |
+| F | 2026-08-05 | QMS | v2.4 (DCR-007): HA-093 added — the M:E ratio is displayed at a precision the count does not support, which is the imprecision Rümke's paper actually concerns. HA-030 re-scored 24 → 12: the sub-target advisory now states a computed confidence interval rather than a general caution, so detection improves from Low to Certain. Residual Medium risks reduce from 3 to 2. |
 | E | 2026-08-05 | QMS | v2.3 (DCR-006): HA-092 added — a category outside the differential included in its percentage denominator. Pre-RPN 64 (High), residual 8. This was live in the shipped peripheral blood profile: NRBC sat in the denominator, understating every leucocyte percentage. |
 | D | 2026-08-05 | QMS | v2.2 (DCR-005): HA-090 and HA-091 added from the ICSH standards review. |
 | C | 2026-08-04 | QMS | v2.1 update (DCR-004). Five hazards added from the design review: HA-080 (hidden key-mapped category, pre-RPN 50 High), HA-063, HA-043, HA-081, HA-064. Four residual RPNs corrected where the v2.0 score credited a control absent from the code: HA-022 (8→4), HA-041 (9→3), HA-060 (6→3), HA-061 (8→4); HA-062 unchanged at 5 but now supported. HA-014 mitigation revised — the specimen selector is no longer locked, per URS-010. Section 5.1 counting errors corrected (Medium 14→21, Low 8→9, HA-021 refiled). Section 5.4 added: every mitigation now maps to a test that executes shipped code. Sections 6.2 and 6.3 added. Severity ratings unchanged throughout and require clinical sign-off. |

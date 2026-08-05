@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 2.2 |
+| **Version** | 2.3 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -205,6 +205,20 @@ Added in v2.2 under DCR-006.
 | SYS-184 | Output SHALL distinguish the differential denominator (`{{total}}`) from the total cells tallied (`{{totalCounted}}`), and SHALL provide `{{<cellType>_per100}}` for excluded categories. Absolute counts SHALL NOT be derived for an excluded category. | URS-036, URS-052 |
 | SYS-185 | Configuration validation SHALL reject a profile that excludes every category from the denominator, that names an undisplayed category in `denominatorExcludes` or `per100Reporting`, or that requests per-100 reporting for a category still inside the denominator. | URS-100 |
 
+### 4.13b Sampling Precision Module (URS-037, URS-041)
+
+Added in v2.3 under DCR-007.
+
+| ID | Requirement | Trace |
+|----|------------|-------|
+| SYS-190 | The system SHALL compute a binomial confidence interval for each reported differential percentage, from the raw count and the differential denominator, never from the rounded percentage. | URS-037 |
+| SYS-191 | The interval SHALL use the Wilson score method. The Wald normal approximation SHALL NOT be used: its coverage is inadequate for small denominators and proportions near zero, and it yields impossible negative bounds for rare categories (REF-001 [S7]). | URS-037 |
+| SYS-192 | Interval bounds SHALL remain within 0–100% for every input, including zero and saturated counts. A zero count SHALL yield a bounding interval rather than no interval. | URS-037 |
+| SYS-193 | The confidence level SHALL be configurable per specimen type (0.90, 0.95, 0.99; default 0.95), and interval display SHALL be disableable. Validation SHALL reject an unsupported level. | URS-037, URS-100 |
+| SYS-194 | The sub-target advisory SHALL state a computed interval at a clinically meaningful proportion, rather than a general statement that confidence is reduced. | URS-041 |
+| SYS-195 | Intervals, the confidence level, the differential denominator and the exclusion list SHALL be carried in the session record and in CSV and JSON export, so that an archived result can be reconstructed. | URS-052, URS-084 |
+| SYS-196 | Where a derived ratio is displayed, the interface SHALL indicate that a ratio of two counted proportions is less precise than either (REF-001 §3.8). A computed interval for a ratio is not required by this revision. | URS-035 |
+
 ### 4.14 Audio Feedback Module (URS-027, URS-097)
 
 Added in v2.1 under DCR-004. This functionality was implemented and shipping in
@@ -383,6 +397,7 @@ Phase 2 item.
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
 | B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
 | C | 2026-02-20 | QMS | Added theme toggle requirements |
+| G | 2026-08-05 | QMS | v2.3 (DCR-007): added SYS-190–SYS-196, the sampling precision module. Every reported percentage carries a Wilson confidence interval; the sub-target advisory is quantified; a derived ratio carries an imprecision advisory. |
 | F | 2026-08-05 | QMS | v2.2 (DCR-006): added SYS-180–SYS-185, the differential denominator module. A category may be counted without belonging to the percentage denominator, and is reported per 100 of it instead — the peripheral blood NRBC convention. |
 | E | 2026-08-04 | QMS | v2.1 (DCR-004): added SYS-140–SYS-179 for audio feedback, autosave/recovery, absolute counts, handedness, output traceability, offline operation, preset catalogue and the configuration editor — all implemented and shipping in v2.0 with no system requirement behind them. Added SYS-104–SYS-109 for configuration validation and resolution, and SYS-S04–SYS-S07 for output/export safety. |
 | D | 2026-02-24 | QMS | Major revision v2.0: unified 14-cell layout, advisory target counts, M:E ratio, Continue Counting, two-row categories, optional case number, non-blocking count completion. Traced to URS-001 v2.0 and SPC-001 v1.2. See Section 9 for full change summary. |

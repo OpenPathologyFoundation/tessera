@@ -39,6 +39,7 @@ solving it.
 | **[S4]** | Rümke CL. The imprecision of the ratio of two percentages observed in differential white blood cell counts: a warning. *Blood Cells* 1985;11(1):137–140. PMID 4074888 | **Not held — abstract only** | Binomial confidence intervals for differential percentages |
 | **[S5]** | Is a 500-Cell Count Necessary for Bone Marrow Differentials? *Am J Clin Pathol* 2018;150(1):84–89. | Summary read | Evidence that 300-cell counts are diagnostically non-inferior |
 | **[S6]** | WHO Classification of Haematolymphoid Tumours, 5th ed. (2022) and International Consensus Classification (2022). | Secondary sources | Blast percentage denominator; diagnostic thresholds |
+| **[S7]** | Brown LD, Cai TT, DasGupta A. **Interval estimation for a binomial proportion.** *Statist Sci* 2001;16(2):101–133. | Summary read | Choice of the Wilson score interval over the Wald approximation |
 
 **Sources not held in full text are marked as such deliberately.** Where a
 requirement rests on [S2], [S3], [S4] or [S6], the citation in URS-001 or
@@ -190,13 +191,64 @@ diagnosis.
 
 ## 5. Requirement Gaps Identified From the Literature
 
+### 3.7 Sampling precision (module M4)
+
+A differential count is a sample. The observed percentage carries binomial
+sampling error that is large at the counts used in practice, and proportionally
+largest for the rare populations that carry the most diagnostic weight.
+
+The application reports a **Wilson score interval** for each percentage. The
+obvious alternative, the Wald normal approximation, is rejected: its coverage is
+poor precisely where this application needs it — small denominators and
+proportions near zero — and it produces impossible negative lower bounds. Two
+blasts in 200 cells gives a Wald lower bound below zero, which would be worse
+than reporting nothing. [S7] documents this and recommends Wilson, which is
+bounded within [0,1] by construction. Verified in suite 01, VV-CI-002.
+
+Two consequences are worth stating plainly, because both are visible in the
+shipped behaviour:
+
+- **A zero count bounds rather than excludes.** Zero blasts in 200 cells gives
+  an upper bound near 1.9%. That is a real statement about what the count has
+  ruled out, and the application now makes it.
+- **A 200-cell count does not resolve the 20% blast threshold.** An observed 20%
+  at 200 cells carries a 95% interval of 15.0–26.1%, which spans the cutoff. At
+  500 cells it is 16.7–23.7% — narrower, and still spanning. This is not a
+  defect in the tool; it is the statistical reality that ICSH §2.6 addresses by
+  directing that the count be extended near a critical threshold. The
+  `intervalSpans()` primitive added in this module is the test for that
+  condition, and is the foundation for the near-threshold prompt deferred to
+  module M5.
+
+### 3.8 What [S4] actually warns about
+
+Rümke's 1985 title is *"The imprecision of the ratio of two percentages observed
+in differential white blood cell counts: a warning."* The subject is **ratios**,
+not single percentages — and the M:E ratio this application computes is exactly
+such a ratio.
+
+A ratio of two counted proportions inherits the sampling error of both, and is
+materially less precise than either. The application displays the M:E ratio to
+one decimal place, which implies a precision the underlying count does not
+support. An interval for a ratio requires Fieller's theorem or a bootstrap and
+is **not** computed in this module; the display instead carries an advisory
+stating that the ratio is less precise than the percentages it derives from.
+Recorded as RA-001 HA-093 and deferred to a future module.
+
+The primary text of [S4] is not held. The statistical claim above is standard
+and does not rest on it, but the specific tabulated values Rümke published
+should be checked against the paper before any of them are quoted.
+
+---
+
 | Gap | Source | Status |
 |-----|--------|--------|
 | No prompt to extend the count when an abnormal percentage sits near a diagnostic threshold | [S1] §2.6 | **Open** — candidate requirement, module M5 |
 | Target count rule is unconditional; ICSH makes 500 vs 300 depend on diagnostic intent | [S1] §2.6 | **Open** — profiles should offer both with the rule stated |
 | `other` category has no ICSH counterpart and may capture cells ICSH excludes | [S1] §2.6 | **Partially addressed** — guidance added; see RA-001 HA-090 |
 | Generic `blasts` category cannot distinguish myeloblasts for M:E purposes | [S1] §2.6 | **Documented limitation** — RA-001 HA-091 |
-| No confidence interval on reported percentages | [S4] | **Open** — module M4 |
+| No confidence interval on reported percentages | [S4] | **Closed** — module M4, DCR-007 |
+| No interval on the M:E **ratio**, which is what [S4] actually warns about | [S4] | **Open** — needs Fieller or bootstrap; advisory shown meanwhile (HA-093) |
 | No comparison against published normal ranges for the NDC | [S1] §2.6 | Out of scope — requires age-stratified reference data |
 | Reference method is two observers × 200 cells | [S2] | Out of scope (URS §6, Phase 2) |
 
@@ -206,6 +258,7 @@ diagnosis.
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| B | 2026-08-05 | QMS | Added [S7] (Brown, Cai & DasGupta) as the basis for choosing Wilson over Wald. Added §3.7 sampling precision and §3.8 on what Rümke's warning actually concerns — ratios, not single percentages, which makes the M:E display the affected element. |
 | A | 2026-08-05 | QMS | Initial issue. ICSH 2008 [S1] verified against full text; counting model, M:E definition and target counts traced to source. Sources not held in full text explicitly marked. |
 
 ## 7. Approval Signatures

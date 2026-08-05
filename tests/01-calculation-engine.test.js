@@ -337,3 +337,137 @@ describe('Calculation Engine — Low Count Advisory (URS-041, SYS-053)', () => {
         assert.equal(Core.buildLowCountNote(100, undefined), null);
     });
 });
+
+// ================================================================
+describe('Sampling Precision — Wilson confidence intervals (URS-037, HA-030)', () => {
+
+    it('VV-CI-001: Known Wilson values are reproduced', () => {
+        // Hand-checked against the closed form. 10 of 200 = 5%.
+        const ci = Core.wilsonInterval(10, 200, 0.95);
+        assert.equal(ci.point, 5);
+        assert.equal(Number(ci.lower.toFixed(2)), 2.74);
+        assert.equal(Number(ci.upper.toFixed(2)), 8.96);
+        assert.equal(ci.n, 200);
+        assert.equal(ci.level, 0.95);
+    });
+
+    it('VV-CI-002: Bounds are never impossible, where Wald would be', () => {
+        // 2 blasts in 200 cells. The Wald interval puts the lower bound below
+        // zero here; that is why Wilson is used (REF-001 [S7]).
+        const p = 2 / 200;
+        const waldLower = (p - 1.959964 * Math.sqrt(p * (1 - p) / 200)) * 100;
+        assert.ok(waldLower < 0, 'precondition: Wald is negative for this count');
+
+        const ci = Core.wilsonInterval(2, 200);
+        assert.ok(ci.lower >= 0, 'Wilson lower bound must not be negative');
+        assert.ok(ci.upper <= 100);
+        assert.ok(ci.lower > 0, 'a non-zero count should have a non-zero lower bound');
+    });
+
+    it('VV-CI-003: A zero count still says something', () => {
+        // 0 blasts in 200 cells does not exclude blasts; it bounds them.
+        const ci = Core.wilsonInterval(0, 200);
+        assert.equal(ci.point, 0);
+        assert.equal(ci.lower, 0);
+        assert.ok(ci.upper > 1 && ci.upper < 2.5, `unexpected upper bound ${ci.upper}`);
+    });
+
+    it('VV-CI-004: A saturated count is bounded at 100', () => {
+        const ci = Core.wilsonInterval(200, 200);
+        assert.equal(ci.point, 100);
+        assert.equal(ci.upper, 100);
+        assert.ok(ci.lower > 95 && ci.lower < 100);
+    });
+
+    it('VV-CI-005: Intervals narrow as the count grows', () => {
+        const widths = [100, 200, 500, 1000].map(n => {
+            const ci = Core.wilsonInterval(0.05 * n, n);
+            return ci.upper - ci.lower;
+        });
+        for (let i = 1; i < widths.length; i++) {
+            assert.ok(widths[i] < widths[i - 1],
+                `interval at index ${i} (${widths[i]}) should be narrower than ${widths[i - 1]}`);
+        }
+    });
+
+    it('VV-CI-006: Higher confidence gives a wider interval', () => {
+        const w = lvl => {
+            const ci = Core.wilsonInterval(10, 200, lvl);
+            return ci.upper - ci.lower;
+        };
+        assert.ok(w(0.90) < w(0.95));
+        assert.ok(w(0.95) < w(0.99));
+    });
+
+    it('VV-CI-007: The interval always contains the point estimate', () => {
+        for (const n of [50, 100, 200, 500]) {
+            for (let c = 0; c <= n; c += Math.max(1, Math.floor(n / 20))) {
+                const ci = Core.wilsonInterval(c, n);
+                assert.ok(ci.lower <= ci.point + 1e-9 && ci.point <= ci.upper + 1e-9,
+                    `${c}/${n}: point ${ci.point} outside [${ci.lower}, ${ci.upper}]`);
+            }
+        }
+    });
+
+    it('VV-CI-008: Degenerate input yields null, not a bogus interval', () => {
+        assert.equal(Core.wilsonInterval(5, 0), null, 'no cells counted');
+        assert.equal(Core.wilsonInterval(-1, 200), null, 'negative count');
+        assert.equal(Core.wilsonInterval(10, 5), null, 'count exceeds denominator');
+        assert.equal(Core.wilsonInterval(NaN, 200), null);
+    });
+
+    it('VV-CI-009: The AML blast threshold is not resolved by a 200-cell count', () => {
+        // The clinically important case. An observed 20% at 200 cells has an
+        // interval spanning the 20% cutoff, so the count does not establish
+        // which side of it the true value lies on.
+        const ci = Core.wilsonInterval(40, 200);
+        assert.ok(Core.intervalSpans(ci, 20), '20% at n=200 must straddle the cutoff');
+        assert.ok(ci.lower < 20 && ci.upper > 20);
+
+        // A 500-cell count narrows it but still straddles — an honest result.
+        const bigger = Core.wilsonInterval(100, 500);
+        assert.ok(Core.intervalSpans(bigger, 20));
+        assert.ok((bigger.upper - bigger.lower) < (ci.upper - ci.lower));
+    });
+
+    it('VV-CI-010: A count far from a threshold does not straddle it', () => {
+        const ci = Core.wilsonInterval(10, 500);   // 2%
+        assert.equal(Core.intervalSpans(ci, 20), false);
+    });
+
+    it('VV-CI-011: Interval formatting is stable', () => {
+        assert.equal(Core.formatInterval(Core.wilsonInterval(10, 200), 1), '2.7–9.0%');
+        assert.equal(Core.formatInterval(null), 'N/A');
+    });
+
+    it('VV-CI-012: Cells-for-precision answers the "how many more" question', () => {
+        const n = Core.cellsForPrecision(0.20, 2);
+        assert.ok(n > 1000 && n < 2000, `unexpected sample size ${n}`);
+        // Tighter precision costs more cells.
+        assert.ok(Core.cellsForPrecision(0.20, 1) > n);
+        assert.equal(Core.cellsForPrecision(0.20, 0), null);
+        assert.equal(Core.cellsForPrecision(-0.1, 2), null);
+    });
+});
+
+// ================================================================
+describe('Low Count Advisory — quantified (URS-041, HA-030)', () => {
+
+    it('VV-LOW-004: The advisory states an actual interval, not a vague warning', () => {
+        const note = Core.buildLowCountNote(216, 500);
+        assert.match(note, /216-cell count/);
+        assert.match(note, /95% confidence interval/);
+        assert.match(note, /\d+\.\d–\d+\.\d%/, 'must contain a computed interval');
+    });
+
+    it('VV-LOW-005: The stated interval matches the engine', () => {
+        const note = Core.buildLowCountNote(216, 500);
+        const expected = Core.formatInterval(Core.wilsonInterval(0.05 * 216, 216), 1);
+        assert.ok(note.includes(expected),
+            `note should contain ${expected}; got: ${note}`);
+    });
+
+    it('VV-LOW-006: The advisory honours the configured confidence level', () => {
+        assert.match(Core.buildLowCountNote(216, 500, 0.99), /99% confidence interval/);
+    });
+});

@@ -907,3 +907,107 @@ describe('Behaviour — Denominator policy (URS-030, DCR-006)', () => {
         h.close();
     });
 });
+
+// ================================================================
+describe('Behaviour — Confidence intervals (URS-037, HA-030)', () => {
+
+    it('TC-B110: The results screen states an interval beside each percentage', async () => {
+        const h = await counting({ caseNumber: 'S25-CI' });
+        h.press('X', 40);    // blasts
+        h.press('F', 160);   // segs
+        h.click('btnCountDone');
+
+        const summary = h.el('results-summary').textContent;
+        assert.match(summary, /20\.00%/, 'point estimate shown');
+        // 40/200 = 20%, Wilson 95% CI is 15.0-26.1%
+        assert.match(summary, /15\.0–26\.1%/, 'interval shown beside it');
+        h.close();
+    });
+
+    it('TC-B111: Intervals are computed from the differential denominator', async () => {
+        // In peripheral blood the NRBC sit outside the differential, so the
+        // interval must be over the leucocytes, not all cells tallied.
+        const h = await boot();
+        h.el('caseNumber').value = 'S25-PBCI';
+        h.el('specimenType').value = 'pb';
+        h.el('specimenType').dispatchEvent(new h.window.Event('change', { bubbles: true }));
+        h.click('btnStartCount');
+        h.press('F', 120);
+        h.press('S', 60);
+        h.press('B', 20);    // NRBC — excluded
+        h.click('btnCountDone');
+
+        const session = h.hooks.state.sessionHistory[0];
+        assert.equal(session.confidenceIntervals.poly.n, 180,
+            'the interval denominator is the differential, not the 200 cells tallied');
+        assert.equal(session.confidenceIntervals.nrbc, undefined,
+            'an excluded category has no interval on the differential');
+        h.close();
+    });
+
+    it('TC-B112: The low-count advisory carries a computed interval', async () => {
+        const h = await counting({ caseNumber: 'C1' });
+        h.press('X', 216);
+        h.click('btnCountDone');
+        const note = h.text('low-count-note');
+        assert.match(note, /216-cell count/);
+        assert.match(note, /95% confidence interval/);
+        assert.match(note, /\d+\.\d–\d+\.\d%/);
+        h.close();
+    });
+
+    it('TC-B113: A profile may disable intervals', async () => {
+        const cfg = clone(DEFAULT_CONFIG);
+        cfg.specimenTypes.forEach(s => { s.confidenceIntervals = { enabled: false }; });
+        const h = await counting({ config: cfg, caseNumber: 'C1' });
+        h.press('X', 40);
+        h.press('F', 160);
+        h.click('btnCountDone');
+        assert.equal(h.hooks.state.sessionHistory[0].confidenceIntervals, null);
+        assert.doesNotMatch(h.el('results-summary').textContent, /15\.0–26\.1%/);
+        h.close();
+    });
+
+    it('TC-B114: The configured confidence level is honoured', async () => {
+        const cfg = clone(DEFAULT_CONFIG);
+        cfg.specimenTypes.forEach(s => { s.confidenceIntervals = { enabled: true, level: 0.99 }; });
+        const h = await counting({ config: cfg, caseNumber: 'C1' });
+        h.press('X', 40);
+        h.press('F', 160);
+        h.click('btnCountDone');
+        const session = h.hooks.state.sessionHistory[0];
+        assert.equal(session.confidenceLevel, 0.99);
+        assert.equal(session.confidenceIntervals.blasts.level, 0.99);
+        // A 99% interval is wider than the 95% one.
+        const ci = session.confidenceIntervals.blasts;
+        assert.ok(ci.lower < 15.0 && ci.upper > 26.1);
+        h.close();
+    });
+
+    it('TC-B115: Intervals reach the CSV archive', async () => {
+        const h = await counting({ caseNumber: 'S25-CSV' });
+        h.press('X', 40);
+        h.press('F', 160);
+        h.click('btnCountDone');
+        h.click('btnExportCsv');
+        const csv = await h.downloadText(0);
+        const header = csv.split('\n')[0];
+        assert.ok(header.includes('confidenceIntervals'));
+        assert.ok(header.includes('confidenceLevel'));
+        assert.ok(header.includes('differentialTotal'),
+            'the denominator the percentages were computed over must be archived');
+        assert.match(csv, /0\.95/);
+        h.close();
+    });
+
+    it('TC-B116: A zero count still yields a bounding interval', async () => {
+        const h = await counting({ caseNumber: 'C1' });
+        h.press('F', 200);   // no blasts at all
+        h.click('btnCountDone');
+        const ci = h.hooks.state.sessionHistory[0].confidenceIntervals.blasts;
+        assert.equal(ci.point, 0);
+        assert.equal(ci.lower, 0);
+        assert.ok(ci.upper > 0, '0 blasts in 200 cells bounds blasts, it does not exclude them');
+        h.close();
+    });
+});

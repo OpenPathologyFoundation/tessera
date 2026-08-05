@@ -1023,6 +1023,27 @@
         return Core.percentagesSummingTo100(state.counts, 2, { exclude: denominatorExcludes() });
     }
 
+    /**
+     * Binomial confidence intervals for each category in the differential
+     * (URS-037). Computed from the raw counts and the differential denominator,
+     * never from the rounded percentage.
+     */
+    function computeIntervals() {
+        var sc = getSpecConfig();
+        var cfg = (sc && sc.confidenceIntervals) || {};
+        if (cfg.enabled === false) return null;
+        var excl = denominatorExcludes();
+        var n = Core.getDenominator(state.counts, excl);
+        if (n === 0) return null;
+        var out = {};
+        Object.keys(sc.outCodes).forEach(function (k) {
+            var ct = sc.outCodes[k];
+            if (excl.indexOf(ct) !== -1) return;
+            out[ct] = Core.wilsonInterval(state.counts[ct] || 0, n, cfg.level);
+        });
+        return out;
+    }
+
     /** Per-100 values for categories reported against the differential. */
     function computePer100Values() {
         var sc = getSpecConfig();
@@ -1073,8 +1094,9 @@
         if (specConfig.formulas && specConfig.formulas.ME_ratio) {
             var meLabel = specConfig.formulas.ME_ratio.label || 'M:E Ratio';
             html += '<div class="mt-2 flex items-center justify-between px-2">';
-            html += '<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">' +
-                Core.escapeHtml(meLabel) + '</span>';
+            html += '<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider" ' +
+                'title="' + Core.escapeAttr('A ratio of two counted proportions carries the sampling error of both, and is therefore substantially less precise than either percentage alone (Rumke 1985). Interpret alongside cellularity and the trephine biopsy; treat small differences between successive ratios with caution.') + '">' +
+                Core.escapeHtml(meLabel) + ' <span class="text-[9px] text-slate-500">&#9662;</span></span>';
             html += '<span class="text-lg font-mono font-semibold text-slate-300" id="val-me-ratio">N/A</span>';
             html += '</div>';
         }
@@ -1385,13 +1407,17 @@
             differentialTotal: differentialTotal,
             denominatorExcludes: excl.slice(),
             per100: computePer100Values(),
+            confidenceIntervals: computeIntervals(),
+            confidenceLevel: (specConfig.confidenceIntervals &&
+                specConfig.confidenceIntervals.level) || 0.95,
             counts: Object.assign({}, state.counts),
             percentages: percentages,
             meRatio: computeMERatio(specConfig),
             morphologyComments: buildMorphologyOutput(),
             // The advisory target counts classified cells, so it is measured
             // against the differential rather than the overall tally.
-            lowCountNote: Core.buildLowCountNote(differentialTotal, specConfig.targetCount),
+            lowCountNote: Core.buildLowCountNote(differentialTotal, specConfig.targetCount,
+                (specConfig.confidenceIntervals && specConfig.confidenceIntervals.level) || 0.95),
             outputs: {}
         };
 
@@ -1486,6 +1512,15 @@
             } else {
                 summaryHtml += '<span class="font-mono font-semibold text-slate-300">' +
                     (typeof pct === 'number' ? pct.toFixed(2) : '0.00') + '%</span>';
+                // The count is a sample; the interval states how much of the
+                // reported figure is sampling error (URS-037).
+                var ci = session.confidenceIntervals && session.confidenceIntervals[ct];
+                if (ci) {
+                    summaryHtml += '<span class="font-mono text-[10px] text-slate-500" ' +
+                        'title="' + Core.escapeAttr(Math.round((session.confidenceLevel || 0.95) * 100) +
+                        '% confidence interval from ' + ci.n + ' cells counted') + '">' +
+                        Core.escapeHtml(Core.formatInterval(ci, 1)) + '</span>';
+                }
             }
             summaryHtml += '</div>';
         });
@@ -1493,7 +1528,8 @@
 
         if (session.meRatio) {
             summaryHtml += '<div class="mt-3 text-sm text-slate-300 border-t border-slate-700/50 pt-2">';
-            summaryHtml += '<span class="text-slate-500 text-xs font-medium uppercase">M:E Ratio:</span> ';
+            summaryHtml += '<span class="text-slate-500 text-xs font-medium uppercase" ' +
+                'title="' + Core.escapeAttr('A ratio of two counted proportions carries the sampling error of both, and is therefore substantially less precise than either percentage alone (Rumke 1985). Interpret alongside cellularity and the trephine biopsy; treat small differences between successive ratios with caution.') + '">M:E Ratio:</span> ';
             summaryHtml += '<span class="font-mono font-semibold">' + Core.escapeHtml(session.meRatio) + '</span>';
             summaryHtml += '</div>';
         }

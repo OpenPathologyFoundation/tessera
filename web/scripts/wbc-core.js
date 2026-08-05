@@ -305,6 +305,124 @@
         return Number(value).toFixed(d) + '%';
     }
 
+    // ================================================================
+    // SAMPLING PRECISION (URS-037, SYS-190 to SYS-195)
+    // ================================================================
+
+    // Two-sided normal quantiles for the supported confidence levels.
+    var Z_SCORES = { 0.90: 1.644854, 0.95: 1.959964, 0.99: 2.575829 };
+
+    /**
+     * Binomial confidence interval for an observed differential proportion,
+     * by the Wilson score method.
+     *
+     * A differential count is a sample: 200 cells drawn from a smear containing
+     * far more. The observed percentage therefore carries sampling error that
+     * is large at the counts used in practice and largest for the rare
+     * populations that matter most diagnostically. Rümke's warning (REF-001
+     * [S4]) is the classic statement of this for differential counting.
+     *
+     * METHOD CHOICE. The obvious implementation is the Wald interval,
+     * p ± z·sqrt(p(1−p)/n). It is rejected here: its coverage is poor precisely
+     * where this application needs it — small n, and proportions near zero —
+     * and it produces impossible negative lower bounds for rare categories. A
+     * count of 2 blasts in 200 cells yields a Wald lower bound below zero,
+     * which would be worse than showing nothing at all. Brown, Cai & DasGupta
+     * (Statist. Sci. 2001;16(2):101–133) document this and recommend Wilson,
+     * which is bounded within [0,1] by construction and behaves sensibly at
+     * zero counts. See REF-001 [S7].
+     *
+     * A zero count is informative rather than degenerate: 0 blasts in 200 cells
+     * gives an upper bound near 1.9%, which is a real statement about what the
+     * count has excluded.
+     *
+     * @param {number} count       cells observed in this category
+     * @param {number} n           the differential denominator
+     * @param {number} [level]     confidence level (0.90, 0.95, 0.99); default 0.95
+     * @returns {{lower:number, upper:number, point:number, n:number, level:number}|null}
+     *          bounds as percentages, or null when n is 0
+     */
+    function wilsonInterval(count, n, level) {
+        if (typeof n !== 'number' || !isFinite(n) || n <= 0) return null;
+        if (typeof count !== 'number' || !isFinite(count) || count < 0) return null;
+        if (count > n) return null;
+
+        var lvl = typeof level === 'number' ? level : 0.95;
+        var z = Z_SCORES[lvl] || Z_SCORES[0.95];
+
+        var p = count / n;
+        var z2 = z * z;
+        var denom = 1 + z2 / n;
+        var centre = (p + z2 / (2 * n)) / denom;
+        var margin = (z / denom) * Math.sqrt((p * (1 - p) / n) + (z2 / (4 * n * n)));
+
+        var lower = centre - margin;
+        var upper = centre + margin;
+        // Clamp: the arithmetic can leave a bound a hair outside [0,1].
+        if (lower < 0) lower = 0;
+        if (upper > 1) upper = 1;
+        // Snap float noise at the boundaries, so a saturated count reads
+        // "100.0%" rather than "99.99999999999999%".
+        if (Math.abs(lower) < 1e-9) lower = 0;
+        if (Math.abs(upper - 1) < 1e-9) upper = 1;
+
+        return {
+            point: p * 100,
+            lower: lower * 100,
+            upper: upper * 100,
+            n: n,
+            level: lvl
+        };
+    }
+
+    /**
+     * Render an interval for display, e.g. "2.7-9.0%".
+     */
+    function formatInterval(ci, decimals) {
+        if (!ci) return 'N/A';
+        var d = typeof decimals === 'number' ? decimals : 1;
+        return ci.lower.toFixed(d) + '–' + ci.upper.toFixed(d) + '%';
+    }
+
+    /**
+     * Whether an interval spans a value — the test for "this count does not
+     * resolve the question".
+     *
+     * ICSH 2008 §2.6 directs that the count be extended when an abnormal
+     * percentage sits "very close to a critical threshold for disease
+     * stratification". An interval straddling that threshold is the precise
+     * form of that condition: the observed percentage is on one side, but the
+     * count does not establish which side the true value lies on.
+     */
+    function intervalSpans(ci, threshold) {
+        if (!ci || typeof threshold !== 'number') return false;
+        return ci.lower <= threshold && ci.upper >= threshold;
+    }
+
+    /**
+     * Cells needed for a given absolute half-width at an observed proportion —
+     * answers "how many more cells would settle this?".
+     *
+     * Uses the Wald sample-size form, which is the standard planning
+     * approximation. It is used only to suggest additional counting effort, and
+     * never to state a result.
+     *
+     * @param {number} p          observed proportion (0-1)
+     * @param {number} halfWidth  desired half-width in percentage points
+     * @param {number} [level]
+     * @returns {number|null} cells required, rounded up
+     */
+    function cellsForPrecision(p, halfWidth, level) {
+        if (typeof p !== 'number' || p < 0 || p > 1) return null;
+        if (typeof halfWidth !== 'number' || halfWidth <= 0) return null;
+        var z = Z_SCORES[typeof level === 'number' ? level : 0.95] || Z_SCORES[0.95];
+        var d = halfWidth / 100;
+        // A zero observed proportion gives no width to work from; fall back to
+        // the most conservative case, p = 0.5.
+        var pp = (p === 0 || p === 1) ? 0.5 : p;
+        return Math.ceil((z * z * pp * (1 - pp)) / (d * d));
+    }
+
     /**
      * Compute a config-defined derived ratio, e.g. M:E (SYS-046, SYS-047).
      * Returns 'N/A' when the denominator is zero, or null when no formula
@@ -401,11 +519,23 @@
      * (URS-041 / SYS-053). Returns null when the target has been met.
      * Non-blocking by design: the target is advisory, never enforced.
      */
-    function buildLowCountNote(total, targetCount) {
+    function buildLowCountNote(total, targetCount, level) {
         if (typeof targetCount !== 'number' || targetCount <= 0) return null;
         if (total >= targetCount) return null;
-        return total + '-cell count (target ' + targetCount + '); statistical ' +
-            'confidence reduced for populations <5%.';
+
+        var note = total + '-cell count (target ' + targetCount + ').';
+
+        // State the imprecision rather than alluding to it. A worked interval
+        // at a clinically meaningful proportion says more than "confidence is
+        // reduced": it lets the reader see how wide the uncertainty actually
+        // is at the count achieved.
+        var ci = wilsonInterval(0.05 * total, total, level);
+        if (ci) {
+            var pct = Math.round((ci.level || 0.95) * 100);
+            note += ' At this count an observed 5% carries a ' + pct +
+                '% confidence interval of ' + formatInterval(ci, 1) + '.';
+        }
+        return note;
     }
 
     // ================================================================
@@ -438,12 +568,31 @@
         'configVersion',
         'targetCount',
         'totalCount',
+        'differentialTotal',
+        'denominatorExcludes',
         'meRatio',
         'morphologyComments',
         'counts',
         'percentages',
+        'per100',
+        'confidenceLevel',
+        'confidenceIntervals',
         'outputs'
     ];
+
+    /**
+     * Reduce intervals to [lower, upper] pairs for archiving — the point
+     * estimate and denominator are already carried in their own columns.
+     */
+    function compactIntervals(intervals) {
+        if (!intervals) return {};
+        var out = {};
+        Object.keys(intervals).forEach(function (ct) {
+            var ci = intervals[ct];
+            if (ci) out[ct] = [Number(ci.lower.toFixed(2)), Number(ci.upper.toFixed(2))];
+        });
+        return out;
+    }
 
     /**
      * Serialize session history to CSV. Every row carries the traceability
@@ -466,10 +615,19 @@
                 session.configVersion,
                 session.targetCount,
                 session.totalCount,
+                // The denominator the percentages were computed over, and what
+                // was excluded from it — without these the archived record
+                // cannot be reconstructed (URS-052).
+                typeof session.differentialTotal === 'number'
+                    ? session.differentialTotal : session.totalCount,
+                JSON.stringify(session.denominatorExcludes || []),
                 session.meRatio,
                 session.morphologyComments || '',
                 JSON.stringify(session.counts || {}),
                 JSON.stringify(session.percentages || {}),
+                JSON.stringify(session.per100 || {}),
+                session.confidenceLevel || '',
+                JSON.stringify(compactIntervals(session.confidenceIntervals)),
                 JSON.stringify(outputsText)
             ].map(escapeCsv);
             lines.push(row.join(','));
@@ -669,6 +827,16 @@
                 }
             }
 
+            if (spec.confidenceIntervals !== undefined) {
+                var ciCfg = spec.confidenceIntervals;
+                if (typeof ciCfg !== 'object' || ciCfg === null) {
+                    errors.push(name + ': confidenceIntervals must be an object');
+                } else if (ciCfg.level !== undefined && !hasOwn(Z_SCORES, ciCfg.level)) {
+                    errors.push(name + ': confidenceIntervals.level must be one of ' +
+                        Object.keys(Z_SCORES).join(', '));
+                }
+            }
+
             if (spec.per100Reporting !== undefined) {
                 if (typeof spec.per100Reporting !== 'object' || spec.per100Reporting === null) {
                     errors.push(name + ': per100Reporting must be an object');
@@ -751,6 +919,10 @@
         calcPercentages: calcPercentages,
         percentagesSummingTo100: percentagesSummingTo100,
         formatPercent: formatPercent,
+        wilsonInterval: wilsonInterval,
+        formatInterval: formatInterval,
+        intervalSpans: intervalSpans,
+        cellsForPrecision: cellsForPrecision,
         computeRatio: computeRatio,
         computeAbsolute: computeAbsolute,
         renderTemplate: renderTemplate,

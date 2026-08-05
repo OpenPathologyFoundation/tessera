@@ -9,6 +9,7 @@
 | **Product Version** | 2.1.0                                                                                                                     |
 | **Classification** | Clinical Laboratory Aid - Software                                                                                      |
 | **Intended Use** | Keyboard-driven manual differential white blood cell counting tool for hematology laboratory personnel                  |
+| **Software Safety Class** | **Class A** (IEC 62304 §4.3) — see §3.1; requires sign-off |
 | **Regulatory Framework** | 21 CFR Part 820 (Quality System Regulation), IEC 62304 (Medical Device Software Lifecycle), ISO 14971 (Risk Management) |
 | **Date Created** | 2026-02-18                                                                                                              |
 | **Document Owner** | Quality Management                                                                                                      |
@@ -27,6 +28,75 @@ WBC ΔΣ is a web-based clinical laboratory software tool that enables hematolog
 ## 3. Intended Use Statement
 
 WBC ΔΣ is intended to be used by trained clinical laboratory personnel (medical technologists, pathologists, and hematology fellows) as a counting and calculation aid during manual microscopic review of bone marrow aspirate and peripheral blood smears. The software tallies operator-entered cell classifications and computes differential percentages. **The software does not perform autonomous cell identification or classification.** All cell identification decisions are made by the operator.
+
+## 3.1 Software Safety Classification (IEC 62304 §4.3)
+
+**Classification: Class A** — no injury or damage to health is possible.
+
+### 3.1.1 Basis
+
+IEC 62304 §4.3 permits the software safety class to be assigned after taking
+into account risk control measures **external to the software**, including
+other diagnostic procedures and health care practice. The classification below
+rests on such measures and is not a claim that the software cannot produce a
+wrong number.
+
+A differential count produced by this tool is never the sole determinant of a
+clinical decision. ICSH 2008 §1 (REF-001 [S1]) states that "a comprehensive
+diagnosis of a BM disorder often requires the integration of various diagnostic
+approaches", listing peripheral blood counts and smear evaluation, aspirate
+smear, particle clot section, trephine biopsy and imprint morphology,
+cytochemistry, immunophenotyping, cytogenetic and molecular genetic techniques,
+and biochemical and microbiological results — and that "the final
+interpretation should be in the context of clinical and preliminary diagnostic
+findings."
+
+The external risk control measures relied upon are therefore:
+
+| # | Measure | Effect |
+|---|---------|--------|
+| E1 | The differential is interpreted alongside the trephine biopsy, flow cytometry, cytogenetics, molecular studies and the clinical picture | A single erroneous percentage does not by itself establish a diagnosis |
+| E2 | Morphological review is performed by a qualified operator who has identified every cell counted | The tool tallies operator decisions; it performs no cell recognition |
+| E3 | Results are reviewed and released by a pathologist under the laboratory's QMS | An implausible differential is subject to professional review before it reaches the record |
+| E4 | Operators are trained and competency-assessed under CLIA/CAP/ISO 15189 | Misuse of the counting interface is addressed by training and supervision |
+| E5 | The count is transcribed into the LIS by an operator who sees the values | A grossly wrong value has a further opportunity for detection |
+
+### 3.1.2 Boundary conditions
+
+This classification is **conditional on the intended use in §3 holding**. It
+would not be supportable if the software were:
+
+- used as the sole basis for a diagnostic decision without corroborating
+  investigations or professional review;
+- operated by untrained personnel, or outside a laboratory quality system;
+- extended to perform automated cell recognition or classification, which would
+  remove measure E2 and make the software a determinant of the result rather
+  than a recorder of the operator's determination.
+
+Any such change requires the classification to be reassessed before release.
+
+### 3.1.3 Consequences of Class A
+
+Under IEC 62304, Class A does not require the software architecture to be
+decomposed into SOUP-isolated items (§5.3.3–5.3.6), nor detailed design of
+software units (§5.4), nor unit-level verification (§5.5.2–5.5.5).
+
+**Those activities have nonetheless been performed.** The verification
+architecture established under DCR-004 provides unit, behavioural and system
+level testing with full requirement traceability. This exceeds what Class A
+requires and is retained deliberately: the classification depends on external
+measures E1–E5 that the manufacturer does not control, and the software's own
+verification is the one control that is under the manufacturer's control.
+
+### 3.1.4 Status
+
+**This classification requires clinical and regulatory sign-off before the DHF
+leaves Draft.** It is an engineering assessment resting on clinical judgments
+about measures E1–E5. It is recorded here so that it is explicit and reviewable
+rather than assumed — no software safety class was stated in any prior revision
+of this DHF, despite IEC 62304 being cited as a governing framework.
+
+---
 
 ## 4. Indications for Use
 
@@ -50,6 +120,7 @@ WBC ΔΣ is intended to be used by trained clinical laboratory personnel (medica
 | TP-001 | Test Plan v2.0 | Verification | Draft |
 | VV-001 | Verification & Validation Protocol v2.0 | V&V | Draft |
 | RTM-001 | Requirements Traceability Matrix v3.0 | Traceability | Draft |
+| **REF-001** | **Standards and Literature Basis v1.0** | Reference | Draft |
 | TR-001 | Test Execution Results | Evidence | Draft |
 | SOP-001 | Standard Operating Procedure | Procedure | Draft |
 | SOP-002 | Deployment Procedure | Procedure | Draft |
@@ -59,6 +130,8 @@ WBC ΔΣ is intended to be used by trained clinical laboratory personnel (medica
 | DCR-002 | Design Change Record — Rename, Logo, License | Change Control | Draft |
 | DCR-003 | Design Change Record — Test Automation | Change Control | Draft |
 | DCR-004 | Design Change Record — Verification Integrity Remediation | Change Control | Draft |
+| DCR-005 | Design Change Record — Standards Grounding (module M3) | Change Control | Draft |
+| DCR-006 | Design Change Record — Denominator Policy (module M1) | Change Control | Draft |
 
 **Document control note (DCR-004)**: two files previously carried Document ID
 URS-001 with neither marked as superseded, and RTM-001 v2.0 was keyed to the

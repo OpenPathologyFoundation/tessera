@@ -1090,10 +1090,20 @@
         cells.forEach(function (ct) {
             var titleAttr = '';
             var indicator = '';
+            var tips = [];
             if (specConfig && specConfig.constituents && specConfig.constituents[ct]) {
                 var constInfo = specConfig.constituents[ct];
-                var tooltip = constInfo.label + ': ' + constInfo.members.join(', ');
-                titleAttr = ' title="' + Core.escapeAttr(tooltip) + '"';
+                tips.push(constInfo.label + ': ' + constInfo.members.join(', '));
+            }
+            // Scope guidance for a category (URS-012). The bone marrow NDC
+            // excludes specific cell types (ICSH 2008 §2.6); a general-purpose
+            // category invites counting them, which would silently depress
+            // every reported percentage. See RA-001 HA-090.
+            if (specConfig && specConfig.categoryNotes && specConfig.categoryNotes[ct]) {
+                tips.push(specConfig.categoryNotes[ct]);
+            }
+            if (tips.length) {
+                titleAttr = ' title="' + Core.escapeAttr(tips.join(' — ')) + '"';
                 indicator = ' <span class="text-[9px] text-slate-500">&#9662;</span>';
             }
             html += '<th class="px-2 py-2 text-[11px] font-semibold text-slate-400 uppercase tracking-wider text-center border-b border-slate-700/50"' + titleAttr + '>' +

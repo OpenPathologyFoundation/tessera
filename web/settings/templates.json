@@ -10,8 +10,24 @@
             "requireCaseNumber": false,
             "upperRowAbnormal": false,
             "categories": {
-                "upper": ["nrbc", "blasts", "pro", "myelo", "meta", "plasma", "mast"],
-                "lower": ["bands", "poly", "baso", "eos", "mono", "lymph", "other"]
+                "upper": [
+                    "nrbc",
+                    "blasts",
+                    "pro",
+                    "myelo",
+                    "meta",
+                    "plasma",
+                    "mast"
+                ],
+                "lower": [
+                    "bands",
+                    "poly",
+                    "baso",
+                    "eos",
+                    "mono",
+                    "lymph",
+                    "other"
+                ]
             },
             "outCodes": {
                 "B": "nrbc",
@@ -32,8 +48,20 @@
             "formulas": {
                 "ME_ratio": {
                     "label": "M:E Ratio",
-                    "numerator": ["blasts", "pro", "myelo", "meta", "bands", "poly", "baso", "eos", "mono"],
-                    "denominator": ["nrbc"],
+                    "numerator": [
+                        "blasts",
+                        "pro",
+                        "myelo",
+                        "meta",
+                        "bands",
+                        "poly",
+                        "baso",
+                        "eos",
+                        "mono"
+                    ],
+                    "denominator": [
+                        "nrbc"
+                    ],
                     "precision": 1
                 }
             },
@@ -65,7 +93,10 @@
             "autosave": true,
             "absoluteCounts": "optional",
             "handedness": "left",
-            "morphologyChecklist": []
+            "morphologyChecklist": [],
+            "categoryNotes": {
+                "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells — ICSH 2008 §2.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
+            }
         },
         {
             "specimenType": "pb",
@@ -74,8 +105,24 @@
             "requireCaseNumber": false,
             "upperRowAbnormal": true,
             "categories": {
-                "upper": ["nrbc", "blasts", "pro", "myelo", "meta", "plasma", "mast"],
-                "lower": ["bands", "poly", "baso", "eos", "mono", "lymph", "other"]
+                "upper": [
+                    "nrbc",
+                    "blasts",
+                    "pro",
+                    "myelo",
+                    "meta",
+                    "plasma",
+                    "mast"
+                ],
+                "lower": [
+                    "bands",
+                    "poly",
+                    "baso",
+                    "eos",
+                    "mono",
+                    "lymph",
+                    "other"
+                ]
             },
             "outCodes": {
                 "B": "nrbc",
@@ -111,7 +158,10 @@
             "autosave": true,
             "absoluteCounts": "optional",
             "handedness": "left",
-            "morphologyChecklist": []
+            "morphologyChecklist": [],
+            "categoryNotes": {
+                "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells — ICSH 2008 §2.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
+            }
         }
     ]
 }

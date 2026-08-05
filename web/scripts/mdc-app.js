@@ -1450,6 +1450,9 @@
             percentages: percentages,
             meRatio: computeMERatio(specConfig),
             formulaResults: computeFormulaResults(specConfig),
+            methodEntries: Core.buildMethodStatement(specConfig, state.configMeta),
+            methodNotes: Core.formatMethodStatement(
+                Core.buildMethodStatement(specConfig, state.configMeta), ' '),
             thresholds: Core.evaluateThresholds(state.counts, specConfig,
                 (specConfig.confidenceIntervals && specConfig.confidenceIntervals.level) || 0.95),
             morphologyComments: buildMorphologyOutput(),
@@ -1591,12 +1594,29 @@
             summaryHtml += '</div>';
         }
 
-        // Traceability footer (URS-052)
+        // Traceability footer (URS-052) and method provenance (URS-055).
+        // The identifier says which profile; the method statement says what
+        // that profile does, which is what a reader needs to compare this
+        // result against another.
         summaryHtml += '<div class="mt-3 pt-2 border-t border-slate-700/50 text-[11px] text-slate-500 flex flex-wrap gap-x-4 gap-y-1">';
         summaryHtml += '<span>Profile: ' + Core.escapeHtml(session.configProfileName || session.configProfileId) +
             ' (' + Core.escapeHtml(session.configProfileId) + ' v' + Core.escapeHtml(session.configVersion) + ')</span>';
         summaryHtml += '<span>Counted: ' + Core.escapeHtml(new Date(session.timestamp).toLocaleString()) + '</span>';
         summaryHtml += '</div>';
+
+        var method = session.methodEntries || [];
+        if (method.length) {
+            summaryHtml += '<details class="mt-2 group">';
+            summaryHtml += '<summary class="cursor-pointer text-[11px] text-slate-500 hover:text-slate-400 ' +
+                'uppercase tracking-wider">Method</summary>';
+            summaryHtml += '<dl class="mt-1 text-[11px] text-slate-500 space-y-0.5">';
+            method.forEach(function (e) {
+                summaryHtml += '<div><dt class="inline font-medium text-slate-400">' +
+                    Core.escapeHtml(e.label) + ':</dt> <dd class="inline">' +
+                    Core.escapeHtml(e.text) + '</dd></div>';
+            });
+            summaryHtml += '</dl></details>';
+        }
 
         el('results-summary').innerHTML = summaryHtml;
 
@@ -1638,6 +1658,14 @@
             if (session.morphologyComments) {
                 outputContent += '<br><br><em>Morphology: ' + Core.escapeHtml(session.morphologyComments) + '</em>';
             }
+
+            // URS-052 requires the configuration profile and version in ALL
+            // output. The clipboard copies this panel, and it is the primary
+            // route into the LIS, so the attribution must live here rather
+            // than only on the surrounding screen.
+            outputContent += '<br><br>[' + Core.escapeHtml(session.configProfileId) +
+                ' v' + Core.escapeHtml(session.configVersion) + ' &middot; ' +
+                Core.escapeHtml(new Date(session.timestamp).toLocaleString()) + ']';
 
             tabPanelsHtml += '<div class="tab-panel ' + (isActive ? '' : 'hidden') + '" data-tab-idx="' + idx + '">';
             tabPanelsHtml += '<div class="p-4 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-slate-300 leading-relaxed font-mono">';

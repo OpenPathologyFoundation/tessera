@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 2.4 |
+| **Version** | 2.5 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -235,6 +235,18 @@ Added in v2.4 under DCR-008.
 | SYS-207 | The near-threshold indication SHALL be informational and SHALL NOT prevent count completion. | URS-038, URS-041 |
 | SYS-208 | Threshold evaluations and all formula results SHALL be carried in the session record. | URS-052 |
 
+### 4.13d Method Provenance Module (URS-052, URS-055)
+
+Added in v2.5 under DCR-009.
+
+| ID | Requirement | Trace |
+|----|------------|-------|
+| SYS-210 | A configuration profile SHALL be able to declare its provenance: the standard it implements, a full citation, and a short note suitable for inclusion in a report. | URS-055 |
+| SYS-211 | A specimen type SHALL be able to declare the basis of its target count, and each formula the basis of its convention. | URS-055, URS-105 |
+| SYS-212 | The system SHALL assemble these into a method statement covering the profile and version, the declared basis, any category excluded from the percentage denominator, the target count basis, each formula's convention, and the confidence level where intervals are reported. Absent declarations SHALL be omitted rather than rendered as empty entries. | URS-055 |
+| SYS-213 | The method statement SHALL be available to output templates as `{{methodNotes}}`, presented on the results screen, and carried in the session record and CSV/JSON export. | URS-055, URS-084 |
+| SYS-214 | Text copied to the clipboard SHALL carry the configuration profile ID, version and timestamp, independently of whether the active template references them. | URS-052 |
+
 ### 4.14 Audio Feedback Module (URS-027, URS-097)
 
 Added in v2.1 under DCR-004. This functionality was implemented and shipping in
@@ -413,6 +425,7 @@ Phase 2 item.
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
 | B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
 | C | 2026-02-20 | QMS | Added theme toggle requirements |
+| I | 2026-08-05 | QMS | v2.5 (DCR-009): added SYS-210–SYS-214, method provenance. SYS-214 closes a URS-052 gap: the clipboard path carried no profile attribution. |
 | H | 2026-08-05 | QMS | v2.4 (DCR-008): added SYS-200–SYS-208, derived quantities and thresholds. Formula rendering generalized from the hardcoded M:E ratio to every formula the profile defines. |
 | G | 2026-08-05 | QMS | v2.3 (DCR-007): added SYS-190–SYS-196, the sampling precision module. Every reported percentage carries a Wilson confidence interval; the sub-target advisory is quantified; a derived ratio carries an imprecision advisory. |
 | F | 2026-08-05 | QMS | v2.2 (DCR-006): added SYS-180–SYS-185, the differential denominator module. A category may be counted without belonging to the percentage denominator, and is reported per 100 of it instead — the peripheral blood NRBC convention. |

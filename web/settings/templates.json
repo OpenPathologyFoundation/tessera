@@ -1,7 +1,12 @@
 {
-    "version": "2.3",
+    "version": "2.4",
     "profileId": "consensus-14",
     "profileName": "Full 14-Part Consensus",
+    "provenance": {
+        "standard": "ICSH 2008",
+        "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
+        "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 §2.6."
+    },
     "specimenTypes": [
         {
             "specimenType": "bm",
@@ -62,7 +67,8 @@
                     "denominator": [
                         "nrbc"
                     ],
-                    "precision": 1
+                    "precision": 1,
+                    "basis": "ICSH 2008 §2.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
                 }
             },
             "templates": [
@@ -120,7 +126,8 @@
                     "label": "plasma cell threshold",
                     "basis": "10% clonal plasma cells is a diagnostic boundary for plasma cell neoplasia."
                 }
-            ]
+            ],
+            "targetCountBasis": "ICSH 2008 §2.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it."
         },
         {
             "specimenType": "pb",
@@ -206,7 +213,8 @@
                     "label": "AML blast threshold",
                     "basis": "WHO 2022 / ICC 2022."
                 }
-            ]
+            ],
+            "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential."
         }
     ]
 }

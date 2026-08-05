@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | URS-001 |
-| **Version** | 2.0 (Rev I) |
+| **Version** | 2.0 (Rev J) |
 | **Product** | WBC ΔΣ (Eukrasia) |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-05 |
@@ -115,9 +115,10 @@ This URS covers all user-facing functionality of WBC ΔΣ including specimen ide
 |----|------------|----------|-----------|
 | URS-050 | The system SHALL generate formatted output upon count completion. | **P0 – Critical** | Output is the primary deliverable. |
 | URS-051 | The system SHALL support export in JSON, CSV, and clipboard (plain text) formats. Institutional output templates SHALL be configurable. | **P1 – High** | _Amended from v1.0._ Specific export formats defined. |
-| URS-052 | The system SHALL include in all output: case/accession number (if entered), specimen type, total cell count, per-cell-type counts and percentages, derived formula values, morphology comments, configuration profile ID and version, and timestamp. | **P0 – Critical** | _Expanded from v1.0._ Complete traceability data in every export. |
+| URS-052 | The system SHALL include in all output: case/accession number (if entered), specimen type, total cell count, per-cell-type counts and percentages, derived formula values, morphology comments, configuration profile ID and version, and timestamp. **"All output" includes text copied to the clipboard**, which is the primary route into the LIS. | **P0 – Critical** | _Expanded from v1.0; clipboard obligation made explicit 2026-08-05 (Rev J)._ Complete traceability data in every export. The clipboard path previously carried the rendered template alone, with no profile attribution — the record reaching the LIS could not be traced to the counting parameters that produced it, which is precisely what this requirement exists to prevent. |
 | URS-053 | The system SHALL provide a mechanism to copy the formatted output text to the system clipboard for pasting into LIS/EMR. | **P1 – High** | Operators need to paste results into the LIS. Manual retyping introduces transcription errors. |
 | URS-054 | The system SHALL provide a print-friendly view or PDF export of the completed count results. | **P2 – Medium** | _New._ Many labs attach printed results to physical case folders or worksheets. |
+| URS-055 | The system SHALL state, with the result, the conventions that produced it: the configuration profile and version, the standard the profile follows, the basis of each derived formula, any category excluded from the percentage denominator, and the confidence level where intervals are reported. | **P1 – High** | _New 2026-08-05 (Rev J, DCR-009)._ URS-052 requires the profile identifier in every export, which tells a reader *which* profile. It does not tell them *what that profile does*, and a differential percentage is not self-explanatory. Identical counts give a materially different M:E ratio depending on whether monocytes are in the numerator, and a materially different blast percentage depending on whether erythroid precursors are in the denominator; both conventions are in current use. A result stating "M:E 2.1:1" without naming its convention cannot be compared against another laboratory's result, or against the same laboratory's result from before a profile change. **Note on numbering:** URS-055 was cited in error by RTM v2.0 (see RTM §2); it is first defined here. |
 
 ### 5.7 Reset and New Case
 
@@ -260,6 +261,7 @@ The tool is given into the hands of the user. Governance of configuration profil
 | A | 2026-02-18 | QMS | Initial draft — complete user requirements defined |
 | B | 2026-02-19 | QMS | Added session export requirement |
 | C | 2026-02-20 | QMS | Added theme switch requirement |
+| J | 2026-08-05 | QMS | URS-055 added: state the conventions that produced a result, not only which profile produced it. URS-052 amended to make explicit that "all output" includes the clipboard — the pasted record previously carried no profile attribution. |
 | I | 2026-08-05 | QMS | URS-038 and URS-039 added: a near-threshold advisory when a confidence interval spans a configured diagnostic threshold, closing the ICSH §2.6 gap recorded in REF-001; and subset-percentage formulas, so both the current and the pre-2022 blast conventions can be expressed. |
 | H | 2026-08-05 | QMS | URS-037 added: report the sampling uncertainty of each differential percentage as a configurable confidence interval. Quantifies what URS-041's advisory previously only alluded to. |
 | G | 2026-08-05 | QMS | URS-030 amended: percentages are computed over a profile-defined differential denominator, and a category may be counted but excluded from it and reported per 100 instead. Corrects the peripheral blood NRBC convention. |

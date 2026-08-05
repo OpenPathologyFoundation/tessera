@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | RA-001 |
-| **Version** | 2.5 |
+| **Version** | 2.6 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-04 |
@@ -165,6 +165,9 @@ primary text against the shipped configuration.
 
 | HA-094 | A count is accepted as settling a diagnostic question it cannot settle | The observed percentage sits on one side of a diagnostic threshold while the count leaves the true value genuinely uncertain. An observed 20% blasts at 200 cells carries a 95% interval of 15.0–26.1%: the case may be reported as meeting the AML threshold on a count that does not establish it. The consequence is a classification the count does not support, in either direction | 4 | The point estimate is reported without reference to any threshold; the operator must recognise the situation unaided and recall the ICSH guidance | 3 | **None** — the reported figure looks equally definite whether the interval is narrow or wide | 4 | **48** | **Medium** | SYS-204–208: profiles define diagnostic thresholds with a citable basis, and where the confidence interval spans one the results screen names the quantity, its interval, the threshold and the basis, and directs the operator to Continue Counting. Implements the ICSH 2008 §2.6 direction to extend the count near a critical threshold. Informational only, per URS-041. | 4x3x1 = **12** (Low). Occurrence is unchanged — whether to extend the count remains a clinical judgement, and a paucicellular aspirate may make it impossible — but detection improves from Low to Certain: the condition is now stated rather than left to be recognised. Verified by VV-THR-001 to 008, TC-B120 to B127, VV-SYS-120 to 123. |
 
+| HA-095 | A result is interpreted without knowing the convention that produced it | Differential figures are compared across laboratories, or against the same laboratory's earlier results, when the underlying conventions differ. Identical counts give a materially different M:E ratio depending on whether monocytes are in the numerator, and a materially different blast percentage depending on whether erythroid precursors are in the denominator; both conventions are in current use. A trend read across a profile change may reflect the change rather than the patient | 3 | The report states figures without stating the conventions behind them; the reader has no way to know a competing convention exists | 4 | **None** | 4 | **48** | **Medium** | SYS-210–213: profiles declare their provenance, formulas their convention and target counts their basis; the system assembles a method statement presented with the result, available to templates, and carried in every export. The shipped profile records that a competing M:E convention exists rather than implying there is only one. | 3x2x2 = **12** (Low). Occurrence falls because the convention travels with the result; detection improves because a reader who sees two differing figures can now identify why. Residual reflects that a reader may still not consult the statement. |
+| HA-096 | The record reaching the LIS cannot be traced to its counting parameters | Clipboard text is the primary route into the patient record. It previously carried the rendered template alone — no profile, no version, no timestamp — so the reported differential could not be tied to the configuration that produced it. URS-052 exists to prevent exactly this, and was met for file export but not for the path most used | 4 | The copy control copies the rendered report panel, which did not include attribution | 4 | **None** | 3 | **48** | **Medium** | SYS-214: the copied text carries profile ID, version and timestamp independently of the active template, so a laboratory cannot lose attribution by editing its templates. | 4x1x2 = **8** (Low). Verified by TC-B131 and VV-SYS-130, the latter reading the real system clipboard. |
+
 ### 4.10 Hazards Identified in the v2.1 Design Review (DCR-004)
 
 | # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
@@ -182,10 +185,10 @@ primary text against the shipped configuration.
 |-----------|-------|-----------|
 | Critical (75-125) | 1 | HA-001 |
 | High (50-74) | 4 | HA-003, HA-030, HA-080, HA-092 |
-| Medium (16-49) | 25 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
+| Medium (16-49) | 27 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
 | Low (1-15) | 9 | HA-023, HA-040, HA-041, HA-050, HA-051, HA-060, HA-062, HA-070, HA-072 |
 
-Total: **39** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
+Total: **41** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
 
 _Two counting errors in the v2.0 table are corrected here: the Medium row was
 labelled 14 against a list of 16 entries and the Low row 8 against a list of 10,
@@ -199,7 +202,7 @@ Every RPN in section 4 has been recomputed from its S, O and D values._
 | Critical (75-125) | **0** |
 | High (50-74) | **0** |
 | Medium (16-49) | **2** (HA-001 RPN=45, HA-002 RPN=30) |
-| Low (1-15) | **37** |
+| Low (1-15) | **39** |
 
 All three residual Medium risks are accepted by design and unchanged from v2.0;
 their rationale is in section 5.3. No residual risk sits above Medium.
@@ -314,6 +317,7 @@ residual scores above to be treated as evidence rather than intent.
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete FMEA |
 | B | 2026-02-24 | QMS | v2.0 update: optional case number (HA-001), advisory target count replacing blocking dialog (HA-030), unified key mappings (HA-010), new hazards for M:E ratio (HA-070, HA-072) and Continue Counting (HA-071), updated risk summary |
+| H | 2026-08-05 | QMS | v2.6 (DCR-009): HA-095 (a result interpreted without its convention) and HA-096 (the LIS record untraceable to its counting parameters) added, both pre-RPN 48. HA-096 was a live URS-052 gap — the clipboard path carried no profile attribution while file export did. |
 | G | 2026-08-05 | QMS | v2.5 (DCR-008): HA-094 added — a count accepted as settling a diagnostic question it cannot settle. Pre-RPN 48, residual 12. Mitigated by the near-threshold advisory, which implements the ICSH §2.6 direction the design review had recorded as an open gap. |
 | F | 2026-08-05 | QMS | v2.4 (DCR-007): HA-093 added — the M:E ratio is displayed at a precision the count does not support, which is the imprecision Rümke's paper actually concerns. HA-030 re-scored 24 → 12: the sub-target advisory now states a computed confidence interval rather than a general caution, so detection improves from Low to Certain. Residual Medium risks reduce from 3 to 2. |
 | E | 2026-08-05 | QMS | v2.3 (DCR-006): HA-092 added — a category outside the differential included in its percentage denominator. Pre-RPN 64 (High), residual 8. This was live in the shipped peripheral blood profile: NRBC sat in the denominator, understating every leucocyte percentage. |

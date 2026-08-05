@@ -432,3 +432,39 @@ test.describe('Near-threshold advisory (URS-038, ICSH 2008 §2.6)', () => {
         await expect(page.locator('#threshold-note')).toBeHidden();
     });
 });
+
+// ================================================================
+test.describe('Method provenance (URS-052, URS-055)', () => {
+
+    test('VV-SYS-130: The pasted report carries profile attribution', async ({ page, browserName }) => {
+        await startCount(page, 'S25-PROV');
+        await count(page, 'x', 50);
+        await page.click('#btnCountDone');
+        await page.click('#btnCopyOutput');
+        await expect(page.locator('#copyBtnText')).toHaveText('Copied!');
+
+        test.skip(browserName !== 'chromium',
+            'clipboard-read permission is Chromium-only in Playwright');
+
+        // What actually lands in the LIS must identify the profile that
+        // produced it — the report is otherwise not interpretable later.
+        const clip = await page.evaluate(() => navigator.clipboard.readText());
+        expect(clip).toContain('consensus-14');
+        expect(clip).toMatch(/v\d+\.\d+/);
+        expect(clip).toContain('S25-PROV');
+    });
+
+    test('VV-SYS-131: The results screen states the conventions used', async ({ page }) => {
+        await startCount(page, 'S25-METHOD');
+        await count(page, 'x', 50);
+        await page.click('#btnCountDone');
+
+        const summary = page.locator('#results-summary');
+        await expect(summary).toContainText('Method');
+        // Expand the disclosure and check the substance.
+        await summary.locator('summary').click();
+        const text = await summary.innerText();
+        expect(text).toContain('ICSH 2008');
+        expect(text).toMatch(/competing convention/i);
+    });
+});

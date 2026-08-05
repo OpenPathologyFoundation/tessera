@@ -5,14 +5,14 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 3.3 |
-| **Product** | WBC ΔΣ v2.4.0 |
-| **Date Executed** | 2026-08-05 (17:28:30 UTC) |
+| **Version** | 3.4 |
+| **Product** | WBC ΔΣ v2.5.0 |
+| **Date Executed** | 2026-08-05 (18:54:31 UTC) |
 | **Status** | **PASS** |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_132830_run/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_145431_run/` |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
@@ -20,16 +20,16 @@
 
 ## 1. Executive Summary
 
-**684 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 3 documented skips.**
+**706 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 5 documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **522** |
-| System (browser) tests | **162** (55 specs x chromium, firefox, webkit, less 3 skips) |
-| **Total executed** | **684** |
-| Passed | **684** |
+| Unit, static and behavioural tests | **540** |
+| System (browser) tests | **166** (57 specs x chromium, firefox, webkit, less 5 skips) |
+| **Total executed** | **706** |
+| Passed | **706** |
 | Failed | **0** |
-| Skipped (documented, §6) | **3** |
+| Skipped (documented, §6) | **5** |
 | Pass Rate | **100.00%** |
 | Suites | 95 (Node) + 11 describe blocks x 3 engines (Playwright) |
 | Skipped / Cancelled / Todo | 0 |
@@ -42,8 +42,8 @@ Regenerate this evidence with `npm run test:qms`.
 
 | | v2.0 (2026-02-24) | v2.1.0 (this run) |
 |---|---|---|
-| Tests recorded | 191 | 684 |
-| Tests executing shipped application code | **0** | 684 |
+| Tests recorded | 191 | 706 |
+| Tests executing shipped application code | **0** | 706 |
 | Layers | Mirrored logic + static text assertions | Unit (shipped engine) + jsdom behaviour + browser system |
 | Browser engines | none | Chromium, Firefox, WebKit |
 
@@ -67,7 +67,7 @@ shipped code can cause a test to fail.
 
 ---
 
-## 3. Node Suite Results (522 tests, 104 suites, 0 failures)
+## 3. Node Suite Results (540 tests, 106 suites, 0 failures)
 
 ### Suite 01 — Calculation Engine
 
@@ -236,6 +236,23 @@ Capabilities verifiable only at this layer (real browser APIs):
 
 ---
 
+### 4.6 Method provenance (added v2.5)
+
+| Suite | Scope | Result |
+|-------|-------|--------|
+| 01 VV-PROV-001..008 | Method statement assembly: profile identity, formula convention, declared denominator, silence when there is nothing to declare, confidence level, empty profile, flattening, reserved placeholders | PASS |
+| 12 SC-030..033 | The shipped profile declares ICSH as its basis, records that a competing M:E convention exists, and states the conditional target-count rule | PASS |
+| 11 TC-B130..B135 | Results statement, clipboard attribution, session and CSV, inline `{{methodNotes}}`, peripheral blood denominator declaration, graceful absence | PASS |
+| E2E VV-SYS-130..131 | Attribution read back from the real system clipboard; conventions stated on the results screen | PASS |
+
+**A URS-052 gap was found while wiring this**: the clipboard path — the primary
+route into the LIS — carried no profile ID, version or timestamp, while file
+export did. The record reaching the patient file was the one output that could
+not be traced to its counting parameters. Recorded as HA-096 and closed; see
+DCR-009 §3.
+
+---
+
 ### 4.5 Derived quantities and thresholds (added v2.4)
 
 | Suite | Scope | Result |
@@ -302,6 +319,8 @@ see DCR-007 §5.1 and §5.2.
 | Saturated interval bound showed float noise | **VV-CI-004 (DCR-007)** | VV-CI-004 |
 | HA-094 count accepted as settling a question it cannot settle | **Standards review (DCR-008)** | VV-THR-001..008, TC-B120..127, VV-SYS-120..123 |
 | E2E assertions ignored CSS text-transform in innerText | **Layer disagreement (DCR-008)** | VV-SYS-125 |
+| HA-096 clipboard output carried no profile attribution (URS-052) | **Wiring provenance (DCR-009)** | TC-B131, VV-SYS-130 |
+| `totalCounted` / `denominator` placeholders were never reserved | **VV-PROV-008 (DCR-009)** | VV-PROV-008 |
 
 The last three were introduced or exposed during remediation and were caught by
 the new layers before release — the behaviour the previous suite could not
@@ -314,8 +333,8 @@ provide.
 1. **URS-034 has been amended to match the implementation.** URS-001 v2.0
    Rev E (2026-08-04) now specifies the largest-remainder method. No deviation
    remains between requirement and implementation.
-2. **Three system tests are skipped on specific engines**, each documented in
-   DCR-004 §5.2: the clipboard read-back on Firefox and WebKit (the
+2. **Five system tests are skipped on specific engines**, each documented in
+   DCR-004 §5.2: the two clipboard read-backs on Firefox and WebKit (the
    `clipboard-read` permission is Chromium-only in Playwright — the copy
    control itself is still exercised on all engines), and the offline reload on
    WebKit (Playwright's WebKit build crashes its driver on offline navigation).
@@ -328,7 +347,7 @@ provide.
 
 ## 7. Conclusion
 
-All 684 executed automated tests pass with no failures, across three browser
+All 706 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -350,6 +369,12 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-05T18:54:31.403Z
+- Command: `npm run test:all`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-05_145431_run/`
+
 - Date (UTC): 2026-08-05T17:28:30.653Z
 - Command: `npm run test:all`
 - Exit Code: 0

@@ -33,8 +33,9 @@
     // render that category's percentage instead of the cell count, silently
     // corrupting every report built from the profile.
     var RESERVED_PLACEHOLDERS = [
-        'total', 'caseNumber', 'comments', 'ME_ratio', 'specimenType',
-        'specimenLabel', 'profileId', 'profileName', 'configVersion', 'timestamp'
+        'total', 'totalCounted', 'denominator', 'caseNumber', 'comments',
+        'ME_ratio', 'specimenType', 'specimenLabel', 'profileId', 'profileName',
+        'configVersion', 'timestamp', 'methodNotes'
     ];
 
     function hasOwn(obj, key) {
@@ -624,7 +625,8 @@
             profileId: session.configProfileId || '',
             profileName: session.configProfileName || '',
             configVersion: session.configVersion || '',
-            timestamp: session.timestamp || ''
+            timestamp: session.timestamp || '',
+            methodNotes: session.methodNotes || ''
         };
         Object.keys(roundedPercentages || {}).forEach(function (ct) {
             // A category outside the differential has no percentage; leaving
@@ -639,6 +641,99 @@
             values[ct + '_per100'] = (v === null || v === undefined) ? 'N/A' : v;
         });
         return values;
+    }
+
+    // ================================================================
+    // METHOD PROVENANCE (URS-055, SYS-210 to SYS-214)
+    // ================================================================
+
+    /**
+     * The conventions that produced a result, as a structured list.
+     *
+     * A differential percentage is not self-explanatory. The same counts yield
+     * a materially different M:E ratio depending on whether monocytes are in
+     * the numerator, and a materially different blast percentage depending on
+     * whether erythroid precursors are in the denominator. Both conventions are
+     * in current use. A report stating "M:E 2.1:1" without saying which
+     * convention produced it cannot be compared against another laboratory's
+     * result, or against the same laboratory's result from before a profile
+     * change.
+     *
+     * This is the same argument as URS-052, which requires the profile ID and
+     * version in every export, carried one step further: the identifier tells a
+     * reader *which* profile, and this tells them *what that profile does*.
+     *
+     * @returns {Array<{label:string, text:string}>}
+     */
+    function buildMethodStatement(spec, meta) {
+        var entries = [];
+        var m = meta || {};
+        var s = spec || {};
+
+        if (m.profileName || m.profileId) {
+            var ident = m.profileName || m.profileId;
+            var qualifier = [];
+            if (m.profileId && m.profileName) qualifier.push(m.profileId);
+            if (m.version) qualifier.push('v' + m.version);
+            entries.push({
+                label: 'Profile',
+                text: ident + (qualifier.length ? ' (' + qualifier.join(' ') + ')' : '')
+            });
+        }
+
+        if (m.provenance && m.provenance.notes) {
+            entries.push({ label: 'Basis', text: m.provenance.notes });
+        }
+
+        // What the percentages are a percentage of. Only stated when it is not
+        // simply "every cell counted", since that is the assumption a reader
+        // would otherwise make.
+        if (Array.isArray(s.denominatorExcludes) && s.denominatorExcludes.length) {
+            var per100 = s.per100Reporting || {};
+            var excluded = s.denominatorExcludes.map(function (ct) {
+                var label = per100[ct] && per100[ct].label;
+                return label ? ct + ' (reported as ' + label + ')' : ct;
+            });
+            entries.push({
+                label: 'Denominator',
+                text: 'Percentages exclude ' + excluded.join(', ') +
+                    ' from the denominator; these are counted but are not part of the differential.'
+            });
+        }
+
+        if (s.targetCountBasis) {
+            entries.push({ label: 'Target count', text: s.targetCountBasis });
+        }
+
+        Object.keys(s.formulas || {}).forEach(function (fname) {
+            var f = s.formulas[fname];
+            if (!f || !f.basis) return;
+            entries.push({ label: f.label || fname, text: f.basis });
+        });
+
+        var ciCfg = s.confidenceIntervals;
+        if (ciCfg && ciCfg.enabled !== false) {
+            var pct = Math.round((ciCfg.level || 0.95) * 100);
+            entries.push({
+                label: 'Precision',
+                text: 'Percentages carry ' + pct + '% binomial confidence intervals ' +
+                    '(Wilson score) reflecting the number of cells counted.'
+            });
+        }
+
+        return entries;
+    }
+
+    /**
+     * Flatten a method statement to a single block of text, for template
+     * substitution and for export.
+     */
+    function formatMethodStatement(entries, separator) {
+        if (!entries || !entries.length) return '';
+        var sep = typeof separator === 'string' ? separator : ' ';
+        return entries.map(function (e) {
+            return e.label + ': ' + e.text;
+        }).join(sep);
     }
 
     /**
@@ -704,6 +799,7 @@
         'per100',
         'confidenceLevel',
         'confidenceIntervals',
+        'methodNotes',
         'outputs'
     ];
 
@@ -755,6 +851,7 @@
                 JSON.stringify(session.per100 || {}),
                 session.confidenceLevel || '',
                 JSON.stringify(compactIntervals(session.confidenceIntervals)),
+                session.methodNotes || '',
                 JSON.stringify(outputsText)
             ].map(escapeCsv);
             lines.push(row.join(','));
@@ -795,13 +892,14 @@
 
         if (Array.isArray(raw)) {
             specimenTypes = raw;
-            meta = { version: '1.0', profileId: 'legacy', profileName: 'Legacy Profile' };
+            meta = { version: '1.0', profileId: 'legacy', profileName: 'Legacy Profile', provenance: null };
         } else if (raw && Array.isArray(raw.specimenTypes)) {
             specimenTypes = raw.specimenTypes;
             meta = {
                 version: raw.version || '2.0',
                 profileId: raw.profileId || 'custom',
-                profileName: raw.profileName || 'Custom Profile'
+                profileName: raw.profileName || 'Custom Profile',
+                provenance: raw.provenance || null
             };
         } else {
             throw new Error('Invalid config format: expected an array or an object with a specimenTypes array');
@@ -824,6 +922,7 @@
             version: meta.version,
             profileId: meta.profileId,
             profileName: meta.profileName,
+            provenance: meta.provenance || null,
             specimenTypes: specimenTypes
         };
     }
@@ -1115,6 +1214,8 @@
         renderTemplate: renderTemplate,
         buildTemplateValues: buildTemplateValues,
         buildLowCountNote: buildLowCountNote,
+        buildMethodStatement: buildMethodStatement,
+        formatMethodStatement: formatMethodStatement,
         escapeCsv: escapeCsv,
         CSV_HEADERS: CSV_HEADERS,
         buildSessionCsv: buildSessionCsv,

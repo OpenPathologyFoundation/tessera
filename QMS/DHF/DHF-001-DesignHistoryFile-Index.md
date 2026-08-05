@@ -6,7 +6,7 @@
 |-------|-------------------------------------------------------------------------------------------------------------------------|
 | **Document ID** | DHF-001                                                                                                                 |
 | **Product Name** | WBC ΔΣ                                                                                                                 |
-| **Product Version** | 2.4.0                                                                                                                     |
+| **Product Version** | 2.5.0                                                                                                                     |
 | **Classification** | Clinical Laboratory Aid - Software                                                                                      |
 | **Intended Use** | Keyboard-driven manual differential white blood cell counting tool for hematology laboratory personnel                  |
 | **Software Safety Class** | **Class A** (IEC 62304 §4.3) — see §3.1; requires sign-off |
@@ -113,10 +113,10 @@ of this DHF, despite IEC 62304 being cited as a governing framework.
 | **URS-001** | **User Requirements Specification v2.0** (`URS-001_UserRequirementsSpecification_v2.0.md`) — **controlled requirement baseline** | Requirements | Draft |
 | URS-001 | User Requirements Specification v1.0 (`URS-001-UserRequirementsSpecification.md`) | Requirements | **Superseded by v2.0** |
 | SPC-001 | Use Case Specification v1.2 (`SPC-001_UseCase_Specification_v1.2.docx`) | Requirements | Draft |
-| SRS-001 | System Requirements Specification v2.4 | Requirements | Draft |
+| SRS-001 | System Requirements Specification v2.5 | Requirements | Draft |
 | SAD-001 | System Architecture Design v2.0 | Design | Draft |
 | SDD-001 | Software Detailed Design v2.0 | Design | Draft |
-| RA-001 | Risk Analysis (FMEA) v2.5 | Risk Management | Draft |
+| RA-001 | Risk Analysis (FMEA) v2.6 | Risk Management | Draft |
 | TP-001 | Test Plan v2.0 | Verification | Draft |
 | VV-001 | Verification & Validation Protocol v2.0 | V&V | Draft |
 | RTM-001 | Requirements Traceability Matrix v3.0 | Traceability | Draft |
@@ -134,6 +134,7 @@ of this DHF, despite IEC 62304 being cited as a governing framework.
 | DCR-006 | Design Change Record — Denominator Policy (module M1) | Change Control | Draft |
 | DCR-007 | Design Change Record — Sampling Precision (module M4) | Change Control | Draft |
 | DCR-008 | Design Change Record — Derived Quantities and Thresholds (module M5) | Change Control | Draft |
+| DCR-009 | Design Change Record — Method Provenance (module M2) | Change Control | Draft |
 
 **Document control note (DCR-004)**: two files previously carried Document ID
 URS-001 with neither marked as superseded, and RTM-001 v2.0 was keyed to the
@@ -148,6 +149,7 @@ superseded banner and RTM-001 v3.0 is re-keyed to v2.0.
 | B | 2026-02-20 | QMS | Added test evidence archive entry |
 | C | 2026-02-20 | QMS | Added design change record entry |
 | D | 2026-02-24 | QMS | Updated to v2.0: 14-cell unified layout, advisory targets, M:E ratio, Continue Counting |
+| J | 2026-08-05 | QMS | v2.5.0 (DCR-009): method provenance. A result now states the conventions that produced it, not only which profile did. Closes a URS-052 gap — the clipboard path, the primary route into the LIS, carried no profile attribution while file export did (HA-096). Completes the five-module standards-review plan. |
 | I | 2026-08-05 | QMS | v2.4.0 (DCR-008): subset-percentage formulas and the near-threshold advisory. Closes the ICSH §2.6 gap recorded under DCR-005: where a confidence interval spans a configured diagnostic threshold, the count does not settle the question and the system now says so. HA-094 added. |
 | H | 2026-08-05 | QMS | v2.3.0 (DCR-007): sampling precision. Every reported percentage carries a Wilson confidence interval and the sub-target advisory is quantified. HA-030 residual 24 → 12. HA-093 added — the M:E ratio implies a precision the count does not support, which is what Rümke's paper actually warns about. |
 | G | 2026-08-05 | QMS | v2.2.0 (DCR-006): differential denominator policy. Nucleated red cells are excluded from the peripheral blood percentage denominator and reported per 100 WBC — they were diluting every reported leucocyte percentage (HA-092, pre-RPN 64). Bone marrow unchanged: ICSH places erythroblasts inside the nucleated differential count. consensus-14 profile 2.0 → 2.1 so installed browsers receive the correction. |

@@ -179,3 +179,39 @@ describe('ICSH conformance — target cell counts (§2.6)', () => {
         }
     });
 });
+
+// ================================================================
+describe('Provenance of the shipped profile (URS-055)', () => {
+
+    it('SC-030: The profile declares the standard it implements', () => {
+        assert.ok(config.provenance, 'the shipped profile must declare its basis');
+        assert.match(config.provenance.citation, /ICSH/);
+        assert.match(config.provenance.citation, /2008/);
+        assert.match(config.provenance.citation, /Int J Lab Hematol/);
+    });
+
+    it('SC-031: The M:E formula records the convention it follows', () => {
+        const basis = bm.formulas.ME_ratio.basis;
+        assert.ok(basis, 'a formula with a competing convention must state which it uses');
+        assert.match(basis, /ICSH 2008/);
+        // The disagreement itself is recorded, so a reader is not left to
+        // assume there is only one convention.
+        assert.match(basis, /competing convention/i);
+    });
+
+    it('SC-032: The target count records the conditional ICSH rule', () => {
+        assert.match(bm.targetCountBasis, /500/);
+        assert.match(bm.targetCountBasis, /300/);
+        assert.match(bm.targetCountBasis, /ICSH 2008/);
+    });
+
+    it('SC-033: Every specimen type produces a usable method statement', () => {
+        for (const spec of config.specimenTypes) {
+            const entries = Core.buildMethodStatement(spec, config);
+            assert.ok(entries.length >= 2, `${spec.specimenType}: statement too thin`);
+            const text = Core.formatMethodStatement(entries, ' ');
+            assert.ok(text.length > 40);
+            assert.doesNotMatch(text, /undefined|\[object/);
+        }
+    });
+});

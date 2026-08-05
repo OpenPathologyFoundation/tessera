@@ -1152,3 +1152,90 @@ describe('Behaviour — Thresholds and subset formulas (URS-038, URS-039)', () =
         h.close();
     });
 });
+
+// ================================================================
+describe('Behaviour — Method provenance (URS-052, URS-055)', () => {
+
+    it('TC-B130: The results screen carries a method statement', async () => {
+        const h = await counting({ caseNumber: 'S25-PROV' });
+        h.press('X', 50);
+        h.click('btnCountDone');
+        const summary = h.el('results-summary').textContent;
+        assert.match(summary, /Method/);
+        assert.match(summary, /ICSH 2008/, 'the standard the profile follows is named');
+        assert.match(summary, /M:E Ratio/, 'the formula convention is stated');
+        h.close();
+    });
+
+    it('TC-B131: The copied report carries the profile and version (URS-052)', async () => {
+        // The clipboard copies the tab panel and is the primary route into the
+        // LIS. Attribution has to live inside the panel, not only around it.
+        const h = await counting({ caseNumber: 'S25-CLIP' });
+        h.press('X', 50);
+        h.click('btnCountDone');
+        const panel = h.document.querySelector('.tab-panel').textContent;
+        assert.match(panel, /consensus-14/);
+        assert.match(panel, /v2\.4/);
+        h.close();
+    });
+
+    it('TC-B132: The method statement reaches the session and the CSV', async () => {
+        const h = await counting({ caseNumber: 'S25-CSV2' });
+        h.press('X', 50);
+        h.click('btnCountDone');
+        const session = h.hooks.state.sessionHistory[0];
+        assert.ok(Array.isArray(session.methodEntries) && session.methodEntries.length);
+        assert.match(session.methodNotes, /ICSH 2008/);
+
+        h.click('btnExportCsv');
+        const csv = await h.downloadText(0);
+        assert.ok(csv.split('\n')[0].includes('methodNotes'));
+        assert.match(csv, /ICSH 2008/);
+        h.close();
+    });
+
+    it('TC-B133: A template may place the method statement inline', async () => {
+        const cfg = clone(DEFAULT_CONFIG);
+        cfg.specimenTypes[0].templates = [{
+            tplCode: 'm', tplName: 'M',
+            outSentence: '{{total}} cells.<br>Method: {{methodNotes}}'
+        }];
+        const h = await counting({ config: cfg, caseNumber: 'C1' });
+        h.press('X', 50);
+        h.click('btnCountDone');
+        const panel = h.document.querySelector('.tab-panel').textContent;
+        assert.match(panel, /Method: Profile: Full 14-Part Consensus/);
+        assert.doesNotMatch(panel, /\{\{/);
+        h.close();
+    });
+
+    it('TC-B134: The peripheral blood method statement declares the denominator', async () => {
+        const h = await boot();
+        h.el('caseNumber').value = 'S25-PB2';
+        h.el('specimenType').value = 'pb';
+        h.el('specimenType').dispatchEvent(new h.window.Event('change', { bubbles: true }));
+        h.click('btnStartCount');
+        h.press('F', 180);
+        h.press('B', 20);
+        h.click('btnCountDone');
+        const notes = h.hooks.state.sessionHistory[0].methodNotes;
+        assert.match(notes, /Denominator/, 'a non-standard denominator must be declared');
+        assert.match(notes, /nrbc/);
+        assert.match(notes, /NRBC per 100 WBC/);
+        h.close();
+    });
+
+    it('TC-B135: A profile with no provenance still produces valid output', async () => {
+        const cfg = clone(DEFAULT_CONFIG);
+        delete cfg.provenance;
+        delete cfg.specimenTypes[0].targetCountBasis;
+        delete cfg.specimenTypes[0].formulas.ME_ratio.basis;
+        const h = await counting({ config: cfg, caseNumber: 'C1' });
+        h.press('X', 50);
+        h.click('btnCountDone');
+        assert.equal(h.hooks.state.phase, 'results');
+        const panel = h.document.querySelector('.tab-panel').textContent;
+        assert.doesNotMatch(panel, /undefined|\[object/);
+        h.close();
+    });
+});

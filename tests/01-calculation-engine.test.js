@@ -668,3 +668,92 @@ describe('Diagnostic thresholds (URS-038, ICSH 2008 §2.6)', () => {
             'nothing counted, nothing to test');
     });
 });
+
+// ================================================================
+describe('Method provenance (URS-055, DCR-009)', () => {
+
+    const META = {
+        profileId: 'consensus-14',
+        profileName: 'Full 14-Part Consensus',
+        version: '2.4',
+        provenance: { notes: 'Categories follow ICSH 2008 §2.6.' }
+    };
+
+    it('VV-PROV-001: The statement names the profile and its version', () => {
+        const e = Core.buildMethodStatement({}, META);
+        const profile = e.find(x => x.label === 'Profile');
+        assert.ok(profile);
+        assert.match(profile.text, /Full 14-Part Consensus/);
+        assert.match(profile.text, /consensus-14/);
+        assert.match(profile.text, /v2\.4/);
+    });
+
+    it('VV-PROV-002: A derived formula states the convention it follows', () => {
+        // The reason this matters: two conventions for the M:E ratio are in
+        // use and give different numbers from identical counts.
+        const e = Core.buildMethodStatement({
+            formulas: {
+                ME_ratio: {
+                    label: 'M:E Ratio',
+                    basis: 'ICSH 2008 §2.6: monocytes included in the numerator.'
+                }
+            }
+        }, META);
+        const me = e.find(x => x.label === 'M:E Ratio');
+        assert.ok(me, 'the formula convention must be stated');
+        assert.match(me.text, /monocytes included/);
+    });
+
+    it('VV-PROV-003: A non-standard denominator is declared', () => {
+        const e = Core.buildMethodStatement({
+            denominatorExcludes: ['nrbc'],
+            per100Reporting: { nrbc: { label: 'NRBC per 100 WBC' } }
+        }, META);
+        const den = e.find(x => x.label === 'Denominator');
+        assert.ok(den, 'excluding a category from the denominator must be stated');
+        assert.match(den.text, /nrbc/);
+        assert.match(den.text, /NRBC per 100 WBC/);
+    });
+
+    it('VV-PROV-004: A plain profile makes no denominator claim', () => {
+        // Bone marrow counts every cell, which is what a reader assumes;
+        // saying so would be noise.
+        const e = Core.buildMethodStatement({ formulas: {} }, META);
+        assert.equal(e.find(x => x.label === 'Denominator'), undefined);
+    });
+
+    it('VV-PROV-005: The confidence level is stated when intervals are shown', () => {
+        const withCI = Core.buildMethodStatement(
+            { confidenceIntervals: { enabled: true, level: 0.99 } }, META);
+        assert.match(withCI.find(x => x.label === 'Precision').text, /99%/);
+
+        const without = Core.buildMethodStatement(
+            { confidenceIntervals: { enabled: false } }, META);
+        assert.equal(without.find(x => x.label === 'Precision'), undefined);
+    });
+
+    it('VV-PROV-006: An empty profile yields an empty statement, not a stub', () => {
+        assert.deepEqual(Core.buildMethodStatement({}, {}), []);
+        assert.equal(Core.formatMethodStatement([]), '');
+        assert.equal(Core.formatMethodStatement(null), '');
+    });
+
+    it('VV-PROV-007: The statement flattens for template substitution', () => {
+        const text = Core.formatMethodStatement(
+            Core.buildMethodStatement({ targetCountBasis: 'ICSH 2008 §2.6.' }, META), ' ');
+        assert.match(text, /Profile: Full 14-Part Consensus/);
+        assert.match(text, /Target count: ICSH 2008/);
+    });
+
+    it('VV-PROV-008: methodNotes is available to templates and cannot be shadowed', () => {
+        assert.ok(Core.RESERVED_PLACEHOLDERS.includes('methodNotes'));
+        // Placeholders added for the denominator policy must be reserved too,
+        // or a category named "totalCounted" would shadow one.
+        ['total', 'totalCounted', 'denominator'].forEach(n =>
+            assert.ok(Core.RESERVED_PLACEHOLDERS.includes(n), `${n} must be reserved`));
+
+        const out = Core.renderTemplate('Method: {{methodNotes}}',
+            Core.buildTemplateValues({ methodNotes: 'ICSH 2008 §2.6.' }, {}));
+        assert.match(out, /Method: ICSH 2008/);
+    });
+});

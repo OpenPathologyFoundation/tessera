@@ -986,8 +986,9 @@
 
         updateCounterDisplay();
 
-        // Target reached chime
-        var total = getTotal();
+        // Target reached chime — measured against the differential, since the
+        // target is a number of classified cells.
+        var total = getDifferentialTotal();
         if (total >= specConfig.targetCount && !state.targetReachedNotified) {
             state.targetReachedNotified = true;
             AudioEngine.playChime();
@@ -1006,9 +1007,32 @@
         return Core.computeRatio(state.counts, specConfig.formulas.ME_ratio);
     }
 
+    /** Categories counted but outside the differential denominator (URS-030). */
+    function denominatorExcludes() {
+        var sc = getSpecConfig();
+        return (sc && sc.denominatorExcludes) || [];
+    }
+
+    /** The number of cells the percentages are computed over. */
+    function getDifferentialTotal() {
+        return Core.getDenominator(state.counts, denominatorExcludes());
+    }
+
     /** Displayed percentages: 2 dp, summing to exactly 100.00 (URS-032, URS-034). */
     function displayPercentages() {
-        return Core.percentagesSummingTo100(state.counts, 2);
+        return Core.percentagesSummingTo100(state.counts, 2, { exclude: denominatorExcludes() });
+    }
+
+    /** Per-100 values for categories reported against the differential. */
+    function computePer100Values() {
+        var sc = getSpecConfig();
+        var cfg = (sc && sc.per100Reporting) || {};
+        var out = {};
+        Object.keys(cfg).forEach(function (ct) {
+            out[ct] = Core.computePer100(state.counts, ct, denominatorExcludes(),
+                typeof cfg[ct].precision === 'number' ? cfg[ct].precision : 1);
+        });
+        return out;
     }
 
     // ================================================================
@@ -1216,8 +1240,11 @@
         if (!specConfig) return;
         var outCodes = specConfig.outCodes;
         var categories = specConfig.categories;
-        var total = getTotal();
+        var total = getDifferentialTotal();
+        var totalCounted = getTotal();
         var pcts = displayPercentages();
+        var per100 = computePer100Values();
+        var per100Cfg = specConfig.per100Reporting || {};
 
         // Update each cell value and percentage
         Object.keys(outCodes).forEach(function (k) {
@@ -1228,7 +1255,20 @@
             if (valEl) valEl.textContent = count;
 
             var pctEl = el('pct-' + ct);
-            if (pctEl) pctEl.textContent = Core.formatPercent(pcts[ct] || 0, 2);
+            if (!pctEl) return;
+            if (pcts[ct] === null) {
+                // Outside the differential: report per 100 of it, not as a
+                // percentage of a denominator this category is not part of.
+                if (Object.prototype.hasOwnProperty.call(per100Cfg, ct)) {
+                    var v = per100[ct];
+                    pctEl.textContent = (v === null ? 'N/A' : v + '/100');
+                    pctEl.title = per100Cfg[ct].label || (ct + ' per 100');
+                } else {
+                    pctEl.textContent = '—';
+                }
+            } else {
+                pctEl.textContent = Core.formatPercent(pcts[ct] || 0, 2);
+            }
         });
 
         // Subtotals
@@ -1242,24 +1282,44 @@
         var lowerSubEl = el('val-sub-lower');
         if (lowerSubEl) lowerSubEl.textContent = lowerSub;
 
+        // Subtotal percentages exclude non-differential categories from both
+        // numerator and denominator, so a row containing one still sums correctly.
+        var excl = denominatorExcludes();
+        var upperIn = 0;
+        categories.upper.forEach(function (ct) {
+            if (excl.indexOf(ct) === -1) upperIn += (state.counts[ct] || 0);
+        });
+        var lowerIn = 0;
+        categories.lower.forEach(function (ct) {
+            if (excl.indexOf(ct) === -1) lowerIn += (state.counts[ct] || 0);
+        });
+
         var upperPctEl = el('pct-sub-upper');
         if (upperPctEl) {
-            upperPctEl.textContent = total > 0 ? Core.formatPercent((upperSub / total) * 100, 2) : '—';
+            upperPctEl.textContent = total > 0 ? Core.formatPercent((upperIn / total) * 100, 2) : '—';
         }
         var lowerPctEl = el('pct-sub-lower');
         if (lowerPctEl) {
-            lowerPctEl.textContent = total > 0 ? Core.formatPercent((lowerSub / total) * 100, 2) : '—';
+            lowerPctEl.textContent = total > 0 ? Core.formatPercent((lowerIn / total) * 100, 2) : '—';
         }
 
-        // Grand total
+        // Grand total — shows the differential denominator, and the overall
+        // tally alongside it when the two differ.
         var grandTotalEl = el('val-grand-total');
-        if (grandTotalEl) grandTotalEl.textContent = total;
+        if (grandTotalEl) {
+            grandTotalEl.textContent = total === totalCounted
+                ? String(total)
+                : total + ' + ' + (totalCounted - total);
+            grandTotalEl.title = total === totalCounted ? ''
+                : total + ' in the differential, ' + (totalCounted - total) +
+                  ' counted outside it (' + excl.join(', ') + ')';
+        }
 
         // M:E ratio
         var meRatioEl = el('val-me-ratio');
         if (meRatioEl) meRatioEl.textContent = computeMERatio(specConfig) || 'N/A';
 
-        // Progress bar
+        // Progress bar — against the differential, matching the target's meaning
         var targetCount = specConfig.targetCount;
         var pctProgress = Math.min((total / targetCount) * 100, 100);
         var bar = el('progress-bar');
@@ -1306,8 +1366,10 @@
      */
     function buildSession(extra) {
         var specConfig = getSpecConfig();
-        var total = getTotal();
-        var percentages = Core.percentagesSummingTo100(state.counts, 2);
+        var excl = denominatorExcludes();
+        var totalCounted = getTotal();
+        var differentialTotal = getDifferentialTotal();
+        var percentages = displayPercentages();
         var meta = state.configMeta || {};
 
         var session = {
@@ -1319,17 +1381,22 @@
             configProfileName: meta.profileName || '',
             configVersion: meta.version || '',
             targetCount: specConfig.targetCount,
-            totalCount: total,
+            totalCount: totalCounted,
+            differentialTotal: differentialTotal,
+            denominatorExcludes: excl.slice(),
+            per100: computePer100Values(),
             counts: Object.assign({}, state.counts),
             percentages: percentages,
             meRatio: computeMERatio(specConfig),
             morphologyComments: buildMorphologyOutput(),
-            lowCountNote: Core.buildLowCountNote(total, specConfig.targetCount),
+            // The advisory target counts classified cells, so it is measured
+            // against the differential rather than the overall tally.
+            lowCountNote: Core.buildLowCountNote(differentialTotal, specConfig.targetCount),
             outputs: {}
         };
 
         // Rendered institutional outputs (integer percentages, summing to 100)
-        var intPcts = Core.percentagesSummingTo100(state.counts, 0);
+        var intPcts = Core.percentagesSummingTo100(state.counts, 0, { exclude: excl });
         var values = Core.buildTemplateValues(session, intPcts);
         specConfig.templates.forEach(function (tpl) {
             session.outputs[tpl.tplCode] = Core.renderTemplate(tpl.outSentence, values);
@@ -1396,17 +1463,30 @@
         }
         summaryHtml += '<span class="text-xs text-slate-400">' + Core.escapeHtml(session.specimenLabel) + '</span>';
         summaryHtml += '</div>';
-        summaryHtml += '<span class="text-xs font-mono text-slate-400">' + session.totalCount + ' cells</span>';
+        var diffTotal = typeof session.differentialTotal === 'number'
+            ? session.differentialTotal : session.totalCount;
+        summaryHtml += '<span class="text-xs font-mono text-slate-400">' + diffTotal + ' cells';
+        if (diffTotal !== session.totalCount) {
+            summaryHtml += ' <span class="text-slate-500">(+' + (session.totalCount - diffTotal) +
+                ' outside differential)</span>';
+        }
+        summaryHtml += '</span>';
         summaryHtml += '</div>';
 
         // Compact cell summary
         summaryHtml += '<div class="flex flex-wrap gap-2">';
         allCells.forEach(function (ct) {
             var pct = session.percentages[ct];
+            var per100 = session.per100 && session.per100[ct];
             summaryHtml += '<div class="flex items-baseline gap-1 px-2 py-1 bg-slate-800 rounded text-xs">';
             summaryHtml += '<span class="text-slate-500 uppercase">' + Core.escapeHtml(ct) + '</span>';
-            summaryHtml += '<span class="font-mono font-semibold text-slate-300">' +
-                (typeof pct === 'number' ? pct.toFixed(2) : '0.00') + '%</span>';
+            if (pct === null) {
+                summaryHtml += '<span class="font-mono font-semibold text-amber-300">' +
+                    (per100 === null || per100 === undefined ? 'N/A' : per100 + '/100') + '</span>';
+            } else {
+                summaryHtml += '<span class="font-mono font-semibold text-slate-300">' +
+                    (typeof pct === 'number' ? pct.toFixed(2) : '0.00') + '%</span>';
+            }
             summaryHtml += '</div>';
         });
         summaryHtml += '</div>';
@@ -1543,6 +1623,9 @@
 
         var html = '<div class="flex flex-wrap gap-2 mt-2">';
         allCells.forEach(function (ct) {
+            // A category outside the differential has no percentage of the WBC
+            // population, so no absolute count can be derived from a WBC.
+            if (session.percentages[ct] === null) return;
             // Derived from the same displayed percentages as the table and the
             // report, so the three can never disagree (FMEA HA-024).
             var abs = Core.computeAbsolute(wbc, session.percentages[ct] || 0);
@@ -1636,8 +1719,11 @@
         html += '</tr><tr>';
         cellKeys.forEach(function (ct) {
             var p = session.percentages ? session.percentages[ct] : undefined;
+            var pc = session.per100 && session.per100[ct];
             html += '<td class="px-2 py-1 font-mono text-center text-slate-500">' +
-                (typeof p === 'number' ? p.toFixed(2) : '0.00') + '%</td>';
+                (p === null
+                    ? (pc === null || pc === undefined ? 'N/A' : pc + '/100')
+                    : (typeof p === 'number' ? p.toFixed(2) + '%' : '0.00%')) + '</td>';
         });
         html += '</tr></table></div>';
 

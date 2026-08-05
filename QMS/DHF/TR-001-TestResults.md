@@ -5,8 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 3.0 |
-| **Product** | WBC ΔΣ v2.1.0 |
+| **Version** | 3.1 |
+| **Product** | WBC ΔΣ v2.2.0 |
 | **Date Executed** | 2026-08-04 (19:03:29 UTC) |
 | **Status** | **PASS** |
 | **Parent Document** | DHF-001 |
@@ -20,15 +20,14 @@
 
 ## 1. Executive Summary
 
-**579 tests passed across 3 verification layers and 3 browser engines, with
-0 failures and 3 documented skips.**
+**615 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 3 documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **450** |
-| System (browser) tests | **132** (44 x chromium, firefox, webkit) |
-| **Total executed** | **579** |
-| Passed | **579** |
+| Unit, static and behavioural tests | **477** |
+| System (browser) tests | **138** (47 specs x chromium, firefox, webkit, less 3 skips) |
+| **Total executed** | **615** |
+| Passed | **615** |
 | Failed | **0** |
 | Skipped (documented, §6) | **3** |
 | Pass Rate | **100.00%** |
@@ -43,8 +42,8 @@ Regenerate this evidence with `npm run test:qms`.
 
 | | v2.0 (2026-02-24) | v2.1.0 (this run) |
 |---|---|---|
-| Tests recorded | 191 | 579 |
-| Tests executing shipped application code | **0** | 579 |
+| Tests recorded | 191 | 615 |
+| Tests executing shipped application code | **0** | 615 |
 | Layers | Mirrored logic + static text assertions | Unit (shipped engine) + jsdom behaviour + browser system |
 | Browser engines | none | Chromium, Firefox, WebKit |
 
@@ -68,7 +67,7 @@ shipped code can cause a test to fail.
 
 ---
 
-## 3. Node Suite Results (450 tests, 95 suites, 0 failures)
+## 3. Node Suite Results (477 tests, 99 suites, 0 failures)
 
 ### Suite 01 — Calculation Engine
 
@@ -237,6 +236,17 @@ Capabilities verifiable only at this layer (real browser APIs):
 
 ---
 
+### 4.3 Standards and denominator coverage (added v2.2)
+
+| Suite | Scope | Result |
+|-------|-------|--------|
+| 12 | ICSH 2008 §2.6 conformance — NDC categories, M:E definition, target counts, exclusion guidance | PASS |
+| 05 VV-DEN-001..006 | Denominator policy: NRBC excluded from the PB differential, per-100 reporting, marrow unaffected, zero-denominator guard | PASS |
+| 11 TC-B100..B107 | Denominator policy in the DOM: grid, split grand total, progress, absolute-count suppression | PASS |
+| E2E VV-SYS-100..102 | The corrected peripheral blood differential in three real browsers | PASS |
+
+---
+
 ## 5. Defect Detection Record
 
 | Defect | Found by | Now guarded by |
@@ -252,6 +262,8 @@ Capabilities verifiable only at this layer (real browser APIs):
 | D-17 cell type shadowing a reserved template placeholder | Adversarial review | Suite 08 reserved-name tests |
 | D-18 config notice clobbering the crash-recovery prompt | Adversarial review | TC-B075 |
 | D-19 negative count restored from a corrupted autosave record | Adversarial review | VV-CALC-024/025/028, TC-B076 |
+| HA-090 ICSH-excluded cells countable into a general category | **Standards review (DCR-005)** | Suite 12 SC-003/004 |
+| HA-092 NRBC diluting the peripheral blood differential | **Standards review (DCR-006)** | VV-DEN-001..006, TC-B100..107, VV-SYS-100..102 |
 
 The last three were introduced or exposed during remediation and were caught by
 the new layers before release — the behaviour the previous suite could not
@@ -278,7 +290,7 @@ provide.
 
 ## 7. Conclusion
 
-All 579 executed automated tests pass with no failures, across three browser
+All 615 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -300,6 +312,12 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-05T11:01:33.246Z
+- Command: `npm run test:all`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-05_070133_run/`
+
 - Date (UTC): 2026-08-04T19:03:29.161Z
 - Command: `npm run test:all`
 - Exit Code: 0

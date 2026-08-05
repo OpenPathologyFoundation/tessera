@@ -6,7 +6,7 @@
 |-------|-------------------------------------------------------------------------------------------------------------------------|
 | **Document ID** | DHF-001                                                                                                                 |
 | **Product Name** | WBC ΔΣ                                                                                                                 |
-| **Product Version** | 2.1.0                                                                                                                     |
+| **Product Version** | 2.2.0                                                                                                                     |
 | **Classification** | Clinical Laboratory Aid - Software                                                                                      |
 | **Intended Use** | Keyboard-driven manual differential white blood cell counting tool for hematology laboratory personnel                  |
 | **Software Safety Class** | **Class A** (IEC 62304 §4.3) — see §3.1; requires sign-off |
@@ -113,15 +113,15 @@ of this DHF, despite IEC 62304 being cited as a governing framework.
 | **URS-001** | **User Requirements Specification v2.0** (`URS-001_UserRequirementsSpecification_v2.0.md`) — **controlled requirement baseline** | Requirements | Draft |
 | URS-001 | User Requirements Specification v1.0 (`URS-001-UserRequirementsSpecification.md`) | Requirements | **Superseded by v2.0** |
 | SPC-001 | Use Case Specification v1.2 (`SPC-001_UseCase_Specification_v1.2.docx`) | Requirements | Draft |
-| SRS-001 | System Requirements Specification v2.1 | Requirements | Draft |
+| SRS-001 | System Requirements Specification v2.2 | Requirements | Draft |
 | SAD-001 | System Architecture Design v2.0 | Design | Draft |
 | SDD-001 | Software Detailed Design v2.0 | Design | Draft |
-| RA-001 | Risk Analysis (FMEA) v2.1 | Risk Management | Draft |
+| RA-001 | Risk Analysis (FMEA) v2.3 | Risk Management | Draft |
 | TP-001 | Test Plan v2.0 | Verification | Draft |
 | VV-001 | Verification & Validation Protocol v2.0 | V&V | Draft |
 | RTM-001 | Requirements Traceability Matrix v3.0 | Traceability | Draft |
 | **REF-001** | **Standards and Literature Basis v1.0** | Reference | Draft |
-| TR-001 | Test Execution Results | Evidence | Draft |
+| TR-001 | Test Execution Results v3.1 | Evidence | Draft |
 | SOP-001 | Standard Operating Procedure | Procedure | Draft |
 | SOP-002 | Deployment Procedure | Procedure | Draft |
 | SOP-003 | Operations Procedure | Procedure | Draft |
@@ -146,6 +146,8 @@ superseded banner and RTM-001 v3.0 is re-keyed to v2.0.
 | B | 2026-02-20 | QMS | Added test evidence archive entry |
 | C | 2026-02-20 | QMS | Added design change record entry |
 | D | 2026-02-24 | QMS | Updated to v2.0: 14-cell unified layout, advisory targets, M:E ratio, Continue Counting |
+| G | 2026-08-05 | QMS | v2.2.0 (DCR-006): differential denominator policy. Nucleated red cells are excluded from the peripheral blood percentage denominator and reported per 100 WBC — they were diluting every reported leucocyte percentage (HA-092, pre-RPN 64). Bone marrow unchanged: ICSH places erythroblasts inside the nucleated differential count. consensus-14 profile 2.0 → 2.1 so installed browsers receive the correction. |
+| F | 2026-08-05 | QMS | v2.1.0 (DCR-005): standards grounding. ICSH 2008 verified against full text; IEC 62304 Class A declared with justification; REF-001 bibliography issued; HA-090/091 added. |
 | E | 2026-08-04 | QMS | v2.1.0 (DCR-004): verification integrity remediation. Test suite re-pointed at shipped code (unit + jsdom behaviour + Playwright system layers across Chromium/Firefox/WebKit, 579 tests). RTM-001 re-keyed to URS-001 v2.0. SRS-001 extended with SYS-140–SYS-179. URS-034 amended to the largest-remainder method (URS Rev E). URS-001 v1.0 marked superseded. RA-001 re-scored: 5 hazards added, 4 residual RPNs corrected. DCR-002/003/004 and SOP-002/003 added to this index. |
 
 ## 7. Approval Signatures

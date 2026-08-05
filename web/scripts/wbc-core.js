@@ -133,6 +133,8 @@
 
     /**
      * Sum every count. Non-numeric and negative entries contribute zero.
+     * This is the total number of cells tallied, including any category that
+     * the profile excludes from the percentage denominator.
      */
     function getTotal(counts) {
         var sum = 0;
@@ -141,6 +143,53 @@
             if (typeof v === 'number' && isFinite(v) && v > 0) sum += v;
         });
         return sum;
+    }
+
+    /**
+     * The denominator the differential percentages are computed over.
+     *
+     * Some categories are counted but do not belong in the denominator. The
+     * governing case is nucleated red cells in a peripheral blood differential:
+     * NRBC are enumerated alongside the leucocytes but are conventionally
+     * reported as a count per 100 WBC, and the WBC count is corrected for them,
+     * because they are not leucocytes. Including them in the denominator
+     * depresses every reported leucocyte percentage — with 20 NRBC among 200
+     * cells, a true 66.7% neutrophil count reports as 60.0%.
+     *
+     * Bone marrow is the opposite case: erythroblasts are a legitimate part of
+     * the nucleated differential count (ICSH 2008 §2.6) and belong in the
+     * denominator. The behaviour is therefore per-profile, never global.
+     *
+     * @param {Object}   counts
+     * @param {string[]} [exclude] cell types counted but not part of the denominator
+     */
+    function getDenominator(counts, exclude) {
+        if (!exclude || exclude.length === 0) return getTotal(counts);
+        var skip = {};
+        exclude.forEach(function (ct) { skip[ct] = true; });
+        var sum = 0;
+        Object.keys(counts || {}).forEach(function (ct) {
+            if (skip[ct]) return;
+            var v = counts[ct];
+            if (typeof v === 'number' && isFinite(v) && v > 0) sum += v;
+        });
+        return sum;
+    }
+
+    /**
+     * A category expressed per 100 units of the differential denominator —
+     * the conventional reporting form for NRBC in peripheral blood.
+     *
+     * @returns {number|null} null when the denominator is zero, so that the
+     *   caller renders "N/A" rather than dividing by nothing.
+     */
+    function computePer100(counts, cellType, exclude, precision) {
+        var denom = getDenominator(counts, exclude);
+        if (denom === 0) return null;
+        var n = (counts && counts[cellType]) || 0;
+        var p = typeof precision === 'number' ? precision : 1;
+        var factor = Math.pow(10, p);
+        return Math.round((n / denom) * 100 * factor) / factor;
     }
 
     /**
@@ -181,14 +230,27 @@
      * When the total is zero every value is 0 and no adjustment is made —
      * there is nothing counted to distribute.
      *
-     * @param {Object} counts   { cellType: integer }
-     * @param {number} decimals decimal places (0 for output templates, 2 for display)
-     * @returns {Object} { cellType: number } summing to exactly 100 (or all 0)
+     * Categories named in `options.exclude` are not part of the differential:
+     * they receive `null` rather than a percentage, and they are absent from
+     * the denominator. The remaining categories still sum to exactly 100.
+     * Report them with computePer100 instead.
+     *
+     * @param {Object}   counts   { cellType: integer }
+     * @param {number}   decimals decimal places (0 for output templates, 2 for display)
+     * @param {Object}   [options]
+     * @param {string[]} [options.exclude] categories outside the differential
+     * @returns {Object} { cellType: number|null } included values sum to exactly 100
      */
-    function percentagesSummingTo100(counts, decimals) {
-        var cellTypes = Object.keys(counts || {});
-        var total = getTotal(counts);
+    function percentagesSummingTo100(counts, decimals, options) {
+        var allTypes = Object.keys(counts || {});
+        var exclude = (options && options.exclude) || [];
+        var skip = {};
+        exclude.forEach(function (ct) { skip[ct] = true; });
+
+        var cellTypes = allTypes.filter(function (ct) { return !skip[ct]; });
+        var total = getDenominator(counts, exclude);
         var out = {};
+        allTypes.forEach(function (ct) { if (skip[ct]) out[ct] = null; });
 
         if (total === 0) {
             cellTypes.forEach(function (ct) { out[ct] = 0; });
@@ -298,9 +360,18 @@
      * Includes the traceability fields required by URS-052.
      */
     function buildTemplateValues(session, roundedPercentages) {
+        // {{total}} is the differential denominator, because "a 200-cell
+        // differential count" means 200 cells were classified into the
+        // percentages being reported. Where a profile excludes a category from
+        // the denominator, {{totalCounted}} gives the number of cells tallied
+        // overall. With no exclusions the two are equal.
+        var differentialTotal = typeof session.differentialTotal === 'number'
+            ? session.differentialTotal : session.totalCount;
         var values = {
             caseNumber: session.caseNumber || '',
-            total: session.totalCount,
+            total: differentialTotal,
+            totalCounted: session.totalCount,
+            denominator: differentialTotal,
             comments: session.morphologyComments || '',
             ME_ratio: session.meRatio || 'N/A',
             specimenType: session.specimenType || '',
@@ -311,7 +382,16 @@
             timestamp: session.timestamp || ''
         };
         Object.keys(roundedPercentages || {}).forEach(function (ct) {
-            values[ct] = roundedPercentages[ct];
+            // A category outside the differential has no percentage; leaving
+            // the token unresolved would print "{{nrbc}}" in a clinical report,
+            // so it renders as N/A and the per-100 form carries the value.
+            values[ct] = roundedPercentages[ct] === null ? 'N/A' : roundedPercentages[ct];
+        });
+        // {{<cellType>_per100}} — the conventional form for a category counted
+        // alongside the differential but reported against it (e.g. NRBC/100 WBC).
+        Object.keys(session.per100 || {}).forEach(function (ct) {
+            var v = session.per100[ct];
+            values[ct + '_per100'] = (v === null || v === undefined) ? 'N/A' : v;
         });
         return values;
     }
@@ -565,6 +645,51 @@
                 errors.push(name + ': targetCount must be a positive number');
             }
 
+            // Denominator policy (URS-030). A category may be counted without
+            // belonging to the differential, but it must be a real displayed
+            // category, and excluding every category would leave nothing to
+            // compute percentages over.
+            if (spec.denominatorExcludes !== undefined) {
+                if (!Array.isArray(spec.denominatorExcludes)) {
+                    errors.push(name + ': denominatorExcludes must be an array');
+                } else {
+                    spec.denominatorExcludes.forEach(function (ct) {
+                        if (!displayedSet[ct]) {
+                            errors.push(name + ': denominatorExcludes names "' + ct +
+                                '", which is not a displayed category');
+                        }
+                    });
+                    var remaining = displayed.filter(function (ct) {
+                        return spec.denominatorExcludes.indexOf(ct) === -1;
+                    });
+                    if (displayed.length > 0 && remaining.length === 0) {
+                        errors.push(name + ': denominatorExcludes removes every category, ' +
+                            'leaving no denominator for the differential');
+                    }
+                }
+            }
+
+            if (spec.per100Reporting !== undefined) {
+                if (typeof spec.per100Reporting !== 'object' || spec.per100Reporting === null) {
+                    errors.push(name + ': per100Reporting must be an object');
+                } else {
+                    Object.keys(spec.per100Reporting).forEach(function (ct) {
+                        if (!displayedSet[ct]) {
+                            errors.push(name + ': per100Reporting names "' + ct +
+                                '", which is not a displayed category');
+                        } else if (!spec.denominatorExcludes ||
+                            spec.denominatorExcludes.indexOf(ct) === -1) {
+                            // Reporting a category both as a percentage of the
+                            // differential and per 100 of it would state the
+                            // same quantity two different ways.
+                            errors.push(name + ': per100Reporting names "' + ct +
+                                '", which is still inside the differential denominator; ' +
+                                'add it to denominatorExcludes as well');
+                        }
+                    });
+                }
+            }
+
             if (spec.formulas) {
                 Object.keys(spec.formulas).forEach(function (fname) {
                     var f = spec.formulas[fname];
@@ -621,6 +746,8 @@
         sanitizeCount: sanitizeCount,
         sanitizeCounts: sanitizeCounts,
         getTotal: getTotal,
+        getDenominator: getDenominator,
+        computePer100: computePer100,
         calcPercentages: calcPercentages,
         percentagesSummingTo100: percentagesSummingTo100,
         formatPercent: formatPercent,

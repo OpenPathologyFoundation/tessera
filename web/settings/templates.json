@@ -1,5 +1,5 @@
 {
-    "version": "2.0",
+    "version": "2.1",
     "profileId": "consensus-14",
     "profileName": "Full 14-Part Consensus",
     "specimenTypes": [
@@ -144,7 +144,7 @@
                 {
                     "tplCode": "mgh",
                     "tplName": "MGH",
-                    "outSentence": "A {{total}}-cell differential count of peripheral blood reveals: {{poly}}% segmented neutrophils, {{bands}}% band forms, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{nrbc}}% nucleated RBCs, {{plasma}}% plasma cells, {{mast}}% mast cells, and {{other}}% other cells."
+                    "outSentence": "A {{total}}-cell differential count of peripheral blood reveals: {{poly}}% segmented neutrophils, {{bands}}% band forms, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{plasma}}% plasma cells, {{mast}}% mast cells, and {{other}}% other cells. Nucleated RBCs {{nrbc_per100}} per 100 WBC."
                 }
             ],
             "constituents": {},
@@ -161,6 +161,15 @@
             "morphologyChecklist": [],
             "categoryNotes": {
                 "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells — ICSH 2008 §2.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
+            },
+            "denominatorExcludes": [
+                "nrbc"
+            ],
+            "per100Reporting": {
+                "nrbc": {
+                    "label": "NRBC per 100 WBC",
+                    "precision": 1
+                }
             }
         }
     ]

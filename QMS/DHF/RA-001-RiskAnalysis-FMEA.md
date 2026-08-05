@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | RA-001 |
-| **Version** | 2.1 |
+| **Version** | 2.3 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-04 |
@@ -159,6 +159,8 @@ primary text against the shipped configuration.
 | HA-090 | Cells that ICSH excludes from the nucleated differential count are tallied into a general-purpose category | The excluded cell enters the denominator and depresses every reported percentage. ICSH §2.6 excludes megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells and non-haemopoietic cells such as metastatic tumour cells. A marrow with numerous smudged cells or tumour infiltrate could have every lineage percentage understated, including the blast percentage used for diagnostic thresholds | 4 | The shipped profile offers an `other` category with no ICSH counterpart and no stated scope; operators reasonably use it for anything unclassifiable | 3 | **None** — the count remains internally consistent and the error is invisible in the output | 4 | **48** | **Medium** | REF-001 §3.2 records the ICSH exclusion list. The `other` category carries interface guidance naming what must not be counted into it, and SOP-001 directs that excluded findings be recorded in the morphology comment rather than tallied. A profile may omit the category entirely. | 4x2x2 = **16** (Medium). **Residual risk accepted with documentation and training.** This cannot be reduced further in software: the tool records the operator's classification and cannot know which cell was placed in `other`. Detection improves from Low to High because the reported morphology comment gives the reviewing pathologist a cross-check. |
 | HA-091 | Lymphoid blasts are included in the M:E ratio numerator | ICSH §2.6 specifies *myeloblasts* in the M:E numerator, but the shipped profile has a single generic `blasts` category. In a lymphoblastic marrow the M:E ratio is overstated | 2 | Profile does not distinguish myeloid from lymphoid blasts | 2 | M:E ratio is secondary to the differential and is interpreted with cellularity, flow cytometry and immunophenotype | 3 | **12** | **Low** | Documented limitation in URS-035 and REF-001 §3.5. A laboratory requiring the distinction configures separate myeloid and lymphoid blast categories, which the schema already supports. | 2x2x2 = **8** (Low) |
 
+| HA-092 | A category that is not part of the differential is included in its percentage denominator | Every reported percentage in that differential is depressed. In peripheral blood, nucleated red cells are enumerated with the leucocytes but are not leucocytes; counting them into the denominator understates every leucocyte percentage in proportion to how many are present. With 20 NRBC among 200 cells a true 66.7% neutrophil proportion reports as 60.0%. The error is largest in exactly the conditions that produce NRBC — haemolysis, myelophthisis, marrow infiltration, neonatal samples — and is invisible in the output, since the percentages remain internally consistent and sum to 100 | 4 | The profile schema had no way to express that a counted category sits outside the differential; every counted cell entered the denominator | 4 | **None** — the differential is self-consistent and gives the reviewer nothing to notice | 4 | **64** | **High** | SYS-180–SYS-185: a profile designates categories excluded from the denominator and reports them per 100 of it. The shipped peripheral blood profile excludes NRBC and reports NRBC per 100 WBC. Bone marrow is unchanged: ICSH 2008 §2.6 places erythroblasts inside the nucleated differential count. Validation rejects a profile that excludes every category or that reports a category both ways. | 4x1x2 = **8** (Low). Verified at all three layers: VV-DEN-001 to 006, TC-B100 to B107, VV-SYS-100 to 102. Detection improves because the counting grid and the report now state the differential denominator and the overall tally separately, so a discrepancy is visible. |
+
 ### 4.10 Hazards Identified in the v2.1 Design Review (DCR-004)
 
 | # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
@@ -175,11 +177,11 @@ primary text against the shipped configuration.
 | Risk Level | Count | Hazard IDs |
 |-----------|-------|-----------|
 | Critical (75-125) | 1 | HA-001 |
-| High (50-74) | 3 | HA-003, HA-030, HA-080 |
-| Medium (16-49) | 21 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
+| High (50-74) | 4 | HA-003, HA-030, HA-080, HA-092 |
+| Medium (16-49) | 23 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
 | Low (1-15) | 9 | HA-023, HA-040, HA-041, HA-050, HA-051, HA-060, HA-062, HA-070, HA-072 |
 
-Total: **34** hazards (29 carried from v2.0, 5 added by the v2.1 design review).
+Total: **37** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
 
 _Two counting errors in the v2.0 table are corrected here: the Medium row was
 labelled 14 against a list of 16 entries and the Low row 8 against a list of 10,
@@ -193,7 +195,7 @@ Every RPN in section 4 has been recomputed from its S, O and D values._
 | Critical (75-125) | **0** |
 | High (50-74) | **0** |
 | Medium (16-49) | **3** (HA-001 RPN=45, HA-002 RPN=30, HA-030 RPN=24) |
-| Low (1-15) | **31** |
+| Low (1-15) | **34** |
 
 All three residual Medium risks are accepted by design and unchanged from v2.0;
 their rationale is in section 5.3. No residual risk sits above Medium.
@@ -308,6 +310,8 @@ residual scores above to be treated as evidence rather than intent.
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete FMEA |
 | B | 2026-02-24 | QMS | v2.0 update: optional case number (HA-001), advisory target count replacing blocking dialog (HA-030), unified key mappings (HA-010), new hazards for M:E ratio (HA-070, HA-072) and Continue Counting (HA-071), updated risk summary |
+| E | 2026-08-05 | QMS | v2.3 (DCR-006): HA-092 added — a category outside the differential included in its percentage denominator. Pre-RPN 64 (High), residual 8. This was live in the shipped peripheral blood profile: NRBC sat in the denominator, understating every leucocyte percentage. |
+| D | 2026-08-05 | QMS | v2.2 (DCR-005): HA-090 and HA-091 added from the ICSH standards review. |
 | C | 2026-08-04 | QMS | v2.1 update (DCR-004). Five hazards added from the design review: HA-080 (hidden key-mapped category, pre-RPN 50 High), HA-063, HA-043, HA-081, HA-064. Four residual RPNs corrected where the v2.0 score credited a control absent from the code: HA-022 (8→4), HA-041 (9→3), HA-060 (6→3), HA-061 (8→4); HA-062 unchanged at 5 but now supported. HA-014 mitigation revised — the specimen selector is no longer locked, per URS-010. Section 5.1 counting errors corrected (Medium 14→21, Low 8→9, HA-021 refiled). Section 5.4 added: every mitigation now maps to a test that executes shipped code. Sections 6.2 and 6.3 added. Severity ratings unchanged throughout and require clinical sign-off. |
 
 ## 8. Approval Signatures

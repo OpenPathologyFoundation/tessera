@@ -34,7 +34,7 @@ describe('Behaviour — Boot and Phase Machine (SYS-001, SYS-130)', () => {
         const h = await boot();
         assert.equal(h.hooks.state.phase, 'case-entry');
         assert.equal(h.hooks.state.configMeta.profileId, 'consensus-14');
-        assert.equal(h.hooks.state.configMeta.version, '2.0');
+        assert.equal(h.hooks.state.configMeta.version, DEFAULT_CONFIG.version);
         assert.ok(h.visible('phase-case-entry'));
         assert.ok(!h.visible('phase-counting'));
         assert.ok(!h.visible('phase-results'));
@@ -668,7 +668,8 @@ describe('Behaviour — Results, Export and Absolute Counts', () => {
         h.click('btnCountDone');
         const summary = h.el('results-summary').textContent;
         assert.match(summary, /consensus-14/);
-        assert.match(summary, /v2\.0/);
+        assert.ok(summary.includes('v' + DEFAULT_CONFIG.version),
+            'results footer must state the profile version in force');
         assert.match(summary, /Counted:/);
         h.close();
     });
@@ -802,6 +803,107 @@ describe('Behaviour — Theme and Audio (URS-095, URS-097)', () => {
         const before = h.audioEvents.length;
         h.press('X', 3);
         assert.ok(h.audioEvents.length > before, 'each counted keystroke should produce a tone');
+        h.close();
+    });
+});
+
+// ================================================================
+describe('Behaviour — Denominator policy (URS-030, DCR-006)', () => {
+
+    /** Switch the booted app to peripheral blood and start counting. */
+    async function pbCounting() {
+        const h = await boot();
+        h.el('caseNumber').value = 'S25-PB';
+        h.el('specimenType').value = 'pb';
+        h.el('specimenType').dispatchEvent(new h.window.Event('change', { bubbles: true }));
+        h.click('btnStartCount');
+        return h;
+    }
+
+    it('TC-B100: NRBC counted in PB do not dilute the leucocyte percentages', async () => {
+        const h = await pbCounting();
+        h.press('F', 120);   // segs
+        h.press('S', 40);    // lymphs
+        h.press('A', 15);    // monos
+        h.press('G', 5);     // eos
+        h.press('B', 20);    // NRBC — counted, but not leucocytes
+
+        // 120/180 = 66.67%, not 120/200 = 60.00%
+        assert.equal(h.text('pct-poly'), '66.67%');
+        assert.equal(h.text('pct-lymph'), '22.22%');
+        h.close();
+    });
+
+    it('TC-B101: NRBC display per 100 WBC rather than a percentage', async () => {
+        const h = await pbCounting();
+        h.press('F', 180);
+        h.press('B', 20);
+        assert.equal(h.text('pct-nrbc'), '11.1/100');
+        assert.match(h.el('pct-nrbc').title, /per 100/i);
+        h.close();
+    });
+
+    it('TC-B102: The grand total distinguishes the differential from the overall tally', async () => {
+        const h = await pbCounting();
+        h.press('F', 180);
+        h.press('B', 20);
+        assert.equal(h.text('val-grand-total'), '180 + 20');
+        assert.match(h.el('val-grand-total').title, /180 in the differential/);
+        h.close();
+    });
+
+    it('TC-B103: Progress tracks the differential, not the cells tallied', async () => {
+        const h = await pbCounting();
+        h.press('B', 50);    // 50 NRBC contribute nothing to a 200-WBC target
+        assert.equal(h.text('progress-label'), '0 / 200 (target)');
+        h.press('F', 100);
+        assert.equal(h.text('progress-label'), '100 / 200 (target)');
+        h.close();
+    });
+
+    it('TC-B104: Displayed percentages still sum to 100 with a category excluded', async () => {
+        const h = await pbCounting();
+        ['F', 'S', 'A', 'G', 'D'].forEach(k => h.press(k, 7));
+        h.press('B', 13);
+        const spec = h.hooks.getSpecConfig();
+        const cells = spec.categories.upper.concat(spec.categories.lower)
+            .filter(ct => (spec.denominatorExcludes || []).indexOf(ct) === -1);
+        const sum = cells.reduce((s, ct) => s + parseFloat(h.text('pct-' + ct)), 0);
+        assert.equal(Number(sum.toFixed(2)), 100);
+        h.close();
+    });
+
+    it('TC-B105: The finalized PB report states leucocytes and NRBC per 100 WBC', async () => {
+        const h = await pbCounting();
+        h.press('F', 180);
+        h.press('B', 20);
+        h.click('btnCountDone');
+        const panel = h.document.querySelector('.tab-panel').textContent;
+        assert.match(panel, /180-cell differential/);
+        assert.match(panel, /11\.1 per 100 WBC/);
+        assert.doesNotMatch(panel, /\{\{/);
+        h.close();
+    });
+
+    it('TC-B106: Absolute counts are not derived for a non-differential category', async () => {
+        const h = await pbCounting();
+        h.press('F', 180);
+        h.press('B', 20);
+        h.click('btnCountDone');
+        h.setInput('wbcTotal', '10');
+        const labels = [...h.document.querySelectorAll('#abs-results span')].map(n => n.textContent);
+        assert.ok(labels.includes('poly'), 'leucocyte categories get absolute counts');
+        assert.ok(!labels.includes('nrbc'),
+            'NRBC is not a fraction of the WBC population, so no absolute count follows from a WBC');
+        h.close();
+    });
+
+    it('TC-B107: Bone marrow is unaffected — erythroblasts remain a percentage', async () => {
+        const h = await counting({ caseNumber: 'S25-BM' });
+        h.press('F', 180);
+        h.press('B', 20);
+        assert.equal(h.text('pct-nrbc'), '10.00%');
+        assert.equal(h.text('val-grand-total'), '200');
         h.close();
     });
 });

@@ -24,8 +24,13 @@ describe('Config Schema V2 — Wrapper Fields', () => {
         assert.ok(isV2, 'Config must be v2 object format');
     });
 
-    it('Has version field set to "2.0"', () => {
-        assert.equal(rawConfig.version, '2.0');
+    it('Has a dotted profile version', () => {
+        // Pinned to a shape, not a literal: the version is what drives the
+        // supersede check that delivers a corrected profile to an installed
+        // browser, so it is expected to change.
+        assert.match(String(rawConfig.version), /^\d+\.\d+(\.\d+)?$/);
+        assert.ok(Core.compareVersions(rawConfig.version, '2.0') >= 0,
+            'shipped profile must not regress below the 2.0 baseline');
     });
 
     it('Has profileId field', () => {

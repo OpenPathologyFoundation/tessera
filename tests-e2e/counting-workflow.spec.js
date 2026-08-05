@@ -10,6 +10,14 @@
  * executed end to end.
  */
 const { test, expect } = require('@playwright/test');
+const fs = require('node:fs');
+const path = require('node:path');
+
+// Read from the shipped profile rather than pinning a literal: the version is
+// what drives the supersede check that delivers a corrected profile to an
+// installed browser, so it is expected to change.
+const SHIPPED = JSON.parse(fs.readFileSync(
+    path.join(__dirname, '..', 'web', 'settings', 'templates.json'), 'utf-8'));
 
 /** Fresh browser state for every test — no carry-over between "patients". */
 // Playwright gives every test a fresh browser context, so localStorage and
@@ -170,7 +178,7 @@ test.describe('Validation scenario V1 — complete bone marrow differential', ()
 
         // Traceability footer present (URS-052)
         await expect(page.locator('#results-summary')).toContainText('consensus-14');
-        await expect(page.locator('#results-summary')).toContainText('v2.0');
+        await expect(page.locator('#results-summary')).toContainText('v' + SHIPPED.version);
 
         // The report percentages must sum to 100
         const panel = await page.locator('.tab-panel:not(.hidden)').innerText();
@@ -271,5 +279,57 @@ test.describe('Specimen type switching (URS-010, URS-013)', () => {
         await page.click('#modal-cancel');
         await expect(page.locator('#specimenTypeCounting')).toHaveValue('bm');
         await expect(page.locator('#val-blasts')).toHaveText('25');
+    });
+});
+
+// ================================================================
+test.describe('Denominator policy — NRBC in peripheral blood (URS-030, DCR-006)', () => {
+
+    async function startPB(page, caseNumber = 'S25-PB') {
+        await page.fill('#caseNumber', caseNumber);
+        await page.selectOption('#specimenType', 'pb');
+        await page.click('#btnStartCount');
+        await expect(page.locator('#phase-counting')).toBeVisible();
+    }
+
+    test('VV-SYS-100: NRBC counted in PB do not dilute the leucocyte percentages', async ({ page }) => {
+        await startPB(page);
+        await count(page, 'f', 120);   // segs
+        await count(page, 's', 40);    // lymphs
+        await count(page, 'a', 15);    // monos
+        await count(page, 'g', 5);     // eos
+        await count(page, 'b', 20);    // NRBC
+
+        // 120/180 = 66.67%. Before this change the same slide reported 60.00%,
+        // because the 20 NRBC sat in the denominator.
+        await expect(page.locator('#pct-poly')).toHaveText('66.67%');
+        await expect(page.locator('#pct-lymph')).toHaveText('22.22%');
+        await expect(page.locator('#pct-nrbc')).toHaveText('11.1/100');
+        await expect(page.locator('#val-grand-total')).toHaveText('180 + 20');
+    });
+
+    test('VV-SYS-101: The report states the leucocyte differential and NRBC per 100 WBC', async ({ page }) => {
+        await startPB(page, 'S25-NRBC');
+        await count(page, 'f', 180);
+        await count(page, 'b', 20);
+        await page.click('#btnCountDone');
+
+        const panel = await page.locator('.tab-panel:not(.hidden)').innerText();
+        expect(panel).toContain('180-cell differential');
+        expect(panel).toContain('11.1 per 100 WBC');
+        expect(panel).not.toContain('{{');
+
+        // The reported leucocyte percentages still sum to 100.
+        const reported = [...panel.matchAll(/(\d+)% /g)].map(m => Number(m[1]));
+        expect(reported.reduce((a, b) => a + b, 0)).toBe(100);
+    });
+
+    test('VV-SYS-102: Bone marrow keeps erythroblasts in the differential', async ({ page }) => {
+        await startCount(page, 'S25-BM');
+        await count(page, 'f', 180);
+        await count(page, 'b', 20);
+        // ICSH 2008 includes erythroblasts in the nucleated differential count.
+        await expect(page.locator('#pct-nrbc')).toHaveText('10.00%');
+        await expect(page.locator('#val-grand-total')).toHaveText('200');
     });
 });

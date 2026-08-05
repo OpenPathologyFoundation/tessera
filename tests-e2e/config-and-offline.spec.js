@@ -18,6 +18,10 @@ const { test, expect } = require('@playwright/test');
 const fs = require('node:fs');
 const path = require('node:path');
 
+// Read from the shipped profile rather than pinning a literal (see above).
+const SHIPPED = JSON.parse(fs.readFileSync(
+    path.join(__dirname, '..', 'web', 'settings', 'templates.json'), 'utf-8'));
+
 async function startAndCount(page, caseNumber, key, n) {
     await page.goto('/counter.html');
     await expect(page.locator('#phase-case-entry')).toBeVisible();
@@ -56,7 +60,7 @@ test.describe('Configuration controls (URS-103)', () => {
 
         const profile = JSON.parse(await readDownload(download));
         expect(profile.profileId).toBe('consensus-14');
-        expect(profile.version).toBe('2.0');
+        expect(profile.version).toBe(SHIPPED.version);
         expect(Array.isArray(profile.specimenTypes)).toBe(true);
     });
 

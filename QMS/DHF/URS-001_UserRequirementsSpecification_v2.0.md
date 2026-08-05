@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | URS-001 |
-| **Version** | 2.0 (Rev F) |
+| **Version** | 2.0 (Rev G) |
 | **Product** | WBC ΔΣ (Eukrasia) |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-05 |
@@ -89,7 +89,7 @@ This URS covers all user-facing functionality of WBC ΔΣ including specimen ide
 
 | ID | Requirement | Priority | Rationale |
 |----|------------|----------|-----------|
-| URS-030 | The system SHALL automatically calculate and display the percentage of each cell type relative to the total count. | **P0 – Critical** | The differential percentage is the primary clinical result. |
+| URS-030 | The system SHALL automatically calculate and display the percentage of each cell type relative to **the differential denominator**, which the configuration profile defines. A profile SHALL be able to designate categories that are counted but excluded from that denominator and reported per 100 of it instead. | **P0 – Critical** | _Amended 2026-08-05 (Rev G, DCR-006)._ The differential percentage is the primary clinical result. Nucleated red cells in peripheral blood are the governing case: they are enumerated alongside the leucocytes but are not leucocytes, and are conventionally reported per 100 WBC with the WBC count corrected. Including them in the denominator depresses every reported leucocyte percentage — with 20 NRBC among 200 cells a true 66.7% neutrophil count reports as 60.0%, which is clinically material in haemolysis, myelophthisis and neonatal samples. Bone marrow is the opposite case: erythroblasts belong in the nucleated differential count (ICSH 2008 §2.6 [S1]) and stay in the denominator. The behaviour is therefore per-profile, never global. |
 | URS-031 | The system SHALL update percentages in real time as counts change. | **P0 – Critical** | Allows operator to monitor the differential as it develops. |
 | URS-032 | The system SHALL display percentages with at minimum 2 decimal places precision. | **P1 – High** | _Amended from v1.0 (was 1 decimal)._ Low-percentage cell types (e.g., basophils at 0.50%) benefit from additional precision. Consistent with observed system behavior. |
 | URS-033 | The system SHALL handle division by zero gracefully when total count is zero (display 0.00%, not NaN or error). | **P0 – Critical** | Application must not crash before counting begins or after reset. |
@@ -257,6 +257,7 @@ The tool is given into the hands of the user. Governance of configuration profil
 | A | 2026-02-18 | QMS | Initial draft — complete user requirements defined |
 | B | 2026-02-19 | QMS | Added session export requirement |
 | C | 2026-02-20 | QMS | Added theme switch requirement |
+| G | 2026-08-05 | QMS | URS-030 amended: percentages are computed over a profile-defined differential denominator, and a category may be counted but excluded from it and reported per 100 instead. Corrects the peripheral blood NRBC convention. |
 | F | 2026-08-05 | QMS | Citations verified against ICSH 2008 full text (REF-001 [S1]). URS-105 attribution corrected — the 500-cell BM target is ICSH, not CAP, and is conditional on diagnostic intent; the 300-cell provision added. URS-035 states the ICSH M:E definition, records the competing convention, and notes the generic-blasts limitation. URS-012 expanded with the ICSH NDC exclusion list. |
 | E | 2026-08-04 | QMS | URS-034 amended: rounding residual distributed by the largest-remainder method rather than applied wholly to the largest-count category. Rationale and worked example in DCR-004 §5.1. Acceptance criterion 5 updated to match. |
 | D | 2026-02-24 | QMS | Major revision: harmonized with SPC-001 v1.2. Amended case number, count completion, configuration, and audio feedback requirements per stakeholder review. Added body fluid, absolute count, auto-save, visual config editor, handedness, and structured comments requirements. See Section 9 for full change summary. |

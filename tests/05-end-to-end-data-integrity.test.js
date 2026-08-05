@@ -60,7 +60,20 @@ function applyKeystrokes(spec, keypresses) {
 function buildSession(specimenType, counts, caseNumber, comments) {
     const spec = specFor(specimenType);
     const total = Core.getTotal(counts);
+    // Mirrors mdc-app.js buildSession: categories the profile places outside
+    // the differential are excluded from the denominator and reported per 100
+    // of it instead.
+    const exclude = spec.denominatorExcludes || [];
+    const differentialTotal = Core.getDenominator(counts, exclude);
+    const per100 = {};
+    Object.keys(spec.per100Reporting || {}).forEach(ct => {
+        per100[ct] = Core.computePer100(counts, ct, exclude,
+            spec.per100Reporting[ct].precision);
+    });
     const session = {
+        differentialTotal,
+        per100,
+        denominatorExcludes: exclude.slice(),
         caseNumber: caseNumber || '',
         specimenType: specimenType,
         specimenLabel: spec.specimenLabel,
@@ -71,14 +84,14 @@ function buildSession(specimenType, counts, caseNumber, comments) {
         targetCount: spec.targetCount,
         totalCount: total,
         counts: counts,
-        percentages: Core.percentagesSummingTo100(counts, 2),
+        percentages: Core.percentagesSummingTo100(counts, 2, { exclude }),
         meRatio: spec.formulas && spec.formulas.ME_ratio
             ? Core.computeRatio(counts, spec.formulas.ME_ratio) : null,
         morphologyComments: comments || '',
-        lowCountNote: Core.buildLowCountNote(total, spec.targetCount),
+        lowCountNote: Core.buildLowCountNote(differentialTotal, spec.targetCount),
         outputs: {}
     };
-    const intPcts = Core.percentagesSummingTo100(counts, 0);
+    const intPcts = Core.percentagesSummingTo100(counts, 0, { exclude });
     const values = Core.buildTemplateValues(session, intPcts);
     spec.templates.forEach(tpl => {
         session.outputs[tpl.tplCode] = Core.renderTemplate(tpl.outSentence, values);
@@ -215,7 +228,8 @@ describe('E2E — Traceability Fields in Output (URS-052)', () => {
         const spec = specFor('bm');
         const session = buildSession('bm', applyKeystrokes(spec, press('X', 10)), 'S25-1234', '');
         assert.equal(session.configProfileId, 'consensus-14');
-        assert.equal(session.configVersion, '2.0');
+        assert.equal(session.configVersion, normalized.version,
+            'the session must record the version of the profile actually in force');
         assert.ok(session.configProfileName);
         assert.equal(session.targetCount, 500);
         assert.ok(session.timestamp);
@@ -359,5 +373,88 @@ describe('E2E — Continue Counting preserves the tally (URS-042, HA-071)', () =
         const p = Core.percentagesSummingTo100(resumed, 2);
         assert.ok(Math.abs(p.blasts - (50 / 210 * 100)) <= 0.01);
         assert.equal(sumOf(p), 100);
+    });
+});
+
+// ================================================================
+describe('E2E — Denominator policy (URS-030, DCR-006)', () => {
+
+    it('VV-DEN-001: NRBC are excluded from the peripheral blood denominator', () => {
+        const spec = specFor('pb');
+        assert.deepEqual(spec.denominatorExcludes, ['nrbc'],
+            'the shipped PB profile must place NRBC outside the differential');
+
+        const counts = applyKeystrokes(spec, [
+            ...press('F', 120), ...press('S', 40), ...press('A', 15),
+            ...press('G', 5), ...press('B', 20)   // B = nrbc
+        ]);
+        assert.equal(Core.getTotal(counts), 200, '200 cells were tallied');
+        assert.equal(Core.getDenominator(counts, ['nrbc']), 180,
+            'but only 180 of them are leucocytes');
+
+        const p = Core.percentagesSummingTo100(counts, 2, { exclude: ['nrbc'] });
+        // 120/180 = 66.67%, not 120/200 = 60%
+        assert.equal(p.poly, 66.67);
+        assert.equal(p.lymph, 22.22);
+        assert.equal(p.nrbc, null, 'NRBC has no percentage of the differential');
+        assert.equal(sumOf(p), 100);
+    });
+
+    it('VV-DEN-002: NRBC are reported per 100 WBC', () => {
+        const spec = specFor('pb');
+        const counts = applyKeystrokes(spec, [...press('F', 180), ...press('B', 20)]);
+        assert.equal(Core.computePer100(counts, 'nrbc', ['nrbc'], 1), 11.1);
+        const session = buildSession('pb', counts, 'S25-1', '');
+        assert.equal(session.per100.nrbc, 11.1);
+        assert.equal(session.differentialTotal, 180);
+        assert.equal(session.totalCount, 200);
+    });
+
+    it('VV-DEN-003: The PB report states the leucocyte count and NRBC per 100 WBC', () => {
+        const spec = specFor('pb');
+        const counts = applyKeystrokes(spec, [...press('F', 180), ...press('B', 20)]);
+        const session = buildSession('pb', counts, 'S25-1', '');
+        const text = Core.htmlToText(session.outputs.mgh);
+        assert.match(text, /180-cell differential/,
+            'the differential is of the 180 leucocytes, not all 200 cells counted');
+        assert.match(text, /100% segmented neutrophils/);
+        assert.match(text, /11\.1 per 100 WBC/);
+        assert.doesNotMatch(text, /\{\{/);
+    });
+
+    it('VV-DEN-004: Bone marrow is unaffected — erythroblasts stay in the denominator', () => {
+        const spec = specFor('bm');
+        assert.ok(!spec.denominatorExcludes || spec.denominatorExcludes.length === 0,
+            'ICSH 2008 includes erythroblasts in the nucleated differential count');
+        const counts = applyKeystrokes(spec, [...press('F', 180), ...press('B', 20)]);
+        const p = Core.percentagesSummingTo100(counts, 2);
+        assert.equal(Core.getDenominator(counts, spec.denominatorExcludes), 200);
+        assert.equal(p.poly, 90);
+        assert.equal(p.nrbc, 10, 'erythroblasts are a reported percentage in marrow');
+    });
+
+    it('VV-DEN-005: The advisory measures the differential, not the overall tally', () => {
+        const spec = specFor('pb');
+        // 190 WBC + 20 NRBC = 210 cells tallied, but only 190 in the differential
+        const counts = applyKeystrokes(spec, [...press('F', 190), ...press('B', 20)]);
+        const session = buildSession('pb', counts, '', '');
+        assert.equal(session.totalCount, 210);
+        assert.equal(session.differentialTotal, 190);
+        assert.ok(session.lowCountNote, 'a 190-leucocyte differential is below the 200 target');
+        assert.match(session.lowCountNote, /190-cell count/);
+    });
+
+    it('VV-DEN-006: A zero denominator does not divide by zero', () => {
+        const spec = specFor('pb');
+        const counts = applyKeystrokes(spec, press('B', 5));   // NRBC only
+        assert.equal(Core.getDenominator(counts, ['nrbc']), 0);
+        assert.equal(Core.computePer100(counts, 'nrbc', ['nrbc'], 1), null);
+        const p = Core.percentagesSummingTo100(counts, 2, { exclude: ['nrbc'] });
+        assert.equal(p.nrbc, null);
+        Object.entries(p).forEach(([ct, v]) => {
+            if (v !== null) assert.equal(v, 0, `${ct} must be 0, not NaN`);
+        });
+        const session = buildSession('pb', counts, '', '');
+        assert.doesNotMatch(Core.htmlToText(session.outputs.mgh), /NaN|Infinity|\{\{/);
     });
 });

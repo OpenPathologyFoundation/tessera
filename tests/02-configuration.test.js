@@ -310,13 +310,30 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
         }
     });
 
-    it('Every template contains all 14 cell type placeholders for its specimen type', () => {
+    it('Every template reports every cell type, in its correct form', () => {
+        // A category inside the differential is reported as a percentage,
+        // {{ct}}. A category the profile excludes from the denominator has no
+        // percentage of the differential and is reported per 100 of it,
+        // {{ct_per100}} — the NRBC convention in peripheral blood.
         for (const entry of config) {
-            const cellTypes = Object.values(entry.outCodes);
+            const excluded = entry.denominatorExcludes || [];
             for (const tpl of entry.templates) {
-                for (const ct of cellTypes) {
-                    assert.ok(tpl.outSentence.includes('{{' + ct + '}}'),
-                        `${entry.specimenType}/${tpl.tplCode}: missing placeholder {{${ct}}}`);
+                for (const ct of Object.values(entry.outCodes)) {
+                    const token = excluded.includes(ct) ? `{{${ct}_per100}}` : `{{${ct}}}`;
+                    assert.ok(tpl.outSentence.includes(token),
+                        `${entry.specimenType}/${tpl.tplCode}: missing placeholder ${token}`);
+                }
+            }
+        }
+    });
+
+    it('A category outside the differential is not also reported as a percentage', () => {
+        for (const entry of config) {
+            for (const ct of (entry.denominatorExcludes || [])) {
+                for (const tpl of entry.templates) {
+                    assert.ok(!tpl.outSentence.includes(`{{${ct}}}`),
+                        `${entry.specimenType}/${tpl.tplCode}: {{${ct}}} is outside the ` +
+                        `differential and must not be reported as a percentage of it`);
                 }
             }
         }
@@ -388,8 +405,10 @@ describe('Configuration — Template Rendering (VV-TPL-001 to VV-TPL-004)', () =
         // Substitute {{total}}
         text = text.replace(/\{\{total\}\}/g, '500');
 
-        // Substitute all 14 cell type placeholders
+        // Substitute all cell type placeholders, in whichever form the profile
+        // reports them
         Object.values(entry.outCodes).forEach(ct => {
+            text = text.replace(new RegExp('\\{\\{' + ct + '_per100\\}\\}', 'g'), '11.1');
             text = text.replace(new RegExp('\\{\\{' + ct + '\\}\\}', 'g'), '7');
         });
 

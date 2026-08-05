@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 2.1 |
+| **Version** | 2.2 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -192,6 +192,19 @@ This SRS covers the functional, performance, interface, data, and security requi
 
 ---
 
+### 4.13a Differential Denominator Module (URS-030, URS-052)
+
+Added in v2.2 under DCR-006.
+
+| ID | Requirement | Trace |
+|----|------------|-------|
+| SYS-180 | A configuration profile SHALL be able to designate cell categories that are counted but excluded from the percentage denominator (`denominatorExcludes`). | URS-030 |
+| SYS-181 | Percentages SHALL be computed over the denominator excluding those categories, and the included categories SHALL still sum to exactly 100 (SYS-044). | URS-030, URS-034 |
+| SYS-182 | An excluded category SHALL NOT be reported as a percentage of the differential. It SHALL be reported per 100 units of the denominator where the profile defines `per100Reporting`, and as "N/A" where the denominator is zero. | URS-030 |
+| SYS-183 | The target count, the progress indicator and the low-count advisory SHALL be measured against the differential denominator, not the total cells tallied, because the target expresses a number of classified cells. | URS-024, URS-041 |
+| SYS-184 | Output SHALL distinguish the differential denominator (`{{total}}`) from the total cells tallied (`{{totalCounted}}`), and SHALL provide `{{<cellType>_per100}}` for excluded categories. Absolute counts SHALL NOT be derived for an excluded category. | URS-036, URS-052 |
+| SYS-185 | Configuration validation SHALL reject a profile that excludes every category from the denominator, that names an undisplayed category in `denominatorExcludes` or `per100Reporting`, or that requests per-100 reporting for a category still inside the denominator. | URS-100 |
+
 ### 4.14 Audio Feedback Module (URS-027, URS-097)
 
 Added in v2.1 under DCR-004. This functionality was implemented and shipping in
@@ -370,6 +383,7 @@ Phase 2 item.
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
 | B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
 | C | 2026-02-20 | QMS | Added theme toggle requirements |
+| F | 2026-08-05 | QMS | v2.2 (DCR-006): added SYS-180–SYS-185, the differential denominator module. A category may be counted without belonging to the percentage denominator, and is reported per 100 of it instead — the peripheral blood NRBC convention. |
 | E | 2026-08-04 | QMS | v2.1 (DCR-004): added SYS-140–SYS-179 for audio feedback, autosave/recovery, absolute counts, handedness, output traceability, offline operation, preset catalogue and the configuration editor — all implemented and shipping in v2.0 with no system requirement behind them. Added SYS-104–SYS-109 for configuration validation and resolution, and SYS-S04–SYS-S07 for output/export safety. |
 | D | 2026-02-24 | QMS | Major revision v2.0: unified 14-cell layout, advisory target counts, M:E ratio, Continue Counting, two-row categories, optional case number, non-blocking count completion. Traced to URS-001 v2.0 and SPC-001 v1.2. See Section 9 for full change summary. |
 

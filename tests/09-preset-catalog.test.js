@@ -198,3 +198,82 @@ describe('Preset Catalog — Specific Presets', () => {
         assert.equal(Object.keys(spec.outCodes).length, 0, 'Custom outCodes must be empty');
     });
 });
+
+// ================================================================
+describe('Preset Catalog — Denominator Policy (URS-030, HA-092)', () => {
+
+    /**
+     * A preset changes the layout, the keys and the wording. It must not
+     * silently change the counting convention.
+     *
+     * Every shipped preset that displayed NRBC in a peripheral blood specimen
+     * omitted `denominatorExcludes`. Loading one therefore counted NRBC into
+     * the leucocyte differential — the exact hazard DCR-006 exists to prevent.
+     * Measured on 180 granulocytes + 20 NRBC: 100.0% granulocytes with the
+     * built-in profile, 90.0% after choosing the harmonized-9 preset.
+     *
+     * The catalogue is a set of starting points, so the safe convention has to
+     * be the one they start from.
+     */
+    const BUILTIN = JSON.parse(fs.readFileSync(
+        path.join(__dirname, '..', 'web', 'settings', 'templates.json'), 'utf-8'));
+
+    /** Specimens that display NRBC but are not marrow, where NRBC belong in the count. */
+    function nucleatedRedInNonMarrow(config) {
+        return (config.specimenTypes || []).filter(spec => {
+            if (spec.specimenType === 'bm') return false;
+            const cats = spec.categories || {};
+            return [].concat(cats.upper || [], cats.lower || []).indexOf('nrbc') !== -1;
+        });
+    }
+
+    expectedPresets.forEach(function (filename) {
+        it(filename + ' excludes NRBC from any non-marrow differential', () => {
+            const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, filename), 'utf-8'));
+            for (const spec of nucleatedRedInNonMarrow(config)) {
+                assert.ok(Array.isArray(spec.denominatorExcludes) &&
+                    spec.denominatorExcludes.indexOf('nrbc') !== -1,
+                    `${filename} (${spec.specimenType}) counts NRBC but leaves them in the ` +
+                    'denominator, understating every leucocyte percentage (HA-092)');
+                assert.ok(spec.per100Reporting && spec.per100Reporting.nrbc,
+                    `${filename} (${spec.specimenType}) excludes NRBC from the denominator but ` +
+                    'never reports them per 100 WBC, so the count is simply lost');
+            }
+        });
+    });
+
+    it('A preset sharing the built-in profileId is the built-in profile', () => {
+        // isCacheSuperseded discards a cached profile when a built-in one with
+        // the SAME profileId carries a higher version. consensus-14.json was
+        // v2.0 against the built-in v2.5, so choosing it from the catalogue
+        // was undone on the next load. It was also missing thresholds,
+        // confidenceIntervals, categoryNotes and the denominator policy.
+        const twins = expectedPresets
+            .map(f => ({ f, c: JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, f), 'utf-8')) }))
+            .filter(x => x.c.profileId === BUILTIN.profileId);
+        assert.ok(twins.length > 0, 'the catalogue must offer the built-in profile');
+
+        for (const { f, c } of twins) {
+            const cmp = (a, b) => {
+                const pa = String(a).split('.').map(Number), pb = String(b).split('.').map(Number);
+                for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+                    if ((pa[i] || 0) !== (pb[i] || 0)) return (pa[i] || 0) - (pb[i] || 0);
+                }
+                return 0;
+            };
+            assert.ok(cmp(c.version, BUILTIN.version) >= 0,
+                `${f} is version ${c.version} against the built-in ${BUILTIN.version}; the counter ` +
+                'would discard it as superseded on the next load');
+
+            for (const shipped of BUILTIN.specimenTypes) {
+                const preset = c.specimenTypes.find(s => s.specimenType === shipped.specimenType);
+                assert.ok(preset, `${f} is missing the ${shipped.specimenType} specimen`);
+                for (const key of Object.keys(shipped)) {
+                    assert.deepEqual(preset[key], shipped[key],
+                        `${f} (${shipped.specimenType}) differs from the built-in profile in "${key}", ` +
+                        'yet claims the same profileId');
+                }
+            }
+        }
+    });
+});

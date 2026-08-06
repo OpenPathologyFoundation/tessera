@@ -5,15 +5,15 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 3.8 |
+| **Version** | 3.9 |
 | **Product** | WBC ΔΣ v2.7.1 |
-| **Date Executed** | 2026-08-06 (02:38:03 UTC) |
+| **Date Executed** | 2026-08-06 (09:10:48 UTC) |
 | **Status** | **PASS** (test outcome) |
 | **Approval State** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_223803_theme-consolidation-and-contrast-sweep/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-06_051048_config-fidelity-and-preset-denominator/` |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
@@ -21,14 +21,14 @@
 
 ## 1. Executive Summary
 
-**820 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
+**836 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **575** |
-| System (browser) tests | **245** (84 specs x chromium, firefox, webkit, less 7 skips) |
-| **Total executed** | **820** |
-| Passed | **820** |
+| Unit, static and behavioural tests | **585** |
+| System (browser) tests | **251** (86 specs x chromium, firefox, webkit, less 7 skips) |
+| **Total executed** | **836** |
+| Passed | **836** |
 | Failed | **0** |
 | Skipped (documented, §6) | **7** |
 | Pass Rate | **100.00%** |
@@ -68,7 +68,7 @@ shipped code can cause a test to fail.
 
 ---
 
-## 3. Node Suite Results (575 tests, 114 suites, 0 failures)
+## 3. Node Suite Results (585 tests, 115 suites, 0 failures)
 
 ### Suite 01 — Calculation Engine
 
@@ -184,7 +184,7 @@ Regressions this layer now guards against:
 
 ---
 
-## 4. System Suite Results — Playwright (84 specs x 3 engines = 252, 7 skipped, 0 failures)
+## 4. System Suite Results — Playwright (86 specs x 3 engines = 258, 7 skipped, 0 failures)
 
 Each spec runs on Chromium, Firefox and WebKit. URS-093 names Chrome, Firefox
 and Edge; Edge shares the Chromium engine and is covered by the chromium
@@ -401,6 +401,44 @@ script in `<head>`, before first paint.
 
 ---
 
+### 4.11 Configuration fidelity (added v2.7.3)
+
+Prompted by a reviewer asking where `denominatorExcludes` is configured. The
+answer was nowhere — and verifying the configuration user interface found three
+defects that produced wrong clinical numbers.
+
+| VV ID / Suite | Verifies | Result |
+|---------------|----------|--------|
+| VV-SYS-063 | The shipped profile saved untouched through the editor returns unchanged, every field deep-equal | PASS |
+| VV-SYS-064 | An edit to a built-in profile is honoured by the counter, keeping the built-in `profileId` | PASS |
+| 09 (per preset) | Any non-marrow specimen displaying NRBC excludes them from the denominator and reports per 100 WBC | PASS |
+| 09 | A preset sharing the built-in `profileId` matches it field-for-field and is not at a lower version | PASS |
+| UD-039 | The reference states where each setting is reached, and its claim about what the editor does not expose matches the editor source | PASS |
+
+**What was found:**
+
+| Defect | Effect |
+|--------|--------|
+| The editor rebuilt each profile from its own form fields | Saving the shipped profile untouched dropped `denominatorExcludes`, `per100Reporting`, `thresholds`, `confidenceIntervals`, `rounding`, `precision`, `categoryNotes`, `targetCountBasis`, `provenance`, and emptied `formulas` — **deleting the M:E ratio** — while reporting success |
+| The editor hard-coded `version: '2.0'` | The counter discarded every edit to a built-in profile as superseded. Measured: BM target changed 500 → 400, saved, counter still used 500 |
+| No shipped preset carried `denominatorExcludes` | Choosing a preset re-introduced HA-092. Measured on 180 granulocytes + 20 NRBC in peripheral blood: **100.0% granulocytes** with the built-in profile, **90.0%** after choosing `harmonized-9` |
+
+The first two masked one another: the version defect meant the field loss never
+reached the counter for `consensus-14`. Renaming the profile — which VV-SYS-062
+does — removes that masking and the field loss applies in full.
+
+**Regression detection confirmed** by reverting each fix:
+
+| Reverted | Detected by |
+|----------|-------------|
+| `version` hard-coded back to `'2.0'` | VV-SYS-064 |
+| Source profile no longer merged on save | VV-SYS-063 |
+| `denominatorExcludes` removed from one preset | Suite 09 (that preset) |
+
+Recorded in DCR-012; hazards HA-099 and HA-100 added to RA-001.
+
+---
+
 ## 5. Defect Detection Record
 
 | Defect | Found by | Now guarded by |
@@ -429,6 +467,10 @@ script in `<head>`, before first paint.
 | 330 further contrast failures across every page, incl. two action buttons failing in *both* themes | **VV-SYS-162..168 (full-surface sweep)** | VV-SYS-162 to 168 |
 | Theme applied after first paint — flash of wrong theme, text transiently below AA | **VV-SYS-168 (Playwright)** | VV-SYS-162 to 168, suite 03 |
 | VV-SYS-155 misreported the vendored Tailwind build as third-party on Firefox | **Evidence capture run** | VV-SYS-155 (now compares against `baseURL`) |
+| HA-099 the editor destroyed every profile field it did not model, incl. the denominator policy and the M:E formula | **Reviewer question: "where do users configure denominatorExcludes?"** | VV-SYS-063 |
+| HA-100 the editor's saved profile was discarded as superseded while reporting success | **Verifying the configuration UI (DCR-012)** | VV-SYS-064 |
+| No shipped preset carried the denominator policy — HA-092 reachable from the catalogue | **Verifying the configuration UI (DCR-012)** | Suite 09 denominator policy tests |
+| The Calculation Reference said "configurable" without saying where | **Reviewer question (DCR-012)** | UD-039 |
 
 The last three were introduced or exposed during remediation and were caught by
 the new layers before release — the behaviour the previous suite could not
@@ -455,7 +497,7 @@ provide.
 
 ## 7. Conclusion
 
-All 820 executed automated tests pass with no failures, across three browser
+All 836 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -477,6 +519,12 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-06T09:10:48.240Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-06_051048_config-fidelity-and-preset-denominator/`
+
 - Date (UTC): 2026-08-06T02:38:03.528Z
 - Command: `npm test`
 - Exit Code: 0

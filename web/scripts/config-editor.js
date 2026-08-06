@@ -110,9 +110,21 @@
 
             editorState.profileId = config.profileId || 'custom';
             editorState.profileName = config.profileName || 'Custom';
+
+            // Everything the editor does not model is kept verbatim and merged
+            // back on save. The editor edits layout, keys, templates and a few
+            // settings; a profile also carries the denominator policy, the
+            // thresholds, the M:E formula, the rounding and precision policy
+            // and its provenance. Rebuilding a profile from the editor's own
+            // fields silently discarded all of it — a peripheral blood profile
+            // that lost denominatorExcludes counts NRBC into the leucocyte
+            // differential, which is HA-092.
+            editorState.rawConfig = config;
+
             editorState.specimenTypes = specimenTypes.map(function (spec) {
                 var outCodes = spec.outCodes || {};
                 return {
+                    raw: spec,
                     specimenType: spec.specimenType,
                     specimenLabel: spec.specimenLabel || spec.specimenType.toUpperCase(),
                     targetCount: spec.targetCount || 200,
@@ -819,42 +831,71 @@
     // ================================================================
     // BUILD CONFIG JSON
     // ================================================================
+    /**
+     * The version this profile should be saved under.
+     *
+     * It used to be hard-coded to '2.0'. The counter discards a cached profile
+     * whose profileId matches a built-in one at a HIGHER version
+     * (Core.isCacheSuperseded) — the mechanism that delivers corrected
+     * profiles to an installed browser. With the built-in profile at 2.5,
+     * every edit saved from this editor was therefore thrown away on the next
+     * load while the editor reported "saved and made active".
+     *
+     * Editing a profile produces a newer revision of it, so the version is
+     * carried forward from the source and its last component incremented.
+     */
+    function nextVersion() {
+        var src = (editorState.rawConfig && editorState.rawConfig.version) || '2.0';
+        var parts = String(src).split('.').map(function (n) { return parseInt(n, 10) || 0; });
+        if (!parts.length) parts = [2, 0];
+        parts[parts.length - 1] += 1;
+        return parts.join('.');
+    }
+
     function buildConfigJSON() {
-        return {
-            version: '2.0',
-            profileId: editorState.profileId,
-            profileName: editorState.profileName,
-            specimenTypes: editorState.specimenTypes.map(function (spec) {
-                return {
-                    specimenType: spec.specimenType,
-                    specimenLabel: spec.specimenLabel,
-                    targetCount: spec.targetCount,
-                    requireCaseNumber: false,
-                    upperRowAbnormal: spec.upperRowAbnormal,
-                    categories: {
-                        upper: spec.upper.slice(),
-                        lower: spec.lower.slice()
-                    },
-                    outCodes: Object.assign({}, spec.outCodes),
-                    formulas: {},
-                    templates: spec.templates.map(function (tpl) {
-                        return { tplCode: tpl.tplCode, tplName: tpl.tplName, outSentence: tpl.outSentence };
-                    }),
-                    constituents: {},
-                    audio: {
-                        enabled: spec.audioEnabled !== false,
-                        countSound: 'click',
-                        undoSound: 'undo',
-                        targetSound: 'chime',
-                        typewriterSound: 'typewriter'
-                    },
-                    autosave: spec.autosaveEnabled !== false,
-                    absoluteCounts: spec.absoluteCounts || 'optional',
-                    handedness: spec.handedness || 'left',
-                    morphologyChecklist: spec.morphologyChecklist.slice()
-                };
-            })
-        };
+        // Start from whatever was loaded so unmodelled top-level fields
+        // (provenance above all) survive the round trip.
+        var out = Object.assign({}, editorState.rawConfig || {});
+        out.version = nextVersion();
+        out.profileId = editorState.profileId;
+        out.profileName = editorState.profileName;
+        out.specimenTypes = editorState.specimenTypes.map(function (spec) {
+            // Same principle per specimen: keep the source, override only what
+            // this editor actually edits. denominatorExcludes, per100Reporting,
+            // thresholds, confidenceIntervals, rounding, precision, formulas,
+            // constituents, categoryNotes and targetCountBasis all ride along.
+            var merged = Object.assign({}, spec.raw || {});
+            merged.specimenType = spec.specimenType;
+            merged.specimenLabel = spec.specimenLabel;
+            merged.targetCount = spec.targetCount;
+            merged.upperRowAbnormal = spec.upperRowAbnormal;
+            merged.categories = {
+                upper: spec.upper.slice(),
+                lower: spec.lower.slice()
+            };
+            merged.outCodes = Object.assign({}, spec.outCodes);
+            merged.templates = spec.templates.map(function (tpl) {
+                return { tplCode: tpl.tplCode, tplName: tpl.tplName, outSentence: tpl.outSentence };
+            });
+            merged.audio = Object.assign(
+                {
+                    countSound: 'click',
+                    undoSound: 'undo',
+                    targetSound: 'chime',
+                    typewriterSound: 'typewriter'
+                },
+                (spec.raw && spec.raw.audio) || {},
+                { enabled: spec.audioEnabled !== false });
+            merged.autosave = spec.autosaveEnabled !== false;
+            merged.absoluteCounts = spec.absoluteCounts || 'optional';
+            merged.handedness = spec.handedness || 'left';
+            merged.morphologyChecklist = spec.morphologyChecklist.slice();
+            if (merged.requireCaseNumber === undefined) merged.requireCaseNumber = false;
+            if (merged.formulas === undefined) merged.formulas = {};
+            if (merged.constituents === undefined) merged.constituents = {};
+            return merged;
+        });
+        return out;
     }
 
     // ================================================================

@@ -1,187 +1,196 @@
 {
-    "version": "2.1",
-    "profileId": "legacy-9",
-    "profileName": "Legacy 9-Part",
-    "provenance": {
-        "standard": "ICSH 2008",
-        "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
-        "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 §2.6."
-    },
-    "description": "Classic medical technology layout: segs, bands, lymphocytes, monocytes, eosinophils, basophils, blasts, metamyelocytes, myelocytes. Left-hand ergonomic key layout.",
-    "specimenTypes": [
+  "version": "2.1",
+  "profileId": "legacy-9",
+  "profileName": "Legacy 9-Part",
+  "provenance": {
+    "standard": "ICSH 2008",
+    "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
+    "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 \u00a72.6."
+  },
+  "description": "Classic medical technology layout: segs, bands, lymphocytes, monocytes, eosinophils, basophils, blasts, metamyelocytes, myelocytes. Left-hand ergonomic key layout.",
+  "specimenTypes": [
+    {
+      "specimenType": "bm",
+      "specimenLabel": "Bone Marrow",
+      "targetCount": 500,
+      "requireCaseNumber": false,
+      "upperRowAbnormal": false,
+      "categories": {
+        "upper": [
+          "nrbc",
+          "blasts",
+          "myelo",
+          "meta"
+        ],
+        "lower": [
+          "bands",
+          "segs",
+          "eos",
+          "baso",
+          "mono",
+          "lymph"
+        ]
+      },
+      "outCodes": {
+        "F": "segs",
+        "D": "bands",
+        "S": "lymph",
+        "A": "mono",
+        "G": "eos",
+        "Z": "baso",
+        "X": "blasts",
+        "C": "myelo",
+        "V": "meta",
+        "B": "nrbc"
+      },
+      "formulas": {
+        "ME_ratio": {
+          "label": "M:E Ratio",
+          "numerator": [
+            "blasts",
+            "myelo",
+            "meta",
+            "bands",
+            "segs",
+            "baso",
+            "eos",
+            "mono"
+          ],
+          "denominator": [
+            "nrbc"
+          ],
+          "precision": 1,
+          "basis": "ICSH 2008 \u00a72.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
+        },
+        "blasts_non_erythroid": {
+          "type": "percentage",
+          "label": "Blasts (% non-erythroid)",
+          "numerator": [
+            "blasts"
+          ],
+          "denominator": [
+            "blasts",
+            "myelo",
+            "meta",
+            "bands",
+            "segs",
+            "eos",
+            "baso",
+            "mono",
+            "lymph"
+          ],
+          "precision": 1,
+          "basis": "Pre-2022 WHO erythroleukaemia rule: blasts expressed as a percentage of non-erythroid cells. WHO 2022 withdrew this in favour of counting blasts against all nucleated cells. Retained here for comparison with historical reports; it is not the current diagnostic convention."
+        }
+      },
+      "templates": [
         {
-            "specimenType": "bm",
-            "specimenLabel": "Bone Marrow",
-            "targetCount": 500,
-            "requireCaseNumber": false,
-            "upperRowAbnormal": false,
-            "categories": {
-                "upper": [
-                    "nrbc",
-                    "blasts",
-                    "myelo",
-                    "meta"
-                ],
-                "lower": [
-                    "bands",
-                    "segs",
-                    "eos",
-                    "baso",
-                    "mono",
-                    "lymph"
-                ]
-            },
-            "outCodes": {
-                "F": "segs",
-                "D": "bands",
-                "S": "lymph",
-                "A": "mono",
-                "G": "eos",
-                "Z": "baso",
-                "X": "blasts",
-                "C": "myelo",
-                "V": "meta",
-                "B": "nrbc"
-            },
-            "formulas": {
-                "ME_ratio": {
-                    "label": "M:E Ratio",
-                    "numerator": [
-                        "blasts",
-                        "myelo",
-                        "meta",
-                        "bands",
-                        "segs",
-                        "baso",
-                        "eos",
-                        "mono"
-                    ],
-                    "denominator": [
-                        "nrbc"
-                    ],
-                    "precision": 1,
-                    "basis": "ICSH 2008 §2.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
-                },
-                "blasts_non_erythroid": {
-                    "type": "percentage",
-                    "label": "Blasts (% non-erythroid)",
-                    "numerator": [
-                        "blasts"
-                    ],
-                    "denominator": [
-                        "blasts",
-                        "myelo",
-                        "meta",
-                        "bands",
-                        "segs",
-                        "eos",
-                        "baso",
-                        "mono",
-                        "lymph"
-                    ],
-                    "precision": 1,
-                    "basis": "Pre-2022 WHO erythroleukaemia rule: blasts expressed as a percentage of non-erythroid cells. WHO 2022 withdrew this in favour of counting blasts against all nucleated cells. Retained here for comparison with historical reports; it is not the current diagnostic convention."
-                }
-            },
-            "templates": [
-                {
-                    "tplCode": "std",
-                    "tplName": "Standard",
-                    "outSentence": "A {{total}}-cell count reveals {{blasts}}% blasts, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{bands}}% bands, {{segs}}% segmented neutrophils, {{eos}}% eosinophils, {{baso}}% basophils, {{mono}}% monocytes, {{lymph}}% lymphocytes, and {{nrbc}}% erythroid precursors. M:E ratio {{ME_ratio}}."
-                }
-            ],
-            "constituents": {},
-            "audio": {
-                "enabled": true,
-                "countSound": "click",
-                "undoSound": "undo",
-                "targetSound": "chime",
-                "typewriterSound": "typewriter"
-            },
-            "autosave": true,
-            "absoluteCounts": "optional",
-            "handedness": "left",
-            "morphologyChecklist": [],
-            "thresholds": [
-                {
-                    "target": "blasts",
-                    "value": 20,
-                    "label": "AML blast threshold (all nucleated cells)",
-                    "basis": "WHO 2022 / ICC 2022 — the current convention."
-                },
-                {
-                    "target": "blasts_non_erythroid",
-                    "value": 20,
-                    "label": "legacy non-erythroid blast threshold",
-                    "basis": "Pre-2022 WHO rule, shown for comparison only."
-                }
-            ],
-            "rounding": "largest-remainder",
-            "precision": {
-                "display": 2,
-                "report": 0
-            },
-            "targetCountBasis": "ICSH 2008 §2.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it."
+          "tplCode": "std",
+          "tplName": "Standard",
+          "outSentence": "A {{total}}-cell count reveals {{blasts}}% blasts, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{bands}}% bands, {{segs}}% segmented neutrophils, {{eos}}% eosinophils, {{baso}}% basophils, {{mono}}% monocytes, {{lymph}}% lymphocytes, and {{nrbc}}% erythroid precursors. M:E ratio {{ME_ratio}}."
+        }
+      ],
+      "constituents": {},
+      "audio": {
+        "enabled": true,
+        "countSound": "click",
+        "undoSound": "undo",
+        "targetSound": "chime",
+        "typewriterSound": "typewriter"
+      },
+      "autosave": true,
+      "absoluteCounts": "optional",
+      "handedness": "left",
+      "morphologyChecklist": [],
+      "thresholds": [
+        {
+          "target": "blasts",
+          "value": 20,
+          "label": "AML blast threshold (all nucleated cells)",
+          "basis": "WHO 2022 / ICC 2022 \u2014 the current convention."
         },
         {
-            "specimenType": "pb",
-            "specimenLabel": "Peripheral Blood",
-            "targetCount": 200,
-            "requireCaseNumber": false,
-            "upperRowAbnormal": true,
-            "categories": {
-                "upper": [
-                    "nrbc",
-                    "blasts",
-                    "myelo",
-                    "meta"
-                ],
-                "lower": [
-                    "bands",
-                    "segs",
-                    "eos",
-                    "baso",
-                    "mono",
-                    "lymph"
-                ]
-            },
-            "outCodes": {
-                "F": "segs",
-                "D": "bands",
-                "S": "lymph",
-                "A": "mono",
-                "G": "eos",
-                "Z": "baso",
-                "X": "blasts",
-                "C": "myelo",
-                "V": "meta",
-                "B": "nrbc"
-            },
-            "templates": [
-                {
-                    "tplCode": "std",
-                    "tplName": "Standard",
-                    "outSentence": "A {{total}}-cell differential count of peripheral blood reveals: {{segs}}% segmented neutrophils, {{bands}}% band forms, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{blasts}}% blasts, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, and {{nrbc}}% nucleated RBCs."
-                }
-            ],
-            "constituents": {},
-            "audio": {
-                "enabled": true,
-                "countSound": "click",
-                "undoSound": "undo",
-                "targetSound": "chime",
-                "typewriterSound": "typewriter"
-            },
-            "autosave": true,
-            "absoluteCounts": "optional",
-            "handedness": "left",
-            "morphologyChecklist": [],
-            "rounding": "largest-remainder",
-            "precision": {
-                "display": 2,
-                "report": 0
-            },
-            "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential."
+          "target": "blasts_non_erythroid",
+          "value": 20,
+          "label": "legacy non-erythroid blast threshold",
+          "basis": "Pre-2022 WHO rule, shown for comparison only."
         }
-    ]
+      ],
+      "rounding": "largest-remainder",
+      "precision": {
+        "display": 2,
+        "report": 0
+      },
+      "targetCountBasis": "ICSH 2008 \u00a72.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it."
+    },
+    {
+      "specimenType": "pb",
+      "specimenLabel": "Peripheral Blood",
+      "targetCount": 200,
+      "requireCaseNumber": false,
+      "upperRowAbnormal": true,
+      "categories": {
+        "upper": [
+          "nrbc",
+          "blasts",
+          "myelo",
+          "meta"
+        ],
+        "lower": [
+          "bands",
+          "segs",
+          "eos",
+          "baso",
+          "mono",
+          "lymph"
+        ]
+      },
+      "outCodes": {
+        "F": "segs",
+        "D": "bands",
+        "S": "lymph",
+        "A": "mono",
+        "G": "eos",
+        "Z": "baso",
+        "X": "blasts",
+        "C": "myelo",
+        "V": "meta",
+        "B": "nrbc"
+      },
+      "templates": [
+        {
+          "tplCode": "std",
+          "tplName": "Standard",
+          "outSentence": "A {{total}}-cell differential count of peripheral blood reveals: {{segs}}% segmented neutrophils, {{bands}}% band forms, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{blasts}}% blasts, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, and {{nrbc}}% nucleated RBCs."
+        }
+      ],
+      "constituents": {},
+      "audio": {
+        "enabled": true,
+        "countSound": "click",
+        "undoSound": "undo",
+        "targetSound": "chime",
+        "typewriterSound": "typewriter"
+      },
+      "autosave": true,
+      "absoluteCounts": "optional",
+      "handedness": "left",
+      "morphologyChecklist": [],
+      "rounding": "largest-remainder",
+      "precision": {
+        "display": 2,
+        "report": 0
+      },
+      "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential.",
+      "denominatorExcludes": [
+        "nrbc"
+      ],
+      "per100Reporting": {
+        "nrbc": {
+          "label": "NRBC per 100 WBC",
+          "precision": 1
+        }
+      }
+    }
+  ]
 }

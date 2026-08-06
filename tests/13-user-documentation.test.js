@@ -285,6 +285,37 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
             'and the page must explain why, rather than staying silent');
     });
 
+    it('UD-039: The reference says where each setting is actually reached', () => {
+        // UD-036 checks the field exists in the profile and that the engine
+        // honours it. That is not the same as a reader being able to find it.
+        // "denominatorExcludes is configurable" sent a reviewer looking for a
+        // control that does not exist: the calculation-policy fields are set
+        // by editing the exported JSON, not in the Configuration Editor.
+        assert.match(calcref, /Where these settings live/,
+            'the reference must tell the reader where a setting is changed, not only that it can be');
+        assert.match(calcref, /Export Config/,
+            'and must name the route that actually reaches the calculation policy');
+
+        const editor = fs.readFileSync(path.join(ROOT, 'web', 'scripts', 'config-editor.js'), 'utf-8')
+            + fs.readFileSync(path.join(ROOT, 'web', 'editor.html'), 'utf-8');
+
+        // Claimed to be outside the editor. If a control is ever added for one
+        // of these, this fails and the reference has to be corrected with it.
+        for (const field of ['denominatorExcludes', 'per100Reporting', 'rounding',
+                             'precision', 'thresholds', 'confidenceIntervals']) {
+            assert.ok(calcref.includes('<code>' + field + '</code>'),
+                `the reference must list "${field}" among the fields it explains`);
+            assert.ok(!new RegExp('id="[^"]*' + field + '[^"]*"', 'i').test(editor),
+                `the editor now has a control for "${field}"; the reference still says it has none`);
+        }
+
+        // Claimed to be inside the editor — these must really be editable.
+        for (const id of ['targetBm', 'targetPb', 'handedness', 'absoluteCounts']) {
+            assert.ok(editor.includes('id="' + id + '"'),
+                `the reference says the editor edits "${id}", but no such control exists`);
+        }
+    });
+
     it('UD-038: Every abbreviation used is expanded in the table', () => {
         for (const abbr of ['WBC','NRBC','M:E ratio','NDC','ICSH','CLSI','AML','MDS','CI','CV'])
             assert.ok(calcref.includes('text-slate-200">' + abbr + '</td>'),

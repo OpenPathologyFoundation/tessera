@@ -80,6 +80,46 @@
         </p>
     </div>
 
+    <!-- ================= where the settings live ================= -->
+    <div class="mt-4 p-4 cfg bg-slate-800/50 rounded">
+        <p class="font-semibold text-accent">Where these settings live</p>
+        <p class="mt-1 text-slate-400">
+            Every <span class="text-accent">Configurable</span> item below is a field in the
+            configuration profile &mdash; a single JSON file that travels with your laboratory's
+            settings. There are two ways to reach it, and they cover different fields.
+        </p>
+        <table class="w-full mt-3 text-xs">
+            <tbody>
+            <tr>
+                <td class="font-semibold text-slate-200 align-top pr-3 whitespace-nowrap">Configuration&nbsp;Editor</td>
+                <td class="text-slate-400">Reached from the counter. Edits the cell layout, the keyboard
+                    assignment, target counts, report templates, the morphology checklist, handedness,
+                    audio and autosave. Everything else in the profile is carried through untouched
+                    when you save.</td>
+            </tr>
+            <tr>
+                <td class="font-semibold text-slate-200 align-top pr-3 pt-2 whitespace-nowrap">Export&nbsp;&rarr;&nbsp;edit&nbsp;&rarr;&nbsp;Import</td>
+                <td class="text-slate-400 pt-2"><strong class="text-slate-200">This is where the
+                    calculation policy is set.</strong> Use <em>Export Config</em> on the counter, edit
+                    the JSON, then <em>Import Config</em>. The counting-policy fields &mdash;
+                    <code>denominatorExcludes</code>, <code>per100Reporting</code>,
+                    <code>rounding</code>, <code>precision</code>, <code>thresholds</code>,
+                    <code>confidenceIntervals</code> and the M:E <code>formulas</code> &mdash; are
+                    <strong class="text-slate-200">not yet exposed as controls in the editor</strong>.
+                    An imported profile is validated before it is accepted, and rejected with reasons
+                    if it cannot be counted with.</td>
+            </tr>
+            <tr>
+                <td class="font-semibold text-slate-200 align-top pr-3 pt-2 whitespace-nowrap">Preset&nbsp;catalogue</td>
+                <td class="text-slate-400 pt-2">A set of complete starting points. A preset changes the
+                    layout, the keys and the wording &mdash; not the counting convention. Every preset
+                    that counts NRBC in peripheral blood keeps them out of the leucocyte denominator,
+                    as the built-in profile does.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
     <!-- ================= abbreviations ================= -->
     <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">Abbreviations</h2>
     <div class="mt-3 overflow-x-auto">

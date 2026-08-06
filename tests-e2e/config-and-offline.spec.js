@@ -331,6 +331,75 @@ test.describe('Configuration editor round-trip (URS-102)', () => {
         await page.keyboard.press('x');
         await expect(page.locator('#val-blasts')).toHaveText('1');
     });
+
+    test('VV-SYS-063: The editor preserves every field it does not itself edit', async ({ page }) => {
+        // The editor rebuilt the profile from its own form fields, so anything
+        // it does not model was destroyed on save: denominatorExcludes,
+        // per100Reporting, thresholds, confidenceIntervals, rounding,
+        // precision, categoryNotes, targetCountBasis, provenance — and
+        // `formulas` was overwritten with {}, deleting the M:E ratio.
+        //
+        // Saving a profile untouched must return it unchanged. VV-SYS-062 did
+        // not catch this because it asserts only on profileId.
+        await page.goto('/counter.html');
+        await page.evaluate(cfg => localStorage.setItem('wbcds_config', JSON.stringify(cfg)), SHIPPED);
+
+        await page.goto('/editor.html');
+        await expect(page.locator('#cell-reference')).toBeVisible();
+        await Promise.all([page.waitForEvent('download'), page.click('#btnSaveProfile')]);
+        await expect(page.locator('#save-status')).toHaveAttribute('data-status', 'ok');
+
+        const after = await page.evaluate(() => JSON.parse(localStorage.getItem('wbcds_config')));
+
+        for (const key of Object.keys(SHIPPED)) {
+            if (key === 'version') continue;   // deliberately advanced, see VV-SYS-064
+            expect(after, `top-level "${key}" was lost`).toHaveProperty(key);
+        }
+        for (const shipped of SHIPPED.specimenTypes) {
+            const saved = after.specimenTypes.find(s => s.specimenType === shipped.specimenType);
+            expect(saved, `the ${shipped.specimenType} specimen was lost`).toBeTruthy();
+            for (const [key, value] of Object.entries(shipped)) {
+                expect(saved[key], `${shipped.specimenType}.${key} did not survive the round trip`)
+                    .toEqual(value);
+            }
+        }
+    });
+
+    test('VV-SYS-064: An edit saved in the editor is honoured by the counter', async ({ page }) => {
+        // The editor wrote a hard-coded version of '2.0'. Because the built-in
+        // profile shares the profileId at a higher version, isCacheSuperseded
+        // discarded the edit on the next load — while the editor reported
+        // "Profile saved and made active" and the counter announced a routine
+        // profile update. Every customisation of a built-in profile was lost.
+        //
+        // VV-SYS-062 renames the profile, which sidesteps the supersede path
+        // entirely; this test deliberately keeps the built-in profileId.
+        await page.goto('/counter.html');
+        await waitForAppReady(page);
+        const before = await page.evaluate(() => window.__wbcTestHooks.state.config
+            .find(s => s.specimenType === 'bm').targetCount);
+        expect(before).not.toBe(400);
+
+        await page.goto('/editor.html');
+        await expect(page.locator('#cell-reference')).toBeVisible();
+        await expect(page.locator('#profileId')).toHaveValue(SHIPPED.profileId);
+        await page.fill('#targetBm', '400');
+        await page.dispatchEvent('#targetBm', 'change');
+        await Promise.all([page.waitForEvent('download'), page.click('#btnSaveProfile')]);
+        await expect(page.locator('#save-status')).toHaveAttribute('data-status', 'ok');
+
+        await page.goto('/counter.html');
+        await waitForAppReady(page);
+        const after = await page.evaluate(() => window.__wbcTestHooks.state.config
+            .find(s => s.specimenType === 'bm').targetCount);
+        expect(after, 'the counter discarded the saved edit').toBe(400);
+
+        // And the operator is not told the profile was "updated" when nothing
+        // of the sort happened.
+        const modal = page.locator('#modal-overlay');
+        if (await modal.isVisible())
+            await expect(page.locator('#modal-message')).not.toContainText('newer built-in profile');
+    });
 });
 
 // ================================================================

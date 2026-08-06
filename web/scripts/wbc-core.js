@@ -21,7 +21,22 @@
     'use strict';
 
     // Default target cell counts per specimen type (URS-105).
-    // PB: 200 per CLSI H20-A2. BM: 500 per CAP recommendation.
+    //
+    // Both figures were previously mis-attributed here, and both readings
+    // overstated what the sources say:
+    //
+    //   PB 200 — NOT "the CLSI H20-A2 reference method". That method is TWO
+    //   reviewers counting 200 cells each, 400 in total (REF-001 [S8], quoting
+    //   H20-A2 verbatim). 200 is one observer's share of it, which is what
+    //   routine single-observer practice does. A good default; not a
+    //   conformance claim. This application implements a single-observer
+    //   workflow, so it does not perform that reference method.
+    //
+    //   BM 500 — ICSH 2008 §2.6, not "a CAP recommendation", and the figure is
+    //   CONDITIONAL: at least 500 when a precise percentage of an abnormal cell
+    //   type is required for diagnosis, at least 300 when the differential is
+    //   not essential to it. A profile expresses which applies through
+    //   targetCount and targetCountBasis.
     var DEFAULT_TARGET = { bm: 500, pb: 200 };
     var FALLBACK_TARGET = 200;
 
@@ -844,7 +859,7 @@
      * (URS-041 / SYS-053). Returns null when the target has been met.
      * Non-blocking by design: the target is advisory, never enforced.
      */
-    function buildLowCountNote(total, targetCount, level) {
+    function buildLowCountNote(total, targetCount, level, basis) {
         if (typeof targetCount !== 'number' || targetCount <= 0) return null;
         if (total >= targetCount) return null;
 
@@ -859,6 +874,20 @@
             var pct = Math.round((ci.level || 0.95) * 100);
             note += ' At this count an observed 5% carries a ' + pct +
                 '% confidence interval of ' + formatInterval(ci, 1) + '.';
+        }
+
+        // The target is a configured number; whether falling short of it
+        // matters depends on the question being asked. ICSH 2008 §2.6 makes
+        // the 500-cell marrow figure conditional on a precise percentage of an
+        // abnormal cell type being required for the diagnosis, and states 300
+        // where it is not. Without that condition in view the advisory
+        // over-warns: a marrow examined for staging reads as deficient at 300
+        // cells when the standard would not require more.
+        //
+        // The basis is stated rather than acted on. The operator knows what the
+        // count is for; this software does not.
+        if (typeof basis === 'string' && basis.trim()) {
+            note += ' Basis for the target: ' + basis.trim();
         }
         return note;
     }

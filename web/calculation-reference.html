@@ -279,6 +279,32 @@
         report's method note. <code>precision</code>: <code>{ "display": 2, "report": 0 }</code>, each 0 to 4.</p>
     </div>
 
+    <h3 class="mt-6 font-semibold text-slate-200">1.2a How many decimals a count can actually support</h3>
+    <p class="mt-2">The default is two decimal places on screen. It is worth being clear that this is a
+    <strong class="text-slate-200">display convention, not a statement of precision</strong>.</p>
+    <p class="mt-2">A differential of <em>n</em> cells can only produce percentages in steps of 100/<em>n</em>:</p>
+    <div class="mt-2 overflow-x-auto">
+    <table class="w-full text-xs">
+        <thead><tr><th>Cells counted</th><th>Smallest possible step</th><th>95% interval around an observed 50%</th></tr></thead>
+        <tbody class="font-mono">
+        <tr><td class="font-sans">100</td><td>1.0 point</td><td>40.4&ndash;59.6%</td></tr>
+        <tr><td class="font-sans">200</td><td>0.5 point</td><td>43.1&ndash;56.9%</td></tr>
+        <tr><td class="font-sans">500</td><td>0.2 point</td><td>45.6&ndash;54.4%</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p class="mt-3">So a 200-cell count displaying <code>66.67%</code> shows two digits that no possible
+    count could have changed independently &mdash; the next attainable value is 67.00% or 66.00% &mdash;
+    beside an interval roughly <strong class="text-slate-200">twelve points wide</strong>. The second
+    decimal is arithmetic, not measurement.</p>
+    <p class="mt-3">Two decimals are nonetheless retained as the default for two honest reasons: a
+    low-frequency category such as basophils at 0.50% reads better with them, and a laboratory replacing an
+    existing report format may need to match it. The interval displayed beside each percentage is the
+    figure that states the real precision, and it is why this tool shows one.</p>
+    <p class="mt-2">A laboratory that finds the extra digits misleading can set
+    <code>precision.display</code> to 0 or 1. The tool does not impose that choice, but it should not let
+    the digits imply more than the count carries.</p>
+
     <!-- ================= 2 ================= -->
     <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">2. How many cells to count</h2>
     <p class="mt-4">Counting is sampling, so precision improves only with the square root of the number

@@ -70,6 +70,14 @@ secondary summaries. H20-A2's own scope is the evaluation of analysers, with
 the manual differential as the reference method it is measured against; this
 application is a manual counting aid and is not an instrument H20-A2 governs.
 
+**The 200-cell figure is one observer's share, not the method.** The reference
+method is two reviewers counting 200 cells each — 400 cells. This application
+implements a single-observer workflow, so it does not perform that method, and
+the documentation must not read as though it does. The engine comment and every
+profile's `targetCountBasis` were corrected 2026-08-06 under DCR-025 (finding
+C-2): 200 is what routine single-observer practice does, which is a documented
+default rather than a conformance claim.
+
 **Purchasing H20-A2 is therefore not required for the current requirement set.**
 It would become necessary if the project were to claim conformance to the
 reference method itself — for example if the two-observer workflow deferred in

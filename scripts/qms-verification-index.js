@@ -69,7 +69,14 @@ function extract() {
     // totals. Counting "lines without an id" directly does not work: the Node
     // reporter prints a line with a duration for every `describe` block too,
     // and those were being reported as unidentified tests.
-    let idNode = 0, idE2e = 0;
+    // Counted directly from test lines, not derived by subtracting from a
+    // separately-measured total. Subtraction proved unstable — it oscillated
+    // between 0 and 1 across identical runs — because the two measurements
+    // come from different passes over the runner output.
+    //
+    // Test lines are indented under their describe block; a top-level describe
+    // prints at column 0 with a duration and would otherwise be counted.
+    let noId = 0;
     // Unique test titles. Playwright lists each case once per engine, so
     // counting raw lines would report 375 where 125 cases exist and make the
     // unidentified figure meaningless.
@@ -103,10 +110,10 @@ function extract() {
         const summary = out.match(/^\u2139 tests (\d+)$/m);
         if (summary) nodeTotal += Number(summary[1]);
         for (const line of out.split('\n')) {
-            const m = /^\s*[✔✖]\s+(.+?)\s+\([\d.]+m?s\)\s*$/.exec(line);
+            const m = /^\s{2,}[✔✖]\s+(.+?)\s+\([\d.]+m?s\)\s*$/.exec(line);
             if (!m) continue;
             const idm = /^([A-Z]{2,4}(?:-[A-Z0-9]+)*?-[A-Z]?\d+)\s*(?:\([^)]*\))?\s*:\s*(.*)$/.exec(m[1]);
-            if (idm) { add(idm[1], idm[2].trim(), file); idNode++; }
+            if (idm) add(idm[1], idm[2].trim(), file); else noId++;
         }
     }
 
@@ -119,7 +126,7 @@ function extract() {
         const title = m[2].split(' › ').pop();
         distinct.add(file + '::' + title);
         const idm = /^([A-Z]{2,4}(?:-[A-Z0-9]+)*?-[A-Z]?\d+)\s*(?:\([^)]*\))?\s*:\s*(.*)$/.exec(title);
-        if (idm) { add(idm[1], idm[2].trim(), file); idE2e++; }
+        if (idm) add(idm[1], idm[2].trim(), file); else noId++;
     }
 
     entries.sort((a, b) => {
@@ -132,7 +139,6 @@ function extract() {
     // extra runs as "unidentified" misdescribed them; `noId` counts only
     // tests whose title carries no identifier.
     const total = nodeTotal + distinct.size;
-    const noId = Math.max(0, nodeTotal - idNode) + Math.max(0, distinct.size - idE2e);
     return { entries, unidentified: noId, instances: total, total };
 }
 

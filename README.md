@@ -324,7 +324,7 @@ CI can run `npm test` for quick feedback, but **QMS evidence requires `npm run t
 | 10 | `tests/10-config-editor.test.js` | Static | Editor structure, JS integrity, key assignment controls |
 | 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 91 tests |
 | E2E | `tests-e2e/*.spec.js` | **System** | The deployed application in Chromium, Firefox and WebKit — 129 specs x 3 engines |
-| **Total** | | | **1004 executed** (617 Node + 387 browser, 3 documented skips) |
+| **Total** | | | **1009 executed** (622 Node + 387 browser, 3 documented skips) |
 
 See `QMS/DHF/DCR/DCR-004-Verification-Integrity-Remediation.md` for why the
 suite was restructured: prior to it, no test executed the application at all.
@@ -356,7 +356,7 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
 | **RA-001** | FMEA risk analysis: 51 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan; register of 688 implemented verification cases, generated from the runners |
+| **TP-001** | Test plan; register of 694 implemented verification cases, generated from the runners |
 | **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |

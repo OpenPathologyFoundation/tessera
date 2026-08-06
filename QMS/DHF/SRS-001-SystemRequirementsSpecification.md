@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 3.1 |
+| **Version** | 3.2 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -98,7 +98,7 @@ This SRS covers the functional, performance, interface, data, and security requi
 | ID | Requirement | URS Trace | Verification Method |
 |----|------------|-----------|-------------------|
 | SYS-040 | The system SHALL calculate each cell percentage as: `(cell_count / total_count) * 100`. | URS-030 | Test |
-| SYS-041 | Percentages SHALL be displayed with exactly 2 decimal places (e.g., "12.50%"). | URS-032 | Test |
+| SYS-041 | ~~Percentages SHALL be displayed with exactly 2 decimal places.~~ **Superseded by SYS-232** (DCR-010 made precision selectable). The two requirements directly contradicted one another: this one mandated exactly 2 places while SYS-232 allows 0 to 4. **2 remains the default.** | URS-032 | Superseded |
 | SYS-042 | When total count is 0, all percentage cells SHALL display "0.00" (not NaN, Infinity, or error). | URS-033 | Test |
 | SYS-043 | Percentage recalculation SHALL occur within 50ms of any count value change. | URS-031 | Test |
 | SYS-044 | The sum of all displayed percentages SHALL equal 100.00% +/- 0.10% (rounding tolerance) when total count > 0. | URS-034 | Test |

@@ -289,3 +289,79 @@ describe('Both M:E conventions are offered (URS-035)', () => {
             'the method statement must carry the convention into the report');
     });
 });
+
+// ================================================================
+describe('Target counts are attributed to what the sources say (C-2, C-4)', () => {
+
+    /**
+     * Independent review, C-2 and C-4. Two target figures were mis-attributed,
+     * and both readings claimed more than the sources support.
+     */
+
+    it('SC-050: The 200-cell target is not presented as the CLSI reference method', () => {
+        // CLSI H20-A2's reference method is TWO reviewers counting 200 cells
+        // each — 400 in total (REF-001 [S8], quoting it verbatim). 200 is one
+        // observer's share, which is what routine single-observer practice
+        // does. This application implements a single-observer workflow and
+        // therefore does not perform that method; saying "200 per CLSI H20-A2"
+        // reads as a conformance claim it cannot support.
+        // Comment prose wraps, so line breaks and `//` markers are flattened
+        // before matching — otherwise the assertion tests the formatter.
+        const engine = fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'scripts', 'wbc-core.js'), 'utf-8')
+            .replace(/\n\s*\/\/\s*/g, ' ');
+        assert.match(engine, /TWO\s+reviewers counting 200 cells each/i,
+            'the engine must record that the reference method is two observers');
+        assert.match(engine, /400 in total/,
+            'and that the method totals 400 cells, not 200');
+        assert.ok(!/PB: 200 per CLSI H20-A2/.test(engine),
+            'the engine still attributes the 200-cell target to CLSI as though it were the method');
+
+        for (const spec of config.specimenTypes) {
+            const basis = spec.targetCountBasis || '';
+            if (!/CLSI/.test(basis)) continue;
+            assert.match(basis, /one observer|two reviewers/i,
+                `${spec.specimenType}: the basis presents 200 as the reference method itself`);
+        }
+    });
+
+    it('SC-051: The 500-cell marrow target is attributed to ICSH, not CAP', () => {
+        // REF-001 §3.3 recorded the "CAP recommendation" attribution as an
+        // error; the engine comment still carried it.
+        const engine = fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'scripts', 'wbc-core.js'), 'utf-8');
+        assert.ok(!/500 per CAP recommendation/.test(engine),
+            'the engine still attributes the 500-cell marrow target to a CAP recommendation');
+        const bm = config.specimenTypes.find(s => s.specimenType === 'bm');
+        assert.match(bm.targetCountBasis || '', /ICSH 2008/,
+            'the marrow target must be attributed to ICSH 2008 §2.6');
+    });
+
+    it('SC-052: The marrow target basis states the ICSH condition', () => {
+        // ICSH makes 500 conditional: at least 500 when a precise percentage of
+        // an abnormal cell type is required for the diagnosis, at least 300
+        // when the differential is not essential to it.
+        const bm = config.specimenTypes.find(s => s.specimenType === 'bm');
+        const basis = bm.targetCountBasis || '';
+        assert.match(basis, /300/, 'the basis must state the lower conditional figure');
+        assert.match(basis, /not essential/i, 'and the condition under which it applies');
+    });
+
+    it('SC-053: A sub-target advisory carries the basis for the target', () => {
+        // Without the condition in view the advisory over-warns: a marrow
+        // examined for staging reads as deficient at 300 cells when the
+        // standard would not require more. The basis is stated, not acted on —
+        // the operator knows what the count is for; the software does not.
+        const bm = config.specimenTypes.find(s => s.specimenType === 'bm');
+        const note = Core.buildLowCountNote(300, bm.targetCount, 0.95, bm.targetCountBasis);
+        assert.ok(note, 'a 300-cell count against a 500 target must produce an advisory');
+        assert.match(note, /300-cell count \(target 500\)/);
+        assert.match(note, /confidence interval/, 'it must still quantify the imprecision');
+        assert.match(note, /Basis for the target: .*ICSH 2008/,
+            'and must state why 500 is the target, so the operator can judge');
+
+        // Omitted where a profile states no basis, rather than inventing one.
+        assert.ok(!/Basis for the target/.test(
+            Core.buildLowCountNote(300, 500, 0.95, undefined) || ''));
+    });
+});

@@ -902,7 +902,7 @@ test.describe('Calculation reference (CAL-001)', () => {
 // ================================================================
 test.describe('Removing a category cleans up after itself (P0-7)', () => {
 
-    test('VV-SYS-070b: Removing a category removes what depended on it', async ({ page }) => {
+    test('VV-SYS-200: Removing a category removes what depended on it', async ({ page }) => {
         // Dragging a chip out of the layout removed it from `categories` and
         // `outCodes` and nothing else. The counting policy kept pointing at it,
         // and the profile then failed validation on save with a message about a

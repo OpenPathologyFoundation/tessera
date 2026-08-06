@@ -1,230 +1,230 @@
 {
-    "version": "2.5",
-    "profileId": "consensus-14",
-    "profileName": "Full 14-Part Consensus",
-    "provenance": {
-        "standard": "ICSH 2008",
-        "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
-        "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 §2.6."
-    },
-    "specimenTypes": [
+  "version": "2.5",
+  "profileId": "consensus-14",
+  "profileName": "Full 14-Part Consensus",
+  "provenance": {
+    "standard": "ICSH 2008",
+    "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
+    "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 \u00a72.6."
+  },
+  "specimenTypes": [
+    {
+      "specimenType": "bm",
+      "specimenLabel": "Bone Marrow",
+      "targetCount": 500,
+      "requireCaseNumber": false,
+      "upperRowAbnormal": false,
+      "categories": {
+        "upper": [
+          "nrbc",
+          "blasts",
+          "pro",
+          "myelo",
+          "meta",
+          "plasma",
+          "mast"
+        ],
+        "lower": [
+          "bands",
+          "poly",
+          "baso",
+          "eos",
+          "mono",
+          "lymph",
+          "other"
+        ]
+      },
+      "outCodes": {
+        "B": "nrbc",
+        "X": "blasts",
+        "R": "pro",
+        "V": "myelo",
+        "C": "meta",
+        "E": "plasma",
+        "W": "mast",
+        "D": "bands",
+        "F": "poly",
+        "Z": "baso",
+        "G": "eos",
+        "A": "mono",
+        "S": "lymph",
+        "Q": "other"
+      },
+      "formulas": {
+        "ME_ratio": {
+          "label": "M:E Ratio",
+          "numerator": [
+            "blasts",
+            "pro",
+            "myelo",
+            "meta",
+            "bands",
+            "poly",
+            "baso",
+            "eos",
+            "mono"
+          ],
+          "denominator": [
+            "nrbc"
+          ],
+          "precision": 1,
+          "basis": "ICSH 2008 \u00a72.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
+        }
+      },
+      "templates": [
         {
-            "specimenType": "bm",
-            "specimenLabel": "Bone Marrow",
-            "targetCount": 500,
-            "requireCaseNumber": false,
-            "upperRowAbnormal": false,
-            "categories": {
-                "upper": [
-                    "nrbc",
-                    "blasts",
-                    "pro",
-                    "myelo",
-                    "meta",
-                    "plasma",
-                    "mast"
-                ],
-                "lower": [
-                    "bands",
-                    "poly",
-                    "baso",
-                    "eos",
-                    "mono",
-                    "lymph",
-                    "other"
-                ]
-            },
-            "outCodes": {
-                "B": "nrbc",
-                "X": "blasts",
-                "R": "pro",
-                "V": "myelo",
-                "C": "meta",
-                "E": "plasma",
-                "W": "mast",
-                "D": "bands",
-                "F": "poly",
-                "Z": "baso",
-                "G": "eos",
-                "A": "mono",
-                "S": "lymph",
-                "Q": "other"
-            },
-            "formulas": {
-                "ME_ratio": {
-                    "label": "M:E Ratio",
-                    "numerator": [
-                        "blasts",
-                        "pro",
-                        "myelo",
-                        "meta",
-                        "bands",
-                        "poly",
-                        "baso",
-                        "eos",
-                        "mono"
-                    ],
-                    "denominator": [
-                        "nrbc"
-                    ],
-                    "precision": 1,
-                    "basis": "ICSH 2008 §2.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
-                }
-            },
-            "templates": [
-                {
-                    "tplCode": "ysm",
-                    "tplName": "Yale SOM",
-                    "outSentence": "A {{total}}-cell count reveals {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{bands}}% bands, {{poly}}% segmented neutrophils, {{eos}}% eosinophils, {{baso}}% basophils, {{mono}}% monocytes, {{lymph}}% lymphocytes, {{plasma}}% plasma cells, {{mast}}% mast cells, {{nrbc}}% erythroid precursors, and {{other}}% other cells. M:E ratio {{ME_ratio}}."
-                },
-                {
-                    "tplCode": "pdx",
-                    "tplName": "Precipio DX",
-                    "outSentence": "Number of cells counted: {{total}}<br><br>Cell Type | Percent<br>Blasts | {{blasts}}%<br>Promyelocytes | {{pro}}%<br>Myelocytes | {{myelo}}%<br>Metamyelocytes | {{meta}}%<br>Bands | {{bands}}%<br>Seg. Neutrophils | {{poly}}%<br>Eosinophils | {{eos}}%<br>Basophils | {{baso}}%<br>Monocytes | {{mono}}%<br>Lymphocytes | {{lymph}}%<br>Plasma Cells | {{plasma}}%<br>Mast Cells | {{mast}}%<br>Erythroid (NRBC) | {{nrbc}}%<br>Other | {{other}}%<br><br>M:E ratio | {{ME_ratio}}"
-                },
-                {
-                    "tplCode": "mgh",
-                    "tplName": "MGH",
-                    "outSentence": "A {{total}}-cell differential count reveals {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{bands}}% bands, {{poly}}% segmented neutrophils, {{eos}}% eosinophils, {{baso}}% basophils, {{mono}}% monocytes, {{lymph}}% lymphocytes, {{plasma}}% plasma cells, {{mast}}% mast cells, {{nrbc}}% erythroid precursors, and {{other}}% other cells. M:E ratio {{ME_ratio}}."
-                }
-            ],
-            "constituents": {},
-            "audio": {
-                "enabled": true,
-                "countSound": "click",
-                "undoSound": "undo",
-                "targetSound": "chime",
-                "typewriterSound": "typewriter"
-            },
-            "autosave": true,
-            "absoluteCounts": "optional",
-            "handedness": "left",
-            "morphologyChecklist": [],
-            "categoryNotes": {
-                "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells — ICSH 2008 §2.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
-            },
-            "confidenceIntervals": {
-                "enabled": true,
-                "level": 0.95
-            },
-            "thresholds": [
-                {
-                    "target": "blasts",
-                    "value": 20,
-                    "label": "AML blast threshold",
-                    "basis": "WHO 2022 / ICC 2022 — 20% blasts of all nucleated cells."
-                },
-                {
-                    "target": "blasts",
-                    "value": 5,
-                    "label": "low blast threshold",
-                    "basis": "ICSH 2008 §2.6 cites 5% as a low threshold warranting an extended count."
-                },
-                {
-                    "target": "plasma",
-                    "value": 10,
-                    "label": "plasma cell threshold",
-                    "basis": "10% clonal plasma cells is a diagnostic boundary for plasma cell neoplasia."
-                }
-            ],
-            "targetCountBasis": "ICSH 2008 §2.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it.",
-            "rounding": "largest-remainder",
-            "precision": {
-                "display": 2,
-                "report": 0
-            }
+          "tplCode": "ysm",
+          "tplName": "Yale SOM",
+          "outSentence": "A {{total}}-cell count reveals {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{bands}}% bands, {{poly}}% segmented neutrophils, {{eos}}% eosinophils, {{baso}}% basophils, {{mono}}% monocytes, {{lymph}}% lymphocytes, {{plasma}}% plasma cells, {{mast}}% mast cells, {{nrbc}}% erythroid precursors, and {{other}}% other cells. M:E ratio {{ME_ratio}}."
         },
         {
-            "specimenType": "pb",
-            "specimenLabel": "Peripheral Blood",
-            "targetCount": 200,
-            "requireCaseNumber": false,
-            "upperRowAbnormal": true,
-            "categories": {
-                "upper": [
-                    "nrbc",
-                    "blasts",
-                    "pro",
-                    "myelo",
-                    "meta",
-                    "plasma",
-                    "mast"
-                ],
-                "lower": [
-                    "bands",
-                    "poly",
-                    "baso",
-                    "eos",
-                    "mono",
-                    "lymph",
-                    "other"
-                ]
-            },
-            "outCodes": {
-                "B": "nrbc",
-                "X": "blasts",
-                "R": "pro",
-                "V": "myelo",
-                "C": "meta",
-                "E": "plasma",
-                "W": "mast",
-                "D": "bands",
-                "F": "poly",
-                "Z": "baso",
-                "G": "eos",
-                "A": "mono",
-                "S": "lymph",
-                "Q": "other"
-            },
-            "templates": [
-                {
-                    "tplCode": "mgh",
-                    "tplName": "MGH",
-                    "outSentence": "A {{total}}-cell differential count of peripheral blood reveals: {{poly}}% segmented neutrophils, {{bands}}% band forms, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{plasma}}% plasma cells, {{mast}}% mast cells, and {{other}}% other cells. Nucleated RBCs {{nrbc_per100}} per 100 WBC."
-                }
-            ],
-            "constituents": {},
-            "audio": {
-                "enabled": true,
-                "countSound": "click",
-                "undoSound": "undo",
-                "targetSound": "chime",
-                "typewriterSound": "typewriter"
-            },
-            "autosave": true,
-            "absoluteCounts": "optional",
-            "handedness": "left",
-            "morphologyChecklist": [],
-            "categoryNotes": {
-                "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells — ICSH 2008 §2.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
-            },
-            "denominatorExcludes": [
-                "nrbc"
-            ],
-            "per100Reporting": {
-                "nrbc": {
-                    "label": "NRBC per 100 WBC",
-                    "precision": 1
-                }
-            },
-            "confidenceIntervals": {
-                "enabled": true,
-                "level": 0.95
-            },
-            "thresholds": [
-                {
-                    "target": "blasts",
-                    "value": 20,
-                    "label": "AML blast threshold",
-                    "basis": "WHO 2022 / ICC 2022."
-                }
-            ],
-            "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential.",
-            "rounding": "largest-remainder",
-            "precision": {
-                "display": 2,
-                "report": 0
-            }
+          "tplCode": "pdx",
+          "tplName": "Precipio DX",
+          "outSentence": "Number of cells counted: {{total}}<br><br>Cell Type | Percent<br>Blasts | {{blasts}}%<br>Promyelocytes | {{pro}}%<br>Myelocytes | {{myelo}}%<br>Metamyelocytes | {{meta}}%<br>Bands | {{bands}}%<br>Seg. Neutrophils | {{poly}}%<br>Eosinophils | {{eos}}%<br>Basophils | {{baso}}%<br>Monocytes | {{mono}}%<br>Lymphocytes | {{lymph}}%<br>Plasma Cells | {{plasma}}%<br>Mast Cells | {{mast}}%<br>Erythroid (NRBC) | {{nrbc}}%<br>Other | {{other}}%<br><br>M:E ratio | {{ME_ratio}}"
+        },
+        {
+          "tplCode": "mgh",
+          "tplName": "MGH",
+          "outSentence": "A {{total}}-cell differential count reveals {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{bands}}% bands, {{poly}}% segmented neutrophils, {{eos}}% eosinophils, {{baso}}% basophils, {{mono}}% monocytes, {{lymph}}% lymphocytes, {{plasma}}% plasma cells, {{mast}}% mast cells, {{nrbc}}% erythroid precursors, and {{other}}% other cells. M:E ratio {{ME_ratio}}."
         }
-    ]
+      ],
+      "constituents": {},
+      "audio": {
+        "enabled": true,
+        "countSound": "click",
+        "undoSound": "undo",
+        "targetSound": "chime",
+        "typewriterSound": "typewriter"
+      },
+      "autosave": true,
+      "absoluteCounts": "optional",
+      "handedness": "left",
+      "morphologyChecklist": [],
+      "categoryNotes": {
+        "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells \u2014 ICSH 2008 \u00a72.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
+      },
+      "confidenceIntervals": {
+        "enabled": true,
+        "level": 0.95
+      },
+      "thresholds": [
+        {
+          "target": "blasts",
+          "value": 20,
+          "label": "AML blast threshold",
+          "basis": "WHO 2022 / ICC 2022 \u2014 20% blasts of all nucleated cells."
+        },
+        {
+          "target": "blasts",
+          "value": 5,
+          "label": "low blast threshold",
+          "basis": "ICSH 2008 \u00a72.6 cites 5% as a low threshold warranting an extended count."
+        },
+        {
+          "target": "plasma",
+          "value": 10,
+          "label": "plasma cell threshold",
+          "basis": "10% clonal plasma cells is a diagnostic boundary for plasma cell neoplasia."
+        }
+      ],
+      "targetCountBasis": "ICSH 2008 \u00a72.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it.",
+      "rounding": "largest-remainder",
+      "precision": {
+        "display": 2,
+        "report": 0
+      }
+    },
+    {
+      "specimenType": "pb",
+      "specimenLabel": "Peripheral Blood",
+      "targetCount": 200,
+      "requireCaseNumber": false,
+      "upperRowAbnormal": true,
+      "categories": {
+        "upper": [
+          "nrbc",
+          "blasts",
+          "pro",
+          "myelo",
+          "meta",
+          "plasma",
+          "mast"
+        ],
+        "lower": [
+          "bands",
+          "poly",
+          "baso",
+          "eos",
+          "mono",
+          "lymph",
+          "other"
+        ]
+      },
+      "outCodes": {
+        "B": "nrbc",
+        "X": "blasts",
+        "R": "pro",
+        "V": "myelo",
+        "C": "meta",
+        "E": "plasma",
+        "W": "mast",
+        "D": "bands",
+        "F": "poly",
+        "Z": "baso",
+        "G": "eos",
+        "A": "mono",
+        "S": "lymph",
+        "Q": "other"
+      },
+      "templates": [
+        {
+          "tplCode": "mgh",
+          "tplName": "MGH",
+          "outSentence": "A {{total}}-cell differential count of peripheral blood reveals: {{poly}}% segmented neutrophils, {{bands}}% band forms, {{lymph}}% lymphocytes, {{mono}}% monocytes, {{eos}}% eosinophils, {{baso}}% basophils, {{blasts}}% blasts, {{pro}}% promyelocytes, {{myelo}}% myelocytes, {{meta}}% metamyelocytes, {{plasma}}% plasma cells, {{mast}}% mast cells, and {{other}}% other cells. Nucleated RBCs {{nrbc_per100}} per 100 WBC."
+        }
+      ],
+      "constituents": {},
+      "audio": {
+        "enabled": true,
+        "countSound": "click",
+        "undoSound": "undo",
+        "targetSound": "chime",
+        "typewriterSound": "typewriter"
+      },
+      "autosave": true,
+      "absoluteCounts": "optional",
+      "handedness": "left",
+      "morphologyChecklist": [],
+      "categoryNotes": {
+        "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells \u2014 ICSH 2008 \u00a72.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
+      },
+      "denominatorExcludes": [
+        "nrbc"
+      ],
+      "per100Reporting": {
+        "nrbc": {
+          "label": "NRBC per 100 WBC",
+          "precision": 1
+        }
+      },
+      "confidenceIntervals": {
+        "enabled": true,
+        "level": 0.95
+      },
+      "thresholds": [
+        {
+          "target": "blasts",
+          "value": 20,
+          "label": "AML blast threshold",
+          "basis": "WHO 2022 / ICC 2022."
+        }
+      ],
+      "targetCountBasis": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does \u2014 a documented default, not a claim to perform the reference method.",
+      "rounding": "largest-remainder",
+      "precision": {
+        "display": 2,
+        "report": 0
+      }
+    }
+  ]
 }

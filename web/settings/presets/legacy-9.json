@@ -185,7 +185,7 @@
         "display": 2,
         "report": 0
       },
-      "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential.",
+      "targetCountBasis": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does \u2014 a documented default, not a claim to perform the reference method.",
       "denominatorExcludes": [
         "nrbc"
       ],

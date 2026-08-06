@@ -75,7 +75,7 @@ same count.
 
 | ID | Verifies |
 |----|----------|
-| VV-SYS-070b | Removing a category removes its denominator exclusion, per-100 entry, thresholds and formula membership — and the profile still saves |
+| VV-SYS-200 | Removing a category removes its denominator exclusion, per-100 entry, thresholds and formula membership — and the profile still saves |
 | **VV-SYS-197** | Each row subtotal equals the sum of the cells displayed in it, at whole-number precision |
 | VV-SYS-198 | The same at two decimal places |
 | VV-SYS-199 | Session history reports at the precision the count used |
@@ -95,7 +95,7 @@ them** among small counts at 0 and 2 decimal places — and the test now uses on
 With the fix reverted it reports `Expected: 12, Received: 13`, which is the
 defect exactly.
 
-Revert-checked: dropping `forgetCategory` makes VV-SYS-070b fail with the
+Revert-checked: dropping `forgetCategory` makes VV-SYS-200 fail with the
 original validation message; restoring the independent subtotal calculation
 fails VV-SYS-197; restoring `toFixed(2)` fails VV-SYS-199.
 
@@ -119,7 +119,7 @@ fails VV-SYS-197; restoring `toFixed(2)` fails VV-SYS-199.
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
-| A | 2026-08-06 | QMS | Initial issue. `forgetCategory` cascade; subtotals as the sum of displayed cells; history honours session precision. VV-SYS-070b, 197, 198, 199. |
+| A | 2026-08-06 | QMS | Initial issue. `forgetCategory` cascade; subtotals as the sum of displayed cells; history honours session precision. VV-SYS-200, 197, 198, 199. |
 
 ---
 

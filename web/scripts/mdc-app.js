@@ -1580,7 +1580,8 @@
             // The advisory target counts classified cells, so it is measured
             // against the differential rather than the overall tally.
             lowCountNote: Core.buildLowCountNote(differentialTotal, specConfig.targetCount,
-                (specConfig.confidenceIntervals && specConfig.confidenceIntervals.level) || 0.95),
+                (specConfig.confidenceIntervals && specConfig.confidenceIntervals.level) || 0.95,
+                specConfig.targetCountBasis),
             outputs: {}
         };
 

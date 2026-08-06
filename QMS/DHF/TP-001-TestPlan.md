@@ -97,14 +97,14 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**688 verification cases** across 26 series and 4 layers, run as 746 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**694 verification cases** across 26 series and 4 layers, run as 751 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 8 (001–011) | Static | QMS counted quantities |
-| `SC-*` | 20 (001–043) | Unit | Standards conformance (ICSH) |
+| `SC-*` | 24 (001–053) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
-| `UD-*` | 48 (001–092) | Static | User-facing documentation |
+| `UD-*` | 49 (001–093) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-AUD-*` | 19 (001–019) | Static | Audio engine structure |
 | `VV-CALC-*` | 24 (001–030) | Unit | Calculation engine vectors |
@@ -124,7 +124,7 @@ auditing how the plan changed.
 | `VV-SCH-*` | 23 (001–023) | Unit | v2 configuration schema |
 | `VV-SRC-*` | 76 (001–076) | Static | Application source integrity (static) |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 113 (001–199) | System | System verification in a real browser |
+| `VV-SYS-*` | 114 (001–200) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
 
@@ -165,6 +165,10 @@ auditing how the plan changed.
 | SC-041 | The editor exposes the formula composition (URS-035) | Unit | `tests/12-standards-conformance.test.js` |
 | SC-042 | The two conventions give different ratios from identical counts | Unit | `tests/12-standards-conformance.test.js` |
 | SC-043 | The convention in force is stated, so a report is interpretable | Unit | `tests/12-standards-conformance.test.js` |
+| SC-050 | The 200-cell target is not presented as the CLSI reference method | Unit | `tests/12-standards-conformance.test.js` |
+| SC-051 | The 500-cell marrow target is attributed to ICSH, not CAP | Unit | `tests/12-standards-conformance.test.js` |
+| SC-052 | The marrow target basis states the ICSH condition | Unit | `tests/12-standards-conformance.test.js` |
+| SC-053 | A sub-target advisory carries the basis for the target | Unit | `tests/12-standards-conformance.test.js` |
 
 #### TC-B-* — Application behaviour in a DOM
 
@@ -314,6 +318,7 @@ auditing how the plan changed.
 | UD-090 | All four statutory criteria are assessed, not just the easy ones | Static | `tests/13-user-documentation.test.js` |
 | UD-091 | The features the argument depends on still exist | Static | `tests/13-user-documentation.test.js` |
 | UD-092 | It is labelled unreviewed until a qualified reviewer signs it | Static | `tests/13-user-documentation.test.js` |
+| UD-093 | The precision table is engine-produced (C-3) | Static | `tests/13-user-documentation.test.js` |
 
 #### VV-ABS-* — Absolute counts and the analyser WBC
 
@@ -922,6 +927,7 @@ auditing how the plan changed.
 | VV-SYS-197 | Each row subtotal equals the sum of the cells displayed in it | System | `tests-e2e/input-integrity.spec.js` |
 | VV-SYS-198 | The same holds at two decimal places | System | `tests-e2e/input-integrity.spec.js` |
 | VV-SYS-199 | Session history reports at the precision the count used | System | `tests-e2e/input-integrity.spec.js` |
+| VV-SYS-200 | Removing a category removes what depended on it | System | `tests-e2e/config-and-offline.spec.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 

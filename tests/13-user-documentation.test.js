@@ -612,6 +612,22 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
         assert.ok(calcref.includes('2.3:1') && calcref.includes('1.7:1'));
     });
 
+    it('UD-093: The precision table is engine-produced (C-3)', () => {
+        // The resolution column and every interval in §1.2a, recomputed. One
+        // was written as 43.2-56.8% and the engine gives 43.1-56.9%; a section
+        // arguing that displayed digits overstate precision cannot itself
+        // carry a digit that is wrong.
+        for (const [n, step] of [[100, '1.0'], [200, '0.5'], [500, '0.2']]) {
+            assert.equal((100 / n).toFixed(1), step, `resolution at n=${n}`);
+            const ci = Core.wilsonInterval(Math.round(0.5 * n), n, 0.95);
+            const text = Core.formatInterval(ci, 1);
+            assert.ok(calcref.includes(text.replace('–', '&ndash;')) || calcref.includes(text),
+                `the reference does not carry the engine's interval for n=${n}: ${text}`);
+        }
+        assert.match(calcref, /display convention, not a statement of precision/,
+            'the section must say plainly what the extra digits are');
+    });
+
     it('UD-033: Every confidence interval in the reference is engine-produced', () => {
         for (const [p, n] of [[0.20,100],[0.20,200],[0.20,500],[0.05,100],[0.05,200],[0.05,500],
                               [0.01,100],[0.01,200],[0.01,500],[0,100],[0,200],[0,500]]) {

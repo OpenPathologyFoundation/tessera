@@ -468,3 +468,106 @@ test.describe('Method provenance (URS-052, URS-055)', () => {
         expect(text).toMatch(/competing convention/i);
     });
 });
+
+// ================================================================
+test.describe('Legibility of clinical advisories (URS-095)', () => {
+
+    /**
+     * WCAG contrast, measured on the rendered page.
+     *
+     * The amber palette used for warnings is chosen for a dark background. On
+     * the light theme it rendered near-white: the near-threshold advisory, the
+     * sub-target note and the abnormal-row flag were all effectively invisible,
+     * and no test noticed because every one of them asserted only on text
+     * content. An advisory that cannot be read is worse than none, because the
+     * system has recorded that it warned.
+     *
+     * Semi-transparent layers are composited down to the page background, since
+     * the panels use a 10% amber tint over the body colour.
+     */
+    async function contrastFailures(page, selectors) {
+        return page.evaluate((sels) => {
+            const px = s => {
+                const m = String(s).match(/rgba?\(([^)]+)\)/);
+                if (!m) return null;
+                const a = m[1].split(',').map(parseFloat);
+                return { r: a[0], g: a[1], b: a[2], a: a.length > 3 ? a[3] : 1 };
+            };
+            const over = (f, b) => ({
+                r: f.r * f.a + b.r * (1 - f.a),
+                g: f.g * f.a + b.g * (1 - f.a),
+                b: f.b * f.a + b.b * (1 - f.a), a: 1
+            });
+            const effBg = el => {
+                const stack = [];
+                for (let e = el; e; e = e.parentElement) {
+                    const c = px(getComputedStyle(e).backgroundColor);
+                    if (c && c.a > 0) stack.push(c);
+                }
+                let base = { r: 255, g: 255, b: 255, a: 1 };
+                for (let i = stack.length - 1; i >= 0; i--) base = over(stack[i], base);
+                return base;
+            };
+            const lum = c => {
+                const f = v => { v /= 255; return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); };
+                return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+            };
+            const ratio = (f, b) => {
+                const a = lum(f), c = lum(b);
+                const hi = Math.max(a, c), lo = Math.min(a, c);
+                return (hi + 0.05) / (lo + 0.05);
+            };
+            const bad = [];
+            for (const sel of sels) {
+                const root = document.querySelector(sel);
+                if (!root || root.classList.contains('hidden')) continue;
+                const nodes = root.children.length ? [...root.querySelectorAll('*')] : [root];
+                for (const el of nodes) {
+                    const t = (el.textContent || '').trim();
+                    if (!t || el.children.length) continue;
+                    const fg = px(getComputedStyle(el).color);
+                    if (!fg) continue;
+                    const r = ratio(fg, effBg(el));
+                    if (r < 4.5) bad.push({ sel, text: t.slice(0, 50), ratio: Number(r.toFixed(2)) });
+                }
+            }
+            return bad;
+        }, selectors);
+    }
+
+    for (const theme of ['light', 'dark']) {
+        test(`VV-SYS-160 (${theme}): advisories are legible in the ${theme} theme`, async ({ page }) => {
+            await page.evaluate(t => sessionStorage.setItem('wbcds_theme', t), theme);
+            await page.reload();
+            await expect(page.locator('#phase-case-entry')).toBeVisible();
+
+            // A count that trips both advisories: plasma straddling 10%,
+            // and a total below the 500-cell bone marrow target.
+            await page.fill('#caseNumber', 'S25-CONTRAST');
+            await page.click('#btnStartCount');
+            await count(page, 'e', 26);    // plasma
+            await count(page, 'f', 274);   // segs -> 300 cells, plasma 8.7%
+            await page.click('#btnCountDone');
+
+            await expect(page.locator('#threshold-note')).toBeVisible();
+            await expect(page.locator('#low-count-note')).toBeVisible();
+
+            const bad = await contrastFailures(page, ['#threshold-note', '#low-count-note']);
+            expect(bad, `text below WCAG AA 4.5:1 in the ${theme} theme: ` +
+                JSON.stringify(bad, null, 1)).toEqual([]);
+        });
+    }
+
+    test('VV-SYS-161: The counting grid stays legible in the light theme', async ({ page }) => {
+        await page.evaluate(() => sessionStorage.setItem('wbcds_theme', 'light'));
+        await page.reload();
+        await expect(page.locator('#phase-case-entry')).toBeVisible();
+        await page.selectOption('#specimenType', 'pb');
+        await page.click('#btnStartCount');
+        await count(page, 'f', 180);
+        await count(page, 'b', 20);   // NRBC renders in amber as "11.1/100"
+
+        const bad = await contrastFailures(page, ['#counter-table-area']);
+        expect(bad, 'counting grid text below WCAG AA: ' + JSON.stringify(bad, null, 1)).toEqual([]);
+    });
+});

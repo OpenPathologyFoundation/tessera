@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | RA-001 |
-| **Version** | 2.8 |
+| **Version** | 2.9 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-04 |
@@ -170,6 +170,8 @@ primary text against the shipped configuration.
 
 | HA-097 | Operator documentation describes software that no longer exists | An operator follows a documented key mapping or target count that the configuration has since changed. USER-GUIDE.md described a nine-category layout with keys and targets that had been superseded; an operator relying on it would have pressed keys mapped to different cell types than the document stated | 4 | Documentation is maintained by hand and nothing verified it against the configuration | 3 | **None** | 3 | **36** | **Medium** | SYS-224: test suite 13 verifies every documented key, target count and quoted figure against the shipped profile and the shipped calculation engine, so documentation drift fails the build. The guide also directs the operator to the on-screen key display as authoritative, since keys are configurable. | 4x1x1 = **4** (Low). Verified by UD-001 to UD-003 (keys and targets), UD-010 to UD-014 (quoted figures recomputed from the engine). |
 
+| HA-098 | A clinical advisory is displayed but cannot be read | The near-threshold advisory, the sub-target note, the abnormal-row flag and the peripheral blood per-100 value all used an amber palette chosen for a dark background. In the light theme they rendered at a contrast ratio of **1.28:1** against their panel — effectively invisible. The system recorded that it had warned; the operator saw nothing. Worse than issuing no advisory, because the count carries a note in its record that the operator never read | 4 | The light theme defined overrides for every slate tone but none for amber or red; every test asserted on advisory *text content*, which was present and correct | 3 | **None** — the element is in the DOM, populated, and reported visible by any content-based check | 5 | **60** | **High** | Light-theme overrides added for the full amber and red scales, chosen to clear WCAG AA (worst measured 4.51:1 light, 11.22:1 dark). VV-SYS-160 and VV-SYS-161 measure rendered contrast in both themes, compositing semi-transparent layers down to the page background, and fail below 4.5:1. | 4x1x1 = **4** (Low). The regression test was confirmed to detect the original defect: with the fix reverted it reports 1.28:1 and fails. |
+
 ### 4.10 Hazards Identified in the v2.1 Design Review (DCR-004)
 
 | # | Failure Mode | Potential Effect | S | Cause | O | Current Controls | D | RPN | Risk Level | Mitigation / Design Control | Residual RPN |
@@ -186,11 +188,11 @@ primary text against the shipped configuration.
 | Risk Level | Count | Hazard IDs |
 |-----------|-------|-----------|
 | Critical (75-125) | 1 | HA-001 |
-| High (50-74) | 4 | HA-003, HA-030, HA-080, HA-092 |
+| High (50-74) | 5 | HA-003, HA-030, HA-080, HA-092, HA-098 |
 | Medium (16-49) | 28 | HA-002, HA-004, HA-010, HA-011, HA-012, HA-013, HA-014, HA-015, HA-020, HA-021, HA-022, HA-024, HA-031, HA-042, HA-043, HA-052, HA-061, HA-063, HA-064, HA-071, HA-081 |
 | Low (1-15) | 9 | HA-023, HA-040, HA-041, HA-050, HA-051, HA-060, HA-062, HA-070, HA-072 |
 
-Total: **42** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
+Total: **43** hazards (29 carried from v2.0, 5 added by the v2.1 design review, 2 by the standards review, 1 by the denominator review).
 
 _Two counting errors in the v2.0 table are corrected here: the Medium row was
 labelled 14 against a list of 16 entries and the Low row 8 against a list of 10,
@@ -204,7 +206,7 @@ Every RPN in section 4 has been recomputed from its S, O and D values._
 | Critical (75-125) | **0** |
 | High (50-74) | **0** |
 | Medium (16-49) | **2** (HA-001 RPN=45, HA-002 RPN=30) |
-| Low (1-15) | **40** |
+| Low (1-15) | **41** |
 
 All three residual Medium risks are accepted by design and unchanged from v2.0;
 their rationale is in section 5.3. No residual risk sits above Medium.
@@ -339,6 +341,7 @@ to DCR-009, are unaffected by this review.
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete FMEA |
 | B | 2026-02-24 | QMS | v2.0 update: optional case number (HA-001), advisory target count replacing blocking dialog (HA-030), unified key mappings (HA-010), new hazards for M:E ratio (HA-070, HA-072) and Continue Counting (HA-071), updated risk summary |
+| K | 2026-08-05 | QMS | v2.9: HA-098 added — a clinical advisory displayed but unreadable. Found live: every warning in the product rendered at 1.28:1 in the light theme. Pre-RPN 60 (High), residual 4. Detection was Low because content-based tests cannot see it. |
 | J | 2026-08-05 | QMS | v2.8: HA-097 added — operator documentation describing superseded software. Found live: USER-GUIDE.md documented a nine-category layout with keys and targets that no longer existed. Pre-RPN 36, residual 4. |
 | I | 2026-08-05 | QMS | v2.7: Severity ratings reviewed by the Document Owner and accepted unchanged; the open action carried since revision D is closed (§6.4). Residual Medium risks HA-001 and HA-002 accepted by design. |
 | H | 2026-08-05 | QMS | v2.6 (DCR-009): HA-095 (a result interpreted without its convention) and HA-096 (the LIS record untraceable to its counting parameters) added, both pre-RPN 48. HA-096 was a live URS-052 gap — the clipboard path carried no profile attribution while file export did. |

@@ -31,6 +31,21 @@
         tbody tr { border-bottom: 1px solid rgba(51,65,85,.4); }
         .cfg { border-left: 3px solid #60a5fa; }
         .warn { border-left: 3px solid #f59e0b; }
+        /* Warning and alert colours. The amber and red scales used here are
+           chosen for a dark background; on the light theme they are near-white
+           and effectively invisible. A clinical advisory that cannot be read is
+           worse than none, because the system has recorded that it warned. */
+        body[data-theme="light"] .text-amber-300 { color: #b45309 !important; }
+        body[data-theme="light"] .text-amber-400 { color: #b45309 !important; }
+        body[data-theme="light"] .text-amber-400\/80 { color: #b45309 !important; }
+        body[data-theme="light"] .text-amber-200\/90 { color: #92400e !important; }
+        body[data-theme="light"] .text-amber-200\/70 { color: #854d0e !important; }
+        body[data-theme="light"] .text-amber-200\/60 { color: #854d0e !important; }
+        body[data-theme="light"] .bg-amber-500\/10 { background-color: #fef3c7 !important; }
+        body[data-theme="light"] .border-amber-500\/30 { border-color: #f59e0b !important; }
+        body[data-theme="light"] .border-amber-500\/40 { border-color: #d97706 !important; }
+        body[data-theme="light"] .border-amber-500\/50 { border-color: #d97706 !important; }
+        body[data-theme="light"] .text-red-400 { color: #b91c1c !important; }
         @media print { nav, .no-print { display:none !important; }
             body { background:#fff !important; color:#000 !important; }
             h2 { break-after: avoid; } table { break-inside: avoid; } }

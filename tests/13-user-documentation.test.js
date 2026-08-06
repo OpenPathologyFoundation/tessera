@@ -349,13 +349,20 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
     });
 
     it('UD-032: The two M:E conventions give the stated ratios', () => {
+        // The alternative is the shipped formula with monocytes removed from
+        // the numerator — one checkbox in the editor, not a separate preset
+        // (DCR-020).
         const presets = path.join(ROOT, 'web', 'settings', 'presets');
-        const load = f => Core.normalizeConfig(JSON.parse(
-            fs.readFileSync(path.join(presets, f), 'utf-8')))
+        const bm = Core.normalizeConfig(JSON.parse(
+            fs.readFileSync(path.join(presets, 'consensus-14.json'), 'utf-8')))
             .specimenTypes.find(s => s.specimenType === 'bm');
+        const icsh = bm.formulas.ME_ratio;
+        const alt = Object.assign({}, icsh,
+            { numerator: icsh.numerator.filter(ct => ct !== 'mono') });
+
         const c = zero(); c.poly = 150; c.mono = 60; c.nrbc = 90;
-        assert.equal(Core.computeRatio(c, load('consensus-14.json').formulas.ME_ratio), '2.3:1');
-        assert.equal(Core.computeRatio(c, load('consensus-14-me-alt.json').formulas.ME_ratio), '1.7:1');
+        assert.equal(Core.computeRatio(c, icsh), '2.3:1');
+        assert.equal(Core.computeRatio(c, alt), '1.7:1');
         assert.ok(calcref.includes('2.3:1') && calcref.includes('1.7:1'));
     });
 

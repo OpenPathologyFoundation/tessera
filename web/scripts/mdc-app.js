@@ -97,18 +97,35 @@
         ctx: null,
         enabled: true,
 
-        init: function () {
+        /**
+         * Two sources, in order: the profile's default, then any choice the
+         * operator has made this session.
+         *
+         * The profile default was previously ignored entirely. Every preset
+         * carried an `audio` object and the configuration editor offered an
+         * Audio checkbox that wrote it, and the counter never read either — so
+         * a laboratory that set audio off in its profile got sound anyway. A
+         * control that does nothing is worse than no control, because the
+         * operator believes the setting took effect.
+         */
+        init: function (specConfig) {
             try {
                 this.ctx = new (window.AudioContext || window.webkitAudioContext)();
             } catch (e) { /* no audio support */ }
-            // Restore saved preference
+
+            if (specConfig && specConfig.audio && specConfig.audio.enabled === false) {
+                this.enabled = false;
+            }
+
+            // A session choice overrides the profile default, in both
+            // directions — the operator at the bench has the last word.
             try {
                 var saved = sessionStorage.getItem(AUDIO_KEY);
-                if (saved === 'off') {
-                    this.enabled = false;
-                    state.audioEnabled = false;
-                }
+                if (saved === 'off') this.enabled = false;
+                else if (saved === 'on') this.enabled = true;
             } catch (e) { /* graceful degradation */ }
+
+            state.audioEnabled = this.enabled;
         },
 
         _playTone: function (freq, type, duration) {
@@ -503,8 +520,8 @@
     // INITIALIZATION
     // ================================================================
     function init() {
-        // Initialize audio engine
-        AudioEngine.init();
+        // Initialize audio engine with this profile's default (URS-097)
+        AudioEngine.init(getSpecConfig());
         updateAudioToggle();
 
         // Populate specimen type selects from config

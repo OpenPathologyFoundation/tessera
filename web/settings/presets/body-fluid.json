@@ -1,72 +1,79 @@
 {
-    "version": "2.0",
-    "profileId": "body-fluid",
-    "profileName": "Body Fluid",
-    "provenance": {
-        "standard": "ICSH 2008",
-        "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
-        "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 §2.6."
-    },
-    "description": "Differential for body fluid specimens (CSF, pleural, peritoneal, synovial). Includes lymphocytes, monocytes/macrophages, mesothelial cells, neutrophils, eosinophils, malignant cells, and other. Left-hand ergonomic key layout.",
-    "specimenTypes": [
+  "version": "2.0",
+  "profileId": "body-fluid",
+  "profileName": "Body Fluid",
+  "provenance": {
+    "standard": "ICSH 2008",
+    "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
+    "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 \u00a72.6."
+  },
+  "description": "Differential for body fluid specimens (CSF, pleural, peritoneal, synovial). Includes lymphocytes, monocytes/macrophages, mesothelial cells, neutrophils, eosinophils, malignant cells, and other. Left-hand ergonomic key layout.",
+  "specimenTypes": [
+    {
+      "specimenType": "bf",
+      "specimenLabel": "Body Fluid",
+      "targetCount": 200,
+      "requireCaseNumber": false,
+      "upperRowAbnormal": false,
+      "categories": {
+        "upper": [
+          "lymph",
+          "mono_macro",
+          "mesothelial",
+          "malignant"
+        ],
+        "lower": [
+          "neutrophils",
+          "eos",
+          "other"
+        ]
+      },
+      "outCodes": {
+        "F": "neutrophils",
+        "D": "lymph",
+        "S": "mono_macro",
+        "A": "eos",
+        "G": "mesothelial",
+        "Z": "malignant",
+        "X": "other"
+      },
+      "templates": [
         {
-            "specimenType": "bf",
-            "specimenLabel": "Body Fluid",
-            "targetCount": 200,
-            "requireCaseNumber": false,
-            "upperRowAbnormal": false,
-            "categories": {
-                "upper": [
-                    "lymph",
-                    "mono_macro",
-                    "mesothelial",
-                    "malignant"
-                ],
-                "lower": [
-                    "neutrophils",
-                    "eos",
-                    "other"
-                ]
-            },
-            "outCodes": {
-                "F": "neutrophils",
-                "D": "lymph",
-                "S": "mono_macro",
-                "A": "eos",
-                "G": "mesothelial",
-                "Z": "malignant",
-                "X": "other"
-            },
-            "templates": [
-                {
-                    "tplCode": "std",
-                    "tplName": "Standard",
-                    "outSentence": "A {{total}}-cell body fluid differential reveals: {{lymph}}% lymphocytes, {{mono_macro}}% monocytes/macrophages, {{mesothelial}}% mesothelial cells, {{neutrophils}}% neutrophils, {{eos}}% eosinophils, {{malignant}}% malignant cells, and {{other}}% other cells."
-                }
-            ],
-            "constituents": {},
-            "audio": {
-                "enabled": true,
-                "countSound": "click",
-                "undoSound": "undo",
-                "targetSound": "chime",
-                "typewriterSound": "typewriter"
-            },
-            "autosave": true,
-            "absoluteCounts": "optional",
-            "handedness": "left",
-            "morphologyChecklist": [
-                "Reactive mesothelial cells",
-                "Signet ring cells",
-                "Hemosiderin-laden macrophages",
-                "Crystals present"
-            ],
-            "rounding": "largest-remainder",
-            "precision": {
-                "display": 2,
-                "report": 0
-            },
-            "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential."
+          "tplCode": "std",
+          "tplName": "Standard",
+          "outSentence": "A {{total}}-cell body fluid differential reveals: {{lymph}}% lymphocytes, {{mono_macro}}% monocytes/macrophages, {{mesothelial}}% mesothelial cells, {{neutrophils}}% neutrophils, {{eos}}% eosinophils, {{malignant}}% malignant cells, and {{other}}% other cells."
         }
-    ]
+      ],
+      "constituents": {},
+      "audio": {
+        "enabled": true,
+        "countSound": "click",
+        "undoSound": "undo",
+        "targetSound": "chime",
+        "typewriterSound": "typewriter"
+      },
+      "autosave": true,
+      "absoluteCounts": "optional",
+      "handedness": "left",
+      "morphologyChecklist": [
+        "Reactive mesothelial cells",
+        "Signet ring cells",
+        "Hemosiderin-laden macrophages",
+        "Crystals present"
+      ],
+      "rounding": "largest-remainder",
+      "precision": {
+        "display": 2,
+        "report": 0
+      },
+      "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential.",
+      "confidenceIntervals": {
+        "enabled": true,
+        "level": 0.95
+      },
+      "categoryNotes": {
+        "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells \u2014 ICSH 2008 \u00a72.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
+      }
+    }
+  ]
 }

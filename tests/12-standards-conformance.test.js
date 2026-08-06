@@ -223,42 +223,69 @@ describe('Both M:E conventions are offered (URS-035)', () => {
     const load = f => Core.normalizeConfig(
         JSON.parse(fs.readFileSync(path.join(presetDir, f), 'utf-8')));
 
-    it('SC-040: The alternative convention ships as a selectable preset', () => {
-        const alt = load('consensus-14-me-alt.json');
-        const bm = alt.specimenTypes.find(s => s.specimenType === 'bm');
-        assert.ok(!bm.formulas.ME_ratio.numerator.includes('mono'),
-            'the alternative excludes monocytes');
-        assert.equal(Core.validateConfig(alt.specimenTypes).length, 0);
+    /**
+     * The alternative M:E convention used to ship as its own preset file. That
+     * file was a fork of consensus-14 differing in one field, and the forking
+     * pattern had already cost correctness twice (HA-104; six presets missing
+     * confidenceIntervals). It was removed under DCR-020.
+     *
+     * The requirement is not that a FILE exists — it is that both conventions
+     * are available, give different answers, and each says which produced a
+     * number. That is what these now verify, against the engine and the
+     * editor control that composes the formula.
+     */
+    it('SC-040: The alternative convention is composable and valid', () => {
+        const base = load('consensus-14.json');
+        const bm = base.specimenTypes.find(s => s.specimenType === 'bm');
+        assert.ok(bm.formulas.ME_ratio.numerator.includes('mono'),
+            'the shipped default follows ICSH 2008 §2.6 and includes monocytes');
+
+        // The alternative is the same profile with monocytes removed from the
+        // numerator — one checkbox in the Counting Policy panel.
+        const alt = JSON.parse(JSON.stringify(base));
+        const altBm = alt.specimenTypes.find(s => s.specimenType === 'bm');
+        altBm.formulas.ME_ratio.numerator =
+            altBm.formulas.ME_ratio.numerator.filter(ct => ct !== 'mono');
+        assert.equal(Core.validateConfig(alt.specimenTypes).length, 0,
+            'the alternative convention must be a valid profile');
     });
 
-    it('SC-041: It is listed in the preset catalogue', () => {
-        const idx = JSON.parse(fs.readFileSync(path.join(presetDir, 'index.json'), 'utf-8'));
-        const entry = idx.presets.find(p => p.profileId === 'consensus-14-me-alt');
-        assert.ok(entry, 'an alternative a laboratory cannot find is not an option');
-        assert.match(entry.summary, /monocytes/);
+    it('SC-041: The editor exposes the formula composition (URS-035)', () => {
+        // An alternative a laboratory cannot reach is not an option. It is
+        // reached through the Counting Policy panel rather than a preset.
+        const editor = fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'scripts', 'config-editor.js'), 'utf-8');
+        assert.match(editor, /pol-f-member/,
+            'the editor must expose numerator and denominator membership');
+        assert.match(editor, /merged\.formulas = /,
+            'and must write the composition back into the saved profile');
     });
 
     it('SC-042: The two conventions give different ratios from identical counts', () => {
-        const icsh = load('consensus-14.json').specimenTypes.find(s => s.specimenType === 'bm');
-        const alt = load('consensus-14-me-alt.json').specimenTypes.find(s => s.specimenType === 'bm');
+        const bm = load('consensus-14.json').specimenTypes.find(s => s.specimenType === 'bm');
+        const icsh = bm.formulas.ME_ratio;
+        const alt = Object.assign({}, icsh,
+            { numerator: icsh.numerator.filter(ct => ct !== 'mono') });
+
         const c = {};
-        Object.values(icsh.outCodes).forEach(ct => { c[ct] = 0; });
+        Object.values(bm.outCodes).forEach(ct => { c[ct] = 0; });
         c.poly = 150; c.mono = 60; c.nrbc = 90;
-        const a = Core.computeRatio(c, icsh.formulas.ME_ratio);
-        const b = Core.computeRatio(c, alt.formulas.ME_ratio);
+
+        const a = Core.computeRatio(c, icsh);
+        const b = Core.computeRatio(c, alt);
         assert.notEqual(a, b, 'if they agreed there would be no choice to make');
         assert.equal(a, '2.3:1');
         assert.equal(b, '1.7:1');
     });
 
-    it('SC-043: Each states its convention, so a report is interpretable', () => {
-        for (const f of ['consensus-14.json', 'consensus-14-me-alt.json']) {
-            const cfg = load(f);
-            const bm = cfg.specimenTypes.find(s => s.specimenType === 'bm');
-            assert.ok(bm.formulas.ME_ratio.basis, `${f}: no stated basis`);
-            assert.match(bm.formulas.ME_ratio.basis, /monocytes/i);
-            const text = Core.formatMethodStatement(Core.buildMethodStatement(bm, cfg), ' ');
-            assert.match(text, /monocytes/i);
-        }
+    it('SC-043: The convention in force is stated, so a report is interpretable', () => {
+        const cfg = load('consensus-14.json');
+        const bm = cfg.specimenTypes.find(s => s.specimenType === 'bm');
+        assert.ok(bm.formulas.ME_ratio.basis, 'no stated basis for the M:E ratio');
+        assert.match(bm.formulas.ME_ratio.basis, /monocytes/i,
+            'the basis must name the contested element');
+        const text = Core.formatMethodStatement(Core.buildMethodStatement(bm, cfg), ' ');
+        assert.match(text, /M:E|myeloid/i,
+            'the method statement must carry the convention into the report');
     });
 });

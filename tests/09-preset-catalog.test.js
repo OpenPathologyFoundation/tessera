@@ -17,8 +17,6 @@ const expectedPresets = [
     'harmonized-9.json',
     'legacy-9.json',
     'minimal-5.json',
-    'frequency-ergo.json',
-    'right-hand.json',
     'body-fluid.json',
     'custom.json'
 ];
@@ -137,15 +135,18 @@ describe('Preset Catalog — Ergonomic Zone Validation', () => {
         });
     });
 
-    it('right-hand.json keys are within right ergonomic zone', () => {
-        const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'right-hand.json'), 'utf-8'));
-        for (const spec of config.specimenTypes) {
-            const keys = Object.keys(spec.outCodes);
-            for (const key of keys) {
-                assert.ok(ERGO_ZONES.right.indexOf(key) !== -1,
-                    'right-hand/' + spec.specimenType + ': key "' + key + '" is outside right ergonomic zone');
-            }
-        }
+    it('The right-hand key layout is still reachable, as an editor action', () => {
+        // The `right-hand` preset was a fork of consensus-14 differing only in
+        // key assignment — and it shipped with four categories that could not
+        // be un-counted (HA-104), because a forked file is a place for a defect
+        // to hide from the profile it was copied from. The layout is not lost:
+        // the editor assigns it.
+        const editor = fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'scripts', 'config-editor.js'), 'utf-8');
+        assert.match(editor, /btnAutoRight/,
+            'the right-hand auto-assignment must remain available in the editor');
+        assert.match(editor, /right:\s*\[/,
+            'the right-hand ergonomic zone must still be defined');
     });
 });
 
@@ -165,11 +166,13 @@ describe('Preset Catalog — Specific Presets', () => {
         assert.equal(Object.keys(spec.outCodes).length, 5, 'Must have 5 key mappings');
     });
 
-    it('right-hand preset has handedness "right"', () => {
-        const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'right-hand.json'), 'utf-8'));
-        for (const spec of config.specimenTypes) {
-            assert.equal(spec.handedness, 'right', spec.specimenType + ': handedness must be right');
-        }
+    it('Handedness remains a per-profile field', () => {
+        // Not dead schema: it drives the editor's "key outside the ergonomic
+        // zone" warning. It is editor-scoped, which is not the same as unused.
+        const editor = fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'scripts', 'config-editor.js'), 'utf-8');
+        assert.match(editor, /isInErgoZone\(key, spec\.handedness/,
+            'handedness must still select the ergonomic zone');
     });
 
     it('body-fluid has bf specimen type', () => {
@@ -273,6 +276,62 @@ describe('Preset Catalog — Denominator Policy (URS-030, HA-092)', () => {
                         `${f} (${shipped.specimenType}) differs from the built-in profile in "${key}", ` +
                         'yet claims the same profileId');
                 }
+            }
+        }
+    });
+});
+
+// ================================================================
+describe('Preset Catalog — No Redundant Forks', () => {
+
+    /**
+     * Nine files held six distinct layouts. Eight of fifteen specimen
+     * definitions were the identical 14-category panel, differing only in key
+     * assignment or M:E composition — both FIELDS inside a profile, editable
+     * in the Configuration Editor.
+     *
+     * The forking cost correctness twice: `right-hand` shipped with four
+     * categories that could not be un-counted (HA-104), and six of eight
+     * presets silently omitted `confidenceIntervals` (P0-9).
+     */
+    it('No two presets are the same layout with the same keys', () => {
+        // Compared ACROSS files, not within one. A profile deliberately uses
+        // the same keys for bone marrow and peripheral blood — an operator
+        // should not relearn the keyboard when the specimen changes.
+        const shapeOf = (config) => JSON.stringify((config.specimenTypes || [])
+            .filter(s => (s.categories || {}).upper && s.categories.upper.length)
+            .map(s => [
+                s.specimenType,
+                s.categories.upper.slice().sort(),
+                (s.categories.lower || []).slice().sort(),
+                Object.entries(s.outCodes || {}).sort()
+            ]));
+
+        const seen = new Map();
+        for (const filename of expectedPresets) {
+            const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, filename), 'utf-8'));
+            const shape = shapeOf(config);
+            if (shape === '[]') continue;                 // custom.json is blank
+            if (seen.has(shape)) {
+                assert.fail(`${filename} is identical in layout and keys to ${seen.get(shape)} — ` +
+                    'it is the same profile under two names. Key assignment and M:E composition ' +
+                    'are fields, editable in the Configuration Editor, not reasons to fork a file');
+            }
+            seen.set(shape, filename);
+        }
+    });
+
+    it('Every selectable preset configures confidence intervals (P0-9)', () => {
+        // Intervals displayed at the 0.95 default while the method statement
+        // omitted the disclosure, because only one preset set the field.
+        for (const filename of expectedPresets) {
+            if (filename === 'custom.json') continue;   // deliberately blank
+            const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, filename), 'utf-8'));
+            for (const spec of config.specimenTypes || []) {
+                if (!(spec.categories && spec.categories.upper.length)) continue;
+                assert.ok(spec.confidenceIntervals,
+                    `${filename} (${spec.specimenType}) does not configure confidenceIntervals, ` +
+                    'so intervals display at a default level the report never states');
             }
         }
     });

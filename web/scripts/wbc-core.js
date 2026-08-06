@@ -195,19 +195,6 @@
     }
 
     /**
-     * Raw (unrounded) percentage of each cell type.
-     * Division-by-zero guard: every value is 0 when total is 0 (SYS-042).
-     */
-    function calcPercentages(counts) {
-        var total = getTotal(counts);
-        var percentages = {};
-        Object.keys(counts || {}).forEach(function (ct) {
-            percentages[ct] = total === 0 ? 0 : (counts[ct] / total) * 100;
-        });
-        return { percentages: percentages, total: total };
-    }
-
-    /**
      * Percentages rounded to `decimals` places and forced to sum to exactly
      * 100 (URS-034 / SYS-044).
      *
@@ -1338,7 +1325,6 @@
         getTotal: getTotal,
         getDenominator: getDenominator,
         computePer100: computePer100,
-        calcPercentages: calcPercentages,
         percentagesSummingTo100: percentagesSummingTo100,
         formatPercent: formatPercent,
         wilsonInterval: wilsonInterval,

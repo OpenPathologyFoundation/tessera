@@ -232,7 +232,7 @@ test.describe('Subset percentage formulas (URS-039)', () => {
     test('VV-SYS-125: The legacy preset reports blasts against both denominators', async ({ page }) => {
         await page.goto('/counter.html');
         await page.click('#btnPresetCatalog');
-        await page.locator('#preset-list button[data-preset-name="Legacy 9-Part"]').click();
+        await page.locator('#preset-list button[data-preset-name="Legacy 10-Part"]').click();
         await expect(page.locator('#modal-title')).toHaveText('Preset Loaded');
         await page.click('#modal-confirm');
         await waitForAppReady(page);

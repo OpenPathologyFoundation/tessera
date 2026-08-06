@@ -1,33 +1,26 @@
 {
   "schemaVersion": "1.0",
-  "description": "Catalogue of built-in configuration profiles (URS-101). Each entry is a starting point a laboratory can load and then adapt in the configuration editor. Profiles marked editorOnly cannot be counted with as-is and are offered only as editor templates.",
+  "description": "Catalogue of built-in configuration profiles (URS-101). Each entry is a starting point a laboratory can load and then adapt in the configuration editor. Profiles marked editorOnly cannot be counted with as-is and are offered only as editor templates. Layouts that differ only in key assignment or M:E composition are not separate profiles: both are fields, editable in the Configuration Editor.",
   "presets": [
     {
       "profileId": "consensus-14",
       "file": "consensus-14.json",
       "name": "Full 14-Part Consensus",
-      "summary": "Complete 14-category differential for bone marrow and peripheral blood, with M:E ratio.",
+      "summary": "Complete 14-category differential for bone marrow and peripheral blood, with M:E ratio. Key layout and M:E composition are editable in the Configuration Editor.",
       "specimens": "BM (500) - PB (200)",
       "default": true
     },
     {
-      "profileId": "consensus-14-me-alt",
-      "file": "consensus-14-me-alt.json",
-      "name": "Full 14-Part — M:E excluding monocytes",
-      "summary": "Identical to the full 14-part consensus, but the M:E ratio excludes monocytes from the numerator — the convention used where ICSH is not followed for this ratio.",
-      "specimens": "BM (500) - PB (200)"
-    },
-    {
       "profileId": "harmonized-9",
       "file": "harmonized-9.json",
-      "name": "Harmonized 9-Part",
+      "name": "Harmonized 10-Part",
       "summary": "Ten-category harmonised panel following contemporary reporting practice.",
       "specimens": "BM (500) - PB (200)"
     },
     {
       "profileId": "legacy-9",
       "file": "legacy-9.json",
-      "name": "Legacy 9-Part",
+      "name": "Legacy 10-Part",
       "summary": "Ten-category panel matching older mechanical counter layouts.",
       "specimens": "BM (500) - PB (200)"
     },
@@ -44,20 +37,6 @@
       "name": "Body Fluid",
       "summary": "CSF, pleural, peritoneal and synovial categories per CLSI H56-A (URS-011).",
       "specimens": "BF (200)"
-    },
-    {
-      "profileId": "frequency-ergo",
-      "file": "frequency-ergo.json",
-      "name": "Frequency-Ergonomic",
-      "summary": "Full 14-category panel with keys ordered by expected cell frequency.",
-      "specimens": "BM (500) - PB (200)"
-    },
-    {
-      "profileId": "right-hand",
-      "file": "right-hand.json",
-      "name": "Right-Hand Default",
-      "summary": "Full 14-category panel mapped to the right-hand QWERTY zone for operators whose left hand drives the microscope (URS-104).",
-      "specimens": "BM (500) - PB (200)"
     },
     {
       "profileId": "custom",

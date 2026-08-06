@@ -68,16 +68,16 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**377 identified verification cases** across 18 series and 4 layers.  359 further tests carry no identifier and are not registered.
+**382 identified verification cases** across 18 series and 4 layers.  344 further tests carry no identifier and are not registered.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
-| `QC-*` | 6 (001–006) | Static | QMS counted quantities |
+| `QC-*` | 7 (001–010) | Static | QMS counted quantities |
 | `SC-*` | 20 (001–043) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 33 (001–063) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
-| `VV-CALC-*` | 22 (001–028) | Unit | Calculation engine vectors |
+| `VV-CALC-*` | 23 (001–029) | Unit | Calculation engine vectors |
 | `VV-CI-*` | 12 (001–012) | Unit | Wilson confidence intervals |
 | `VV-DEN-*` | 6 (001–006) | Unit | Denominator policy |
 | `VV-E2E-*` | 23 (001–050) | Unit | End-to-end data integrity |
@@ -87,7 +87,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | `VV-PROV-*` | 8 (001–008) | Unit | Method provenance |
 | `VV-RND-*` | 7 (001–007) | Unit | Rounding policy |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 107 (001–193) | System | System verification in a real browser |
+| `VV-SYS-*` | 110 (001–196) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
 
@@ -101,6 +101,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | QC-004 | VV-001 and TP-001 carry a generated register | Static | `tests/14-qms-counts.test.js` |
 | QC-005 | Every identifier cited by RTM-001 and TR-001 is registered | Static | `tests/14-qms-counts.test.js` |
 | QC-006 | The two registers agree | Static | `tests/14-qms-counts.test.js` |
+| QC-010 | No asset under web/ is referenced by nothing | Static | `tests/14-qms-counts.test.js` |
 
 #### SC-* — Standards conformance (ICSH)
 
@@ -122,10 +123,10 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | SC-031 | The M:E formula records the convention it follows | Unit | `tests/12-standards-conformance.test.js` |
 | SC-032 | The target count records the conditional ICSH rule | Unit | `tests/12-standards-conformance.test.js` |
 | SC-033 | Every specimen type produces a usable method statement | Unit | `tests/12-standards-conformance.test.js` |
-| SC-040 | The alternative convention ships as a selectable preset | Unit | `tests/12-standards-conformance.test.js` |
-| SC-041 | It is listed in the preset catalogue | Unit | `tests/12-standards-conformance.test.js` |
+| SC-040 | The alternative convention is composable and valid | Unit | `tests/12-standards-conformance.test.js` |
+| SC-041 | The editor exposes the formula composition (URS-035) | Unit | `tests/12-standards-conformance.test.js` |
 | SC-042 | The two conventions give different ratios from identical counts | Unit | `tests/12-standards-conformance.test.js` |
-| SC-043 | Each states its convention, so a report is interpretable | Unit | `tests/12-standards-conformance.test.js` |
+| SC-043 | The convention in force is stated, so a report is interpretable | Unit | `tests/12-standards-conformance.test.js` |
 
 #### TC-B-* — Application behaviour in a DOM
 
@@ -299,6 +300,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-CALC-026 | A single counted category is 100% at every precision | Unit | `tests/01-calculation-engine.test.js` |
 | VV-CALC-027 | Extreme ratios still sum to exactly 100 | Unit | `tests/01-calculation-engine.test.js` |
 | VV-CALC-028 | getTotal ignores negative and non-finite entries | Unit | `tests/01-calculation-engine.test.js` |
+| VV-CALC-029 | The live path honours the denominator, which the deleted one did not | Unit | `tests/01-calculation-engine.test.js` |
 
 #### VV-CI-* — Wilson confidence intervals
 
@@ -534,6 +536,9 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-SYS-191 | When enabled, the report carries the corrected ANC and its basis | System | `tests-e2e/input-integrity.spec.js` |
 | VV-SYS-192 | When disabled, the report is unchanged by a WBC | System | `tests-e2e/input-integrity.spec.js` |
 | VV-SYS-193 | Declaring the WBC already corrected changes the reported figure and says so | System | `tests-e2e/input-integrity.spec.js` |
+| VV-SYS-194 | A profile with audio disabled starts silent | System | `tests-e2e/input-integrity.spec.js` |
+| VV-SYS-195 | A profile with audio enabled starts with sound | System | `tests-e2e/input-integrity.spec.js` |
+| VV-SYS-196 | The operator overrides the profile, in both directions | System | `tests-e2e/input-integrity.spec.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 

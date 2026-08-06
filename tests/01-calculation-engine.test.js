@@ -50,25 +50,43 @@ const ME_FORMULA = {
 // ================================================================
 describe('Calculation Engine — Percentage Computation (SYS-040 to SYS-045)', () => {
 
+    /**
+     * These cases previously exercised `calcPercentages`, which the application
+     * never called and which divided by the RAW total — ignoring
+     * denominatorExcludes. Seven assertions of coverage on a function no user
+     * path reached, and a loaded gun: wiring it in would have made the live
+     * percentages silently disagree with the report for any profile that
+     * excludes a category.
+     *
+     * The function is deleted. The cases are kept and re-pointed at
+     * `percentagesSummingTo100`, which is what `displayPercentages()` in
+     * mdc-app.js actually calls — so the coverage now lands on shipped code.
+     *
+     * Precision is 10 places here to read the raw quotient; the application
+     * uses 2 for display and 0 for the report.
+     */
+    const RAW = 10;
+    const pct = (c, opts) => Core.percentagesSummingTo100(c, RAW, opts || {});
+
     it('VV-CALC-001: All zeros returns 0.00 for every cell (SYS-042, HA-021)', () => {
-        const { percentages, total } = Core.calcPercentages(zeroCounts());
-        assert.equal(total, 0);
-        for (const [ct, pct] of Object.entries(percentages)) {
-            assert.equal(pct, 0, `${ct} should be 0 when total is 0`);
-            assert.ok(!Number.isNaN(pct), `${ct} must not be NaN`);
-            assert.ok(Number.isFinite(pct), `${ct} must not be Infinity`);
+        const percentages = pct(zeroCounts());
+        assert.equal(Core.getTotal(zeroCounts()), 0);
+        for (const [ct, value] of Object.entries(percentages)) {
+            assert.equal(value, 0, `${ct} should be 0 when total is 0`);
+            assert.ok(Number.isFinite(value), `${ct} must not be NaN or Infinity`);
         }
     });
 
     it('VV-CALC-002: Single cell counted = 100.00% (SYS-040)', () => {
-        const { percentages, total } = Core.calcPercentages(counts({ blasts: 1 }));
-        assert.equal(total, 1);
+        const c = counts({ blasts: 1 });
+        assert.equal(Core.getTotal(c), 1);
+        const percentages = pct(c);
         assert.equal(percentages.blasts, 100);
         assert.equal(percentages.poly, 0);
     });
 
     it('VV-CALC-003: Two equal cells = 50.00% each', () => {
-        const { percentages } = Core.calcPercentages(counts({ poly: 50, lymph: 50 }));
+        const percentages = pct(counts({ poly: 50, lymph: 50 }));
         assert.equal(percentages.poly, 50);
         assert.equal(percentages.lymph, 50);
     });
@@ -76,29 +94,44 @@ describe('Calculation Engine — Percentage Computation (SYS-040 to SYS-045)', (
     it('VV-CALC-004: Fourteen equal cells = 7.142857...% raw', () => {
         const all = {};
         CELL_TYPES.forEach(ct => { all[ct] = 10; });
-        const { percentages, total } = Core.calcPercentages(all);
-        assert.equal(total, 140);
+        assert.equal(Core.getTotal(all), 140);
+        const percentages = pct(all);
         CELL_TYPES.forEach(ct => {
-            assert.ok(Math.abs(percentages[ct] - 7.142857142857143) < 1e-9, ct);
+            assert.ok(Math.abs(percentages[ct] - 7.1428571429) < 1e-9, `${ct}: ${percentages[ct]}`);
         });
     });
 
     it('VV-CALC-005: One dominant cell 95/5', () => {
-        const { percentages } = Core.calcPercentages(counts({ blasts: 95, lymph: 5 }));
+        const percentages = pct(counts({ blasts: 95, lymph: 5 }));
         assert.equal(percentages.blasts, 95);
         assert.equal(percentages.lymph, 5);
     });
 
     it('VV-CALC-008: Acute leukemia pattern — 45% blasts', () => {
-        const { percentages } = Core.calcPercentages(
-            counts({ blasts: 45, poly: 20, lymph: 20, mono: 10, eos: 5 }));
+        const percentages = pct(counts({ blasts: 45, poly: 20, lymph: 20, mono: 10, eos: 5 }));
         assert.equal(percentages.blasts, 45);
     });
 
     it('VV-CALC-014: Maximum capacity (9999 cells) computes without degradation (SYS-P04)', () => {
-        const { percentages, total } = Core.calcPercentages(counts({ poly: 9000, lymph: 999 }));
-        assert.equal(total, 9999);
-        assert.ok(Math.abs(percentages.poly - 90.00900090009001) < 1e-9);
+        const c = counts({ poly: 9000, lymph: 999 });
+        assert.equal(Core.getTotal(c), 9999);
+        const percentages = pct(c);
+        assert.ok(Math.abs(percentages.poly - 90.0090009001) < 1e-9, String(percentages.poly));
+    });
+
+    it('VV-CALC-029: The live path honours the denominator, which the deleted one did not', () => {
+        // The distinction that made calcPercentages dangerous: 180 leucocytes
+        // and 20 nucleated red cells. Over the raw total, segmented
+        // neutrophils are 60%; over the differential denominator, 66.7%.
+        const c = counts({ poly: 120, lymph: 60, nrbc: 20 });
+        assert.equal(Core.getTotal(c), 200);
+        assert.equal(Core.getDenominator(c, ['nrbc']), 180);
+
+        const raw = pct(c);
+        const differential = pct(c, { exclude: ['nrbc'] });
+        assert.equal(raw.poly, 60);
+        assert.ok(Math.abs(differential.poly - 66.6666666667) < 1e-9, String(differential.poly));
+        assert.equal(differential.nrbc, null, 'an excluded category has no percentage');
     });
 
     it('Non-numeric and missing values do not corrupt the total', () => {

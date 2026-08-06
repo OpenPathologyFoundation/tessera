@@ -98,3 +98,61 @@ describe('Verification identifiers exist (URS-092)', () => {
             'VV-001 and TP-001 register different identifiers');
     });
 });
+
+// ================================================================
+describe('Shipped assets are all reachable (URS-094)', () => {
+
+    /**
+     * `web/` carried 1.3 MB of files no page referenced — decorative textures,
+     * three institutional favicons, a script font, and a stylesheet
+     * (`counter.css`) that nothing loaded but which was the only thing keeping
+     * three of the images alive. All of it was precached for offline use and
+     * shipped to every workstation.
+     *
+     * Dead weight is not merely untidy here: URS-094 exists because these are
+     * laboratory machines with restricted networks, and the service worker
+     * fetches the shell on first load.
+     */
+    const fs2 = require('node:fs');
+    const WEB = path.join(__dirname, '..', 'web');
+
+    /** Every file under web/, excluding the vendored bundle. */
+    function walk(dir, out = []) {
+        for (const name of fs2.readdirSync(dir)) {
+            const full = path.join(dir, name);
+            if (fs2.statSync(full).isDirectory()) {
+                if (name !== 'vendor') walk(full, out);
+            } else {
+                out.push(full);
+            }
+        }
+        return out;
+    }
+
+    it('QC-010: No asset under web/ is referenced by nothing', () => {
+        const files = walk(WEB);
+        const ASSET = /\.(png|jpe?g|gif|svg|ico|ttf|woff2?|css)$/i;
+        // Text the references could live in: pages, scripts, styles, profiles,
+        // the service worker, and the QMS documents.
+        const haystack = files
+            .filter(f => /\.(html|js|css|json|md)$/i.test(f))
+            .map(f => fs2.readFileSync(f, 'utf-8'))
+            .join('\n');
+
+        const orphans = [];
+        for (const file of files.filter(f => ASSET.test(f))) {
+            const base = path.basename(file);
+            // Count references from OTHER files only.
+            const self = fs2.readFileSync(file, 'utf-8').length;
+            const occurrences = haystack.split(base).length - 1;
+            const inSelf = /\.(css)$/i.test(file) ? 0 : 0;
+            if (occurrences - inSelf === 0) {
+                orphans.push(path.relative(path.join(__dirname, '..'), file) +
+                    ` (${Math.round(self / 1024)} KB)`);
+            }
+        }
+        assert.deepEqual(orphans, [],
+            'these are shipped and precached but referenced by nothing:\n  ' +
+            orphans.join('\n  '));
+    });
+});

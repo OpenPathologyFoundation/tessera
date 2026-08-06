@@ -406,3 +406,50 @@ test.describe('Absolute counts in the report are optional (SYS-251)', () => {
         await expect(panel).toContainText('already-corrected');
     });
 });
+
+// ================================================================
+test.describe('The profile audio default is honoured (URS-097)', () => {
+
+    /**
+     * Every preset carried an `audio` object and the configuration editor
+     * offered an Audio checkbox that wrote it — and the counter read neither.
+     * Turning audio off in a profile did nothing. A control that does nothing
+     * is worse than no control: the operator believes the setting took effect.
+     */
+    async function withAudio(page, enabled) {
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.evaluate((on) => {
+            sessionStorage.clear();                 // no session override
+            const c = JSON.parse(localStorage.getItem('wbcds_config'));
+            c.specimenTypes.forEach(s => { s.audio = Object.assign({}, s.audio, { enabled: on }); });
+            c.version = '99.0';
+            localStorage.setItem('wbcds_config', JSON.stringify(c));
+        }, enabled);
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+    }
+
+    test('VV-SYS-194: A profile with audio disabled starts silent', async ({ page }) => {
+        await withAudio(page, false);
+        await expect(page.locator('#audioLabel')).toHaveText('Sound Off');
+        await expect(page.locator('#btnToggleAudio')).toHaveAttribute('aria-pressed', 'false');
+    });
+
+    test('VV-SYS-195: A profile with audio enabled starts with sound', async ({ page }) => {
+        await withAudio(page, true);
+        await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+    });
+
+    test('VV-SYS-196: The operator overrides the profile, in both directions', async ({ page }) => {
+        // The bench has the last word, and the choice survives a reload.
+        await withAudio(page, false);
+        await expect(page.locator('#audioLabel')).toHaveText('Sound Off');
+        await page.click('#btnToggleAudio');
+        await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+        await page.reload();
+        await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+    });
+});

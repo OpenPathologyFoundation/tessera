@@ -1,7 +1,7 @@
 {
   "version": "2.1",
   "profileId": "legacy-9",
-  "profileName": "Legacy 9-Part",
+  "profileName": "Legacy 10-Part",
   "provenance": {
     "standard": "ICSH 2008",
     "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
@@ -121,7 +121,11 @@
         "display": 2,
         "report": 0
       },
-      "targetCountBasis": "ICSH 2008 \u00a72.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it."
+      "targetCountBasis": "ICSH 2008 \u00a72.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it.",
+      "confidenceIntervals": {
+        "enabled": true,
+        "level": 0.95
+      }
     },
     {
       "specimenType": "pb",
@@ -190,7 +194,19 @@
           "label": "NRBC per 100 WBC",
           "precision": 1
         }
-      }
+      },
+      "confidenceIntervals": {
+        "enabled": true,
+        "level": 0.95
+      },
+      "thresholds": [
+        {
+          "target": "blasts",
+          "value": 20,
+          "label": "AML blast threshold",
+          "basis": "WHO 2022 / ICC 2022."
+        }
+      ]
     }
   ]
 }

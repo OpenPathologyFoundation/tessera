@@ -80,7 +80,7 @@
             "lymph"
           ],
           "precision": 1,
-          "basis": "Pre-2022 WHO erythroleukaemia rule: blasts expressed as a percentage of non-erythroid cells. WHO 2022 withdrew this in favour of counting blasts against all nucleated cells. Retained here for comparison with historical reports; it is not the current diagnostic convention."
+          "basis": "Erythroleukaemia rule of the WHO 4th edition: blasts expressed as a percentage of non-erythroid cells. Withdrawn by the 2016 revision (Arber et al., Blood 2016;127:2391-2405) in favour of counting blasts against all nucleated cells; WHO 2022 and ICC 2022 retained that denominator. Retained here for comparison with historical reports; it is not the current diagnostic convention."
         }
       },
       "templates": [

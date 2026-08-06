@@ -392,6 +392,41 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
         }
     });
 
+    it('UD-040: The blast-denominator change is attributed to WHO 2016, not 2022', () => {
+        // Independent review finding C-1. The non-erythroid-cell blast
+        // denominator was withdrawn by the 2016 revision of the WHO 4th
+        // edition (Arber et al., Blood 2016;127(20):2391-2405), which
+        // eliminated acute erythroid leukaemia, erythroid/myeloid subtype.
+        // WHO 2022 (5th ed.) and the ICC 2022 both RETAINED the
+        // all-nucleated-cells denominator; neither made the change.
+        //
+        // The error appeared in the engine comment, the calculation reference,
+        // a shipped preset and URS-001 — a wrong date on the citation for a
+        // rule that moves a case across the 20% blast boundary.
+        assert.match(calcref, /2016/,
+            'the reference must attribute the change to the 2016 revision');
+        assert.match(calcref, /Arber/,
+            'and must cite it, since the date alone is the thing that was wrong');
+        assert.ok(!/WHO 2022 withdrew/i.test(calcref),
+            'the reference still attributes the withdrawal to WHO 2022');
+
+        const engine = fs.readFileSync(
+            path.join(ROOT, 'web', 'scripts', 'wbc-core.js'), 'utf-8');
+        assert.ok(!/WHO 2022 withdrew/i.test(engine),
+            'wbc-core.js still attributes the withdrawal to WHO 2022');
+        assert.match(engine, /2016/,
+            'wbc-core.js must name the 2016 revision');
+
+        // No shipped profile may carry the wrong attribution either — the
+        // threshold basis text is shown to the operator in the advisory.
+        const presetDir = path.join(ROOT, 'web', 'settings', 'presets');
+        for (const file of fs.readdirSync(presetDir).filter(f => f.endsWith('.json'))) {
+            const raw = fs.readFileSync(path.join(presetDir, file), 'utf-8');
+            assert.ok(!/WHO 2022 withdrew/i.test(raw),
+                `${file} attributes the blast-denominator change to WHO 2022`);
+        }
+    });
+
     it('UD-038: Every abbreviation used is expanded in the table', () => {
         for (const abbr of ['WBC','NRBC','M:E ratio','NDC','ICSH','CLSI','AML','MDS','CI','CV'])
             assert.ok(calcref.includes('text-slate-200">' + abbr + '</td>'),

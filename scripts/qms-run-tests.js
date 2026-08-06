@@ -73,7 +73,9 @@ const testArgs = process.env.QMS_TEST_ARGS
     ? process.env.QMS_TEST_ARGS.split(' ').filter(Boolean)
     : ['test'];
 
-const commandText = `${command} ${testArgs.join(' ')}`.trim();
+let commandText = `${command} ${testArgs.join(' ')}`.trim();
+// Recorded after the layers are known, so the bundle never names a command it
+// did not run — TR-001 claimed `npm run test:all` against a Node-only bundle.
 
 const envLines = [
     `date_utc=${now.toISOString()}`,
@@ -123,7 +125,7 @@ if (dirty) {
     dirty.split('\n').forEach((line) => envLines.push(`  ${line}`));
 }
 
-fs.writeFileSync(path.join(runDir, 'command.txt'), commandText + '\n', 'utf8');
+// command.txt is written after execution, below, once both layers are known.
 fs.writeFileSync(path.join(runDir, 'environment.txt'), envLines.join('\n') + '\n', 'utf8');
 
 const result = spawnSync(command, testArgs, {
@@ -138,7 +140,39 @@ const output = [
 
 fs.writeFileSync(path.join(runDir, 'test-output-raw.txt'), output, 'utf8');
 
-const status = result.status === 0 ? 'PASS' : 'FAIL';
+/**
+ * The system layer, executed here rather than pasted in afterwards.
+ *
+ * This runner produced only the Node layer, while TR-001 headlined a total
+ * spanning three browser engines and named `npm run test:all` as the command.
+ * The browser results were appended to each bundle by hand, so the largest
+ * part of the evidence in an Approved record had no auditable provenance —
+ * nothing tied it to the same tree, the same moment, or even the same machine.
+ *
+ * Set QMS_SKIP_E2E=1 to capture the Node layer alone; the bundle then says so
+ * rather than leaving the omission to be inferred.
+ */
+const skipE2e = process.env.QMS_SKIP_E2E === '1';
+let e2eResult = null;
+
+if (!skipE2e) {
+    e2eResult = spawnSync('npx', ['playwright', 'test', '--reporter=list'], {
+        cwd: repoRoot,
+        encoding: 'utf8'
+    });
+    fs.writeFileSync(
+        path.join(runDir, 'e2e-output-raw.txt'),
+        [e2eResult.stdout || '', e2eResult.stderr || ''].join(''),
+        'utf8');
+}
+
+// A run is PASS only if every layer it claims to cover passed.
+if (!skipE2e) commandText += ' && npx playwright test';
+fs.writeFileSync(path.join(runDir, 'command.txt'), commandText + '\n', 'utf8');
+
+const nodeOk = result.status === 0;
+const e2eOk = skipE2e ? null : (e2eResult && e2eResult.status === 0);
+const status = (nodeOk && e2eOk !== false) ? 'PASS' : 'FAIL';
 
 // A run against uncommitted code is evidence of something, but not of a
 // released state. Say so in the bundle rather than let a later reader assume
@@ -148,14 +182,22 @@ const provenance = treeState === 'clean'
     : `**PROVISIONAL — ${treeState.toUpperCase()} TREE.** Nearest commit \`${gitCommit || 'unknown'}\`, ` +
       'but the code measured is not that commit. Not admissible as release evidence.';
 
+const layerLines = skipE2e
+    ? ['- Node layer: ' + (nodeOk ? 'PASS' : 'FAIL'),
+       '- System layer (Playwright): **NOT RUN** (QMS_SKIP_E2E=1) — this bundle covers the Node layer only']
+    : ['- Node layer: ' + (nodeOk ? 'PASS' : 'FAIL'),
+       '- System layer (Playwright, 3 engines): ' + (e2eOk ? 'PASS' : 'FAIL')];
+
 const summaryLines = [
     '# Test Run Summary',
     '',
     `- Date (UTC): ${now.toISOString()}`,
     `- Code identity: ${provenance}`,
     `- Branch: ${gitBranch || 'unknown'}`,
+    ...layerLines,
     `- Command: \`${commandText}\``,
-    `- Exit Code: ${result.status === null ? 'null' : result.status}`,
+    `- Exit Code: node=${result.status === null ? 'null' : result.status}` +
+        (skipE2e ? '' : `, playwright=${e2eResult && e2eResult.status !== null ? e2eResult.status : 'null'}`),
     `- Result: **${status}**`,
     `- Evidence Folder: \`${path.relative(repoRoot, runDir)}\``,
     '',
@@ -163,7 +205,7 @@ const summaryLines = [
     `- \`command.txt\``,
     `- \`environment.txt\``,
     `- \`test-output-raw.txt\``
-];
+].concat(skipE2e ? [] : [`- \`e2e-output-raw.txt\``]);
 
 fs.writeFileSync(path.join(runDir, 'test-summary.md'), summaryLines.join('\n') + '\n', 'utf8');
 
@@ -482,7 +524,9 @@ if (cliArgs.updateDcr) {
     updateDcrEvidence(resolvedDcr, relativeEvidencePath);
 }
 if (cliArgs.updateTr) {
-    appendTrRunLog(relativeEvidencePath, status, result.status === null ? 'null' : result.status, commandText);
+    // The run log records the OVERALL outcome, not one layer's exit code.
+    appendTrRunLog(relativeEvidencePath, status,
+        (nodeOk && e2eOk !== false) ? 0 : 1, commandText);
 }
 
 process.stdout.write(output);

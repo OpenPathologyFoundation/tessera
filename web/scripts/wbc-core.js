@@ -492,11 +492,15 @@
      * One group of categories expressed as a percentage of another.
      *
      * The governing case is "blasts as a percentage of non-erythroid cells" —
-     * the pre-2022 WHO erythroleukaemia rule. WHO 2022 withdrew it in favour of
-     * counting blasts against all nucleated cells, but laboratories still
-     * report it when comparing against historical results, and the two figures
-     * can differ enough to move a case across a diagnostic boundary in a marrow
-     * with expanded erythropoiesis.
+     * the erythroleukaemia rule of the WHO 4th edition. It was withdrawn by the
+     * **2016 revision** (Arber et al., Blood 2016;127(20):2391-2405), which
+     * eliminated acute erythroid leukaemia, erythroid/myeloid subtype, and
+     * counts blasts against all nucleated cells instead. WHO 2022 (5th ed.) and
+     * the ICC 2022 both retained that denominator; neither made the change.
+     *
+     * Laboratories still report the historical figure when comparing against
+     * earlier results, and the two can differ enough to move a case across a
+     * diagnostic boundary in a marrow with expanded erythropoiesis.
      *
      * Unlike a ratio, this has a real denominator count, so it carries a
      * binomial confidence interval in the way a ratio cannot (REF-001 §3.8).

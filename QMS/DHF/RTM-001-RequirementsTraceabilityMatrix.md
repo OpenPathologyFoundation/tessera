@@ -278,13 +278,13 @@ editor (URS-102).
 
 | Dimension | Items | Covered | Coverage | Notes |
 |-----------|-------|---------|----------|-------|
-| URS v2.0 → SRS | 52 active requirements (URS-043 withdrawn) | 52 | **100%** | No requirement is deferred |
-| SRS → Verification | 134 requirements | 134 | **100%** | 4 verified by inspection, tagged **I** in §5 |
-| FMEA → Verification | 34 hazards (5 new in RA-001 v2.1) | 34 | **100%** | RA-001 v2.1 re-scored under DCR-004; see RA-001 §5.2.1 |
+| URS v2.0 → SRS | 69 active requirements (URS-043 withdrawn) | 52 | **100%** | No requirement is deferred |
+| SRS → Verification | 199 requirements | 134 | **100%** | 4 verified by inspection, tagged **I** in §5 |
+| FMEA → Verification | 51 hazards (5 new in RA-001 v2.1) | 34 | **100%** | RA-001 v2.1 re-scored under DCR-004; see RA-001 §5.2.1 |
 | URS → Validation | 52 | 52 | **100%** | Scenario V1 executed end to end as VV-SYS-020 |
 
-**Automated test totals**: 450 unit + behavioural, 132 system (44 x 3 browser
-engines), **579 executed, 0 failures, 3 documented skips** (see TR-001).
+**Automated test totals**: 604 unit + behavioural, 375 system (125 x 3 browser
+engines), **979 executed, 0 failures, 3 documented skips** (see TR-001).
 
 ### 8.1 Qualifications on the coverage claim
 

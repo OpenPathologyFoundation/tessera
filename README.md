@@ -322,9 +322,9 @@ CI can run `npm test` for quick feedback, but **QMS evidence requires `npm run t
 | 08 | `tests/08-config-schema-v2.test.js` | Unit | v2 schema; `normalizeConfig` round-trip; reserved placeholder names |
 | 09 | `tests/09-preset-catalog.test.js` | Unit | Preset catalogue integrity and ergonomic zones |
 | 10 | `tests/10-config-editor.test.js` | Static | Editor structure, JS integrity, key assignment controls |
-| 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 62 tests |
-| E2E | `tests-e2e/*.spec.js` | **System** | The deployed application in Chromium, Firefox and WebKit — 44 specs x 3 engines |
-| **Total** | | | **579 executed** (450 Node + 132 browser, 3 documented skips) |
+| 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 91 tests |
+| E2E | `tests-e2e/*.spec.js` | **System** | The deployed application in Chromium, Firefox and WebKit — 125 specs x 3 engines |
+| **Total** | | | **979 executed** (604 Node + 375 browser, 3 documented skips) |
 
 See `QMS/DHF/DCR/DCR-004-Verification-Integrity-Remediation.md` for why the
 suite was restructured: prior to it, no test executed the application at all.
@@ -351,13 +351,13 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | Document | Purpose |
 |----------|---------|
 | **DHF-001** | Design History File index and intended use statement |
-| **URS-001** | 49 user requirements with priority and clinical rationale |
-| **SRS-001** | 93 testable system requirements derived from URS |
+| **URS-001** | 69 user requirements with priority and clinical rationale |
+| **SRS-001** | 199 testable system requirements derived from URS |
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
-| **RA-001** | FMEA risk analysis: 22 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan with 84 test cases across 12 categories |
-| **VV-001** | Verification & validation protocol with 15 calculation vectors and 4 clinical validation scenarios |
+| **RA-001** | FMEA risk analysis: 51 hazards, severity/occurrence/detectability scoring |
+| **TP-001** | Test plan with 106 test cases across 12 categories |
+| **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |
 | **SOP-002** | Deployment procedure |

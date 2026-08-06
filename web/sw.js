@@ -29,6 +29,7 @@ const SHELL_ASSETS = [
     './editor.html',
     './help.html',
     './methods.html',
+    './calculation-reference.html',
     './vendor/tailwind.js',
     './scripts/wbc-core.js',
     './scripts/mdc-app.js',

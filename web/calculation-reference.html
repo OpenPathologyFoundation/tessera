@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculation Reference — WBC ΔΣ</title>
+    <script src="vendor/tailwind.js"></script>
+    <script>
+        tailwind.config = { theme: { extend: {
+            colors: { accent: { DEFAULT: '#60a5fa' } },
+            fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'] } } } };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <!-- Optional webfonts: absent offline, the local font stacks apply -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body[data-theme="light"] { background-color:#f8fafc; color:#0f172a; }
+        body[data-theme="light"] .bg-slate-950 { background-color:#f8fafc !important; }
+        body[data-theme="light"] .bg-slate-900\/60 { background-color:#f1f5f9 !important; }
+        body[data-theme="light"] .bg-slate-800\/50 { background-color:rgba(226,232,240,.7) !important; }
+        body[data-theme="light"] .text-slate-100,
+        body[data-theme="light"] .text-slate-200 { color:#0f172a !important; }
+        body[data-theme="light"] .text-slate-300 { color:#1e293b !important; }
+        body[data-theme="light"] .text-slate-400 { color:#334155 !important; }
+        body[data-theme="light"] .text-slate-500 { color:#475569 !important; }
+        body[data-theme="light"] .border-slate-700 { border-color:#cbd5e1 !important; }
+        body[data-theme="light"] .border-slate-800 { border-color:#e2e8f0 !important; }
+        table { border-collapse: collapse; }
+        th, td { text-align: left; padding: .45rem .6rem; vertical-align: top; }
+        thead th { border-bottom: 1px solid #334155; font-weight: 600; }
+        tbody tr { border-bottom: 1px solid rgba(51,65,85,.4); }
+        .cfg { border-left: 3px solid #60a5fa; }
+        .warn { border-left: 3px solid #f59e0b; }
+        @media print { nav, .no-print { display:none !important; }
+            body { background:#fff !important; color:#000 !important; }
+            h2 { break-after: avoid; } table { break-inside: avoid; } }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-300 font-sans min-h-screen antialiased">
+
+<nav class="border-b border-slate-800 bg-slate-900/60 no-print sticky top-0 backdrop-blur-sm">
+    <div class="max-w-3xl mx-auto px-6 h-14 flex items-center justify-between">
+        <span class="text-sm font-semibold text-slate-200">Calculation Reference</span>
+        <div class="flex items-center gap-4 text-xs">
+            <a href="counter.html" class="text-accent hover:underline">&larr; Counter</a>
+            <a href="methods.html" class="text-slate-500 hover:text-slate-300">Methods &amp; Limitations</a>
+            <a href="help.html" class="text-slate-500 hover:text-slate-300">Quick start</a>
+        </div>
+    </div>
+</nav>
+
+<main class="max-w-3xl mx-auto px-6 py-10 leading-relaxed text-sm">
+
+    <h1 class="text-2xl font-bold text-slate-100">Every number this tool produces</h1>
+    <p class="mt-2 text-slate-400">
+        How it is calculated, why, what the alternatives are, where the
+        controversy lies, and how to change it.
+    </p>
+    <p class="mt-4 text-xs text-slate-500">
+        Peter Gershkovich, M.D., M.H.A. &middot; info@openpathology.tech &middot;
+        Version 1.0 &middot; 2026-08-05
+    </p>
+
+    <div class="mt-6 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
+        <p class="font-semibold text-slate-200">Who this is for</p>
+        <p class="mt-1 text-slate-400">
+            A pathologist who is not a haematopathologist, and who wants to know
+            exactly what the arithmetic is doing before trusting it, or before
+            deciding what their laboratory should configure. Every abbreviation
+            is expanded. No software knowledge is assumed.
+        </p>
+        <p class="mt-3 text-slate-400">
+            <strong class="text-slate-200">The governing principle:</strong> where
+            haematology practice genuinely disagrees, this tool does not pick a
+            winner. It ships a documented default, makes the alternative
+            selectable, and states in every report which one produced the
+            numbers. Where you see a blue <span class="text-accent">Configurable</span>
+            note, that is a decision your laboratory owns.
+        </p>
+    </div>
+
+    <!-- ================= abbreviations ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">Abbreviations</h2>
+    <div class="mt-3 overflow-x-auto">
+    <table class="w-full text-xs">
+        <tbody>
+        <tr><td class="font-semibold text-slate-200">WBC</td><td>White blood cell (leucocyte)</td></tr>
+        <tr><td class="font-semibold text-slate-200">RBC</td><td>Red blood cell (erythrocyte)</td></tr>
+        <tr><td class="font-semibold text-slate-200">NRBC</td><td>Nucleated red blood cell &mdash; an immature red cell still carrying a nucleus, normally confined to marrow but appearing in blood in certain conditions</td></tr>
+        <tr><td class="font-semibold text-slate-200">M:E ratio</td><td>Myeloid-to-erythroid ratio</td></tr>
+        <tr><td class="font-semibold text-slate-200">NDC</td><td>Nucleated differential count &mdash; the marrow differential as defined by ICSH</td></tr>
+        <tr><td class="font-semibold text-slate-200">BM</td><td>Bone marrow</td></tr>
+        <tr><td class="font-semibold text-slate-200">PB</td><td>Peripheral blood</td></tr>
+        <tr><td class="font-semibold text-slate-200">LIS</td><td>Laboratory information system</td></tr>
+        <tr><td class="font-semibold text-slate-200">ICSH</td><td>International Council for Standardization in Haematology</td></tr>
+        <tr><td class="font-semibold text-slate-200">CLSI</td><td>Clinical and Laboratory Standards Institute</td></tr>
+        <tr><td class="font-semibold text-slate-200">WHO</td><td>World Health Organization (here, its classification of haematolymphoid tumours, 2022)</td></tr>
+        <tr><td class="font-semibold text-slate-200">ICC</td><td>International Consensus Classification of myeloid neoplasms, 2022</td></tr>
+        <tr><td class="font-semibold text-slate-200">AML</td><td>Acute myeloid leukaemia</td></tr>
+        <tr><td class="font-semibold text-slate-200">MDS</td><td>Myelodysplastic syndrome</td></tr>
+        <tr><td class="font-semibold text-slate-200">CI</td><td>Confidence interval</td></tr>
+        <tr><td class="font-semibold text-slate-200">CV</td><td>Coefficient of variation &mdash; a measure of reproducibility</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <!-- ================= 1 ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">1. The differential percentage</h2>
+
+    <p class="mt-4">You classify cells one at a time. The tool tallies them and expresses each
+    category as a proportion of a total.</p>
+    <pre class="mt-3 p-3 bg-slate-800/50 border border-slate-700 rounded text-xs overflow-x-auto">percentage of category X  =  (cells counted as X ÷ denominator) × 100</pre>
+    <p class="mt-3">Everything else follows from two questions: <strong class="text-slate-200">what goes in
+    the denominator</strong>, and <strong class="text-slate-200">how the result is rounded</strong>.</p>
+
+    <h3 class="mt-6 font-semibold text-slate-200">1.1 What goes in the denominator</h3>
+
+    <p class="mt-2"><strong class="text-slate-200">Bone marrow.</strong> Every nucleated cell you counted,
+    including erythroid precursors. This is the ICSH definition. Erythroid cells belong in a marrow
+    differential because the balance between red-cell and white-cell production is much of why the
+    marrow is being examined &mdash; that balance is the M:E ratio (§3).</p>
+
+    <p class="mt-3"><strong class="text-slate-200">Peripheral blood.</strong> Leucocytes only. Nucleated red
+    cells are counted but <strong class="text-slate-200">excluded from the denominator</strong> and reported
+    separately as NRBC per 100 WBC.</p>
+
+    <p class="mt-3 font-semibold text-slate-200">Why NRBC are treated differently in blood</p>
+    <p class="mt-1">In a healthy adult nucleated red cells do not circulate; they lose the nucleus before
+    leaving the marrow. Their appearance in blood is pathological &mdash; severe haemolysis, marrow
+    infiltration, severe hypoxia &mdash; or normal in the newborn.</p>
+    <p class="mt-2">They are not leucocytes. A leucocyte differential describes the composition of the
+    white cell population, and a red cell precursor in that denominator dilutes every leucocyte
+    percentage. There is a practical reason too: analysers historically counted NRBC as white cells, so
+    the reported count needs correcting &mdash;</p>
+    <pre class="mt-2 p-3 bg-slate-800/50 border border-slate-700 rounded text-xs overflow-x-auto">corrected WBC = uncorrected WBC × 100 ÷ (100 + NRBC per 100 WBC)</pre>
+    <p class="mt-2">&mdash; and that formula requires NRBC expressed <em>per 100 WBC</em>, not as a
+    percentage of all nucleated cells. Reporting it the other way makes the correction wrong.</p>
+
+    <p class="mt-4 font-semibold text-slate-200">A blood film with 180 leucocytes and 20 nucleated red cells</p>
+    <div class="mt-2 overflow-x-auto">
+    <table class="w-full text-xs">
+        <thead><tr><th></th><th>NRBC in denominator</th><th>NRBC excluded (this tool)</th></tr></thead>
+        <tbody class="font-mono">
+        <tr><td class="font-sans">Denominator</td><td>200</td><td class="text-slate-100">180</td></tr>
+        <tr><td class="font-sans">Segmented neutrophils (120)</td><td>60.0%</td><td class="text-slate-100">66.7%</td></tr>
+        <tr><td class="font-sans">Lymphocytes (40)</td><td>20.0%</td><td class="text-slate-100">22.2%</td></tr>
+        <tr><td class="font-sans">Monocytes (15)</td><td>7.5%</td><td class="text-slate-100">8.3%</td></tr>
+        <tr><td class="font-sans">Nucleated red cells (20)</td><td>10.0%</td><td class="text-slate-100">11.1 per 100 WBC</td></tr>
+        <tr><td class="font-sans">Report opens</td><td>"A 200-cell differential"</td><td class="text-slate-100">"A 180-cell differential count"</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p class="mt-3">Every leucocyte percentage is understated by about 10% relative when NRBC sit in the
+    denominator, and the error grows with the NRBC count. In a newborn, or a patient with marrow
+    infiltration where NRBC can exceed the leucocytes, the distortion becomes severe.</p>
+
+    <div class="mt-4 p-4 warn bg-amber-500/10 rounded text-xs text-amber-200/90">
+        <p class="font-semibold text-amber-300">Controversy, and honesty about the evidence</p>
+        <p class="mt-1">The convention is not seriously disputed in laboratory haematology. What can and
+        cannot be cited: CLSI H20-A2 specifies two observers counting 200 cells each, quoted verbatim in
+        an open-access ICSH paper. The ICSH flow cytometry reference method treats nucleated red cells as
+        a population distinct from leucocytes, identified by absence of the CD45 antigen. <strong>Neither
+        states the reporting rule in words. This is the weakest citation in the design file and is flagged
+        for clinical corroboration.</strong></p>
+    </div>
+    <div class="mt-3 p-4 cfg bg-slate-800/50 rounded text-xs">
+        <p class="font-semibold text-accent">Configurable</p>
+        <p class="mt-1 text-slate-400"><code>denominatorExcludes</code> &mdash; any category can be counted
+        but kept out of the denominator. <code>per100Reporting</code> sets how it is then expressed. A
+        laboratory wanting NRBC inside the denominator omits both.</p>
+    </div>
+
+    <h3 class="mt-6 font-semibold text-slate-200">1.2 How the result is rounded</h3>
+    <p class="mt-2">Percentages rarely divide evenly. Three equal categories rounded to whole numbers give
+    33 + 33 + 33 = 99%, not 100%. Laboratories resolve this differently, so
+    <strong class="text-slate-200">all three approaches are offered</strong>.</p>
+    <p class="mt-3">Fourteen categories with ten cells each &mdash; every one truly 7.14%:</p>
+    <div class="mt-2 overflow-x-auto">
+    <table class="w-full text-xs">
+        <thead><tr><th>Policy</th><th>Result</th><th>Total</th><th>Worst single-category error</th></tr></thead>
+        <tbody>
+        <tr><td><strong class="text-slate-200">Largest remainder</strong> <span class="text-slate-500">(default)</span></td><td class="font-mono">twelve at 7%, two at 8%</td><td class="font-mono text-slate-100">100%</td><td class="font-mono">0.86 points</td></tr>
+        <tr><td><strong class="text-slate-200">Largest count</strong></td><td class="font-mono">thirteen at 7%, one at <span class="text-amber-300">9%</span></td><td class="font-mono text-slate-100">100%</td><td class="font-mono text-amber-300">1.86 points</td></tr>
+        <tr><td><strong class="text-slate-200">Independent</strong></td><td class="font-mono">all at 7%</td><td class="font-mono text-amber-300">98%</td><td class="font-mono">0.14 points</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p class="mt-3"><strong class="text-slate-200">Largest remainder</strong> (the Hare method, from
+    parliamentary seat allocation): every value is rounded down, then the leftover units go one at a time
+    to the categories closest to rounding up. Totals 100%, and no category is displaced by more than one
+    unit of the last decimal shown. This is the default.</p>
+    <p class="mt-2"><strong class="text-slate-200">Largest count</strong>: the whole rounding difference is
+    added to the category with the most cells. Also totals 100% and is simple to describe, which is why
+    some laboratory procedures specify it. Its weakness is visible above &mdash; one category reads 9%
+    against a true 7.14%, which matters where a single percentage meets a diagnostic cut-off.</p>
+    <p class="mt-2"><strong class="text-slate-200">Independent</strong>: each rounded on its own merits.
+    Individually the most faithful; the cost is a report that visibly does not total 100%, which some
+    clinicians read as an error.</p>
+    <div class="mt-3 p-4 warn bg-amber-500/10 rounded text-xs text-amber-200/90">
+        <p class="font-semibold text-amber-300">Controversy</p>
+        <p class="mt-1">No standard dictates this &mdash; it is a reporting policy. The default is largest
+        remainder because a forced 100% is what readers expect and it achieves that with the least
+        distortion of any individual number. A laboratory whose procedure specifies otherwise should be
+        able to follow its own procedure.</p>
+    </div>
+    <div class="mt-3 p-4 cfg bg-slate-800/50 rounded text-xs">
+        <p class="font-semibold text-accent">Configurable</p>
+        <p class="mt-1 text-slate-400"><code>rounding</code>: <code>"largest-remainder"</code> |
+        <code>"largest-count"</code> | <code>"independent"</code>. Whichever is chosen is stated in the
+        report's method note. <code>precision</code>: <code>{ "display": 2, "report": 0 }</code>, each 0 to 4.</p>
+    </div>
+
+    <!-- ================= 2 ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">2. How many cells to count</h2>
+    <p class="mt-4">Counting is sampling, so precision improves only with the square root of the number
+    counted: quadrupling the count halves the uncertainty.</p>
+    <p class="mt-3"><strong class="text-slate-200">Bone marrow &mdash; 500 cells.</strong> ICSH 2008 §2.6:
+    <em>"At least 500 cells should be counted in at least two smears when a precise percentage of an
+    abnormal cell type is required for diagnosis and disease. At least 300 cells should be counted if the
+    NDC is not essential to the diagnosis."</em> The guidance is <strong class="text-slate-200">conditional</strong>,
+    which is often lost when quoted. An <em>American Journal of Clinical Pathology</em> study (2018, 165
+    cases, five technologists) found 300-cell counts diagnostically equivalent to 500, including 100%
+    sensitivity at the 20% blast threshold &mdash; supporting the ICSH 300-cell provision.</p>
+    <p class="mt-3"><strong class="text-slate-200">Peripheral blood &mdash; 200 cells.</strong> The CLSI
+    H20-A2 reference method is two independent observers counting 200 cells each.</p>
+    <div class="mt-3 p-4 warn bg-amber-500/10 rounded text-xs text-amber-200/90">
+        <p class="font-semibold text-amber-300">Controversy</p>
+        <p class="mt-1">The two-observer element is almost never done in routine practice &mdash; it is a
+        reference procedure for evaluating analysers, not a clinical workflow. This tool implements the
+        single-observer count. A two-observer mode is a documented future item, not a current capability.</p>
+    </div>
+    <div class="mt-3 p-4 cfg bg-slate-800/50 rounded text-xs">
+        <p class="font-semibold text-accent">Configurable</p>
+        <p class="mt-1 text-slate-400"><code>targetCount</code> per specimen type. The target is
+        <strong>advisory and never enforced</strong>: you may finish at any count above zero. Finishing
+        below target produces a note stating the precision achieved rather than blocking you &mdash; a
+        paucicellular aspirate may make a longer count impossible, and you are the one who knows that.</p>
+    </div>
+
+    <!-- ================= 3 ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">3. The myeloid-to-erythroid ratio</h2>
+    <p class="mt-4">The ratio of white-cell precursors to red-cell precursors. It answers: is this marrow
+    making proportionally too much of one lineage? Conventionally 2:1 to 4:1 is normal. It is always read
+    alongside cellularity, because a proportion says nothing about absolute quantity &mdash; a marrow can
+    have a normal M:E ratio and be profoundly hypocellular.</p>
+    <p class="mt-3">This tool follows ICSH 2008 §2.6 exactly:</p>
+    <pre class="mt-2 p-3 bg-slate-800/50 border border-slate-700 rounded text-xs overflow-x-auto">        myeloblasts + promyelocytes + myelocytes + metamyelocytes
+        + band forms + segmented neutrophils + eosinophils
+        + basophils + promonocytes + monocytes
+M:E =  ─────────────────────────────────────────────────────────────
+        erythroblasts at all stages of differentiation</pre>
+    <p class="mt-2">Lymphocytes, plasma cells and mast cells take no part in either the numerator or the
+    denominator. They are neither myeloid nor erythroid.</p>
+
+    <div class="mt-4 p-4 warn bg-amber-500/10 rounded text-xs text-amber-200/90">
+        <p class="font-semibold text-amber-300">Controversy &mdash; and it is a real one</p>
+        <p class="mt-1"><strong>ICSH includes monocytes and their precursors. A widely taught alternative
+        excludes them.</strong> The argument for exclusion is developmental: that "myeloid" here should mean
+        the granulocytic series specifically. The argument for inclusion &mdash; ICSH's position &mdash; is
+        that monocytes are myeloid by derivation and the ratio should capture total
+        granulocytic-plus-monocytic production against red-cell production. Both are taught; both appear in
+        textbooks.</p>
+        <table class="mt-3 w-full">
+            <thead><tr><th class="text-amber-300">150 segs, 60 monocytes, 90 erythroblasts</th><th class="text-amber-300">M:E</th></tr></thead>
+            <tbody>
+            <tr><td>ICSH convention (monocytes included)</td><td class="font-mono font-semibold">2.3:1</td></tr>
+            <tr><td>Alternative convention (monocytes excluded)</td><td class="font-mono font-semibold">1.7:1</td></tr>
+            </tbody>
+        </table>
+        <p class="mt-2">That difference can move a marrow across the boundary of what a reader considers
+        normal. Comparing an M:E ratio against another laboratory's, or your own from before a change of
+        convention, is meaningless unless both used the same rule.</p>
+    </div>
+    <div class="mt-3 p-4 cfg bg-slate-800/50 rounded text-xs">
+        <p class="font-semibold text-accent">Configurable</p>
+        <p class="mt-1 text-slate-400">Both conventions ship as selectable presets:
+        <code>consensus-14</code> (ICSH, default) and <code>consensus-14-me-alt</code> (excluding
+        monocytes). The numerator and denominator are lists of categories, so any other convention can be
+        expressed. Every report states which convention produced its ratio.</p>
+    </div>
+    <p class="mt-4"><strong class="text-slate-200">A precision warning specific to ratios.</strong> A ratio
+    of two counted proportions carries the sampling error of <em>both</em>, so it is substantially less
+    precise than either percentage alone. This is the subject of Rümke's 1985 paper, titled &mdash;
+    pointedly &mdash; <em>"The imprecision of the ratio of two percentages observed in differential white
+    blood cell counts: a warning."</em> The ratio is shown to one decimal place because that is
+    conventional, with an advisory that small differences between successive ratios should not be
+    over-read. <strong class="text-slate-200">No confidence interval is computed for the ratio</strong>:
+    doing so correctly requires Fieller's theorem or a bootstrap, which is documented as outstanding work
+    rather than approximated badly.</p>
+
+    <!-- ================= 4 ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">4. Confidence intervals</h2>
+    <p class="mt-4">You counted 200 cells from a film containing millions. A different 200 cells from the
+    same film would have given a somewhat different answer. That variation is not error in the sense of
+    mistake &mdash; it would occur for a perfect observer &mdash; it is the arithmetic consequence of
+    sampling. When the tool shows <span class="font-mono text-slate-200">15.0&ndash;26.1%</span> beside an
+    observed 20%, it means: given 40 blasts in 200 cells, true values across roughly that range are
+    consistent with what was observed.</p>
+    <p class="mt-2"><strong class="text-slate-200">It is not</strong> a measure of whether you identified
+    the cells correctly. It cannot detect a misclassification.</p>
+
+    <div class="mt-4 overflow-x-auto">
+    <table class="w-full text-xs">
+        <thead><tr><th>Observed</th><th>100 cells</th><th>200 cells</th><th>500 cells</th></tr></thead>
+        <tbody class="font-mono">
+        <tr><td class="text-slate-100">20%</td><td>13.3–28.9%</td><td class="text-slate-100">15.0–26.1%</td><td>16.7–23.7%</td></tr>
+        <tr><td class="text-slate-100">5%</td><td>2.2–11.2%</td><td>2.7–9.0%</td><td>3.4–7.3%</td></tr>
+        <tr><td class="text-slate-100">1%</td><td>0.2–5.4%</td><td>0.3–3.6%</td><td>0.4–2.3%</td></tr>
+        <tr><td class="text-slate-100">0%</td><td>0–3.7%</td><td>0–1.9%</td><td>0–0.8%</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p class="mt-3"><strong class="text-slate-200">The 20% row.</strong> That figure separates acute myeloid
+    leukaemia from myelodysplastic syndrome in the classifications that use it. At 200 cells an observed
+    20% spans the threshold &mdash; the count does not establish which side the true value falls on. At 500
+    cells it narrows to 16.7&ndash;23.7% and <em>still</em> spans it. This is not a deficiency of the
+    software; it is the statistical reality of counting cells, and it is why ICSH directs that the count be
+    extended near a critical threshold.</p>
+    <p class="mt-2"><strong class="text-slate-200">The 0% row.</strong> Counting zero blasts in 200 cells
+    does not exclude blasts. It places them below roughly 1.9%. Reporting a bare "0%" overstates what was
+    established.</p>
+
+    <p class="mt-4 font-semibold text-slate-200">Why this method and not the obvious one</p>
+    <p class="mt-1">The textbook formula is the <strong class="text-slate-200">Wald interval</strong>,
+    <span class="font-mono">p ± 1.96 × √(p(1−p)/n)</span>. This tool does not use it. Wald performs badly
+    exactly where haematology needs it &mdash; small counts and proportions near zero, which is to say rare
+    populations near diagnostic cut-offs. For 2 blasts in 200 cells:</p>
+    <div class="mt-2 overflow-x-auto">
+    <table class="w-full text-xs">
+        <tbody class="font-mono">
+        <tr><td class="font-sans">Wald</td><td class="text-amber-300">−0.38% to 2.38%</td></tr>
+        <tr><td class="font-sans">Wilson (used here)</td><td class="text-slate-100">0.3% to 3.6%</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p class="mt-2">A negative lower bound for a blast percentage is not a rounding artefact; it is a result
+    that cannot be put in front of a clinician. The <strong class="text-slate-200">Wilson score interval</strong>
+    is bounded within 0&ndash;100% by construction and behaves sensibly at zero counts. Brown, Cai and
+    DasGupta's review in <em>Statistical Science</em> (2001) documents Wald's coverage failures at length and
+    recommends Wilson for exactly these conditions.</p>
+    <div class="mt-3 p-4 warn bg-amber-500/10 rounded text-xs text-amber-200/90">
+        <p class="font-semibold text-amber-300">Not configurable, and why</p>
+        <p class="mt-1">The interval method is fixed at Wilson. Offering Wald would be offering a method
+        that produces impossible values in this tool's characteristic case &mdash; a worse instrument, not a
+        choice. The confidence <em>level</em> is configurable, and interval display can be switched off.</p>
+    </div>
+    <div class="mt-3 p-4 cfg bg-slate-800/50 rounded text-xs">
+        <p class="font-semibold text-accent">Configurable</p>
+        <p class="mt-1 text-slate-400"><code>confidenceIntervals</code>:
+        <code>{ "enabled": true, "level": 0.95 }</code> &mdash; 0.90, 0.95 or 0.99.</p>
+    </div>
+
+    <!-- ================= 5 ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">5. The near-threshold advisory</h2>
+    <p class="mt-4">When a confidence interval spans a diagnostic threshold your laboratory has configured,
+    the results screen says so, names the threshold and its basis, and points at Continue Counting.</p>
+    <p class="mt-3">The reasoning is the ICSH direction to extend the count when an abnormal percentage is
+    very close to a critical threshold. <em>"Very close"</em> had no operational definition until the
+    interval supplied one: <strong class="text-slate-200">an interval that straddles the threshold means the
+    count has not settled the question.</strong></p>
+    <p class="mt-3">Two deliberate limits. <strong class="text-slate-200">It never blocks you</strong>, for
+    the same reason the target count is advisory. And <strong class="text-slate-200">it does not promise
+    resolution</strong> &mdash; counting more narrows the interval but need not resolve the threshold, since
+    a true value sitting exactly on the line straddles it at any count.</p>
+    <div class="mt-3 p-4 cfg bg-slate-800/50 rounded text-xs">
+        <p class="font-semibold text-accent">Configurable</p>
+        <p class="mt-1 text-slate-400"><code>thresholds</code>: each with a target category, a percentage,
+        a label and a citable basis. Shipped defaults are 20% blasts (WHO 2022 / ICC 2022), 5% blasts (the
+        value ICSH names as an example) and 10% plasma cells. <strong>These are defaults, not clinical
+        instruction</strong> &mdash; review them against your own reporting practice. Configuring none
+        disables the advisory.</p>
+    </div>
+
+    <!-- ================= 6 ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">6. Blast percentage: of what, exactly?</h2>
+    <p class="mt-4">Historically, in marrows with heavily expanded erythropoiesis, blasts were expressed as a
+    percentage of <strong class="text-slate-200">non-erythroid</strong> cells &mdash; erythroid precursors
+    removed from the denominator. This was the WHO erythroleukaemia rule.
+    <strong class="text-slate-200">WHO 2022 withdrew it.</strong> Blasts are now counted as a percentage of
+    all nucleated cells.</p>
+    <p class="mt-3">The two can differ enormously. Take a marrow of 500 nucleated cells: 300 erythroid
+    precursors, and 200 non-erythroid cells of which 45 are blasts.</p>
+    <div class="mt-2 overflow-x-auto">
+    <table class="w-full text-xs">
+        <thead><tr><th>Convention</th><th>Blast percentage</th></tr></thead>
+        <tbody>
+        <tr><td>Of all nucleated cells (WHO 2022, current)</td><td class="font-mono font-semibold text-slate-100">9.0%</td></tr>
+        <tr><td>Of non-erythroid cells (pre-2022)</td><td class="font-mono font-semibold text-amber-300">22.5%</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p class="mt-3">The same slide falls on opposite sides of the 20% boundary depending on the rule. This
+    tool reports blasts as a percentage of all nucleated cells, matching current practice.</p>
+    <div class="mt-3 p-4 cfg bg-slate-800/50 rounded text-xs">
+        <p class="font-semibold text-accent">Configurable</p>
+        <p class="mt-1 text-slate-400">A subset percentage can be defined as an additional reported figure
+        &mdash; a numerator group over a denominator group of your choosing. The <code>legacy-9</code> preset
+        demonstrates it, reporting both figures side by side for comparison against historical results.
+        Because a subset percentage has a real denominator count it also carries a confidence interval, and
+        it can be given a diagnostic threshold of its own.</p>
+    </div>
+
+    <!-- ================= 7 ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">7. Which cells belong in the count</h2>
+    <p class="mt-4">ICSH 2008 §2.6 defines the marrow nucleated differential count as: blast cells,
+    promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils,
+    mast cells, promonocytes and monocytes, lymphocytes, plasma cells, and erythroblasts. The shipped
+    default implements exactly this list, and an automated test holds it there.</p>
+    <div class="mt-3 p-4 warn bg-amber-500/10 rounded text-xs text-amber-200/90">
+        <p class="font-semibold text-amber-300">ICSH explicitly excludes these from the count</p>
+        <p class="mt-1">Megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged
+        (lysed) cells, and non-haemopoietic cells such as metastatic tumour cells. Lymphoid aggregates
+        should be commented on but not tallied.</p>
+        <p class="mt-2">A cell counted into any category enters the denominator. Tally a smudged cell or a
+        tumour cell and every reported percentage falls slightly &mdash; including the blast percentage
+        being compared against a threshold. Because the totals stay internally consistent, nothing on screen
+        reveals the error. Record such findings in the <strong>morphology comment</strong> instead.</p>
+    </div>
+    <div class="mt-3 p-4 cfg bg-slate-800/50 rounded text-xs">
+        <p class="font-semibold text-accent">Configurable</p>
+        <p class="mt-1 text-slate-400">The category list is entirely yours. A laboratory that considers
+        "other" too risky can remove it. <code>categoryNotes</code> attaches scope guidance to any category.</p>
+    </div>
+
+    <!-- ================= 8 ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">8. Known limitations of manual counting</h2>
+    <p class="mt-4">These are limitations of the method, not of this software. The quantified findings come
+    from a four-institution ICSH study of 616 samples comparing manual morphology against flow cytometry and
+    analysers (Hedley et al., 2026).</p>
+    <div class="mt-3 overflow-x-auto">
+    <table class="w-full text-xs">
+        <tbody>
+        <tr><td class="font-semibold text-slate-200 w-1/3">Rare populations are least reliable</td><td>Blasts correlated well above roughly 10%, but below that suffered <em>"a large degree of imprecision primarily with morphology due to the small number of cells counted"</em>. Blasts showed the largest reproducibility variation of any category, a CV just over 15% &mdash; exactly the range where diagnostic thresholds sit.</td></tr>
+        <tr><td class="font-semibold text-slate-200">Band vs segmented is observer-dependent</td><td>Variability attributed partly to <em>"high variation between morphologists in differentiating band and segmented neutrophils"</em>.</td></tr>
+        <tr><td class="font-semibold text-slate-200">Immature granulocytes lack a standard</td><td><em>"The lack of a traceable standard for what are arbitrary morphologic features."</em> Two competent morphologists may legitimately disagree.</td></tr>
+        <tr><td class="font-semibold text-slate-200">Basophils are too few to be precise</td><td>Poor correlation between methods, <em>"in part due to the relatively small number of basophils counted by morphology"</em>.</td></tr>
+        <tr><td class="font-semibold text-slate-200">The smear introduces error</td><td>Non-uniform distribution, staining quality and dysplastic features all act before counting begins. ICSH recommends at least two smears where a precise abnormal percentage matters.</td></tr>
+        </tbody>
+    </table>
+    </div>
+    <p class="mt-3">A practical consequence: if your laboratory does not rely on the band/segmented
+    distinction, <strong class="text-slate-200">configure a single combined granulocyte category</strong>.
+    Counting what can be distinguished reliably is better than splitting what cannot.</p>
+
+    <!-- ================= 9 ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">9. What the software does not do</h2>
+    <ul class="mt-3 space-y-2 list-disc list-inside text-slate-400">
+        <li><strong class="text-slate-200">No cell recognition.</strong> Every classification is yours. Press the wrong key and it records the wrong cell; nothing in it can detect that.</li>
+        <li><strong class="text-slate-200">No diagnostic decision.</strong> It reports thresholds you configured; it does not interpret them.</li>
+        <li><strong class="text-slate-200">No confidence interval for the M:E ratio</strong> (§3).</li>
+        <li><strong class="text-slate-200">No two-observer reference workflow</strong> (§2).</li>
+        <li><strong class="text-slate-200">No absolute counts without your input</strong> &mdash; computed only when you supply an analyser white cell count, and never derived for categories outside the differential.</li>
+    </ul>
+
+    <!-- ================= 10 ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">10. Chosen versus fixed</h2>
+    <div class="mt-3 overflow-x-auto">
+    <table class="w-full text-xs">
+        <thead><tr><th>Decision</th><th>Status</th><th>Default</th></tr></thead>
+        <tbody>
+        <tr><td>Cell categories</td><td class="text-accent">Configurable</td><td>ICSH 2008 §2.6, fourteen categories</td></tr>
+        <tr><td>Keyboard mapping</td><td class="text-accent">Configurable</td><td>Left-hand ergonomic</td></tr>
+        <tr><td>Target cell count</td><td class="text-accent">Configurable</td><td>BM 500, PB 200</td></tr>
+        <tr><td>Denominator: which categories count</td><td class="text-accent">Configurable</td><td>BM all; PB excludes NRBC</td></tr>
+        <tr><td>Per-100 reporting</td><td class="text-accent">Configurable</td><td>NRBC per 100 WBC in blood</td></tr>
+        <tr><td>Rounding policy</td><td class="text-accent">Configurable</td><td>Largest remainder</td></tr>
+        <tr><td>Decimal precision</td><td class="text-accent">Configurable</td><td>Display 2, report 0</td></tr>
+        <tr><td>M:E numerator and denominator</td><td class="text-accent">Configurable</td><td>ICSH, monocytes included</td></tr>
+        <tr><td>Additional subset percentages</td><td class="text-accent">Configurable</td><td>None by default</td></tr>
+        <tr><td>Diagnostic thresholds</td><td class="text-accent">Configurable</td><td>20% and 5% blasts, 10% plasma cells</td></tr>
+        <tr><td>Confidence level, and whether shown</td><td class="text-accent">Configurable</td><td>95%, shown</td></tr>
+        <tr><td>Report wording</td><td class="text-accent">Configurable</td><td>Three institutional templates</td></tr>
+        <tr><td><strong class="text-slate-200">Confidence interval method</strong></td><td class="text-amber-300">Fixed</td><td>Wilson score &mdash; §4</td></tr>
+        <tr><td><strong class="text-slate-200">That percentages derive from counted cells</strong></td><td class="text-amber-300">Fixed</td><td>&mdash;</td></tr>
+        </tbody>
+    </table>
+    </div>
+
+    <!-- ================= refs ================= -->
+    <h2 class="mt-10 text-lg font-semibold text-slate-100 border-b border-slate-800 pb-2">References</h2>
+    <ol class="mt-3 space-y-2 text-xs text-slate-400 list-decimal list-inside">
+        <li>Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the International Council for
+            Standardization in Haematology. <strong>ICSH guidelines for the standardization of bone marrow
+            specimens and reports.</strong> <em>Int J Lab Hematol</em> 2008;30(5):349&ndash;364.</li>
+        <li>Hedley BD, Keeney M, Gambell P, Qu C, Mao J, Davis BH, Wood BL. <strong>White Blood Cell
+            Enumeration and Differential by Flow Cytometry: The ICSH WBC Reference Method.</strong>
+            <em>Int J Lab Hematol</em> 2026;48(1):93&ndash;101. Open access.</li>
+        <li>CLSI <strong>H20-A2</strong>. Reference Leukocyte (WBC) Differential Count (Proportional) and
+            Evaluation of Instrumental Methods, 2nd ed. Wayne PA: CLSI; 2007.</li>
+        <li>Rümke CL. <strong>The imprecision of the ratio of two percentages observed in differential white
+            blood cell counts: a warning.</strong> <em>Blood Cells</em> 1985;11(1):137&ndash;140.</li>
+        <li>Brown LD, Cai TT, DasGupta A. <strong>Interval estimation for a binomial proportion.</strong>
+            <em>Statist Sci</em> 2001;16(2):101&ndash;133.</li>
+        <li><strong>Is a 500-Cell Count Necessary for Bone Marrow Differentials?</strong>
+            <em>Am J Clin Pathol</em> 2018;150(1):84&ndash;89.</li>
+        <li><strong>WHO Classification of Haematolymphoid Tumours</strong>, 5th ed., 2022; and the
+            <strong>International Consensus Classification</strong>, 2022.</li>
+        <li>Comar SR, Malvezzi M, Pasquini R. <strong>To follow or not to follow the recommendations
+            regarding microscopic analysis of the CLSI H20-A2…</strong> <em>Rev Bras Hematol Hemoter</em>
+            2015;37(1):69&ndash;70. Open access.</li>
+    </ol>
+
+    <p class="mt-10 pt-4 border-t border-slate-800 text-xs text-slate-500">
+        WBC ΔΣ is a counting and calculation aid for trained laboratory personnel. It performs no cell
+        identification and makes no diagnostic decision. Any laboratory deploying it should validate it
+        locally under its own quality management system.
+    </p>
+
+</main>
+
+<script>
+    try {
+        var t = sessionStorage.getItem('wbcds_theme');
+        if (t) document.body.setAttribute('data-theme', t);
+    } catch (e) { /* default theme */ }
+</script>
+
+</body>
+</html>

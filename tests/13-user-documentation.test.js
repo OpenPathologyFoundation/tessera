@@ -27,7 +27,9 @@ const config = Core.normalizeConfig(
     JSON.parse(fs.readFileSync(path.join(ROOT, 'web', 'settings', 'templates.json'), 'utf-8')));
 const guide = fs.readFileSync(path.join(ROOT, 'USER-GUIDE.md'), 'utf-8');
 const methods = fs.readFileSync(path.join(ROOT, 'web', 'methods.html'), 'utf-8');
-const calcref = fs.readFileSync(path.join(ROOT, 'QMS', 'DHF', 'CALCULATION-REFERENCE.md'), 'utf-8');
+// The controlled artefact is the served page; the QMS Markdown file is a
+// control record that points at it (CAL-001 Rev B).
+const calcref = fs.readFileSync(path.join(ROOT, 'web', 'calculation-reference.html'), 'utf-8');
 
 // ================================================================
 describe('User guide tracks the shipped configuration (URS-092)', () => {
@@ -215,7 +217,7 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
         assert.ok(ind.every(v => v === 7));
 
         assert.match(calcref, /twelve at 7%, two at 8%/);
-        assert.match(calcref, /thirteen at 7%, one at \*\*9%\*\*/);
+        assert.match(calcref, /thirteen at 7%, one at .*?9%/s);
         assert.match(calcref, /all at 7%/);
     });
 
@@ -227,7 +229,7 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
         const c = zero(); c.poly = 150; c.mono = 60; c.nrbc = 90;
         assert.equal(Core.computeRatio(c, load('consensus-14.json').formulas.ME_ratio), '2.3:1');
         assert.equal(Core.computeRatio(c, load('consensus-14-me-alt.json').formulas.ME_ratio), '1.7:1');
-        assert.ok(calcref.includes('**2.3:1**') && calcref.includes('**1.7:1**'));
+        assert.ok(calcref.includes('2.3:1') && calcref.includes('1.7:1'));
     });
 
     it('UD-033: Every confidence interval in the reference is engine-produced', () => {
@@ -258,7 +260,7 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
             numerator: ['blasts'],
             denominator: CELLS.filter(x => x !== 'nrbc'), precision: 1
         }).display, '22.5%');
-        assert.ok(calcref.includes('**9.0%**') && calcref.includes('**22.5%**'));
+        assert.ok(calcref.includes('9.0%') && calcref.includes('22.5%'));
     });
 
     it('UD-036: Every choice the reference calls configurable really is', () => {
@@ -277,13 +279,15 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
     });
 
     it('UD-037: What the reference calls fixed is stated as fixed', () => {
-        assert.match(calcref, /\*\*Fixed\*\*.*Wilson score/s);
-        assert.match(calcref, /Not configurable, and why/);
+        assert.ok(calcref.includes('Fixed</td><td>Wilson score'),
+            'the summary table must list the interval method as Fixed');
+        assert.match(calcref, /Not configurable, and why/,
+            'and the page must explain why, rather than staying silent');
     });
 
     it('UD-038: Every abbreviation used is expanded in the table', () => {
         for (const abbr of ['WBC','NRBC','M:E ratio','NDC','ICSH','CLSI','AML','MDS','CI','CV'])
-            assert.ok(calcref.includes('| **' + abbr + '**'),
+            assert.ok(calcref.includes('text-slate-200">' + abbr + '</td>'),
                 `"${abbr}" is used but not expanded in the abbreviations table`);
     });
 });

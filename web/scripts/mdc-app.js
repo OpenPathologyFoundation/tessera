@@ -1639,7 +1639,10 @@
             });
             summaryHtml += '</dl>';
             summaryHtml += '<p class="mt-2"><a href="methods.html" target="_blank" rel="noopener" ' +
-                'class="text-accent hover:underline">How these figures are calculated, and their limitations &rarr;</a></p>';
+                'class="text-accent hover:underline">How these figures are calculated, and their limitations &rarr;</a>';
+            summaryHtml += ' <span class="text-slate-600">&middot;</span> ';
+            summaryHtml += '<a href="calculation-reference.html" target="_blank" rel="noopener" ' +
+                'class="text-accent hover:underline">Full calculation reference &rarr;</a></p>';
             summaryHtml += '</details>';
         }
 

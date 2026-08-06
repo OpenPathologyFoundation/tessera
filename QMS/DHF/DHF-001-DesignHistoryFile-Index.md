@@ -6,7 +6,7 @@
 |-------|-------------------------------------------------------------------------------------------------------------------------|
 | **Document ID** | DHF-001                                                                                                                 |
 | **Product Name** | WBC ΔΣ                                                                                                                 |
-| **Product Version** | 2.7.0                                                                                                                     |
+| **Product Version** | 2.7.1                                                                                                                     |
 | **Classification** | Clinical Laboratory Aid - Software                                                                                      |
 | **Intended Use** | Keyboard-driven manual differential white blood cell counting tool for hematology laboratory personnel                  |
 | **Software Safety Class** | **Class A** (IEC 62304 §4.3) — confirmed 2026-08-05, see §3.1 |
@@ -135,7 +135,7 @@ requires the classification to be reassessed before release.
 | RTM-001 | Requirements Traceability Matrix v3.0 | Traceability | Draft |
 | **REF-001** | **Standards and Literature Basis v1.0 (Rev D)** | Reference | Draft |
 | MAL-001 | Methods and Limitations, operator-facing (`web/methods.html`) | Instructions for Use | Draft |
-| CAL-001 | Calculation Reference (`CALCULATION-REFERENCE.md`) — every calculation explained, with alternatives and controversies | Instructions for Use | Draft |
+| CAL-001 | Calculation Reference (`web/calculation-reference.html`; control record `CALCULATION-REFERENCE.md`) — every calculation explained, with alternatives, controversies and what is configurable | Instructions for Use | In Review |
 | CRB-001 | Clinical Review Brief (`CLINICAL-REVIEW-BRIEF.md`) — the request put to reviewing haematopathologists | Review Record | Issued |
 | TR-001 | Test Execution Results v3.1 | Evidence | Draft |
 | SOP-001 | Standard Operating Procedure | Procedure | Draft |
@@ -166,6 +166,7 @@ superseded banner and RTM-001 v3.0 is re-keyed to v2.0.
 | B | 2026-02-20 | QMS | Added test evidence archive entry |
 | C | 2026-02-20 | QMS | Added design change record entry |
 | D | 2026-02-24 | QMS | Updated to v2.0: 14-cell unified layout, advisory targets, M:E ratio, Continue Counting |
+| M | 2026-08-05 | QMS | v2.7.1: CAL-001 moved from a Markdown file in this directory to `web/calculation-reference.html`, so that it ships with the product, is reachable from the case-entry screen, the Methods page and the results screen, and is available offline. The Markdown file is retained as the document control record. Held in one place to avoid the drift recorded as HA-097. |
 | L | 2026-08-05 | QMS | v2.7.0 (DCR-010): rounding policy, decimal precision and the M:E convention become selections rather than fixed behaviour — three choices the tool had been making on the laboratory's behalf. Calculation Reference issued. |
 | K | 2026-08-05 | QMS | v2.6.0: **IEC 62304 Class A confirmed** and **RA-001 severity ratings reviewed and accepted** by the Document Owner, closing the two open sign-offs. CLSI H20-A2 resolved without purchase — its specification is quoted in Hedley 2025 (REF-001 §2.1). Operator-facing Methods and Limitations page added and pinned to the shipped configuration by test suite 13. HA-097 added: USER-GUIDE.md was found describing a superseded nine-category layout. |
 | J | 2026-08-05 | QMS | v2.5.0 (DCR-009): method provenance. A result now states the conventions that produced it, not only which profile did. Closes a URS-052 gap — the clipboard path, the primary route into the LIS, carried no profile attribution while file export did (HA-096). Completes the five-module standards-review plan. |

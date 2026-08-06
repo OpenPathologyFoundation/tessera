@@ -110,10 +110,18 @@ presets are now synchronised and a test holds them there.
 
 ## 6. The Calculation Reference
 
-`QMS/DHF/CALCULATION-REFERENCE.md` documents every number the tool produces for
+`web/calculation-reference.html` documents every number the tool produces for
 a pathologist who is not a haematopathologist: what is calculated, how, why,
 what the alternatives are, where the controversy lies, the references, and how
 to change it. Every abbreviation is expanded.
+
+It ships with the product rather than sitting in the design file, because a
+reference a laboratory cannot open from the application is a reference it will
+not read. It is reachable from the case-entry screen, the Methods and
+Limitations page and the results screen, and is cached for offline use.
+`QMS/DHF/CALCULATION-REFERENCE.md` is retained as the document control record
+and points at it; holding the text in one place avoids the documentation drift
+recorded as HA-097.
 
 It is pinned by tests. Every worked example, comparison table and confidence
 interval it quotes is recomputed from the shipped engine (UD-030 to UD-038), and

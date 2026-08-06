@@ -35,6 +35,7 @@
         <span class="text-sm font-semibold text-slate-200">Methods &amp; Limitations</span>
         <div class="flex items-center gap-4 text-xs">
             <a href="counter.html" class="text-accent hover:underline">&larr; Back to counter</a>
+            <a href="calculation-reference.html" class="text-slate-500 hover:text-slate-300">Calculation reference</a>
             <a href="help.html" class="text-slate-500 hover:text-slate-300">Quick start</a>
         </div>
     </div>
@@ -50,6 +51,14 @@
         manual differential count can establish. Nothing here is specific to this
         software; most of it is true of any manual differential, and is stated so that
         the numbers are read for what they are.
+    </p>
+
+    <p class="mt-4 p-4 bg-slate-800/50 border border-slate-700 rounded-lg text-sm">
+        <strong class="text-slate-200">Want the full derivation?</strong>
+        The <a href="calculation-reference.html" class="text-accent hover:underline">Calculation
+        Reference</a> covers every figure in more depth &mdash; the alternatives to each method,
+        where the professional controversy lies, the citations, and exactly which choices your
+        laboratory can configure. This page is the summary; that one is the argument.
     </p>
 
     <!-- ============================================================ -->
@@ -103,12 +112,19 @@
 
     <h3 class="mt-5 text-sm font-semibold text-slate-200">Rounding</h3>
     <p class="mt-2 text-sm">
-        Percentages are made to total exactly 100% using the largest-remainder method:
-        each value is truncated, and the leftover units go to the categories with the
-        largest remainders. No category is ever moved by more than one unit of the last
-        decimal shown. The simpler approach — putting the whole rounding difference on
-        the largest category — can shift a single number by two percentage points or
-        more in a report, so it is not used here.
+        By default, percentages are made to total exactly 100% using the
+        largest-remainder method: each value is truncated, and the leftover units go to
+        the categories with the largest remainders. No category is moved by more than
+        one unit of the last decimal shown.
+    </p>
+    <p class="mt-2 text-sm">
+        This is a <strong class="text-slate-200">reporting policy, not a mathematical
+        necessity</strong>, and your laboratory can choose differently: the whole
+        residual may instead be applied to the largest category, or each percentage may
+        be rounded independently and the total left to fall where it does. The three
+        differ materially — see the
+        <a href="calculation-reference.html" class="text-accent hover:underline">Calculation
+        Reference §1.2</a>. Whichever is configured is stated in the report's method note.
     </p>
 
     <!-- ============================================================ -->

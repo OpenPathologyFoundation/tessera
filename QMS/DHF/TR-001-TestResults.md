@@ -5,15 +5,15 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 3.6 |
-| **Product** | WBC ΔΣ v2.7.0 |
+| **Version** | 3.7 |
+| **Product** | WBC ΔΣ v2.7.1 |
 | **Date Executed** | 2026-08-06 (00:25:44 UTC) |
 | **Status** | **PASS** (test outcome) |
 | **Approval State** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_202544_run/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_211104_run/` |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
@@ -21,16 +21,16 @@
 
 ## 1. Executive Summary
 
-**751 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 6 documented skips.**
+**768 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
 
 | Metric | Value |
 |--------|-------|
 | Unit, static and behavioural tests | **574** |
-| System (browser) tests | **177** (61 specs x chromium, firefox, webkit, less 6 skips) |
-| **Total executed** | **751** |
-| Passed | **751** |
+| System (browser) tests | **194** (67 specs x chromium, firefox, webkit, less 7 skips) |
+| **Total executed** | **768** |
+| Passed | **768** |
 | Failed | **0** |
-| Skipped (documented, §6) | **6** |
+| Skipped (documented, §6) | **7** |
 | Pass Rate | **100.00%** |
 | Suites | 95 (Node) + 11 describe blocks x 3 engines (Playwright) |
 | Skipped / Cancelled / Todo | 0 |
@@ -43,8 +43,8 @@ Regenerate this evidence with `npm run test:qms`.
 
 | | v2.0 (2026-02-24) | v2.1.0 (this run) |
 |---|---|---|
-| Tests recorded | 191 | 751 |
-| Tests executing shipped application code | **0** | 751 |
+| Tests recorded | 191 | 768 |
+| Tests executing shipped application code | **0** | 768 |
 | Layers | Mirrored logic + static text assertions | Unit (shipped engine) + jsdom behaviour + browser system |
 | Browser engines | none | Chromium, Firefox, WebKit |
 
@@ -237,6 +237,15 @@ Capabilities verifiable only at this layer (real browser APIs):
 
 ---
 
+### 4.9 Calculation reference as a served page (added v2.7.1)
+
+| Suite | Scope | Result |
+|-------|-------|--------|
+| E2E VV-SYS-150..155 | Reachable from the counter, the Methods page and the results screen; renders all ten sections; states both what is configurable and what is fixed; available offline; loads no third-party script | PASS |
+| 13 UD-030..038 | Repointed at `web/calculation-reference.html`, the controlled artefact | PASS |
+
+---
+
 ### 4.8 Selectable reporting policy (added v2.7)
 
 | Suite | Scope | Result |
@@ -390,7 +399,7 @@ provide.
 
 ## 7. Conclusion
 
-All 751 executed automated tests pass with no failures, across three browser
+All 768 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -412,6 +421,12 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-06T01:11:04.922Z
+- Command: `npm run test:all`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-05_211104_run/`
+
 - Date (UTC): 2026-08-06T00:25:44.395Z
 - Command: `npm run test:all`
 - Exit Code: 0

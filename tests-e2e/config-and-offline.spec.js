@@ -589,3 +589,86 @@ test.describe('Methods and limitations documentation (URS-092, URS-055)', () => 
         await context.setOffline(false);
     });
 });
+
+// ================================================================
+test.describe('Calculation reference (CAL-001)', () => {
+
+    test('VV-SYS-150: Reachable from the counter and renders', async ({ page }) => {
+        await page.goto('/counter.html');
+        await page.locator('a[href="calculation-reference.html"]').first().click();
+        await expect(page).toHaveURL(/calculation-reference\.html$/);
+        await expect(page.locator('h1')).toContainText('Every number this tool produces');
+
+        const body = await page.locator('main').innerText();
+        for (const heading of [
+            'The differential percentage', 'How many cells to count',
+            'The myeloid-to-erythroid ratio', 'Confidence intervals',
+            'The near-threshold advisory', 'Blast percentage',
+            'Which cells belong in the count', 'Known limitations',
+            'What the software does not do', 'Chosen versus fixed'
+        ]) {
+            expect(body).toContain(heading);
+        }
+    });
+
+    test('VV-SYS-151: Reachable from the methods page and links back', async ({ page }) => {
+        await page.goto('/methods.html');
+        await page.locator('main a[href="calculation-reference.html"]').first().click();
+        await expect(page).toHaveURL(/calculation-reference\.html$/);
+        await page.locator('a[href="methods.html"]').first().click();
+        await expect(page).toHaveURL(/methods\.html$/);
+    });
+
+    test('VV-SYS-152: Reachable from the results screen', async ({ page }) => {
+        await page.goto('/counter.html');
+        await page.fill('#caseNumber', 'S25-REF');
+        await page.click('#btnStartCount');
+        for (let i = 0; i < 20; i++) await page.keyboard.press('x');
+        await page.click('#btnCountDone');
+        await page.locator('#results-summary summary').click();
+        const link = page.locator('#results-summary a[href="calculation-reference.html"]');
+        await expect(link).toBeVisible();
+        await expect(link).toContainText('calculation reference');
+    });
+
+    test('VV-SYS-153: States both what is configurable and what is fixed', async ({ page }) => {
+        await page.goto('/calculation-reference.html');
+        const body = await page.locator('main').innerText();
+        // The page's central claim, verifiable by reading it.
+        expect(body).toContain('Not configurable, and why');
+        expect(body).toMatch(/Wilson score/);
+        expect(body).toMatch(/largest-remainder/);
+        expect(body).toMatch(/2\.3:1/);
+        expect(body).toMatch(/1\.7:1/);
+        // Configurable markers appear for the choices a laboratory owns.
+        expect(await page.locator('.cfg').count()).toBeGreaterThanOrEqual(6);
+    });
+
+    test('VV-SYS-154: Available offline', async ({ page, context, browserName }) => {
+        test.skip(browserName === 'webkit',
+            'Playwright WebKit cannot navigate while offline');
+        await page.goto('/counter.html');
+        await page.evaluate(async () => {
+            if (navigator.serviceWorker) await navigator.serviceWorker.ready;
+        });
+        await page.goto('/calculation-reference.html');
+        await expect(page.locator('h1')).toBeVisible();
+
+        await context.setOffline(true);
+        await page.reload();
+        await expect(page.locator('h1')).toContainText('Every number this tool produces');
+        await context.setOffline(false);
+    });
+
+    test('VV-SYS-155: Loads no third-party script (URS-094)', async ({ page }) => {
+        const remote = [];
+        page.on('request', r => {
+            const u = new URL(r.url());
+            if (u.origin !== new URL(page.url() || 'http://127.0.0.1').origin &&
+                r.resourceType() === 'script') remote.push(r.url());
+        });
+        await page.goto('/calculation-reference.html');
+        await expect(page.locator('h1')).toBeVisible();
+        expect(remote).toHaveLength(0);
+    });
+});

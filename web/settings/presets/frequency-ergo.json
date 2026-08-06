@@ -2,6 +2,11 @@
     "version": "2.0",
     "profileId": "frequency-ergo",
     "profileName": "Frequency-Ergonomic",
+    "provenance": {
+        "standard": "ICSH 2008",
+        "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
+        "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 §2.6."
+    },
     "description": "Cell types ordered by typical frequency, with the most common cells mapped to home-row keys for ergonomic efficiency. Optimized for speed during long counting sessions.",
     "specimenTypes": [
         {
@@ -11,8 +16,24 @@
             "requireCaseNumber": false,
             "upperRowAbnormal": false,
             "categories": {
-                "upper": ["nrbc", "myelo", "meta", "blasts", "pro", "plasma", "mast"],
-                "lower": ["poly", "bands", "lymph", "mono", "eos", "baso", "other"]
+                "upper": [
+                    "nrbc",
+                    "myelo",
+                    "meta",
+                    "blasts",
+                    "pro",
+                    "plasma",
+                    "mast"
+                ],
+                "lower": [
+                    "poly",
+                    "bands",
+                    "lymph",
+                    "mono",
+                    "eos",
+                    "baso",
+                    "other"
+                ]
             },
             "outCodes": {
                 "F": "poly",
@@ -33,9 +54,22 @@
             "formulas": {
                 "ME_ratio": {
                     "label": "M:E Ratio",
-                    "numerator": ["blasts", "pro", "myelo", "meta", "bands", "poly", "baso", "eos", "mono"],
-                    "denominator": ["nrbc"],
-                    "precision": 1
+                    "numerator": [
+                        "blasts",
+                        "pro",
+                        "myelo",
+                        "meta",
+                        "bands",
+                        "poly",
+                        "baso",
+                        "eos",
+                        "mono"
+                    ],
+                    "denominator": [
+                        "nrbc"
+                    ],
+                    "precision": 1,
+                    "basis": "ICSH 2008 §2.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
                 }
             },
             "templates": [
@@ -46,11 +80,23 @@
                 }
             ],
             "constituents": {},
-            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "audio": {
+                "enabled": true,
+                "countSound": "click",
+                "undoSound": "undo",
+                "targetSound": "chime",
+                "typewriterSound": "typewriter"
+            },
             "autosave": true,
             "absoluteCounts": "optional",
             "handedness": "left",
-            "morphologyChecklist": []
+            "morphologyChecklist": [],
+            "rounding": "largest-remainder",
+            "precision": {
+                "display": 2,
+                "report": 0
+            },
+            "targetCountBasis": "ICSH 2008 §2.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it."
         },
         {
             "specimenType": "pb",
@@ -59,8 +105,24 @@
             "requireCaseNumber": false,
             "upperRowAbnormal": true,
             "categories": {
-                "upper": ["nrbc", "myelo", "meta", "blasts", "pro", "plasma", "mast"],
-                "lower": ["poly", "bands", "lymph", "mono", "eos", "baso", "other"]
+                "upper": [
+                    "nrbc",
+                    "myelo",
+                    "meta",
+                    "blasts",
+                    "pro",
+                    "plasma",
+                    "mast"
+                ],
+                "lower": [
+                    "poly",
+                    "bands",
+                    "lymph",
+                    "mono",
+                    "eos",
+                    "baso",
+                    "other"
+                ]
             },
             "outCodes": {
                 "F": "poly",
@@ -86,11 +148,23 @@
                 }
             ],
             "constituents": {},
-            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "audio": {
+                "enabled": true,
+                "countSound": "click",
+                "undoSound": "undo",
+                "targetSound": "chime",
+                "typewriterSound": "typewriter"
+            },
             "autosave": true,
             "absoluteCounts": "optional",
             "handedness": "left",
-            "morphologyChecklist": []
+            "morphologyChecklist": [],
+            "rounding": "largest-remainder",
+            "precision": {
+                "display": 2,
+                "report": 0
+            },
+            "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential."
         }
     ]
 }

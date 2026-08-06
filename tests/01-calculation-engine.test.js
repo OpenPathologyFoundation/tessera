@@ -757,3 +757,86 @@ describe('Method provenance (URS-055, DCR-009)', () => {
         assert.match(out, /Method: ICSH 2008/);
     });
 });
+
+// ================================================================
+describe('Selectable rounding policy (URS-034, DCR-010)', () => {
+
+    const thirds = counts({ poly: 1, lymph: 1, mono: 1 });
+    const fourteen = (() => { const c = {}; CELL_TYPES.forEach(ct => { c[ct] = 10; }); return c; })();
+
+    it('VV-RND-001: largest-remainder is the default and totals exactly 100', () => {
+        const a = Core.percentagesSummingTo100(thirds, 0);
+        const b = Core.percentagesSummingTo100(thirds, 0, { method: 'largest-remainder' });
+        assert.deepEqual(a, b, 'omitting the method must select largest-remainder');
+        assert.equal(sumOf(a), 100);
+    });
+
+    it('VV-RND-002: largest-count totals 100 but displaces one category further', () => {
+        // Fourteen equal categories, true value 7.14% each.
+        const hare = Core.percentagesSummingTo100(fourteen, 0, { method: 'largest-remainder' });
+        const lc = Core.percentagesSummingTo100(fourteen, 0, { method: 'largest-count' });
+        assert.equal(sumOf(hare), 100);
+        assert.equal(sumOf(lc), 100);
+
+        const spread = o => Math.max(...Object.values(o)) - Math.min(...Object.values(o));
+        assert.equal(spread(hare), 1, 'largest-remainder keeps every category within one unit');
+        assert.ok(spread(lc) > spread(hare),
+            'largest-count concentrates the residual, widening the spread');
+        assert.equal(Math.max(...Object.values(lc)), 9,
+            'one category reads 9% against a true 7.14% — the reason it is not the default');
+    });
+
+    it('VV-RND-003: independent rounding is faithful per category but need not total 100', () => {
+        const ind = Core.percentagesSummingTo100(fourteen, 0, { method: 'independent' });
+        Object.values(ind).forEach(v => assert.equal(v, 7, 'each is its own honest rounding'));
+        assert.equal(sumOf(ind), 98, 'and the total is therefore not 100');
+    });
+
+    it('VV-RND-004: Every policy still respects the denominator exclusion', () => {
+        const c = counts({ poly: 120, lymph: 40, mono: 15, eos: 5, nrbc: 20 });
+        for (const method of ['largest-remainder', 'largest-count', 'independent']) {
+            const p = Core.percentagesSummingTo100(c, 2, { exclude: ['nrbc'], method });
+            assert.equal(p.nrbc, null, `${method}: excluded category has no percentage`);
+            assert.ok(Math.abs(p.poly - (120 / 180 * 100)) < 1.5,
+                `${method}: computed over 180, not 200`);
+        }
+    });
+
+    it('VV-RND-005: Validation rejects an unknown policy', () => {
+        const errs = Core.validateConfig([{
+            specimenType: 'bm', targetCount: 100, rounding: 'banker',
+            categories: { upper: ['blasts'], lower: ['poly'] },
+            outCodes: { X: 'blasts', F: 'poly' },
+            templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }]
+        }]);
+        assert.ok(errs.some(e => /rounding must be/.test(e)), errs.join('; '));
+    });
+
+    it('VV-RND-006: Validation rejects an impossible precision', () => {
+        const base = {
+            specimenType: 'bm', targetCount: 100,
+            categories: { upper: ['blasts'], lower: ['poly'] },
+            outCodes: { X: 'blasts', F: 'poly' },
+            templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }]
+        };
+        for (const bad of [{ display: 9 }, { report: -1 }, { display: 1.5 }]) {
+            assert.ok(Core.validateConfig([Object.assign({}, base, { precision: bad })])
+                .some(e => /precision\./.test(e)), JSON.stringify(bad));
+        }
+        assert.equal(Core.validateConfig([Object.assign({}, base,
+            { precision: { display: 1, report: 1 } })]).length, 0);
+    });
+
+    it('VV-RND-007: The method statement declares which policy is in force', () => {
+        for (const [method, phrase] of [
+            ['largest-remainder', /largest-remainder/],
+            ['largest-count', /largest category/],
+            ['independent', /may not total exactly 100/]
+        ]) {
+            const e = Core.buildMethodStatement({ rounding: method }, {});
+            const r = e.find(x => x.label === 'Rounding');
+            assert.ok(r, `${method}: no Rounding entry`);
+            assert.match(r.text, phrase);
+        }
+    });
+});

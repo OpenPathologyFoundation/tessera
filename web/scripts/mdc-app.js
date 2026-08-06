@@ -1041,9 +1041,25 @@
         return Core.getDenominator(state.counts, denominatorExcludes());
     }
 
-    /** Displayed percentages: 2 dp, summing to exactly 100.00 (URS-032, URS-034). */
+    /** The rounding policy and decimal precision this profile has chosen. */
+    function roundingMethod() {
+        var sc = getSpecConfig();
+        return (sc && sc.rounding) || 'largest-remainder';
+    }
+
+    function precisionFor(which) {
+        var sc = getSpecConfig();
+        var p = (sc && sc.precision) || {};
+        if (typeof p[which] === 'number') return p[which];
+        return which === 'report' ? 0 : 2;
+    }
+
+    /** Displayed percentages, at the profile's precision and policy (URS-032, URS-034). */
     function displayPercentages() {
-        return Core.percentagesSummingTo100(state.counts, 2, { exclude: denominatorExcludes() });
+        return Core.percentagesSummingTo100(state.counts, precisionFor('display'), {
+            exclude: denominatorExcludes(),
+            method: roundingMethod()
+        });
     }
 
     /**
@@ -1320,7 +1336,7 @@
                     pctEl.textContent = '—';
                 }
             } else {
-                pctEl.textContent = Core.formatPercent(pcts[ct] || 0, 2);
+                pctEl.textContent = Core.formatPercent(pcts[ct] || 0, precisionFor('display'));
             }
         });
 
@@ -1349,11 +1365,11 @@
 
         var upperPctEl = el('pct-sub-upper');
         if (upperPctEl) {
-            upperPctEl.textContent = total > 0 ? Core.formatPercent((upperIn / total) * 100, 2) : '—';
+            upperPctEl.textContent = total > 0 ? Core.formatPercent((upperIn / total) * 100, precisionFor('display')) : '—';
         }
         var lowerPctEl = el('pct-sub-lower');
         if (lowerPctEl) {
-            lowerPctEl.textContent = total > 0 ? Core.formatPercent((lowerIn / total) * 100, 2) : '—';
+            lowerPctEl.textContent = total > 0 ? Core.formatPercent((lowerIn / total) * 100, precisionFor('display')) : '—';
         }
 
         // Grand total — shows the differential denominator, and the overall
@@ -1429,6 +1445,7 @@
         var differentialTotal = getDifferentialTotal();
         var percentages = displayPercentages();
         var meta = state.configMeta || {};
+        var roundingPolicy = roundingMethod();
 
         var session = {
             caseNumber: state.caseNumber,
@@ -1439,6 +1456,9 @@
             configProfileName: meta.profileName || '',
             configVersion: meta.version || '',
             targetCount: specConfig.targetCount,
+            rounding: roundingPolicy,
+            displayPrecision: precisionFor('display'),
+            reportPrecision: precisionFor('report'),
             totalCount: totalCounted,
             differentialTotal: differentialTotal,
             denominatorExcludes: excl.slice(),
@@ -1464,7 +1484,8 @@
         };
 
         // Rendered institutional outputs (integer percentages, summing to 100)
-        var intPcts = Core.percentagesSummingTo100(state.counts, 0, { exclude: excl });
+        var intPcts = Core.percentagesSummingTo100(state.counts, precisionFor('report'),
+            { exclude: excl, method: roundingPolicy });
         var values = Core.buildTemplateValues(session, intPcts);
         specConfig.templates.forEach(function (tpl) {
             session.outputs[tpl.tplCode] = Core.renderTemplate(tpl.outSentence, values);
@@ -1552,8 +1573,9 @@
                 summaryHtml += '<span class="font-mono font-semibold text-amber-300">' +
                     (per100 === null || per100 === undefined ? 'N/A' : per100 + '/100') + '</span>';
             } else {
+                var dp = typeof session.displayPrecision === 'number' ? session.displayPrecision : 2;
                 summaryHtml += '<span class="font-mono font-semibold text-slate-300">' +
-                    (typeof pct === 'number' ? pct.toFixed(2) : '0.00') + '%</span>';
+                    (typeof pct === 'number' ? pct.toFixed(dp) : (0).toFixed(dp)) + '%</span>';
                 // The count is a sample; the interval states how much of the
                 // reported figure is sampling error (URS-037).
                 var ci = session.confidenceIntervals && session.confidenceIntervals[ct];

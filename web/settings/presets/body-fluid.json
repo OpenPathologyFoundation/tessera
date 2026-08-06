@@ -2,6 +2,11 @@
     "version": "2.0",
     "profileId": "body-fluid",
     "profileName": "Body Fluid",
+    "provenance": {
+        "standard": "ICSH 2008",
+        "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
+        "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 §2.6."
+    },
     "description": "Differential for body fluid specimens (CSF, pleural, peritoneal, synovial). Includes lymphocytes, monocytes/macrophages, mesothelial cells, neutrophils, eosinophils, malignant cells, and other. Left-hand ergonomic key layout.",
     "specimenTypes": [
         {
@@ -11,8 +16,17 @@
             "requireCaseNumber": false,
             "upperRowAbnormal": false,
             "categories": {
-                "upper": ["lymph", "mono_macro", "mesothelial", "malignant"],
-                "lower": ["neutrophils", "eos", "other"]
+                "upper": [
+                    "lymph",
+                    "mono_macro",
+                    "mesothelial",
+                    "malignant"
+                ],
+                "lower": [
+                    "neutrophils",
+                    "eos",
+                    "other"
+                ]
             },
             "outCodes": {
                 "F": "neutrophils",
@@ -31,7 +45,13 @@
                 }
             ],
             "constituents": {},
-            "audio": { "enabled": true, "countSound": "click", "undoSound": "undo", "targetSound": "chime", "typewriterSound": "typewriter" },
+            "audio": {
+                "enabled": true,
+                "countSound": "click",
+                "undoSound": "undo",
+                "targetSound": "chime",
+                "typewriterSound": "typewriter"
+            },
             "autosave": true,
             "absoluteCounts": "optional",
             "handedness": "left",
@@ -40,7 +60,13 @@
                 "Signet ring cells",
                 "Hemosiderin-laden macrophages",
                 "Crystals present"
-            ]
+            ],
+            "rounding": "largest-remainder",
+            "precision": {
+                "display": 2,
+                "report": 0
+            },
+            "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential."
         }
     ]
 }

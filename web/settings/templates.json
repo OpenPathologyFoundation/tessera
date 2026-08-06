@@ -1,5 +1,5 @@
 {
-    "version": "2.4",
+    "version": "2.5",
     "profileId": "consensus-14",
     "profileName": "Full 14-Part Consensus",
     "provenance": {
@@ -127,7 +127,12 @@
                     "basis": "10% clonal plasma cells is a diagnostic boundary for plasma cell neoplasia."
                 }
             ],
-            "targetCountBasis": "ICSH 2008 §2.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it."
+            "targetCountBasis": "ICSH 2008 §2.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it.",
+            "rounding": "largest-remainder",
+            "precision": {
+                "display": 2,
+                "report": 0
+            }
         },
         {
             "specimenType": "pb",
@@ -214,7 +219,12 @@
                     "basis": "WHO 2022 / ICC 2022."
                 }
             ],
-            "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential."
+            "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential.",
+            "rounding": "largest-remainder",
+            "precision": {
+                "display": 2,
+                "report": 0
+            }
         }
     ]
 }

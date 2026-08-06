@@ -11,6 +11,13 @@
       "default": true
     },
     {
+      "profileId": "consensus-14-me-alt",
+      "file": "consensus-14-me-alt.json",
+      "name": "Full 14-Part — M:E excluding monocytes",
+      "summary": "Identical to the full 14-part consensus, but the M:E ratio excludes monocytes from the numerator — the convention used where ICSH is not followed for this ratio.",
+      "specimens": "BM (500) - PB (200)"
+    },
+    {
       "profileId": "harmonized-9",
       "file": "harmonized-9.json",
       "name": "Harmonized 9-Part",

@@ -1,12 +1,7 @@
 {
-    "version": "2.0",
-    "profileId": "consensus-14",
-    "profileName": "Full 14-Part Consensus",
-    "provenance": {
-        "standard": "ICSH 2008",
-        "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
-        "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 §2.6."
-    },
+    "version": "1.0",
+    "profileId": "consensus-14-me-alt",
+    "profileName": "Full 14-Part — M:E excluding monocytes",
     "description": "Complete 14-cell differential with all precursors and mature cell lines. Default for comprehensive bone marrow and peripheral blood analysis. Left-hand ergonomic key layout.",
     "specimenTypes": [
         {
@@ -53,7 +48,7 @@
             },
             "formulas": {
                 "ME_ratio": {
-                    "label": "M:E Ratio",
+                    "label": "M:E Ratio (excl. monocytes)",
                     "numerator": [
                         "blasts",
                         "pro",
@@ -62,14 +57,13 @@
                         "bands",
                         "poly",
                         "baso",
-                        "eos",
-                        "mono"
+                        "eos"
                     ],
                     "denominator": [
                         "nrbc"
                     ],
                     "precision": 1,
-                    "basis": "ICSH 2008 §2.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
+                    "basis": "Alternative convention: granulocytes and their precursors only, EXCLUDING monocytes and promonocytes, over erythroblasts at all stages. ICSH 2008 §2.6 includes monocytes; this profile deliberately does not. Ratios from the two conventions are not comparable."
                 }
             },
             "templates": [
@@ -176,5 +170,10 @@
             },
             "targetCountBasis": "CLSI H20-A2: 200 leucocytes for a reference differential."
         }
-    ]
+    ],
+    "provenance": {
+        "standard": "ICSH 2008 categories; alternative M:E convention",
+        "citation": "Lee S-H et al. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
+        "notes": "Cell categories follow ICSH 2008 §2.6. The M:E ratio uses the alternative convention that EXCLUDES monocytes and their precursors from the myeloid numerator. ICSH includes them; both conventions are in use and give different ratios from identical counts."
+    }
 }

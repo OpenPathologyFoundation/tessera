@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 2.6 |
+| **Version** | 2.7 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -259,6 +259,19 @@ Added in v2.6.
 | SYS-223 | The page SHALL be reachable from the case-entry screen, the quick start guide and the results screen, and SHALL be available offline. | URS-092, URS-094 |
 | SYS-224 | Operator documentation SHALL be verified against the shipped configuration and the shipped calculation engine, so that a configuration change cannot leave it stating figures the software does not produce. | URS-092 |
 
+### 4.13f Reporting Policy Module (URS-034, URS-032)
+
+Added in v2.7 under DCR-010.
+
+| ID | Requirement | Trace |
+|----|------------|-------|
+| SYS-230 | The rounding policy SHALL be selectable per specimen type from `largest-remainder`, `largest-count` and `independent`, defaulting to `largest-remainder`. | URS-034 |
+| SYS-231 | Under `largest-remainder` and `largest-count` the included percentages SHALL total exactly 100 at the precision reported. Under `independent` they need not, and the profile is understood to have elected that. | URS-034 |
+| SYS-232 | Displayed and reported decimal precision SHALL be independently selectable, 0 to 4 places, defaulting to 2 and 0. | URS-032 |
+| SYS-233 | Validation SHALL reject an unrecognised rounding policy or an out-of-range precision. | URS-100 |
+| SYS-234 | The method statement SHALL declare the rounding policy in force, since it changes the reported figures. | URS-055 |
+| SYS-235 | Both M:E conventions — including and excluding monocytes — SHALL ship as selectable presets, each declaring its basis. | URS-035 |
+
 ### 4.14 Audio Feedback Module (URS-027, URS-097)
 
 Added in v2.1 under DCR-004. This functionality was implemented and shipping in
@@ -437,6 +450,7 @@ Phase 2 item.
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
 | B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
 | C | 2026-02-20 | QMS | Added theme toggle requirements |
+| K | 2026-08-05 | QMS | v2.7 (DCR-010): added SYS-230–SYS-235, reporting policy. Rounding method, decimal precision and the M:E convention are now selections rather than fixed behaviour. |
 | J | 2026-08-05 | QMS | v2.6: added SYS-220–SYS-224, operator documentation, verified against the shipped configuration and engine (suite 13). |
 | I | 2026-08-05 | QMS | v2.5 (DCR-009): added SYS-210–SYS-214, method provenance. SYS-214 closes a URS-052 gap: the clipboard path carried no profile attribution. |
 | H | 2026-08-05 | QMS | v2.4 (DCR-008): added SYS-200–SYS-208, derived quantities and thresholds. Formula rendering generalized from the hardcoded M:E ratio to every formula the profile defines. |

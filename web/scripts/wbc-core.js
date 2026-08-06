@@ -233,18 +233,37 @@
      *
      * Categories named in `options.exclude` are not part of the differential:
      * they receive `null` rather than a percentage, and they are absent from
-     * the denominator. The remaining categories still sum to exactly 100.
-     * Report them with computePer100 instead.
+     * the denominator. Report them with computePer100 instead.
+     *
+     * THE METHOD IS SELECTABLE. Rounding a differential is a reporting policy,
+     * not a mathematical necessity, and laboratories differ on it. Three are
+     * offered:
+     *
+     *   'largest-remainder'  (default) Hare method. Sums to exactly 100 and
+     *                        holds every category within one unit of its true
+     *                        value.
+     *   'largest-count'      Sums to exactly 100 by giving the entire residual
+     *                        to the largest category. This is the literal
+     *                        wording of URS-034 as originally written; it is
+     *                        offered because some laboratories specify it, but
+     *                        it can displace one category by several points at
+     *                        integer precision.
+     *   'independent'        Each category rounded on its own. Individually the
+     *                        most faithful, but the reported figures may total
+     *                        99% or 101%, which some laboratories accept and
+     *                        others will not.
      *
      * @param {Object}   counts   { cellType: integer }
-     * @param {number}   decimals decimal places (0 for output templates, 2 for display)
+     * @param {number}   decimals decimal places
      * @param {Object}   [options]
      * @param {string[]} [options.exclude] categories outside the differential
-     * @returns {Object} { cellType: number|null } included values sum to exactly 100
+     * @param {string}   [options.method]  rounding policy, as above
+     * @returns {Object} { cellType: number|null }
      */
     function percentagesSummingTo100(counts, decimals, options) {
         var allTypes = Object.keys(counts || {});
         var exclude = (options && options.exclude) || [];
+        var method = (options && options.method) || 'largest-remainder';
         var skip = {};
         exclude.forEach(function (ct) { skip[ct] = true; });
 
@@ -259,6 +278,32 @@
         }
 
         var factor = Math.pow(10, decimals);
+
+        // Each category rounded on its own; no adjustment, no forced total.
+        if (method === 'independent') {
+            cellTypes.forEach(function (ct) {
+                out[ct] = Math.round((counts[ct] / total) * 100 * factor) / factor;
+            });
+            return out;
+        }
+
+        // The whole residual to the largest category.
+        if (method === 'largest-count') {
+            var scaledSum = 0, largest = null, largestCount = -1;
+            cellTypes.forEach(function (ct, idx) {
+                var scaled = Math.round((counts[ct] / total) * 100 * factor);
+                out[ct] = scaled / factor;
+                scaledSum += scaled;
+                if (counts[ct] > largestCount) { largestCount = counts[ct]; largest = ct; }
+            });
+            var residual = Math.round(100 * factor) - scaledSum;
+            if (residual !== 0 && largest !== null) {
+                out[largest] = (Math.round(out[largest] * factor) + residual) / factor;
+            }
+            return out;
+        }
+
+        // Default: largest remainder (Hare).
         var target = Math.round(100 * factor);
         var entries = [];
         var floorSum = 0;
@@ -701,6 +746,15 @@
             });
         }
 
+        var ROUNDING_TEXT = {
+            'largest-remainder': 'Percentages are rounded by the largest-remainder method, so they total exactly 100%; no category is moved by more than one unit of the last decimal shown.',
+            'largest-count': 'Percentages total exactly 100%, with the whole rounding residual applied to the largest category.',
+            'independent': 'Each percentage is rounded independently, so the reported figures may not total exactly 100%.'
+        };
+        if (s.rounding && ROUNDING_TEXT[s.rounding]) {
+            entries.push({ label: 'Rounding', text: ROUNDING_TEXT[s.rounding] });
+        }
+
         if (s.targetCountBasis) {
             entries.push({ label: 'Target count', text: s.targetCountBasis });
         }
@@ -1050,6 +1104,24 @@
                         errors.push(name + ': denominatorExcludes removes every category, ' +
                             'leaving no denominator for the differential');
                     }
+                }
+            }
+
+            if (spec.rounding !== undefined &&
+                ['largest-remainder', 'largest-count', 'independent'].indexOf(spec.rounding) === -1) {
+                errors.push(name + ': rounding must be "largest-remainder", "largest-count" or "independent"');
+            }
+
+            if (spec.precision !== undefined) {
+                if (typeof spec.precision !== 'object' || spec.precision === null) {
+                    errors.push(name + ': precision must be an object');
+                } else {
+                    ['display', 'report'].forEach(function (k) {
+                        var v = spec.precision[k];
+                        if (v !== undefined && (typeof v !== 'number' || v < 0 || v > 4 || v % 1 !== 0)) {
+                            errors.push(name + ': precision.' + k + ' must be a whole number of decimal places, 0 to 4');
+                        }
+                    });
                 }
             }
 

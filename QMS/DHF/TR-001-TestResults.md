@@ -5,15 +5,15 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 3.5 |
-| **Product** | WBC ΔΣ v2.6.0 |
-| **Date Executed** | 2026-08-05 (20:42:45 UTC) |
+| **Version** | 3.6 |
+| **Product** | WBC ΔΣ v2.7.0 |
+| **Date Executed** | 2026-08-06 (00:25:44 UTC) |
 | **Status** | **PASS** (test outcome) |
 | **Approval State** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_164245_run/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_202544_run/` |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
@@ -21,14 +21,14 @@
 
 ## 1. Executive Summary
 
-**731 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 6 documented skips.**
+**751 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 6 documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **554** |
+| Unit, static and behavioural tests | **574** |
 | System (browser) tests | **177** (61 specs x chromium, firefox, webkit, less 6 skips) |
-| **Total executed** | **731** |
-| Passed | **731** |
+| **Total executed** | **751** |
+| Passed | **751** |
 | Failed | **0** |
 | Skipped (documented, §6) | **6** |
 | Pass Rate | **100.00%** |
@@ -43,8 +43,8 @@ Regenerate this evidence with `npm run test:qms`.
 
 | | v2.0 (2026-02-24) | v2.1.0 (this run) |
 |---|---|---|
-| Tests recorded | 191 | 731 |
-| Tests executing shipped application code | **0** | 731 |
+| Tests recorded | 191 | 751 |
+| Tests executing shipped application code | **0** | 751 |
 | Layers | Mirrored logic + static text assertions | Unit (shipped engine) + jsdom behaviour + browser system |
 | Browser engines | none | Chromium, Firefox, WebKit |
 
@@ -68,7 +68,7 @@ shipped code can cause a test to fail.
 
 ---
 
-## 3. Node Suite Results (554 tests, 111 suites, 0 failures)
+## 3. Node Suite Results (574 tests, 114 suites, 0 failures)
 
 ### Suite 01 — Calculation Engine
 
@@ -237,6 +237,25 @@ Capabilities verifiable only at this layer (real browser APIs):
 
 ---
 
+### 4.8 Selectable reporting policy (added v2.7)
+
+| Suite | Scope | Result |
+|-------|-------|--------|
+| 01 VV-RND-001..007 | All three rounding policies: default selection, the spread each produces at integer precision, exclusion still honoured, validation of unknown policies and out-of-range precision, policy declared in the method statement | PASS |
+| 12 SC-040..043 | Both M:E conventions ship, are catalogued, give different ratios from identical counts, and each declares its basis | PASS |
+| 13 UD-030..038 | Every worked example, comparison table and interval in the Calculation Reference recomputed from the engine; every choice it calls configurable verified as configurable | PASS |
+
+**A defect was found**: the `consensus-14` preset never received the provenance
+fields added to `templates.json` under DCR-009. A laboratory loading that preset
+would have lost the standard citation and the M:E basis. All presets are now
+synchronised.
+
+UD-036 is the notable test — it asserts that every choice the reference document
+*calls* configurable really is, since a reference promising configurability the
+software does not offer would be worse than one promising nothing.
+
+---
+
 ### 4.7 Operator documentation (added v2.6)
 
 | Suite | Scope | Result |
@@ -371,7 +390,7 @@ provide.
 
 ## 7. Conclusion
 
-All 731 executed automated tests pass with no failures, across three browser
+All 751 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -393,6 +412,12 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-06T00:25:44.395Z
+- Command: `npm run test:all`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-05_202544_run/`
+
 - Date (UTC): 2026-08-05T20:42:45.861Z
 - Command: `npm run test:all`
 - Exit Code: 0

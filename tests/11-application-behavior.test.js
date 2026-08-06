@@ -1175,7 +1175,8 @@ describe('Behaviour — Method provenance (URS-052, URS-055)', () => {
         h.click('btnCountDone');
         const panel = h.document.querySelector('.tab-panel').textContent;
         assert.match(panel, /consensus-14/);
-        assert.match(panel, /v2\.4/);
+        assert.ok(panel.includes('v' + DEFAULT_CONFIG.version),
+            'the version in force must travel with the copied report');
         h.close();
     });
 

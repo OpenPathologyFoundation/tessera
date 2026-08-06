@@ -215,3 +215,50 @@ describe('Provenance of the shipped profile (URS-055)', () => {
         }
     });
 });
+
+// ================================================================
+describe('Both M:E conventions are offered (URS-035)', () => {
+
+    const presetDir = path.join(__dirname, '..', 'web', 'settings', 'presets');
+    const load = f => Core.normalizeConfig(
+        JSON.parse(fs.readFileSync(path.join(presetDir, f), 'utf-8')));
+
+    it('SC-040: The alternative convention ships as a selectable preset', () => {
+        const alt = load('consensus-14-me-alt.json');
+        const bm = alt.specimenTypes.find(s => s.specimenType === 'bm');
+        assert.ok(!bm.formulas.ME_ratio.numerator.includes('mono'),
+            'the alternative excludes monocytes');
+        assert.equal(Core.validateConfig(alt.specimenTypes).length, 0);
+    });
+
+    it('SC-041: It is listed in the preset catalogue', () => {
+        const idx = JSON.parse(fs.readFileSync(path.join(presetDir, 'index.json'), 'utf-8'));
+        const entry = idx.presets.find(p => p.profileId === 'consensus-14-me-alt');
+        assert.ok(entry, 'an alternative a laboratory cannot find is not an option');
+        assert.match(entry.summary, /monocytes/);
+    });
+
+    it('SC-042: The two conventions give different ratios from identical counts', () => {
+        const icsh = load('consensus-14.json').specimenTypes.find(s => s.specimenType === 'bm');
+        const alt = load('consensus-14-me-alt.json').specimenTypes.find(s => s.specimenType === 'bm');
+        const c = {};
+        Object.values(icsh.outCodes).forEach(ct => { c[ct] = 0; });
+        c.poly = 150; c.mono = 60; c.nrbc = 90;
+        const a = Core.computeRatio(c, icsh.formulas.ME_ratio);
+        const b = Core.computeRatio(c, alt.formulas.ME_ratio);
+        assert.notEqual(a, b, 'if they agreed there would be no choice to make');
+        assert.equal(a, '2.3:1');
+        assert.equal(b, '1.7:1');
+    });
+
+    it('SC-043: Each states its convention, so a report is interpretable', () => {
+        for (const f of ['consensus-14.json', 'consensus-14-me-alt.json']) {
+            const cfg = load(f);
+            const bm = cfg.specimenTypes.find(s => s.specimenType === 'bm');
+            assert.ok(bm.formulas.ME_ratio.basis, `${f}: no stated basis`);
+            assert.match(bm.formulas.ME_ratio.basis, /monocytes/i);
+            const text = Core.formatMethodStatement(Core.buildMethodStatement(bm, cfg), ' ');
+            assert.match(text, /monocytes/i);
+        }
+    });
+});

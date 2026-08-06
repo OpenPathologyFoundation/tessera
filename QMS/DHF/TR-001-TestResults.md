@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 4.1 |
+| **Version** | 4.2 |
 | **Product** | WBC ΔΣ v2.7.1 |
 | **Date Executed** | 2026-08-06 (10:26:56 UTC) |
 | **Status** | **PASS** (test outcome) |
@@ -13,7 +13,7 @@
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-06_062656_shared-dialog-and-hover-contrast/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-06_073300_review-p0-remediation/` — first bundle carrying a verified code identity (`56a68f2`, clean tree) |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
@@ -21,14 +21,14 @@
 
 ## 1. Executive Summary
 
-**896 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
+**939 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **591** |
-| System (browser) tests | **305** (104 specs x chromium, firefox, webkit, less 7 skips) |
-| **Total executed** | **896** |
-| Passed | **896** |
+| Unit, static and behavioural tests | **595** |
+| System (browser) tests | **344** (117 specs x chromium, firefox, webkit, less 7 skips) |
+| **Total executed** | **939** |
+| Passed | **939** |
 | Failed | **0** |
 | Skipped (documented, §6) | **7** |
 | Pass Rate | **100.00%** |
@@ -68,7 +68,7 @@ shipped code can cause a test to fail.
 
 ---
 
-## 3. Node Suite Results (591 tests, 116 suites, 0 failures)
+## 3. Node Suite Results (595 tests, 117 suites, 0 failures)
 
 ### Suite 01 — Calculation Engine
 
@@ -184,7 +184,7 @@ Regressions this layer now guards against:
 
 ---
 
-## 4. System Suite Results — Playwright (104 specs x 3 engines = 312, 7 skipped, 0 failures)
+## 4. System Suite Results — Playwright (117 specs x 3 engines = 351, 7 skipped, 0 failures)
 
 Each spec runs on Chromium, Firefox and WebKit. URS-093 names Chrome, Firefox
 and Edge; Edge shares the Chromium engine and is covered by the chromium
@@ -524,6 +524,46 @@ recorded in DCR-014 §5.
 
 ---
 
+### 4.14 Input-path integrity (added v2.7.6)
+
+Five safety-relevant defects were found by independent review, not by this
+suite. Each was verified against the code before being accepted. The two worst
+are in the input path.
+
+| VV ID / Suite | Verifies | Result |
+|---------------|----------|--------|
+| VV-SYS-180 | Every mapped key in **every selectable preset** increments AND decrements | PASS |
+| VV-SYS-181 | One keydown followed by forty auto-repeats counts 1, not 41 | PASS |
+| VV-SYS-182 | Keystrokes composed by an input method do not count | PASS |
+| VV-SYS-183 | Escape on an alert still runs its continuation | PASS |
+| VV-SYS-184/185 | A stale crash-recovery snapshot is discarded; a recent one is offered | PASS |
+| UD-050..053 | SOP-001's key tables, targets and behaviour match the shipped profile | PASS |
+
+| Defect | Effect |
+|--------|--------|
+| **HA-103** auto-repeat unguarded | A held key added ~30 cells/second, indistinguishable from counting. Pre-RPN **80**, the highest in RA-001 |
+| **HA-104** undo unreachable | Shift changes the character punctuation keys emit, so four categories in `right-hand` — including **blasts** — could not be un-counted at all |
+| `escHtml` did not escape quotes | Used in ~30 attribute positions; a profile field with a quote closed the attribute |
+| `isDuplicateKey` always false | The duplicate-key warning had never been drawn |
+| Escape skipped an alert's continuation | The interrupted-count recovery offer was silently discarded |
+| README denied localStorage held patient data | `wbcds_autosave` holds the accession number and morphology comments |
+| **SOP-001 documented a superseded key map** | An operator following the issued SOP would press A for a blast and record a **monocyte** — the HA-097 class, closed for USER-GUIDE.md and never propagated |
+
+**Two of these tests initially passed against the broken code.** Playwright's
+`keyboard.press('Shift+.')` sends `key="."`, not `">"`, so the undo test could
+not reproduce the defect it was written for; and the first auto-repeat
+revert-check removed the guard in the theme shortcut rather than the counting
+path. Both were corrected until the revert-check reproduced the exact finding
+— `right-hand.json (bm): Shift+"." did not decrement blasts`, and a count of 41.
+
+**Evidence provenance.** From this run onward every bundle records the commit,
+branch and tree state, and a dirty-tree run is stamped **PROVISIONAL — not
+admissible as release evidence**. Bundles before this one name only a date and
+a Node version; at least one "Approved" bundle was captured from a working tree
+that exists in no commit.
+
+---
+
 ## 5. Defect Detection Record
 
 | Defect | Found by | Now guarded by |
@@ -588,7 +628,7 @@ provide.
 
 ## 7. Conclusion
 
-All 896 executed automated tests pass with no failures, across three browser
+All 939 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -610,6 +650,13 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-06T11:33:00.137Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Code identity: `56a68f2d5ad94cfc4df7a6ad7dcf15cd0f7a3465` (clean tree)
+- Evidence: `QMS/DHF/TestEvidence/2026-08-06_073300_review-p0-remediation/`
+
 - Date (UTC): 2026-08-06T10:26:56.634Z
 - Command: `npm test`
 - Exit Code: 0

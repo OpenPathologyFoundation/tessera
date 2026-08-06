@@ -1439,25 +1439,38 @@
         var lowerSubEl = el('val-sub-lower');
         if (lowerSubEl) lowerSubEl.textContent = lowerSub;
 
-        // Subtotal percentages exclude non-differential categories from both
-        // numerator and denominator, so a row containing one still sums correctly.
+        // Subtotal percentages are the SUM OF THE DISPLAYED CELL PERCENTAGES,
+        // not an independent calculation over the raw counts.
+        //
+        // They used to be computed as (rowTotal / denominator) * 100 and
+        // rounded on their own, while the cells above them went through the
+        // profile's rounding policy. At `precision.display: 0` the two
+        // disagree visibly — a row of 33/33/34 under a subtotal reading 99 —
+        // and a reader who adds up the column is right and the footer is
+        // wrong. The invariant that matters here is that the row reconciles.
+        //
+        // A category outside the differential has no percentage and simply
+        // does not contribute; its count is reported per 100 instead.
         var excl = denominatorExcludes();
-        var upperIn = 0;
-        categories.upper.forEach(function (ct) {
-            if (excl.indexOf(ct) === -1) upperIn += (state.counts[ct] || 0);
-        });
-        var lowerIn = 0;
-        categories.lower.forEach(function (ct) {
-            if (excl.indexOf(ct) === -1) lowerIn += (state.counts[ct] || 0);
-        });
+        var displayed = displayPercentages();
+        var sumRow = function (row) {
+            var sum = 0;
+            row.forEach(function (ct) {
+                var v = displayed[ct];
+                if (typeof v === 'number') sum += v;
+            });
+            return sum;
+        };
 
         var upperPctEl = el('pct-sub-upper');
         if (upperPctEl) {
-            upperPctEl.textContent = total > 0 ? Core.formatPercent((upperIn / total) * 100, precisionFor('display')) : '—';
+            upperPctEl.textContent = total > 0
+                ? Core.formatPercent(sumRow(categories.upper), precisionFor('display')) : '—';
         }
         var lowerPctEl = el('pct-sub-lower');
         if (lowerPctEl) {
-            lowerPctEl.textContent = total > 0 ? Core.formatPercent((lowerIn / total) * 100, precisionFor('display')) : '—';
+            lowerPctEl.textContent = total > 0
+                ? Core.formatPercent(sumRow(categories.lower), precisionFor('display')) : '—';
         }
 
         // Grand total — shows the differential denominator, and the overall
@@ -2138,10 +2151,14 @@
         cellKeys.forEach(function (ct) {
             var p = session.percentages ? session.percentages[ct] : undefined;
             var pc = session.per100 && session.per100[ct];
+            // The precision the session was counted at, not a hard-coded 2.
+            // A profile set to whole numbers showed 33.00% in history and 33%
+            // everywhere else, for the same count.
+            var hdp = typeof session.displayPrecision === 'number' ? session.displayPrecision : 2;
             html += '<td class="px-2 py-1 font-mono text-center text-slate-500">' +
                 (p === null
                     ? (pc === null || pc === undefined ? 'N/A' : pc + '/100')
-                    : (typeof p === 'number' ? p.toFixed(2) + '%' : '0.00%')) + '</td>';
+                    : (typeof p === 'number' ? p.toFixed(hdp) + '%' : (0).toFixed(hdp) + '%')) + '</td>';
         });
         html += '</tr></table></div>';
 

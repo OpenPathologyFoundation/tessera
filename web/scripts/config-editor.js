@@ -289,8 +289,10 @@
                 Object.keys(spec.outCodes).forEach(function (k) {
                     if (spec.outCodes[k] === cellId) delete spec.outCodes[k];
                 });
+                forgetCategory(spec, cellId);
                 renderLayout();
                 renderKeyAssignment();
+                renderPolicyEditor();
                 updatePlaceholderList();
                 updatePreview();
             });
@@ -589,6 +591,42 @@
         });
     }
 
+
+
+    /**
+     * Remove every reference to a category that is no longer displayed.
+     *
+     * Dragging a chip out of the layout used to remove it from `categories` and
+     * `outCodes` and nothing else. The counting policy kept pointing at it, and
+     * the profile then failed validation on save with a message about a
+     * category the operator had just deleted:
+     *
+     *     "denominatorExcludes names 'nrbc', which is not a displayed category"
+     *
+     * The validator was right; the editor had left the profile inconsistent and
+     * made the operator work out why. Removing a category now removes what
+     * depended on it, in the same action.
+     */
+    function forgetCategory(spec, cellId) {
+        var at = (spec.denominatorExcludes || []).indexOf(cellId);
+        if (at !== -1) spec.denominatorExcludes.splice(at, 1);
+
+        if (spec.per100Reporting) delete spec.per100Reporting[cellId];
+
+        // A threshold on a category that is no longer counted has nothing to test.
+        spec.thresholds = (spec.thresholds || []).filter(function (t) {
+            return t.target !== cellId;
+        });
+
+        // A formula referencing it would name an unmapped cell type.
+        Object.keys(spec.formulas || {}).forEach(function (name) {
+            var f = spec.formulas[name];
+            ['numerator', 'denominator'].forEach(function (side) {
+                if (!Array.isArray(f[side])) return;
+                f[side] = f[side].filter(function (ct) { return ct !== cellId; });
+            });
+        });
+    }
 
     // ================================================================
     // COUNTING POLICY EDITOR (DCR-013)

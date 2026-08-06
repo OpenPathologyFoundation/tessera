@@ -97,7 +97,7 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**397 identified verification cases** across 18 series and 4 layers.  344 further tests carry no identifier and are not registered.
+**400 identified verification cases** across 18 series and 4 layers.  345 further tests carry no identifier and are not registered.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
@@ -116,7 +116,7 @@ auditing how the plan changed.
 | `VV-PROV-*` | 8 (001–008) | Unit | Method provenance |
 | `VV-RND-*` | 7 (001–007) | Unit | Rounding policy |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 110 (001–196) | System | System verification in a real browser |
+| `VV-SYS-*` | 113 (001–199) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
 
@@ -583,6 +583,9 @@ auditing how the plan changed.
 | VV-SYS-194 | A profile with audio disabled starts silent | System | `tests-e2e/input-integrity.spec.js` |
 | VV-SYS-195 | A profile with audio enabled starts with sound | System | `tests-e2e/input-integrity.spec.js` |
 | VV-SYS-196 | The operator overrides the profile, in both directions | System | `tests-e2e/input-integrity.spec.js` |
+| VV-SYS-197 | Each row subtotal equals the sum of the cells displayed in it | System | `tests-e2e/input-integrity.spec.js` |
+| VV-SYS-198 | The same holds at two decimal places | System | `tests-e2e/input-integrity.spec.js` |
+| VV-SYS-199 | Session history reports at the precision the count used | System | `tests-e2e/input-integrity.spec.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 

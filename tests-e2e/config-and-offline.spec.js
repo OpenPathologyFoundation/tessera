@@ -898,3 +898,49 @@ test.describe('Calculation reference (CAL-001)', () => {
         expect(remote, 'third-party scripts: ' + remote.join(', ')).toHaveLength(0);
     });
 });
+
+// ================================================================
+test.describe('Removing a category cleans up after itself (P0-7)', () => {
+
+    test('VV-SYS-070b: Removing a category removes what depended on it', async ({ page }) => {
+        // Dragging a chip out of the layout removed it from `categories` and
+        // `outCodes` and nothing else. The counting policy kept pointing at it,
+        // and the profile then failed validation on save with a message about a
+        // category the operator had just deleted:
+        //
+        //   "denominatorExcludes names 'nrbc', which is not a displayed category"
+        //
+        // The validator was right. The editor had left the profile inconsistent
+        // and made the operator work out why.
+        await page.goto('/counter.html');
+        await page.evaluate(cfg => localStorage.setItem('wbcds_config', JSON.stringify(cfg)), SHIPPED);
+        await page.goto('/editor.html');
+        await expect(page.locator('#policy-editor')).toBeVisible();
+        await page.locator('#specimen-tabs button', { hasText: 'Peripheral' }).click();
+
+        // Peripheral blood excludes nrbc from the denominator, reports it per
+        // 100, and the shipped profile carries a blasts threshold.
+        await expect(page.locator('.pol-excl[data-cell="nrbc"]')).toBeChecked();
+
+        // Remove both categories from the layout.
+        await page.locator('.remove-cell[data-cell-id="nrbc"]').first().click();
+        await page.locator('.remove-cell[data-cell-id="blasts"]').first().click();
+
+        // Saving must succeed: nothing should still reference the removed
+        // categories.
+        await Promise.all([page.waitForEvent('download'), page.click('#btnSaveProfile')]);
+        await expect(page.locator('#save-status')).toHaveAttribute('data-status', 'ok');
+
+        const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('wbcds_config')));
+        const pb = saved.specimenTypes.find(s => s.specimenType === 'pb');
+        expect(pb.denominatorExcludes || [], 'the removed category is still excluded').not.toContain('nrbc');
+        expect(Object.keys(pb.per100Reporting || {}), 'it is still reported per 100').not.toContain('nrbc');
+        for (const t of pb.thresholds || []) {
+            expect(t.target, 'a threshold still targets a removed category').not.toBe('blasts');
+        }
+        for (const f of Object.values(pb.formulas || {})) {
+            expect([...(f.numerator || []), ...(f.denominator || [])])
+                .not.toContain('nrbc');
+        }
+    });
+});

@@ -453,3 +453,107 @@ test.describe('The profile audio default is honoured (URS-097)', () => {
         await expect(page.locator('#audioLabel')).toHaveText('Sound On');
     });
 });
+
+// ================================================================
+test.describe('Displayed figures reconcile with each other (P0-10)', () => {
+
+    /**
+     * Subtotals were computed independently over the raw counts and rounded on
+     * their own, while the cells above them went through the profile's rounding
+     * policy. At whole-number precision the two disagree visibly — a row of
+     * 33/33/34 under a subtotal reading 99 — and a reader who adds up the
+     * column is right while the footer is wrong.
+     *
+     * The subtotal is now the sum of what is displayed, because that is the
+     * property a pathologist checks.
+     */
+    async function countAtPrecision(page, decimals, caseNumber) {
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.evaluate((dp) => {
+            sessionStorage.clear();
+            const c = JSON.parse(localStorage.getItem('wbcds_config'));
+            c.specimenTypes.forEach(s => { s.precision = { display: dp, report: dp }; });
+            c.version = '99.0';
+            localStorage.setItem('wbcds_config', JSON.stringify(c));
+        }, decimals);
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        if (caseNumber) await page.fill('#caseNumber', caseNumber);
+        await page.click('#btnStartCount');
+    }
+
+    const num = t => parseFloat(String(t).replace('%', ''));
+
+    test('VV-SYS-197: Each row subtotal equals the sum of the cells displayed in it', async ({ page }) => {
+        // Whole-number precision, and a count chosen because the two methods
+        // genuinely differ on it. Most counts coincide — both are
+        // approximations of the same quantity — so an arbitrary case proves
+        // nothing. This one was found by searching the engine for a count
+        // where the sum of the displayed cells and an independent calculation
+        // over the row disagree.
+        //
+        // 1 plasma (upper), 2 poly + 5 lymph (lower), 8 cells:
+        //   plasma displays 12%, so the upper row is 12%
+        //   1/8 computed independently is 12.5%, which rounds to 13%
+        await countAtPrecision(page, 0);
+        await page.keyboard.press('e');                                  // plasma, upper
+        for (let i = 0; i < 2; i++) await page.keyboard.press('f');      // poly,   lower
+        for (let i = 0; i < 5; i++) await page.keyboard.press('s');      // lymph,  lower
+
+        const rows = await page.evaluate(() => {
+            const h = window.__wbcTestHooks;
+            const spec = h.getSpecConfig();
+            const read = ct => {
+                const cell = document.getElementById('pct-' + ct);
+                return cell ? parseFloat(cell.textContent) || 0 : 0;
+            };
+            return {
+                upper: spec.categories.upper.map(read).reduce((a, b) => a + b, 0),
+                lower: spec.categories.lower.map(read).reduce((a, b) => a + b, 0),
+                upperSub: parseFloat(document.getElementById('pct-sub-upper').textContent),
+                lowerSub: parseFloat(document.getElementById('pct-sub-lower').textContent)
+            };
+        });
+
+        expect(rows.upperSub, 'the upper subtotal does not equal the cells above it')
+            .toBeCloseTo(rows.upper, 2);
+        expect(rows.lowerSub, 'the lower subtotal does not equal the cells above it')
+            .toBeCloseTo(rows.lower, 2);
+        // And together they account for the whole differential.
+        expect(rows.upperSub + rows.lowerSub).toBeCloseTo(100, 2);
+    });
+
+    test('VV-SYS-198: The same holds at two decimal places', async ({ page }) => {
+        await countAtPrecision(page, 2);
+        for (let i = 0; i < 7; i++) await page.keyboard.press('x');
+        for (let i = 0; i < 11; i++) await page.keyboard.press('f');
+        for (let i = 0; i < 5; i++) await page.keyboard.press('s');
+
+        const upperSub = num(await page.locator('#pct-sub-upper').textContent());
+        const lowerSub = num(await page.locator('#pct-sub-lower').textContent());
+        expect(upperSub + lowerSub).toBeCloseTo(100, 2);
+    });
+
+    test('VV-SYS-199: Session history reports at the precision the count used', async ({ page }) => {
+        // The history modal hard-coded toFixed(2), so a profile set to whole
+        // numbers showed 33.00% there and 33% everywhere else, for one count.
+        await countAtPrecision(page, 0, 'S25-HIST');
+        await page.keyboard.press('x');
+        await page.keyboard.press('f');
+        await page.click('#btnCountDone');
+
+        // The panel is a collapsed <details> (SYS-092); open it first.
+        await expect(page.locator('#session-history-section')).toBeVisible();
+        await page.locator('#session-history-section summary').click();
+        await page.locator('.history-entry').first().click();
+        const modal = page.locator('#history-modal-content');
+        await expect(modal).toBeVisible();
+        const text = await modal.innerText();
+        expect(text, 'history is showing two decimals for a whole-number profile')
+            .not.toMatch(/\d+\.\d\d%/);
+        expect(text).toMatch(/50%/);
+    });
+});

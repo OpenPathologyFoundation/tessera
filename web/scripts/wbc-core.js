@@ -491,6 +491,102 @@
     }
 
     /**
+     * A confidence interval for a derived ratio (REF-001 §3.8, HA-093).
+     *
+     * Rümke 1985 warned that a ratio of two counted proportions inherits the
+     * sampling error of both and is materially less precise than either. The
+     * application displayed the M:E ratio to one decimal place with only a
+     * prose advisory saying so. This quantifies it.
+     *
+     * THE FRAMING, which is what makes this exact rather than approximate.
+     *
+     * The ratio uses two disjoint groups drawn from one count. Conditioning on
+     * the number of cells that fall in EITHER group removes the rest of the
+     * differential as a nuisance, and what remains is a single binomial:
+     *
+     *     m = M + E                     cells in the ratio at all
+     *     p = M / m                     proportion of those that are myeloid
+     *     M:E = M / E = p / (1 - p)     the ODDS of p
+     *
+     * So an interval for the ratio is the odds transform of an interval for a
+     * proportion — and the proportion interval is the Wilson score interval
+     * this module already uses and REF-001 §3.7 already defends. The transform
+     * is monotonic, so the bounds map directly.
+     *
+     * WHY NOT FIELLER OR A BOOTSTRAP. Fieller's theorem degenerates when the
+     * denominator is not significantly different from zero, producing an
+     * unbounded or complement interval that cannot be displayed sensibly — and
+     * a marrow with no erythroid cells is exactly the case a clinician most
+     * wants bounded. A parametric bootstrap handles that but is stochastic:
+     * the same count would give a slightly different interval on each run,
+     * which is not acceptable for a figure that enters a patient record. This
+     * route is deterministic, analytic, and reuses a method already justified.
+     *
+     * BOUNDARIES. With no erythroid cells p̂ = 1, the Wilson upper bound is 1,
+     * and the upper limit is reported as Infinity — which is the truth: the
+     * ratio is unbounded above. The lower bound stays finite and useful. With
+     * no myeloid cells the lower limit is 0. Neither case throws.
+     *
+     * Returns null when the ratio is undefined (no cells in either group) or
+     * when the formula is not a ratio.
+     */
+    function ratioInterval(counts, formula, level) {
+        if (!formula || !Array.isArray(formula.numerator) || !Array.isArray(formula.denominator)) {
+            return null;
+        }
+        if ((formula.type || 'ratio') !== 'ratio') return null;
+
+        var num = 0, den = 0;
+        formula.numerator.forEach(function (ct) { num += (counts[ct] || 0); });
+        formula.denominator.forEach(function (ct) { den += (counts[ct] || 0); });
+
+        var m = num + den;
+        if (m <= 0) return null;
+
+        var p = wilsonInterval(num, m, level);
+        if (!p) return null;
+
+        // wilsonInterval reports PERCENTAGES; the odds transform needs
+        // proportions.
+        var lo = p.lower / 100;
+        var hi = p.upper / 100;
+
+        // Odds transform. The division is guarded rather than left to Infinity
+        // arithmetic, so the boundary case is explicit: a bound of 1 means no
+        // cells in the denominator group are excluded, and the ratio is
+        // unbounded above.
+        var lower = lo >= 1 ? Infinity : lo / (1 - lo);
+        var upper = hi >= 1 ? Infinity : hi / (1 - hi);
+
+        return {
+            lower: lower,
+            upper: upper,
+            n: m,                       // cells the ratio is based on, not the total
+            level: p.level
+        };
+    }
+
+    /**
+     * A ratio interval as text, e.g. "1.8–3.0" or "1.8–∞".
+     */
+    function formatRatioInterval(interval, precision) {
+        if (!interval) return '';
+        var dp = typeof precision === 'number' ? precision : 1;
+
+        // A bound below the display resolution is shown to two significant
+        // figures instead of being rounded to zero. With no myeloid cells
+        // counted the upper bound is 0.04, and printing "0.0-0.0" would assert
+        // a certainty the count does not have.
+        function bound(v) {
+            if (!isFinite(v)) return '\u221e';
+            if (v === 0) return (0).toFixed(dp);
+            if (Math.abs(v) < Math.pow(10, -dp)) return v.toPrecision(2).replace(/0+$/, '');
+            return v.toFixed(dp);
+        }
+        return bound(interval.lower) + '\u2013' + bound(interval.upper);
+    }
+
+    /**
      * One group of categories expressed as a percentage of another.
      *
      * The governing case is "blasts as a percentage of non-erythroid cells" —
@@ -1361,6 +1457,8 @@
         intervalSpans: intervalSpans,
         cellsForPrecision: cellsForPrecision,
         computeRatio: computeRatio,
+        ratioInterval: ratioInterval,
+        formatRatioInterval: formatRatioInterval,
         computeSubsetPercentage: computeSubsetPercentage,
         computeFormula: computeFormula,
         evaluateThresholds: evaluateThresholds,

@@ -1106,9 +1106,23 @@
     function computeFormulaResults(specConfig) {
         var defs = (specConfig && specConfig.formulas) || {};
         var out = {};
+        var ciCfg = (specConfig && specConfig.confidenceIntervals) || {};
+        var wantCi = ciCfg.enabled !== false;
         Object.keys(defs).forEach(function (fname) {
             var r = Core.computeFormula(state.counts, defs[fname]);
-            if (r) out[fname] = { label: defs[fname].label || fname, type: r.type, display: r.display, value: r.value };
+            if (!r) return;
+            out[fname] = { label: defs[fname].label || fname, type: r.type, display: r.display, value: r.value };
+            // Rümke's warning quantified rather than only asserted (REF-001
+            // §3.8, HA-093). Governed by the same setting as the percentage
+            // intervals: a profile that suppresses one suppresses both.
+            if (wantCi && r.type === 'ratio') {
+                var ci = Core.ratioInterval(state.counts, defs[fname], ciCfg.level || 0.95);
+                if (ci) {
+                    out[fname].interval = ci;
+                    out[fname].intervalText = Core.formatRatioInterval(
+                        ci, typeof defs[fname].precision === 'number' ? defs[fname].precision : 1);
+                }
+            }
         });
         return out;
     }
@@ -1733,6 +1747,13 @@
                     Core.escapeHtml(r.label) + ':</span> ';
                 summaryHtml += '<span class="font-mono font-semibold">' +
                     Core.escapeHtml(r.display) + '</span>';
+                if (r.intervalText) {
+                    var lvl = Math.round((r.interval.level || 0.95) * 100);
+                    summaryHtml += '<span class="font-mono text-xs text-slate-500 ml-1"' +
+                        ' title="' + Core.escapeAttr(lvl + '% confidence interval, from ' +
+                            r.interval.n + ' cells in the ratio') + '">' +
+                        Core.escapeHtml(r.intervalText) + '</span>';
+                }
                 summaryHtml += '</span>';
             });
             summaryHtml += '</div>';

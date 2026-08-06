@@ -97,14 +97,14 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**694 verification cases** across 26 series and 4 layers, run as 751 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**705 verification cases** across 26 series and 4 layers, run as 762 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 8 (001–011) | Static | QMS counted quantities |
 | `SC-*` | 24 (001–053) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
-| `UD-*` | 49 (001–093) | Static | User-facing documentation |
+| `UD-*` | 50 (001–094) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-AUD-*` | 19 (001–019) | Static | Audio engine structure |
 | `VV-CALC-*` | 24 (001–030) | Unit | Calculation engine vectors |
@@ -116,7 +116,7 @@ auditing how the plan changed.
 | `VV-EDT-*` | 40 (001–040) | Static | Configuration editor structure |
 | `VV-INC-*` | 3 (001–006) | Unit | Increment and decrement |
 | `VV-LOW-*` | 6 (001–006) | Unit | Sub-target advisory |
-| `VV-ME-*` | 6 (001–006) | Unit | Myeloid-to-erythroid ratio |
+| `VV-ME-*` | 13 (001–016) | Unit | Myeloid-to-erythroid ratio |
 | `VV-PRE-*` | 20 (001–020) | Unit | Preset catalogue integrity |
 | `VV-PROV-*` | 8 (001–008) | Unit | Method provenance |
 | `VV-RND-*` | 7 (001–007) | Unit | Rounding policy |
@@ -124,7 +124,7 @@ auditing how the plan changed.
 | `VV-SCH-*` | 23 (001–023) | Unit | v2 configuration schema |
 | `VV-SRC-*` | 76 (001–076) | Static | Application source integrity (static) |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 114 (001–200) | System | System verification in a real browser |
+| `VV-SYS-*` | 117 (001–203) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
 
@@ -319,6 +319,7 @@ auditing how the plan changed.
 | UD-091 | The features the argument depends on still exist | Static | `tests/13-user-documentation.test.js` |
 | UD-092 | It is labelled unreviewed until a qualified reviewer signs it | Static | `tests/13-user-documentation.test.js` |
 | UD-093 | The precision table is engine-produced (C-3) | Static | `tests/13-user-documentation.test.js` |
+| UD-094 | The ratio-interval table is engine-produced (G-2) | Static | `tests/13-user-documentation.test.js` |
 
 #### VV-ABS-* — Absolute counts and the analyser WBC
 
@@ -615,6 +616,13 @@ auditing how the plan changed.
 | VV-ME-004 | Zero numerator over a positive denominator is 0.0:1 | Unit | `tests/01-calculation-engine.test.js` |
 | VV-ME-005 | Absent formula returns null so no ratio row is rendered | Unit | `tests/01-calculation-engine.test.js` |
 | VV-ME-006 | Every numerator member contributes to the ratio | Unit | `tests/01-calculation-engine.test.js` |
+| VV-ME-010 | The interval is the odds transform of the Wilson interval | Unit | `tests/01-calculation-engine.test.js` |
+| VV-ME-011 | The same ratio is far less precise at a smaller count | Unit | `tests/01-calculation-engine.test.js` |
+| VV-ME-012 | A ratio is much less precise than the percentages behind it | Unit | `tests/01-calculation-engine.test.js` |
+| VV-ME-013 | With no erythroid cells the upper bound is unbounded, not an error | Unit | `tests/01-calculation-engine.test.js` |
+| VV-ME-014 | With no myeloid cells the bound is shown, not rounded to zero | Unit | `tests/01-calculation-engine.test.js` |
+| VV-ME-015 | Undefined and non-ratio cases return null rather than throwing | Unit | `tests/01-calculation-engine.test.js` |
+| VV-ME-016 | The interval narrows monotonically as the count grows | Unit | `tests/01-calculation-engine.test.js` |
 
 #### VV-PRE-* — Preset catalogue integrity
 
@@ -928,6 +936,9 @@ auditing how the plan changed.
 | VV-SYS-198 | The same holds at two decimal places | System | `tests-e2e/input-integrity.spec.js` |
 | VV-SYS-199 | Session history reports at the precision the count used | System | `tests-e2e/input-integrity.spec.js` |
 | VV-SYS-200 | Removing a category removes what depended on it | System | `tests-e2e/config-and-offline.spec.js` |
+| VV-SYS-201 | The displayed ratio is accompanied by its interval | System | `tests-e2e/input-integrity.spec.js` |
+| VV-SYS-202 | The same ratio at a tenth of the count reads far less precisely | System | `tests-e2e/input-integrity.spec.js` |
+| VV-SYS-203 | A profile with intervals disabled shows none | System | `tests-e2e/input-integrity.spec.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 

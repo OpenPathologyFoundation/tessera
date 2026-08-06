@@ -932,3 +932,93 @@ describe('Corrected WBC for nucleated red cells (URS-036, HA-105)', () => {
         }
     });
 });
+
+// ================================================================
+describe('Confidence interval for a derived ratio (HA-093, REF-001 §3.8)', () => {
+
+    /**
+     * Rümke 1985 — "The imprecision of the ratio of two percentages observed in
+     * differential white blood cell counts: a warning" — is about RATIOS, not
+     * single percentages. The application displayed the M:E ratio to one
+     * decimal place with only a prose advisory saying it was imprecise.
+     *
+     * The interval is exact rather than approximate because of how the ratio
+     * is framed. Conditioning on the cells that fall in either group leaves a
+     * single binomial: M:E is the ODDS of the proportion of those cells that
+     * are myeloid. So the interval is the odds transform of a Wilson interval,
+     * which this engine already computes and REF-001 §3.7 already defends.
+     */
+    const ME = { numerator: ['poly', 'mono'], denominator: ['nrbc'], precision: 1 };
+
+    it('VV-ME-010: The interval is the odds transform of the Wilson interval', () => {
+        const c = counts({ poly: 150, mono: 60, nrbc: 90 });   // 210 : 90
+        const ci = Core.ratioInterval(c, ME, 0.95);
+        const p = Core.wilsonInterval(210, 300, 0.95);
+        assert.equal(ci.n, 300, 'the interval rests on the cells IN the ratio, not the total');
+        assert.ok(Math.abs(ci.lower - (p.lower / 100) / (1 - p.lower / 100)) < 1e-12);
+        assert.ok(Math.abs(ci.upper - (p.upper / 100) / (1 - p.upper / 100)) < 1e-12);
+        // And the point estimate lies inside it.
+        assert.ok(ci.lower < 210 / 90 && 210 / 90 < ci.upper);
+    });
+
+    it('VV-ME-011: The same ratio is far less precise at a smaller count', () => {
+        // This is Rümke's warning made visible: an identical displayed ratio,
+        // materially different precision.
+        const big = Core.ratioInterval(counts({ poly: 150, mono: 60, nrbc: 90 }), ME, 0.95);
+        const small = Core.ratioInterval(counts({ poly: 15, mono: 6, nrbc: 9 }), ME, 0.95);
+        assert.equal(Core.computeRatio(counts({ poly: 150, mono: 60, nrbc: 90 }), ME), '2.3:1');
+        assert.equal(Core.computeRatio(counts({ poly: 15, mono: 6, nrbc: 9 }), ME), '2.3:1');
+        assert.equal(Core.formatRatioInterval(big, 1), '1.8–3.0');
+        assert.equal(Core.formatRatioInterval(small, 1), '1.1–5.0');
+        assert.ok((small.upper - small.lower) > (big.upper - big.lower) * 2,
+            'a tenfold smaller count must give a materially wider interval');
+    });
+
+    it('VV-ME-012: A ratio is much less precise than the percentages behind it', () => {
+        // The whole point of Rümke's warning.
+        const c = counts({ poly: 150, mono: 60, nrbc: 90 });
+        const ratio = Core.ratioInterval(c, ME, 0.95);
+        const pct = Core.wilsonInterval(90, 300, 0.95);          // erythroid %
+        const ratioSpanRel = (ratio.upper - ratio.lower) / (210 / 90);
+        const pctSpanRel = (pct.upper - pct.lower) / 30;
+        assert.ok(ratioSpanRel > pctSpanRel,
+            'the ratio must be reported as relatively less precise than its components');
+    });
+
+    it('VV-ME-013: With no erythroid cells the upper bound is unbounded, not an error', () => {
+        // Fieller degenerates here; this is the case a clinician most wants
+        // bounded below, and it is.
+        const ci = Core.ratioInterval(counts({ poly: 210, nrbc: 0 }), ME, 0.95);
+        assert.ok(ci, 'a ratio with an empty denominator must still yield an interval');
+        assert.ok(isFinite(ci.lower) && ci.lower > 0, 'the lower bound stays finite and useful');
+        assert.equal(ci.upper, Infinity);
+        assert.match(Core.formatRatioInterval(ci, 1), /–∞$/);
+    });
+
+    it('VV-ME-014: With no myeloid cells the bound is shown, not rounded to zero', () => {
+        const ci = Core.ratioInterval(counts({ poly: 0, mono: 0, nrbc: 90 }), ME, 0.95);
+        assert.equal(ci.lower, 0);
+        assert.ok(ci.upper > 0 && ci.upper < 0.1);
+        // "0.0–0.0" would assert a certainty the count does not have.
+        assert.notEqual(Core.formatRatioInterval(ci, 1), '0.0–0.0');
+        assert.match(Core.formatRatioInterval(ci, 1), /^0\.0–0\.04/);
+    });
+
+    it('VV-ME-015: Undefined and non-ratio cases return null rather than throwing', () => {
+        assert.equal(Core.ratioInterval(counts({}), ME, 0.95), null, 'nothing counted');
+        assert.equal(Core.ratioInterval(counts({ poly: 1 }), null, 0.95), null, 'no formula');
+        assert.equal(Core.ratioInterval(counts({ poly: 1, nrbc: 1 }),
+            { type: 'percentage', numerator: ['poly'], denominator: ['poly', 'nrbc'] }, 0.95), null,
+            'a percentage formula has its own interval and is not an odds');
+    });
+
+    it('VV-ME-016: The interval narrows monotonically as the count grows', () => {
+        let previous = Infinity;
+        for (const k of [1, 2, 5, 10, 50]) {
+            const ci = Core.ratioInterval(counts({ poly: 7 * k, nrbc: 3 * k }), ME, 0.95);
+            const span = ci.upper - ci.lower;
+            assert.ok(span < previous, `not narrowing at ${10 * k} cells`);
+            previous = span;
+        }
+    });
+});

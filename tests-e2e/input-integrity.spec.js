@@ -557,3 +557,66 @@ test.describe('Displayed figures reconcile with each other (P0-10)', () => {
         expect(text).toMatch(/50%/);
     });
 });
+
+// ================================================================
+test.describe('The M:E ratio carries its own interval (HA-093)', () => {
+
+    async function countMarrow(page, segs, mono, ery) {
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.evaluate(() => sessionStorage.clear());
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.fill('#caseNumber', 'S25-ME');
+        await page.click('#btnStartCount');
+        for (let i = 0; i < segs; i++) await page.keyboard.press('f');
+        for (let i = 0; i < mono; i++) await page.keyboard.press('a');
+        for (let i = 0; i < ery; i++) await page.keyboard.press('b');
+        await page.click('#btnCountDone');
+    }
+
+    test('VV-SYS-201: The displayed ratio is accompanied by its interval', async ({ page }) => {
+        // Rümke 1985 is about ratios. Displaying 2.3:1 to one decimal implies a
+        // precision the count does not support; the interval states it.
+        await countMarrow(page, 150, 60, 90);
+        const summary = await page.locator('#results-summary').innerText();
+        expect(summary).toMatch(/2\.3:1/);
+        expect(summary, 'the ratio is shown without its interval').toMatch(/1\.8–3\.0/);
+    });
+
+    test('VV-SYS-202: The same ratio at a tenth of the count reads far less precisely', async ({ page }) => {
+        await countMarrow(page, 15, 6, 9);
+        const summary = await page.locator('#results-summary').innerText();
+        expect(summary).toMatch(/2\.3:1/);       // identical point estimate
+        expect(summary).toMatch(/1\.1–5\.0/);    // materially wider
+    });
+
+    test('VV-SYS-203: A profile with intervals disabled shows none', async ({ page }) => {
+        // Governed by the same setting as the percentage intervals: a profile
+        // that suppresses one suppresses both.
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.evaluate(() => {
+            sessionStorage.clear();
+            const c = JSON.parse(localStorage.getItem('wbcds_config'));
+            c.specimenTypes.forEach(s => { s.confidenceIntervals = { enabled: false, level: 0.95 }; });
+            c.version = '99.0';
+            localStorage.setItem('wbcds_config', JSON.stringify(c));
+        });
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.click('#btnStartCount');
+        for (let i = 0; i < 150; i++) await page.keyboard.press('f');
+        for (let i = 0; i < 90; i++) await page.keyboard.press('b');
+        await page.click('#btnCountDone');
+
+        const summary = await page.locator('#results-summary').innerText();
+        expect(summary).toMatch(/1\.7:1/);
+        expect(summary, 'an interval appeared where the profile disabled them')
+            .not.toMatch(/\d\.\d–\d\.\d/);
+    });
+});

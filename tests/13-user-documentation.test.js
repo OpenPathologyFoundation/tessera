@@ -628,6 +628,23 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
             'the section must say plainly what the extra digits are');
     });
 
+    it('UD-094: The ratio-interval table is engine-produced (G-2)', () => {
+        // Three rows quoting the same ratio at three counts. If any is wrong,
+        // the section arguing that a ratio is imprecise is itself imprecise.
+        const ME = { numerator: ['poly', 'mono'], denominator: ['nrbc'], precision: 1 };
+        for (const [segs, mono, ery] of [[150, 60, 90], [15, 6, 9], [5, 2, 3]]) {
+            const c = zero(); c.poly = segs; c.mono = mono; c.nrbc = ery;
+            assert.equal(Core.computeRatio(c, ME), '2.3:1', 'the point estimate must be identical');
+            const text = Core.formatRatioInterval(Core.ratioInterval(c, ME, 0.95), 1);
+            assert.ok(calcref.includes(text.replace('–', '&ndash;')),
+                `the reference does not carry the engine's interval ${text} for n=${segs + mono + ery}`);
+        }
+        assert.ok(!/No confidence interval is computed for the ratio/i.test(calcref),
+            'the reference still says no interval is computed for the ratio');
+        assert.match(calcref, /odds/i,
+            'the reference must explain the framing that makes the interval exact');
+    });
+
     it('UD-033: Every confidence interval in the reference is engine-produced', () => {
         for (const [p, n] of [[0.20,100],[0.20,200],[0.20,500],[0.05,100],[0.05,200],[0.05,500],
                               [0.01,100],[0.01,200],[0.01,500],[0,100],[0,200],[0,500]]) {

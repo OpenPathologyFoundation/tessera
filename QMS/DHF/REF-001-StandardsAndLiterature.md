@@ -283,12 +283,41 @@ not single percentages — and the M:E ratio this application computes is exactl
 such a ratio.
 
 A ratio of two counted proportions inherits the sampling error of both, and is
-materially less precise than either. The application displays the M:E ratio to
-one decimal place, which implies a precision the underlying count does not
-support. An interval for a ratio requires Fieller's theorem or a bootstrap and
-is **not** computed in this module; the display instead carries an advisory
-stating that the ratio is less precise than the percentages it derives from.
-Recorded as RA-001 HA-093 and deferred to a future module.
+materially less precise than either.
+
+**Closed 2026-08-06 (DCR-026).** The ratio now carries an interval, and it is
+exact rather than approximate because of how the quantity is framed. The ratio
+uses two disjoint groups drawn from one count; conditioning on the number of
+cells falling in either group removes the rest of the differential as a
+nuisance, and what remains is a single binomial:
+
+> m = M + E — cells in the ratio at all
+> p = M / m — the proportion of those that are myeloid
+> **M:E = M / E = p / (1 − p)** — the *odds* of p
+
+An interval for the ratio is therefore the odds transform of an interval for a
+proportion, and the proportion interval is the Wilson score interval already
+adopted in §3.7 on the basis of [S7]. The transform is monotonic, so the bounds
+map directly.
+
+**Neither Fieller's theorem nor a bootstrap was used.** Fieller degenerates when
+the denominator is not significantly different from zero, producing an unbounded
+or complement interval — and a marrow with no erythroid cells is precisely the
+case a clinician wants bounded below. A parametric bootstrap handles that but is
+stochastic: the same count would give a slightly different interval on each run,
+which is not acceptable for a figure entering a patient record.
+
+What the reader now sees, on the same 210 myeloid to 90 erythroid count:
+
+| Cells in the ratio | M:E displayed | 95% interval |
+|---|---|---|
+| 300 | 2.3:1 | 1.8–3.0 |
+| 30 | 2.3:1 | 1.1–5.0 |
+| 10 | 2.3:1 | 0.7–8.3 |
+
+The identical displayed ratio, at three counts. That is Rümke's warning made
+legible, which the prose advisory could only assert. The advisory is retained
+alongside it. **RA-001 HA-093 is closed.**
 
 The primary text of [S4] is not held. The statistical claim above is standard
 and does not rest on it, but the specific tabulated values Rümke published

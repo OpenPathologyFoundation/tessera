@@ -67,6 +67,7 @@
                 absoluteCounts: 'optional',
                 audioEnabled: true,
                 autosaveEnabled: true,
+                absoluteCountsInReport: false,
                 rounding: 'largest-remainder',
                 precisionDisplay: 2,
                 precisionReport: 0,
@@ -95,6 +96,7 @@
         var prec = spec.precision || {};
         var ci = spec.confidenceIntervals || {};
         return {
+            absoluteCountsInReport: spec.absoluteCountsInReport === true,
             rounding: spec.rounding || 'largest-remainder',
             precisionDisplay: prec.display === undefined ? 2 : prec.display,
             precisionReport: prec.report === undefined ? 0 : prec.report,
@@ -661,6 +663,14 @@
                 l[1] + '</option>';
         });
         html += '</select></div>';
+        html += '<div class="col-span-2 flex items-start gap-2">' +
+            '<label class="inline-flex items-start gap-2 text-sm text-slate-300 cursor-pointer">' +
+            '<input type="checkbox" id="pol-abs-report" class="accent-accent mt-0.5"' +
+            (spec.absoluteCountsInReport ? ' checked' : '') + '>' +
+            '<span>Include absolute counts in the report' +
+            '<span class="block text-[11px] text-slate-500">Adds {{&lt;cell&gt;_abs}}, {{wbcUsed}} and ' +
+            '{{wbcBasis}} to the templates below. The report is re-rendered once an analyser WBC is ' +
+            'entered; until then those tokens read &ldquo;not provided&rdquo;.</span></span></label></div>';
         html += '</div></div>';
 
         // ---- denominator policy ----
@@ -801,6 +811,7 @@
 
             if (el.id === 'pol-rounding') { spec.rounding = el.value; return refresh(); }
             if (el.id === 'pol-ci-enabled') { spec.ciEnabled = el.checked; return refresh(); }
+            if (el.id === 'pol-abs-report') { spec.absoluteCountsInReport = el.checked; return refresh(); }
             if (el.id === 'pol-ci-level') { spec.ciLevel = parseFloat(el.value); return; }
 
             if (el.id === 'pol-prec-display' || el.id === 'pol-prec-report') {
@@ -1017,12 +1028,48 @@
         });
     }
 
+    /**
+     * Every placeholder this profile actually resolves.
+     *
+     * This advertised four kinds of token while the engine supported the full
+     * reserved set plus a per-100 form per excluded category. A laboratory
+     * building a peripheral blood profile therefore could not discover
+     * `{{nrbc_per100}}` — the one token that makes the denominator policy
+     * reportable — from the editor that exists to build the report.
+     */
     function updatePlaceholderList() {
         var spec = getActiveSpec();
         var allCells = spec.upper.concat(spec.lower);
-        var placeholders = ['{{total}}'].concat(allCells.map(function (ct) { return '{{' + ct + '}}'; }));
-        placeholders.push('{{ME_ratio}}', '{{caseNumber}}', '{{comments}}');
-        document.getElementById('placeholderList').textContent = placeholders.join('  ');
+        var groups = [];
+
+        groups.push(['Counts', ['{{total}}', '{{totalCounted}}', '{{denominator}}']]);
+        groups.push(['Percentages', allCells.map(function (ct) { return '{{' + ct + '}}'; })]);
+
+        var per100 = (spec.denominatorExcludes || []).filter(function (ct) {
+            return allCells.indexOf(ct) !== -1;
+        }).map(function (ct) { return '{{' + ct + '_per100}}'; });
+        if (per100.length) groups.push(['Per 100 (outside the denominator)', per100]);
+
+        var derived = Object.keys(spec.formulas || {}).map(function (f) { return '{{' + f + '}}'; });
+        if (derived.length) groups.push(['Derived figures', derived]);
+
+        if (spec.absoluteCountsInReport) {
+            groups.push(['Absolute counts (need an analyser WBC)',
+                allCells.map(function (ct) { return '{{' + ct + '_abs}}'; })
+                    .concat(['{{wbcEntered}}', '{{wbcUsed}}', '{{wbcBasis}}'])]);
+        }
+
+        groups.push(['Case and provenance', [
+            '{{caseNumber}}', '{{comments}}', '{{specimenLabel}}', '{{specimenType}}',
+            '{{profileId}}', '{{profileName}}', '{{configVersion}}', '{{timestamp}}', '{{methodNotes}}'
+        ]]);
+
+        var html = '';
+        groups.forEach(function (g) {
+            html += '<div class="mb-1"><span class="text-slate-500">' + escHtml(g[0]) + ':</span> ' +
+                '<span class="font-mono text-slate-400">' + escHtml(g[1].join('  ')) + '</span></div>';
+        });
+        document.getElementById('placeholderList').innerHTML = html;
     }
 
     // ================================================================
@@ -1270,6 +1317,7 @@
                 absoluteCounts: 'optional',
                 audioEnabled: true,
                 autosaveEnabled: true,
+                absoluteCountsInReport: false,
                 rounding: 'largest-remainder',
                 precisionDisplay: 2,
                 precisionReport: 0,
@@ -1387,6 +1435,7 @@
             // written from the editor rather than carried through. Empty
             // collections are omitted rather than written as empty ones, so a
             // profile states only the policy it actually sets.
+            merged.absoluteCountsInReport = spec.absoluteCountsInReport === true;
             merged.rounding = spec.rounding || 'largest-remainder';
             merged.precision = { display: spec.precisionDisplay, report: spec.precisionReport };
             merged.confidenceIntervals = { enabled: spec.ciEnabled !== false, level: Number(spec.ciLevel) };

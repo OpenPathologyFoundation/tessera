@@ -368,6 +368,9 @@ Phase 2 item.
 | SYS-248 | Where a category is counted but excluded from the differential denominator and reported per 100, the system SHALL correct the entered analyser WBC by `WBC x 100 / (100 + per-100 value)` before deriving any absolute count. | URS-036, URS-030, HA-105 |
 | SYS-249 | The system SHALL NOT apply that correction silently: it SHALL display the value entered, the arithmetic and the result, and SHALL allow the operator to declare the entered value already corrected, in which case it is used unchanged. | URS-036, HA-105 |
 | SYS-250 | The correction control SHALL be offered only where the correction applies, and the basis of the absolute counts SHALL be stated whenever it does. | URS-036 |
+| SYS-251 | A profile SHALL be able to select whether absolute counts appear in the report (`absoluteCountsInReport`), defaulting to **off**. When selected, `{{<cellType>_abs}}`, `{{wbcEntered}}`, `{{wbcUsed}}` and `{{wbcBasis}}` SHALL resolve, and the report SHALL be re-rendered once an analyser WBC is entered. | URS-036, URS-102 |
+| SYS-252 | Where no analyser WBC has been entered, an absolute-count placeholder SHALL resolve to an explicit statement that it was not provided, and SHALL NOT render as blank or as zero. | URS-036, HA-106 |
+| SYS-253 | The configuration editor SHALL list every placeholder the active profile resolves, including the per-100 and absolute-count forms. | URS-102 |
 
 ### 4.22 Configuration Validation Requirements (URS-021, URS-022)
 

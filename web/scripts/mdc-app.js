@@ -1608,6 +1608,33 @@
     // ================================================================
     // RESULTS RENDERING
     // ================================================================
+    /**
+     * The contents of one output panel — the text the clipboard copies.
+     *
+     * Extracted so that re-rendering after an analyser WBC is entered produces
+     * byte-identical output to the original render. Rebuilding it separately
+     * is how the provenance stamp or the morphology line quietly goes missing
+     * from one path and not the other.
+     */
+    function buildOutputPanelHtml(session, tpl) {
+        var out = '';
+        if (session.caseNumber) {
+            out += '<strong>Case: ' + Core.escapeHtml(session.caseNumber) + '</strong><br><br>';
+        }
+        out += session.outputs[tpl.tplCode] || '';
+        if (session.morphologyComments) {
+            out += '<br><br><em>Morphology: ' + Core.escapeHtml(session.morphologyComments) + '</em>';
+        }
+        // URS-052 requires the configuration profile and version in ALL output.
+        // The clipboard copies this panel, and it is the primary route into the
+        // LIS, so the attribution must live here rather than only on the
+        // surrounding screen.
+        out += '<br><br>[' + Core.escapeHtml(session.configProfileId) +
+            ' v' + Core.escapeHtml(session.configVersion) + ' &middot; ' +
+            Core.escapeHtml(new Date(session.timestamp).toLocaleString()) + ']';
+        return out;
+    }
+
     function renderResults(session) {
         var specConfig = getSpecConfigForType(session.specimenType) || getSpecConfig();
         var categories = specConfig.categories;
@@ -1749,22 +1776,7 @@
                 '" data-tab-idx="' + idx + '">' +
                 Core.escapeHtml(tpl.tplName) + '</button>';
 
-            var outputContent = '';
-            if (session.caseNumber) {
-                outputContent += '<strong>Case: ' + Core.escapeHtml(session.caseNumber) + '</strong><br><br>';
-            }
-            outputContent += session.outputs[tpl.tplCode] || '';
-            if (session.morphologyComments) {
-                outputContent += '<br><br><em>Morphology: ' + Core.escapeHtml(session.morphologyComments) + '</em>';
-            }
-
-            // URS-052 requires the configuration profile and version in ALL
-            // output. The clipboard copies this panel, and it is the primary
-            // route into the LIS, so the attribution must live here rather
-            // than only on the surrounding screen.
-            outputContent += '<br><br>[' + Core.escapeHtml(session.configProfileId) +
-                ' v' + Core.escapeHtml(session.configVersion) + ' &middot; ' +
-                Core.escapeHtml(new Date(session.timestamp).toLocaleString()) + ']';
+            var outputContent = buildOutputPanelHtml(session, tpl);
 
             tabPanelsHtml += '<div class="tab-panel ' + (isActive ? '' : 'hidden') + '" data-tab-idx="' + idx + '">';
             tabPanelsHtml += '<div class="p-4 bg-slate-800/50 border border-slate-700 rounded-lg text-sm text-slate-300 leading-relaxed font-mono">';
@@ -1941,6 +1953,53 @@
         });
         html += '</div>';
         absResults.innerHTML = html;
+
+        // The report is rendered at Count Done, before the analyser WBC exists.
+        // A profile that asks for absolute counts in the report therefore needs
+        // it re-rendered once the WBC is known.
+        if (specConfig.absoluteCountsInReport) {
+            session.wbcEntered = wbc;
+            session.wbcUsed = leucocyteWbc;
+            session.wbcBasis = applyCorrection
+                ? ('corrected for ' + nrbcPer100.toFixed(1) + ' NRBC per 100 WBC (entered ' +
+                   wbc.toFixed(2) + ')')
+                : (nrbcPer100 > 0
+                    ? 'entered as an already-corrected leucocyte count'
+                    : 'as entered; no nucleated red cells counted');
+            session.absolutes = {};
+            allCells.forEach(function (ct) {
+                if (session.percentages[ct] === null) return;
+                session.absolutes[ct] = Core.computeAbsolute(leucocyteWbc, session.percentages[ct] || 0);
+            });
+            rerenderOutputs(session, specConfig);
+        }
+    }
+
+    /**
+     * Re-render the institutional outputs for a session whose absolute counts
+     * have just become available, and refresh what is on screen.
+     *
+     * Only the derived absolute figures change; the counts, the percentages and
+     * the provenance stamp are the same count they always were.
+     */
+    function rerenderOutputs(session, specConfig) {
+        var excl = session.denominatorExcludes || [];
+        var intPcts = Core.percentagesSummingTo100(state.counts, precisionFor('report'),
+            { exclude: excl, method: specConfig.rounding || 'largest-remainder' });
+        var values = Core.buildTemplateValues(session, intPcts);
+        specConfig.templates.forEach(function (tpl) {
+            session.outputs[tpl.tplCode] = Core.renderTemplate(tpl.outSentence, values);
+        });
+
+        // Replace only the panel contents. Re-running renderResults would
+        // rebuild the WBC field and wipe the value the operator just typed.
+        var panels = document.querySelectorAll('#tab-panels .tab-panel');
+        specConfig.templates.forEach(function (tpl, idx) {
+            var panel = panels[idx];
+            if (!panel) return;
+            var box = panel.firstElementChild;
+            if (box) box.innerHTML = buildOutputPanelHtml(session, tpl);
+        });
     }
 
     /**

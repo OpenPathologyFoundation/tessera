@@ -35,7 +35,8 @@
     var RESERVED_PLACEHOLDERS = [
         'total', 'totalCounted', 'denominator', 'caseNumber', 'comments',
         'ME_ratio', 'specimenType', 'specimenLabel', 'profileId', 'profileName',
-        'configVersion', 'timestamp', 'methodNotes'
+        'configVersion', 'timestamp', 'methodNotes',
+        'wbcEntered', 'wbcUsed', 'wbcBasis'
     ];
 
     function hasOwn(obj, key) {
@@ -722,6 +723,26 @@
             var v = session.per100[ct];
             values[ct + '_per100'] = (v === null || v === undefined) ? 'N/A' : v;
         });
+
+        // {{<cellType>_abs}} — absolute concentration, available only when the
+        // profile asks for absolute counts in the report AND an analyser WBC
+        // has been entered.
+        //
+        // Where no WBC has been entered these resolve to "not provided", never
+        // to blank or zero. A blank reads as an omission and a zero reads as a
+        // measured absence; both are wrong, and for an absolute neutrophil
+        // count a spurious zero is the most dangerous value in the report.
+        var abs = session.absolutes;
+        var haveAbs = abs && typeof session.wbcUsed === 'number' && session.wbcUsed > 0;
+        Object.keys(roundedPercentages || {}).forEach(function (ct) {
+            if (!haveAbs) { values[ct + '_abs'] = 'not provided'; return; }
+            var v = abs[ct];
+            values[ct + '_abs'] = (typeof v === 'number' && isFinite(v))
+                ? Number(v.toFixed(2)) : 'N/A';
+        });
+        values.wbcEntered = haveAbs ? Number(session.wbcEntered.toFixed(2)) : 'not provided';
+        values.wbcUsed = haveAbs ? Number(session.wbcUsed.toFixed(2)) : 'not provided';
+        values.wbcBasis = haveAbs ? (session.wbcBasis || '') : 'not provided';
         return values;
     }
 
@@ -1142,6 +1163,11 @@
                             'leaving no denominator for the differential');
                     }
                 }
+            }
+
+            if (spec.absoluteCountsInReport !== undefined &&
+                typeof spec.absoluteCountsInReport !== 'boolean') {
+                errors.push(name + ': absoluteCountsInReport must be true or false');
             }
 
             if (spec.rounding !== undefined &&

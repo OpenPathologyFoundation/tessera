@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | DCR-016 |
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Date Created** | 2026-08-06 |
 | **Status** | **In Review** — engineering approvals complete; **clinical approval required before use** |
 | **Parent Document** | DHF-001 |
@@ -126,11 +126,58 @@ Specifically for clinical review:
 
 ---
 
+## 4a. Rev B — Absolute Counts in the Report (SYS-251 to SYS-253)
+
+Rev A left the corrected absolute neutrophil count on the results screen only,
+so it was visible to the operator who typed the WBC and to nobody downstream.
+That was named in §5 as a limitation. It is now selectable.
+
+**`absoluteCountsInReport`**, per specimen, **defaulting to off.** Off is the
+right default: the figure derives from an analyser WBC the operator types,
+which the application cannot verify against anything, and carrying an
+unverifiable number into the patient record should be a laboratory's deliberate
+choice rather than something that arrives with an update.
+
+When selected, `{{<cellType>_abs}}`, `{{wbcEntered}}`, `{{wbcUsed}}` and
+`{{wbcBasis}}` resolve, and the report is re-rendered once a WBC is entered —
+the report is built at completion, before that value exists.
+
+**HA-106.** An unresolved absolute-count token would render blank, or zero if
+defaulted numerically. A blank absolute neutrophil count reads as an omission;
+a zero reads as a measured absence and is the most alarming value the field can
+take. Both are false. The tokens resolve to the explicit string *"not
+provided"* until a WBC is entered.
+
+`{{wbcBasis}}` states which value produced the figure — corrected, with the
+per-100 value and the entered figure, or taken as already corrected. An
+absolute count in a record without that basis is not checkable by whoever reads
+it next, which is the HA-096 argument applied to a derived number.
+
+The panel-content builder was extracted so the re-render produces byte-identical
+output to the first render, including the URS-052 provenance stamp. Rebuilding
+it separately is how a stamp quietly goes missing from one path and not the
+other.
+
+**Also closed here:** the configuration editor advertised four placeholder kinds
+while the engine resolved the full reserved set plus a per-100 form per excluded
+category. A laboratory building a peripheral blood profile could not discover
+`{{nrbc_per100}}` — the token that makes the denominator policy reportable —
+from the editor that exists to build the report. It now lists every placeholder
+the active profile resolves, grouped (SYS-253).
+
+Verified by VV-SYS-191 (enabled: the ANC, the WBC used, the basis, and the
+provenance stamp all present; "not provided" before a WBC), VV-SYS-192
+(disabled: the report is unchanged by a WBC, while the on-screen aid still
+works) and VV-SYS-193 (declaring the value already corrected changes the
+reported figure and says so). Regression detection confirmed by disabling the
+re-render.
+
+---
+
 ## 5. What This Change Does Not Address
 
-- Absolute counts remain a results-screen aid and do not enter the report
-  templates, the clipboard text or the CSV export. The correction is therefore
-  visible only to the operator who entered the WBC.
+- Absolute counts do not enter the CSV or JSON export, which are archives of
+  the count rather than of derived figures.
 - The correction assumes the analyser counts **all** nucleated red cells as
   leucocytes. Modern analysers with dedicated NRBC channels may report a WBC
   already free of them; that is what the checkbox is for, but the application
@@ -145,6 +192,7 @@ Specifically for clinical review:
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-08-06 | QMS | Initial issue. `correctWbcForNrbc`, the results-screen interface, SYS-248–250, HA-105, VV-ABS-020–024 and VV-SYS-186–190. |
+| B | 2026-08-06 | QMS | Absolute counts made selectable in the report (`absoluteCountsInReport`, default off). SYS-251–253, HA-106, VV-SYS-191–193. Placeholder discoverability closed. |
 
 ---
 

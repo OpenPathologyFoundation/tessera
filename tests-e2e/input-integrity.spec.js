@@ -329,3 +329,80 @@ test.describe('Absolute counts are corrected for nucleated red cells (HA-105)', 
         expect(await polyAbs(page)).toBeCloseTo(8.00, 2);   // 80% of 10, uncorrected
     });
 });
+
+// ================================================================
+test.describe('Absolute counts in the report are optional (SYS-251)', () => {
+
+    /**
+     * Absolute counts were a results-screen aid only, so the corrected ANC —
+     * the number that drives neutropenia grading — never left the screen. It
+     * is now reportable, but OFF by default: the figure derives from an
+     * analyser WBC the operator types, which the application cannot verify,
+     * and a laboratory should decide deliberately to carry it into the record.
+     */
+    async function profileWithAbsInReport(page, enabled) {
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.evaluate((on) => {
+            const c = JSON.parse(localStorage.getItem('wbcds_config'));
+            const pb = c.specimenTypes.find(s => s.specimenType === 'pb');
+            pb.absoluteCountsInReport = on;
+            pb.templates = [{
+                tplCode: 'abs', tplName: 'Absolute',
+                outSentence: 'ANC {{poly_abs}} (WBC {{wbcUsed}}, {{wbcBasis}}).'
+            }];
+            c.version = '99.0';
+            localStorage.setItem('wbcds_config', JSON.stringify(c));
+        }, enabled);
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.selectOption('#specimenType', 'pb');
+        await page.click('#btnStartCount');
+        for (let i = 0; i < 120; i++) await page.keyboard.press('f');
+        for (let i = 0; i < 80; i++) await page.keyboard.press('s');
+        for (let i = 0; i < 40; i++) await page.keyboard.press('b');
+        await page.click('#btnCountDone');
+    }
+
+    test('VV-SYS-191: When enabled, the report carries the corrected ANC and its basis', async ({ page }) => {
+        await profileWithAbsInReport(page, true);
+        const panel = page.locator('.tab-panel').first();
+
+        // Before a WBC is entered the token must say so — never blank, never
+        // zero. A spurious zero ANC is the most dangerous value in the report.
+        await expect(panel).toContainText('not provided');
+
+        await page.fill('#wbcTotal', '10');
+        await expect(panel).toContainText('ANC 5');
+        await expect(panel).toContainText('8.33');
+        await expect(panel).toContainText('corrected for 20.0 NRBC per 100 WBC');
+
+        // The provenance stamp survives the re-render (URS-052).
+        await expect(panel).toContainText('consensus-14');
+    });
+
+    test('VV-SYS-192: When disabled, the report is unchanged by a WBC', async ({ page }) => {
+        await profileWithAbsInReport(page, false);
+        const panel = page.locator('.tab-panel').first();
+        const before = await panel.innerText();
+        await page.fill('#wbcTotal', '10');
+        await page.waitForTimeout(300);
+        expect(await panel.innerText()).toBe(before);
+        // The on-screen aid still works. Case-insensitive: the badge label is
+        // uppercased by CSS, so the DOM text is lower case (cf. VV-SYS-125).
+        await expect(page.locator('#abs-results')).toContainText(/poly/i);
+    });
+
+    test('VV-SYS-193: Declaring the WBC already corrected changes the reported figure and says so', async ({ page }) => {
+        await profileWithAbsInReport(page, true);
+        await page.fill('#wbcTotal', '10');
+        const panel = page.locator('.tab-panel').first();
+        await expect(panel).toContainText('ANC 5');
+
+        await page.check('#wbcAlreadyCorrected');
+        await expect(panel).toContainText('ANC 6');
+        await expect(panel).toContainText('already-corrected');
+    });
+});

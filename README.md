@@ -386,8 +386,19 @@ The application works offline after initial page load (all assets served locally
 ## Security & Privacy
 
 - **No patient data is transmitted** to any server. All processing is client-side.
-- **No cookies** or localStorage are used for patient data.
-- **sessionStorage** is used only for session history (auto-cleared on tab close).
+- **No cookies** are used.
+- **sessionStorage** holds the session history and the theme, and is cleared when
+  the tab closes.
+- **localStorage holds two things**: the active configuration profile, and — while
+  a count is in progress — a crash-recovery snapshot under `wbcds_autosave`.
+  **That snapshot includes the accession number and the free-text morphology
+  comments**, so it survives a browser restart on that workstation. It is written
+  so an interrupted count can be recovered rather than recounted, is discarded
+  when the count is completed or reset, and is discarded on load if it is more
+  than 12 hours old.
+  On a shared workstation this is data at rest: the residual exposure is recorded
+  in `RA-001` and the control is local policy — a per-user profile, or clearing
+  browsing data between operators.
 - **Input sanitization** via HTML entity escaping prevents XSS.
 - The case/accession number is the only specimen identifier entered.
 

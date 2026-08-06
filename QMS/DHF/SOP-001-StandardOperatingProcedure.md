@@ -5,10 +5,10 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SOP-001 |
-| **Version** | 1.0 |
+| **Version** | 2.0 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
-| **Status** | **Issued for local adoption** — to be reviewed and signed by the adopting laboratory |
+| **Status** | **Issued for local adoption** — to be reviewed and signed by the adopting laboratory. Key mappings, targets and completion behaviour corrected 2026-08-06 against the shipped profile (DCR-015); any locally printed copy of v1.0 must be withdrawn. |
 | **Parent Document** | DHF-001 |
 | **Effective Date** | TBD (upon validation completion) |
 
@@ -85,18 +85,19 @@ This SOP applies to all clinical laboratory personnel who use the WBC ΔΣ appli
 1. Use the **Specimen Type** dropdown to select the appropriate type:
    - **Bone Marrow** — for aspirate smear differentials
    - **Peripheral Blood** — for blood smear differentials
-2. Verify the counting table displays the correct cell type categories:
-   - **Bone Marrow**: blast, pro, gran, eryth, baso, eos, plasma, lymph, mono
-   - **Peripheral Blood**: poly, band, lymph, mono, eos, baso, pro, blast, other
-3. The specimen type selector will be locked once counting begins.
+2. Verify the counting table displays the cell type categories your profile
+   defines. For the shipped profile these are:
+   - **Bone Marrow**: nrbc, blasts, pro, myelo, meta, plasma, mast, bands, poly, baso, eos, mono, lymph, other
+   - **Peripheral Blood**: nrbc, blasts, pro, myelo, meta, plasma, mast, bands, poly, baso, eos, mono, lymph, other
+3. The specimen type can be changed during counting. Doing so saves the count in
+   progress to the session history first and starts a fresh tally (URS-013).
 
 ### 5.4 Starting the Count
 
 1. Position the microscope slide for systematic review (e.g., start at one edge of the feathered zone).
 2. Click the **"Start Count"** button.
 3. The system will confirm counting mode is active:
-   - "Start Count" button becomes disabled
-   - Specimen type dropdown becomes locked
+   - The counting grid and the running total appear
    - Keyboard input is now captured for counting
 4. **Note**: The morphology comments field is available during counting. When you click in the comments field, keyboard input goes to the text field (not to cell counting). Click outside the field to resume counting.
 
@@ -106,36 +107,50 @@ For each cell identified under the microscope, press the corresponding keyboard 
 
 #### Bone Marrow Key Mapping
 
+Generated from the shipped profile `consensus-14` v2.5. **The
+authoritative mapping is always the key display on the counting screen** — keys
+are configurable, and a laboratory that adapts the profile changes them.
+
 | Key | Cell Type | Description |
 |-----|-----------|-------------|
-| **A** | blast | Myeloblasts |
-| **S** | pro | Promyelocytes / Myelocytes |
-| **D** | gran | Maturing granulocytes (metamyelocytes, bands, segs) |
-| **F** | eryth | Erythroid precursors (all stages) |
-| **Z** | baso | Basophils / Mast cells |
-| **X** | eos | Eosinophils (all stages) |
-| **C** | plasma | Plasma cells |
-| **V** | lymph | Lymphocytes |
-| **B** | mono | Monocytes |
+| **Q** | other | Other cells |
+| **W** | mast | Mast cells |
+| **E** | plasma | Plasma cells |
+| **R** | pro | Promyelocytes |
+| **A** | mono | Monocytes |
+| **S** | lymph | Lymphocytes |
+| **D** | bands | Band neutrophils |
+| **F** | poly | Segmented neutrophils |
+| **G** | eos | Eosinophils |
+| **Z** | baso | Basophils |
+| **X** | blasts | Blasts |
+| **C** | meta | Metamyelocytes |
+| **V** | myelo | Myelocytes |
+| **B** | nrbc | Nucleated red blood cells (erythroid precursors) |
 
 #### Peripheral Blood Key Mapping
 
 | Key | Cell Type | Description |
 |-----|-----------|-------------|
-| **A** | poly | Segmented neutrophils (polymorphonuclear) |
-| **S** | band | Band neutrophils |
-| **D** | lymph | Lymphocytes |
-| **F** | mono | Monocytes |
-| **Z** | eos | Eosinophils |
-| **X** | baso | Basophils |
-| **C** | pro | Immature granulocytic precursors (promyelocytes, myelocytes, metamyelocytes) |
-| **V** | blast | Blasts |
-| **B** | other | Other cells (e.g., nucleated RBCs — count but report separately) |
+| **Q** | other | Other cells |
+| **W** | mast | Mast cells |
+| **E** | plasma | Plasma cells |
+| **R** | pro | Promyelocytes |
+| **A** | mono | Monocytes |
+| **S** | lymph | Lymphocytes |
+| **D** | bands | Band neutrophils |
+| **F** | poly | Segmented neutrophils |
+| **G** | eos | Eosinophils |
+| **Z** | baso | Basophils |
+| **X** | blasts | Blasts |
+| **C** | meta | Metamyelocytes |
+| **V** | myelo | Myelocytes |
+| **B** | nrbc | Nucleated red blood cells (erythroid precursors) |
 
 #### During Counting
 
 - The **key mapping row** at the bottom of the table shows which key maps to which cell type — reference it as needed.
-- Watch the **running total** in the rightmost column to track progress toward the minimum count.
+- Watch the **running total** to track progress toward the target count.
 - Percentages update in real time as you count.
 - A brief **visual flash** on the cell confirms each keypress was registered.
 
@@ -167,18 +182,23 @@ During or after counting, you may enter morphology observations:
 
 ### 5.7 Completing the Count
 
-1. When the total count reaches or exceeds the minimum required:
-   - **Bone Marrow**: 200 cells (institution configurable)
-   - **Peripheral Blood**: 100 cells (institution configurable)
+1. Count toward the target for the specimen:
+   - **Bone Marrow**: 500 cells (profile configurable)
+   - **Peripheral Blood**: 200 cells (profile configurable)
+
+   The target is **advisory, not enforced** (URS-041). Nothing blocks you from
+   finishing earlier or continuing beyond it.
 2. Click the **"Count Done"** button.
-3. **If the count is below the minimum**, a warning dialog will appear:
-   - Review the warning message.
-   - If the specimen is adequate but hypocellular, click **"Continue"** to generate the output.
-   - If you want to continue counting, click **"Cancel"** to return to counting mode.
+3. **If the count is below the target**, the results screen carries an advisory
+   stating the count reached and the confidence interval it supports. It does
+   not block, and there is no dialog to dismiss. Judge whether the count is
+   adequate for the question being asked.
 4. After count completion:
-   - The counting table locks (no further changes possible).
+   - Keyboard counting stops, and further keystrokes cannot alter the tally.
    - Output reports are generated in the tabbed output area.
-   - Keyboard input is no longer captured.
+   - **"Continue Counting"** returns to counting with the tally intact if you
+     decide more cells are needed — for example when an advisory says the count
+     does not resolve a diagnostic threshold.
 
 ### 5.8 Reviewing and Copying Output
 

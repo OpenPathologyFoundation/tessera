@@ -314,9 +314,22 @@
         if (target) { target.focus(); if (target.select) target.select(); }
     }
 
-    /** Acknowledgement: nothing to decide. No Cancel. */
+    /**
+     * Acknowledgement: nothing to decide. No Cancel.
+     *
+     * `onOk` runs on BOTH paths. An alert has one outcome — it has been read —
+     * so dismissing it with Escape must do what pressing OK does. It did not:
+     * the "Configuration Updated" alert chains to interrupted-count recovery,
+     * and Escape silently skipped it, losing the offer to restore a count.
+     * That was introduced with Escape support itself; there was no way to
+     * dismiss an alert before.
+     */
     function showAlert(title, message, onOk) {
-        open({ title: title, message: message, confirmText: 'OK', cancelText: null, onConfirm: onOk });
+        open({
+            title: title, message: message,
+            confirmText: 'OK', cancelText: null,
+            onConfirm: onOk, onCancel: onOk
+        });
     }
 
     /** Two-way choice. Cancel is always offered. */

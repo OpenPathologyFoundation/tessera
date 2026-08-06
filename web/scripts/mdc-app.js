@@ -395,10 +395,22 @@
         } catch (e) { /* graceful degradation */ }
     }
 
+    // A recovery snapshot is for an interruption, not an archive. Beyond this
+    // it is more likely to resurrect a stale case than to save work, and it is
+    // patient data at rest on a possibly shared workstation.
+    var AUTOSAVE_MAX_AGE_MS = 12 * 60 * 60 * 1000;
+
     function loadAutosaveState() {
         try {
-            var data = localStorage.getItem(AUTOSAVE_KEY);
-            if (data) return JSON.parse(data);
+            var raw = localStorage.getItem(AUTOSAVE_KEY);
+            if (!raw) return null;
+            var data = JSON.parse(raw);
+            var age = Date.now() - Date.parse(data && data.timestamp);
+            if (isFinite(age) && age > AUTOSAVE_MAX_AGE_MS) {
+                clearAutosaveState();
+                return null;
+            }
+            return data;
         } catch (e) { /* graceful degradation */ }
         return null;
     }
@@ -947,6 +959,44 @@
         });
     }
 
+    /**
+     * The configured key this event refers to, or null.
+     *
+     * The character a key produces changes under Shift: on a US layout Shift+"."
+     * is ">", Shift+"," is "<", Shift+"/" is "?" and Shift+";" is ":". Since
+     * Shift is how a miscount is corrected, a profile that maps punctuation had
+     * working increment and SILENTLY BROKEN undo — the shipped `right-hand`
+     * preset maps ".", ",", "/" and ";" to blasts, metamyelocytes, basophils
+     * and monocytes, none of which could be un-counted at all. Blasts are the
+     * category most likely to need correcting.
+     *
+     * The printed character is tried first, so a laboratory on AZERTY or QWERTZ
+     * gets the key its keyboard is labelled with. Only if that does not match a
+     * mapping does the physical position decide, which Shift does not change.
+     */
+    var PHYSICAL_KEY = {
+        Period: '.', Comma: ',', Slash: '/', Semicolon: ';', Quote: "'",
+        BracketLeft: '[', BracketRight: ']', Minus: '-', Equal: '=',
+        Backslash: '\\', Backquote: '`'
+    };
+
+    function physicalChar(code) {
+        if (!code) return '';
+        if (Object.prototype.hasOwnProperty.call(PHYSICAL_KEY, code)) return PHYSICAL_KEY[code];
+        var m = /^Key([A-Z])$/.exec(code);
+        if (m) return m[1];
+        m = /^Digit([0-9])$/.exec(code);
+        return m ? m[1] : '';
+    }
+
+    function resolveCountingKey(ev, outCodes) {
+        var printed = String(ev.key).toUpperCase();
+        if (Object.prototype.hasOwnProperty.call(outCodes, printed)) return printed;
+        var physical = physicalChar(ev.code).toUpperCase();
+        if (physical && Object.prototype.hasOwnProperty.call(outCodes, physical)) return physical;
+        return null;
+    }
+
     // ================================================================
     // KEYBOARD HANDLER (SYS-030 to SYS-039)
     // ================================================================
@@ -963,16 +1013,28 @@
         // Ignore modifier combos except Shift (SYS-036)
         if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
 
+        // A tally records deliberate acts, and operating-system auto-repeat is
+        // not one. A held, sticky or bouncing key would add cells at roughly
+        // 30 per second, each with its own confirmation sound, and nothing in
+        // the interface distinguishes that from fast counting. At a 200-500
+        // cell target a two-second stuck key is a material, undetectable
+        // miscount. The theme shortcut already guarded against this; the
+        // counting path — the one place it changes a clinical number — did not.
+        if (ev.repeat) return;
+        // An input method editor emits key events while a candidate window is
+        // open; those keystrokes belong to the editor, not the tally.
+        if (ev.isComposing) return;
+
         // Never swallow keystrokes aimed at a form control
         var tag = ev.target && ev.target.tagName ? ev.target.tagName.toUpperCase() : '';
         if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
-        var key = String(ev.key).toUpperCase();
         var specConfig = getSpecConfig();
         if (!specConfig) return;
         var outCodes = specConfig.outCodes;
 
-        if (!Object.prototype.hasOwnProperty.call(outCodes, key)) return;
+        var key = resolveCountingKey(ev, outCodes);
+        if (key === null) return;
 
         ev.preventDefault();
 

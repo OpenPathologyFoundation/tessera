@@ -26,10 +26,71 @@ const ROOT = path.join(__dirname, '..');
 const config = Core.normalizeConfig(
     JSON.parse(fs.readFileSync(path.join(ROOT, 'web', 'settings', 'templates.json'), 'utf-8')));
 const guide = fs.readFileSync(path.join(ROOT, 'USER-GUIDE.md'), 'utf-8');
+const sop = fs.readFileSync(
+    path.join(ROOT, 'QMS', 'DHF', 'SOP-001-StandardOperatingProcedure.md'), 'utf-8');
 const methods = fs.readFileSync(path.join(ROOT, 'web', 'methods.html'), 'utf-8');
 // The controlled artefact is the served page; the QMS Markdown file is a
 // control record that points at it (CAL-001 Rev B).
 const calcref = fs.readFileSync(path.join(ROOT, 'web', 'calculation-reference.html'), 'utf-8');
+
+// ================================================================
+describe('SOP-001 tracks the shipped configuration (HA-097)', () => {
+
+    /**
+     * HA-097 was raised because USER-GUIDE.md documented a superseded
+     * nine-category layout. The control was added for that file and not
+     * propagated: SOP-001 — a document marked "Issued for local adoption",
+     * i.e. the one a laboratory prints and follows — still documented
+     * A=blast, F=eryth, X=eos with targets of 200 and 100.
+     *
+     * The shipped profile maps A=mono, F=poly and X=blasts. An operator
+     * following the issued SOP would have pressed A for a blast and recorded
+     * a monocyte, and F for an erythroid precursor and recorded a segmented
+     * neutrophil — a systematically wrong differential with no error shown.
+     */
+
+    it('UD-050: Every counting key in the shipped profile is documented correctly', () => {
+        for (const spec of config.specimenTypes) {
+            for (const [key, cellType] of Object.entries(spec.outCodes)) {
+                const row = new RegExp('\\|\\s*\\*\\*' + key + '\\*\\*\\s*\\|\\s*' + cellType + '\\s*\\|');
+                assert.match(sop, row,
+                    `SOP-001 does not map "${key}" to "${cellType}" for ${spec.specimenType}; ` +
+                    'an operator following it would record the wrong cell type');
+            }
+        }
+    });
+
+    it('UD-051: SOP-001 documents no key the profile does not define', () => {
+        const defined = new Set();
+        for (const spec of config.specimenTypes) {
+            for (const key of Object.keys(spec.outCodes)) defined.add(key);
+        }
+        const documented = [...sop.matchAll(/\|\s*\*\*([A-Z])\*\*\s*\|/g)].map(m => m[1]);
+        assert.ok(documented.length > 0, 'SOP-001 must document the key mapping');
+        for (const key of documented) {
+            assert.ok(defined.has(key),
+                `SOP-001 documents key "${key}", which the shipped profile does not map`);
+        }
+    });
+
+    it('UD-052: SOP-001 states the shipped target counts', () => {
+        for (const spec of config.specimenTypes) {
+            assert.ok(sop.includes(String(spec.targetCount)),
+                `SOP-001 does not state the ${spec.specimenType} target of ${spec.targetCount}`);
+        }
+    });
+
+    it('UD-053: SOP-001 does not describe withdrawn behaviour', () => {
+        // URS-041 makes the target advisory and URS-043 (locking after
+        // completion) was withdrawn in favour of Continue Counting.
+        assert.ok(!/warning dialog will appear/i.test(sop),
+            'SOP-001 still describes a blocking below-target dialog; the advisory does not block');
+        assert.ok(!/counting table locks/i.test(sop),
+            'SOP-001 still says the table locks after completion; Continue Counting replaced that');
+        assert.ok(!/selector will be locked/i.test(sop),
+            'SOP-001 still says the specimen selector locks; it can be changed during counting');
+    });
+});
 
 // ================================================================
 describe('User guide tracks the shipped configuration (URS-092)', () => {

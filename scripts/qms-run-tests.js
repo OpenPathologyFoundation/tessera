@@ -92,6 +92,37 @@ try {
     // Ignore npm version lookup failures
 }
 
+/**
+ * The code identity this run measured.
+ *
+ * Without it a bundle records a result and not what produced it, which is the
+ * one job a Design History File has. Bundles captured before this change name
+ * a date and a Node version and nothing else; at least one "Approved" bundle
+ * was captured from a working tree that exists in no commit, and nothing in it
+ * says so.
+ */
+function git(args) {
+    try {
+        const r = spawnSync('git', args, { cwd: repoRoot, encoding: 'utf8' });
+        return r.status === 0 ? r.stdout.trim() : '';
+    } catch (e) {
+        return '';
+    }
+}
+
+const gitCommit = git(['rev-parse', 'HEAD']);
+const gitBranch = git(['rev-parse', '--abbrev-ref', 'HEAD']);
+const dirty = git(['status', '--porcelain']);
+const treeState = gitCommit ? (dirty ? 'DIRTY' : 'clean') : 'unknown (not a git repository)';
+
+envLines.push(`git_commit=${gitCommit || 'unknown'}`);
+envLines.push(`git_branch=${gitBranch || 'unknown'}`);
+envLines.push(`tree_state=${treeState}`);
+if (dirty) {
+    envLines.push('dirty_files=');
+    dirty.split('\n').forEach((line) => envLines.push(`  ${line}`));
+}
+
 fs.writeFileSync(path.join(runDir, 'command.txt'), commandText + '\n', 'utf8');
 fs.writeFileSync(path.join(runDir, 'environment.txt'), envLines.join('\n') + '\n', 'utf8');
 
@@ -108,10 +139,21 @@ const output = [
 fs.writeFileSync(path.join(runDir, 'test-output-raw.txt'), output, 'utf8');
 
 const status = result.status === 0 ? 'PASS' : 'FAIL';
+
+// A run against uncommitted code is evidence of something, but not of a
+// released state. Say so in the bundle rather than let a later reader assume
+// the commit named beside it is what was measured.
+const provenance = treeState === 'clean'
+    ? `\`${gitCommit}\` (clean tree)`
+    : `**PROVISIONAL — ${treeState.toUpperCase()} TREE.** Nearest commit \`${gitCommit || 'unknown'}\`, ` +
+      'but the code measured is not that commit. Not admissible as release evidence.';
+
 const summaryLines = [
     '# Test Run Summary',
     '',
     `- Date (UTC): ${now.toISOString()}`,
+    `- Code identity: ${provenance}`,
+    `- Branch: ${gitBranch || 'unknown'}`,
     `- Command: \`${commandText}\``,
     `- Exit Code: ${result.status === null ? 'null' : result.status}`,
     `- Result: **${status}**`,
@@ -415,6 +457,7 @@ function appendTrRunLog(relativeEvidencePath, statusText, exitCode, cmdText) {
         `- Command: \`${cmdText}\``,
         `- Exit Code: ${exitCode}`,
         `- Result: **${statusText}**`,
+        `- Code identity: ${provenance}`,
         `- Evidence: \`${relativeEvidencePath}/\``
     ].join('\n');
     let updated = content;

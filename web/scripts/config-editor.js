@@ -411,10 +411,22 @@
         });
     }
 
+    /**
+     * Whether this cell type is reachable from more than one key.
+     *
+     * This counted `Object.keys(outCodes)` equal to `key`. Object keys are
+     * unique, so the count was never above one and the warning branch was
+     * unreachable — the amber border it controls had never once been drawn.
+     *
+     * The condition that genuinely confuses an operator is the reverse:
+     * outCodes maps key -> cell, so two keys CAN address the same cell. The
+     * card shows only the last of them, while the other key silently counts
+     * into the same category.
+     */
     function isDuplicateKey(key, cellType, spec) {
         var count = 0;
         Object.keys(spec.outCodes).forEach(function (k) {
-            if (k === key) count++;
+            if (spec.outCodes[k] === cellType) count++;
         });
         return count > 1;
     }
@@ -1403,10 +1415,27 @@
     // ================================================================
     // UTILITIES
     // ================================================================
+    /**
+     * Escape for interpolation into markup, INCLUDING attribute values.
+     *
+     * This used to round-trip through `div.textContent` -> `div.innerHTML`,
+     * which escapes & < > but NOT " or '. It is used in roughly thirty
+     * attribute positions — `value="' + escHtml(tpl.tplName) + '"` and the
+     * like — so a profile field containing a double quote closed the attribute
+     * and anything after it became markup. Profiles are JSON files shared
+     * between institutions and loaded from disk, which is exactly why
+     * wbc-core.js bothers with template sanitisation.
+     *
+     * Core.escapeAttr escapes all five characters. The fallback exists only so
+     * the editor still renders if the engine failed to load.
+     */
     function escHtml(str) {
-        var div = document.createElement('div');
-        div.textContent = String(str);
-        return div.innerHTML;
+        if (window.WBCCore && window.WBCCore.escapeAttr) {
+            return window.WBCCore.escapeAttr(str);
+        }
+        return String(str)
+            .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
     // ================================================================

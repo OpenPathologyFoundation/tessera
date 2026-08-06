@@ -5,13 +5,13 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SDD-001 |
-| **Version** | 2.0 |
+| **Version** | 3.0 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
-| **Date Revised** | 2026-02-24 |
+| **Date Revised** | 2026-08-06 |
 | **Status** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
-| **Input Documents** | URS-001 v2.0, SRS-001 v2.0, SAD-001 v2.0 |
+| **Input Documents** | URS-001 v2.0 Rev M, SRS-001 v3.1, SAD-001 v2.0, DCR-006 to DCR-018 |
 
 ---
 
@@ -445,22 +445,24 @@ END
 
 Visual flash feedback is provided by `flashCell(cellType, direction)`, which briefly applies CSS class `flash-increment` (green) or `flash-decrement` (red) for 250ms.
 
-#### 3.5.2 calcPercent(cellType)
+#### 3.5.2 Percentage computation
 
-Percentage calculation is performed inline within `updateCounterDisplay()`:
+**Superseded by §3.10.2.** This section previously described the computation as
 
 ```
-percentage = (state.counts[cellType] / total) * 100
+percentage = (state.counts[cellType] / total) * 100      // then toFixed(2)
 ```
 
-Rounded to 2 decimal places via `toFixed(2)`. Returns `'0.00%'` when total equals zero.
+That has not been the implementation since DCR-006. It is wrong in three ways
+that each change a reported number:
 
-**Verification Boundary Cases**:
-- total = 0 (all zeros): all percentages display `0.00%`
-- total = 1 (single cell): that cell shows `100.00%`, rest `0.00%`
-- All cells equal: each shows `100/N` percent
-- One cell has all counts: shows `100.00%`, rest `0.00%`
-- Large counts (e.g., 9999 total): normal floating-point arithmetic
+1. the denominator is not the total — categories may be excluded from it
+   (§3.10.1);
+2. rounding is a selectable policy, not `toFixed` (§3.10.2);
+3. display precision and report precision are separate and configurable.
+
+The description is retained rather than deleted so that a reader of an earlier
+revision can see what changed.
 
 #### 3.5.3 generateOutput(specConfig, counts, caseNumber, comments)
 
@@ -585,60 +587,373 @@ This prevents keypresses in the textarea from triggering cell counts without phy
 
 ### 3.8 Configuration File Schema (templates.json)
 
-```json
-[
+The schema below is the **v2 profile**, validated by `WBCCore.validateConfig`
+(§3.10.6). The earlier revision of this section documented a nine-category
+layout with key mappings (`L` for blasts, `A` for basophils) that the product
+has not shipped since v2.0, and omitted every field added by DCR-006 onward.
+
+```jsonc
+{
+  "version": "2.5",                    // supersede comparison, §3.11.3
+  "profileId": "consensus-14",         // identity; appears in every report
+  "profileName": "Full 14-Part Consensus",
+  "provenance": { ... },               // free-form origin record
+  "specimenTypes": [
     {
-        "specimenType": "bm",
-        "targetCount": 500,
-        "upperRowAbnormal": false,
-        "categories": {
-            "upper": ["nrbc","blasts","pro","myelo","meta","plasma","mast"],
-            "lower": ["bands","poly","baso","eos","mono","lymph","other"]
-        },
-        "outCodes": {
-            "R":"nrbc","L":"blasts","O":"pro","M":"myelo","T":"meta","C":"plasma","S":"mast",
-            "B":"bands","P":"poly","A":"baso","E":"eos","N":"mono","Y":"lymph","X":"other"
-        },
-        "formulas": {
-            "ME_ratio": {
-                "label": "M:E Ratio",
-                "numerator": ["blasts","pro","myelo","meta","bands","poly","baso","eos","mono"],
-                "denominator": ["nrbc"],
-                "precision": 1
-            }
-        },
-        "templates": [
-            {
-                "tplCode": "ysm",
-                "tplName": "Yale SOM",
-                "outSentence": "A {{total}}-cell count reveals {{blasts}}% blasts, ..."
-            }
-        ]
+      "specimenType": "bm",
+      "specimenLabel": "Bone Marrow",
+      "targetCount": 500,              // advisory, never enforced (URS-041)
+      "targetCountBasis": "ICSH 2008 §2.6: at least 500 cells when …",
+
+      "categories": {                  // display order; two rows
+        "upper": [ … ], "lower": [ … ]
+      },
+      "outCodes": { "X": "blasts", "F": "poly", … },   // key -> category
+
+      // ---- counting policy: these decide the reported numbers ----
+      "denominatorExcludes": ["nrbc"],          // §3.10.1  (pb only)
+      "per100Reporting": {                      // §3.10.1
+        "nrbc": { "label": "NRBC per 100 WBC", "precision": 1 }
+      },
+      "rounding": "largest-remainder",          // §3.10.2
+      "precision": { "display": 2, "report": 0 },
+      "confidenceIntervals": { "enabled": true, "level": 0.95 },   // §3.10.3
+      "thresholds": [                                              // §3.10.4
+        { "target": "blasts", "value": 20, "label": "AML blast threshold",
+          "basis": "WHO 2022 / ICC 2022 — 20% blasts of all nucleated cells." }
+      ],
+      "formulas": {                                                // §3.10.5
+        "ME_ratio": { "label": "M:E Ratio", "type": "ratio",
+                      "numerator": [ … ], "denominator": ["nrbc"],
+                      "precision": 1, "basis": "ICSH 2008 §2.6: …" }
+      },
+      "absoluteCountsInReport": false,          // §3.13
+
+      // ---- presentation and workflow ----
+      "templates": [ { "tplCode": "…", "tplName": "…", "outSentence": "…" } ],
+      "constituents": { },             // aggregated-category membership
+      "categoryNotes": { },            // operator-facing notes per category
+      "morphologyChecklist": [ … ],
+      "handedness": "left",
+      "absoluteCounts": "optional",    // optional | always | disabled
+      "audio": { "enabled": true, … }, // §3.12
+      "autosave": true,                // §3.14
+      "requireCaseNumber": false,
+      "upperRowAbnormal": false
     }
-]
+  ]
+}
 ```
 
-**Schema Validation Rules**:
+**Which fields change a number.** `denominatorExcludes`, `per100Reporting`,
+`rounding`, `precision`, `confidenceIntervals`, `thresholds` and `formulas`
+alter what is reported, not merely how it looks. They are edited in the
+Counting Policy panel (§3.17) and every one is stated in the method statement
+(§3.10.7) so a reader can tell which convention produced a figure.
 
-1. **Root**: Must be an array with at least 1 element
-2. **Each element** must have:
-   - `specimenType` (string, unique across array)
-   - `outCodes` (object)
-   - `templates` (array)
-   - `targetCount` (integer, positive; defaults to 500 for BM, 200 for PB if absent)
-   - `categories` (object with `upper` and `lower` arrays)
-   - `upperRowAbnormal` (boolean)
-3. **outCodes**: Keys must be single uppercase letters; values must be non-empty strings matching entries in `categories.upper` or `categories.lower`
-4. **No duplicate keys or cell type values** within a single specimen type
-5. **formulas** (optional): Object where each formula has:
-   - `label` (string, display name)
-   - `numerator` (array of cell type strings)
-   - `denominator` (array of cell type strings)
-   - `precision` (integer, decimal places for `.toFixed()`)
-6. **templates**: Each must have:
-   - `tplCode` (string, unique identifier)
-   - `tplName` (string, display name)
-   - `outSentence` (string, must contain `{{total}}` placeholder)
+### 3.9 Reset and State Lifecycle (URS-003, URS-060, URS-063)
+
+`resetToStart()` returns the application to case entry. It clears `state.counts`,
+the case number, the morphology comments and the checklist, and discards the
+autosave snapshot (§3.14). It **preserves the specimen type**, because the next
+case on a bench is usually the same specimen, and focuses the case field.
+
+Reset is confirmed through the shared dialog (§3.18) whenever a count is in
+progress; with an empty tally it proceeds without asking. The confirmation
+always offers Cancel — a destructive action with no escape route was a defect
+recorded and closed under DCR-004.
+
+Changing the case number mid-count takes the same path. Changing the specimen
+type does not: it saves the count in progress to session history first and
+starts a fresh tally (URS-013), so work is never silently discarded.
+
+---
+
+### 3.10 Calculation Engine (`web/scripts/wbc-core.js`)
+
+The engine is a **UMD module with no DOM access**. That boundary is the reason
+the unit layer can execute the shipped calculation rather than a copy of it: the
+same file is `require`d by the Node suites and loaded by a `<script>` tag in the
+browser. Nothing in it reads `document`, `window` or storage.
+
+`mdc-app.js` holds state and renders; every number it displays comes from here.
+
+#### 3.10.1 Denominator policy (DCR-006)
+
+A category may be **counted but held outside the percentage denominator**, and
+then reported per 100 of it instead.
+
+```
+getDenominator(counts, exclude) = Σ counts[ct] for ct ∉ exclude
+percentage(ct)   = counts[ct] / denominator × 100        for ct ∉ exclude
+per100(ct)       = counts[ct] / denominator × 100        for ct ∈ exclude
+```
+
+The two expressions are identical; only the reporting label differs. This is
+the convention for nucleated red cells in peripheral blood: they are not
+leucocytes, and leaving them in the denominator dilutes every leucocyte
+percentage. On 180 leucocytes and 20 NRBC, segmented neutrophils read 66.7%
+rather than 60.0%.
+
+A category outside the denominator has **no percentage**, and the engine returns
+`null` rather than zero. `null` renders as `N/A` or as the per-100 form; a zero
+would read as a measured absence.
+
+Bone marrow is deliberately the opposite: ICSH 2008 §2.6 places erythroblasts
+inside the nucleated differential count, so a marrow profile excludes nothing.
+
+#### 3.10.2 Rounding (DCR-010)
+
+`percentagesSummingTo100(counts, decimals, { exclude, method })` implements
+three selectable policies:
+
+| `method` | Behaviour | Total |
+|----------|-----------|-------|
+| `largest-remainder` (default) | Hare quota: floor every value, then give the residual units to the largest fractional remainders | Exactly 100 |
+| `largest-count` | Give the whole residual to the largest category | Exactly 100 |
+| `independent` | Round each value alone | May be 99 or 101 |
+
+Largest remainder is the default because it reaches 100% with the least
+distortion of any single figure. Fourteen categories of ten cells each — every
+one truly 7.14% — give twelve at 7% and two at 8% under largest remainder, and
+one at **9%** under largest count.
+
+Boundary values within 1e-9 of a whole number are snapped before flooring, so
+accumulated floating-point error cannot turn 100 into 99.99999999999999.
+
+Display precision and report precision are separate fields: the screen may carry
+two decimals while the report carries none.
+
+#### 3.10.3 Confidence intervals (DCR-007)
+
+A differential count is a **sample**. `wilsonInterval(count, n, level)` returns
+the Wilson score interval for the observed proportion.
+
+The Wald interval was rejected: at 2 of 200 it returns a **negative** lower
+bound, which is not a possible percentage. Wilson is bounded, behaves at zero
+and at saturation, and is the interval Brown, Cai & DasGupta (2001) recommend at
+these counts. `Z_SCORES` holds 0.90, 0.95 and 0.99; any other level is rejected
+by validation.
+
+Intervals are computed over the **differential denominator**, not the total, so
+they are consistent with the percentages beside them.
+
+#### 3.10.4 Diagnostic thresholds (DCR-008)
+
+`evaluateThresholds` marks a threshold as *spanned* when the confidence interval
+for its target crosses the configured value. The results screen then states that
+the count does not resolve the question.
+
+It is **advisory and never blocks** — a paucicellular aspirate may make an
+extended count impossible, and the operator is the one who knows that. A
+threshold may target a displayed category still inside the denominator, or a
+percentage formula; validation rejects a threshold on a category that has no
+percentage to test.
+
+#### 3.10.5 Derived figures (DCR-008, DCR-010)
+
+`computeRatio` and `computeSubsetPercentage` evaluate `formulas`. A `ratio`
+(M:E) has no denominator count and therefore carries no interval; a
+`percentage` of a subset does, and validation requires its numerator to be
+contained in its denominator so the result cannot exceed 100%.
+
+Both M:E conventions are expressible — ICSH 2008 §2.6 includes monocytes in the
+numerator, a widely taught alternative excludes them, and the same counts give
+2.3:1 or 1.7:1 accordingly. The composition is a configuration field, and the
+convention in force appears in the method statement.
+
+#### 3.10.6 Configuration validation
+
+`validateConfig` is the single gate. It rejects a profile that would count
+wrongly rather than merely one that is malformed: a key mapped to a category
+that is never displayed, `denominatorExcludes` naming an undisplayed category or
+emptying the denominator, `per100Reporting` for a category still inside it, a
+threshold with nothing to test, a percentage formula that can exceed 100%, a
+precision outside 0–4, a confidence level with no z-score, and a formula named
+after a reserved placeholder.
+
+The **same function** validates on import, on editor save and on load, so a
+profile cannot enter by one route that another would refuse.
+
+#### 3.10.7 Method provenance (DCR-009)
+
+`buildMethodStatement` returns the conventions that produced a result — profile
+and version, denominator policy, rounding, precision, interval level, M:E
+composition and the citation for each. `formatMethodStatement` renders it for
+`{{methodNotes}}`.
+
+The argument is that a differential percentage is not self-explanatory: the same
+counts give a materially different M:E ratio and a materially different blast
+percentage depending on conventions that are all in current use. A figure
+without its convention cannot be compared against another laboratory's, or
+against the same laboratory's earlier result.
+
+---
+
+### 3.11 Configuration Lifecycle (URS-103, URS-106)
+
+#### 3.11.1 Resolution order
+
+On load the application fetches `settings/templates.json` and reads any cached
+profile from `localStorage.wbcds_config`. Both are validated. The cached profile
+wins, **except** when superseded (§3.11.3). If neither validates the application
+refuses to start and says why, rather than counting with an unknown
+configuration.
+
+#### 3.11.2 Import and export
+
+`exportConfig` writes the **raw** cached profile, so a round trip through export
+and import is lossless. `importConfig` validates before adopting and reports the
+reasons on rejection, keeping the previous profile active.
+
+#### 3.11.3 Supersede
+
+`isCacheSuperseded(cached, shipped)` returns true when the two share a
+`profileId` and the shipped `version` is higher. This is what allows a corrected
+default profile to reach a browser that already cached the old one. The operator
+is told, and the cache is replaced.
+
+The editor increments the version of any profile it saves (§3.17), so a local
+edit is a newer revision of its parent and is not discarded by the profile it
+came from — a defect recorded as HA-100.
+
+---
+
+### 3.12 Audio Feedback (URS-027, URS-097)
+
+`AudioEngine` synthesises short tones with the Web Audio API; no audio files are
+shipped. Distinct sounds mark a count, an undo, reaching the target, and typing
+in the comments field — the last so the operator can hear that keystrokes are
+going to text rather than to the tally, which is the failure the sound exists to
+prevent.
+
+The context is created on first user gesture, as browsers require, and the
+enabled state is held in `sessionStorage`.
+
+---
+
+### 3.13 Absolute Counts and the Analyser WBC (URS-036, DCR-016)
+
+Absolute counts are derived on the results screen from an operator-entered
+analyser WBC.
+
+**The entered value is corrected for nucleated red cells before use.** Impedance
+analysers count NRBC as leucocytes — they resist the lysing reagent — so the
+reported WBC is inflated whenever they circulate:
+
+```
+correctWbcForNrbc(reported, nrbcPer100) = reported × 100 ÷ (100 + nrbcPer100)
+```
+
+At 20 NRBC per 100 WBC every absolute count derived from an uncorrected value is
+overstated by 20%. The absolute neutrophil count drives neutropenia grading, and
+that error moves values across the 1.5 and 0.5 ×10⁹/L boundaries.
+
+**The correction is displayed, never applied silently.** The entered value, the
+arithmetic and the result are all shown, and a checkbox declares a value the
+analyser already corrected, which is then used unchanged. Only the operator
+knows the provenance of the number; correcting a corrected value introduces the
+error in the opposite direction.
+
+The control is offered only where a category is both counted and excluded from
+the denominator — the condition under which the correction applies. Marrow
+profiles are therefore unaffected.
+
+`absoluteCountsInReport` (default **off**) adds `{{<cell>_abs}}`, `{{wbcUsed}}`
+and `{{wbcBasis}}` to the templates and re-renders the report once a WBC is
+entered. Before that the tokens resolve to *"not provided"* — never blank, never
+zero, because a zero absolute neutrophil count reads as a measured absence.
+
+---
+
+### 3.14 Autosave and Crash Recovery (URS-085)
+
+`saveAutosaveState()` writes the case number, specimen, counts, morphology
+comments and checklist to `localStorage.wbcds_autosave` after every keystroke.
+On load, a snapshot triggers a Restore-or-Discard prompt.
+
+Two properties matter:
+
+- The snapshot **contains patient data** — the accession number and free-text
+  comments — and therefore persists on the workstation across browser restarts.
+  It is discarded on completion, on reset, and on load if **older than 12
+  hours**. The residual data-at-rest exposure is recorded in RA-001.
+- The recovery prompt is opened **non-dismissible** (§3.18): its Cancel action is
+  *Discard*, and a stray Escape must not throw away a recovered count.
+
+---
+
+### 3.15 Offline Operation (URS-094)
+
+`sw.js` caches the application shell — every page, `wbc-core.js`,
+`wbc-dialog.js`, `mdc-app.js`, `config-editor.js`, `styles/theme.css` and the
+vendored Tailwind build — **cache-first**. Configuration profiles are
+**network-first with a cache fallback**, so a corrected profile is seen when the
+network is available and the application still boots when it is not.
+
+Nothing render-blocking is fetched from a third party. Webfonts are a
+progressive enhancement; their absence changes only the typeface.
+
+`CACHE_VERSION` must be bumped whenever a shell asset changes, or an installed
+browser keeps serving the old one. This has been forgotten before and is the
+reason each change record states the bump explicitly.
+
+---
+
+### 3.16 Preset Catalogue (URS-101)
+
+`settings/presets/index.json` lists the shipped profiles; each entry names a
+file loaded on demand. Selecting one replaces the active configuration and
+clears any count in progress, which the catalogue states before it happens.
+
+A preset changes **layout, keys and wording — not the counting convention**.
+Every preset that counts NRBC in a non-marrow specimen excludes them from the
+leucocyte denominator, as the built-in profile does. That was not true before
+DCR-012: choosing a preset silently re-introduced HA-092, and suite 09 now fails
+if any preset omits the policy.
+
+---
+
+### 3.17 Configuration Editor (`web/scripts/config-editor.js`, URS-102, URS-104)
+
+Drag-and-drop layout, key capture, template editing, the morphology checklist,
+and a **Counting Policy** panel exposing the fields of §3.10 per specimen type.
+
+Two design rules, both established by defect:
+
+- **Merge, never rebuild.** The editor retains the loaded profile and overrides
+  only what it edits. Rebuilding from its own form fields destroyed every field
+  it did not model — the denominator policy, the thresholds, the M:E formula —
+  while reporting success (HA-099).
+- **Constrain the controls, do not rely on validation.** The last category
+  cannot be removed from the denominator; excluding a category creates its
+  per-100 entry and deletes any threshold on it; threshold targets are drawn
+  only from categories that have a percentage to test. The panel cannot compose
+  a profile `validateConfig` would reject.
+
+Saving increments the profile version (§3.11.3) and validates before activating;
+an invalid draft is downloaded but never made active, and the message says which
+happened.
+
+---
+
+### 3.18 Dialogs (`web/scripts/wbc-dialog.js`)
+
+One widget for acknowledgement, confirmation and short forms, shared by the
+counter and the editor. It replaced the browser's `prompt()`, which cannot state
+a rule, cannot show which identifiers are taken, cannot refuse input except by
+discarding it, and ignores the selected theme.
+
+- Focus moves into the dialog, is confined to it, and returns to the element
+  that opened it. The tab cycle is driven explicitly, because WebKit omits
+  buttons from the tab order.
+- **A dialog owns the keyboard**: counting keys do not reach the tally while one
+  is open. The Reset confirmation opens during counting with focus on a button,
+  where the "ignore form controls" guard did not apply.
+- Escape cancels, **except** where both branches are consequential; such a
+  dialog is opened `dismissible: false`.
+- An acknowledgement's callback runs on **both** paths, since an alert has one
+  outcome. Escape once skipped a continuation that offered count recovery.
 
 ---
 
@@ -698,49 +1013,49 @@ This prevents keypresses in the textarea from triggering cell counts without phy
 
 ---
 
-## 5. CSS Classes
+## 5. Presentation and Delivery
 
-The application uses **Tailwind CSS** (loaded via CDN) for all styling. There is no custom stylesheet. All visual presentation is achieved through Tailwind utility classes applied directly in HTML and in dynamically generated markup.
+### 5.1 Browser Support and Delivery (URS-093, URS-094)
 
-**Key Tailwind patterns used**:
+Chrome, Firefox and Edge without plugins or installation. Edge shares the
+Chromium engine; verification runs on Chromium, Firefox and WebKit, the last as
+additional assurance rather than a stated target.
 
-| Pattern | Purpose |
-|---------|---------|
-| `hidden` | Display: none toggle for phase containers and conditional UI elements |
-| `flex`, `items-center`, `justify-between` | Flexbox layout for header, badges, rows |
-| `grid`, `gap-*` | Grid layout where applicable |
-| `bg-slate-*` | Background colors for dark theme (slate palette) |
-| `text-slate-*`, `text-accent` | Text colors; `text-accent` is a custom color via CSS variable |
-| `font-mono` | Monospace font for counts, percentages, ratios |
-| `border`, `border-slate-*` | Borders for table cells and sections |
-| `rounded-lg`, `rounded-md` | Border radius for cards and inputs |
-| `transition-colors`, `transition-all` | Smooth transitions for hover and state changes |
-| `animate-pulse` | Pulsing animation for active counting status indicator |
-| `px-*`, `py-*`, `mt-*`, `mb-*` | Spacing utilities |
-| `text-xs`, `text-sm`, `text-lg`, `text-2xl` | Font size scale |
-| `uppercase`, `tracking-wider` | Text transform for labels |
-| `overflow-x-auto` | Horizontal scroll for counter table on small screens |
-| `min-h-screen` | Full viewport height for layout |
+**Nothing render-blocking is fetched from a third party.** Tailwind is vendored
+at `web/vendor/tailwind.js` and precached by the service worker; the earlier
+revision of this section described it as loaded from a CDN, which would have
+made the application unusable on a workstation with restricted internet — the
+condition URS-094 exists for. Webfonts remain a progressive enhancement.
 
-**Custom CSS classes** (defined in `<style>` within `counter.html`):
+Delivery is static files over HTTP. There is no build step: the shipped sources
+are the sources under verification, which is what allows the unit layer to
+execute the calculation engine directly (§3.10).
 
-| Class | Purpose |
-|-------|---------|
-| `flash-increment` | Green flash animation on cell increment (250ms) |
-| `flash-decrement` | Red flash animation on cell decrement (250ms) |
-| `tab-active` | Active tab indicator (border-bottom accent color) |
-| `counting-active` | Applied to `<body>` during counting phase |
+### 5.2 Theming and Styling (URS-095)
 
-**Theme system**: a `data-theme="light"` or `data-theme="dark"` attribute on the **root `<html>` element** drives the overrides in `web/styles/theme.css`, one stylesheet shared by every page.
+Tailwind utility classes, plus **one shared stylesheet**, `web/styles/theme.css`,
+carrying the light-theme overrides, the muted-tone corrections, the shared
+animation and the print rules.
 
-Two design points are load-bearing and were both established by defect:
+One stylesheet, not one block per page. Each page previously kept its own
+overrides — 39, 22, 20, 12 and, for the quick-start guide, none — and they
+drifted. The drift was clinical rather than cosmetic: advisories rendered at
+1.28:1 against their panel in the light theme, and keyboard-map labels at
+1.93:1 (HA-098).
 
-- **The attribute is on `<html>`, not `<body>`, and is set by an inline script in `<head>`.** It must apply before the first paint. Applied at the end of `<body>` — as it originally was — the page painted in the dark theme and then transitioned to light, which is both a visible flash and, because many controls carry `transition-colors`, a window in which text is genuinely below WCAG AA.
-- **One stylesheet, not one block per page.** Each page previously carried its own overrides (39, 20, 22, 12 and 0 of them). They drifted, and the drift was clinical: advisories at 1.28:1 and keyboard labels at 1.93:1. See RA-001 HA-098.
+Colour values are computed against the surfaces they are actually used on, and
+against the **lightest** such surface rather than the darkest, since the same
+utility class appears over several. Interaction states count: every primary
+button darkens on hover, because the Tailwind default lightens it to 3.68:1
+against white text — below AA at exactly the moment the pointer is on it.
 
-Tones are calibrated against the **lightest** surface each class is used on, not the darkest, and verified on the rendered page by VV-SYS-160..168.
+The theme attribute lives on `<html>` and is applied by an inline script in
+`<head>`, before first paint. Applied at the end of `<body>` the page painted in
+one theme and transitioned to the other, which is both a visible flash and, with
+`transition-colors`, a window in which text is genuinely below AA.
 
----
+Contrast is verified on the rendered page, in both themes, across every page and
+phase and in the hover state (VV-SYS-160 to 178).
 
 ## 6. Error Handling
 
@@ -763,6 +1078,7 @@ Tones are calibrated against the **lightest** surface each class is used on, not
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| 3.0 | 2026-08-06 | QMS | **Revised for everything built since DCR-006.** §3.9 to §3.18 added: reset lifecycle, the calculation engine (denominator policy, rounding, Wilson intervals, thresholds, derived figures, validation, method provenance), configuration lifecycle, audio, absolute counts and the NRBC correction, autosave, offline operation, the preset catalogue, the configuration editor and the shared dialog. §3.5.2 marked superseded — it described a percentage computation the product has not used since DCR-006. §3.8 schema replaced; it documented a nine-category layout and key mappings that have not shipped since v2.0. §5 rewritten: it stated that Tailwind loads from a CDN, which would defeat URS-094. Closes the RTM-001 citations of §3.9, §3.11 to §3.17 and §5.1, which pointed at sections that did not exist. See DCR-019. |
 | A | 2026-02-18 | QMS | Initial draft -- detailed design |
 | B | 2026-02-19 | QMS | Added session export design notes |
 | C | 2026-02-20 | QMS | Added theme toggle design notes |

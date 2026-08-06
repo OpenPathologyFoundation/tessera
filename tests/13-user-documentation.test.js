@@ -34,6 +34,72 @@ const methods = fs.readFileSync(path.join(ROOT, 'web', 'methods.html'), 'utf-8')
 const calcref = fs.readFileSync(path.join(ROOT, 'web', 'calculation-reference.html'), 'utf-8');
 
 // ================================================================
+describe('SDD-001 describes the software that exists (URS-092)', () => {
+
+    /**
+     * SDD-001 contained zero occurrences of Wilson, confidence, threshold,
+     * denominatorExcludes, per100 or rounding — it described none of what had
+     * been built since DCR-006, while RTM-001 cited sections §3.9 and §3.11 to
+     * §3.17 that did not exist and §3.5.2 gave a percentage formula the product
+     * had not used for months.
+     *
+     * A design document that describes different software than the one shipped
+     * is not merely stale; it is what a reviewer reads to decide whether the
+     * implementation is sound.
+     */
+    const sdd = fs.readFileSync(
+        path.join(ROOT, 'QMS', 'DHF', 'SDD-001-SoftwareDetailedDesign.md'), 'utf-8');
+
+    it('UD-060: Every section RTM-001 cites in SDD-001 exists', () => {
+        const rtm = fs.readFileSync(
+            path.join(ROOT, 'QMS', 'DHF', 'RTM-001-RequirementsTraceabilityMatrix.md'), 'utf-8');
+        const cited = new Set();
+        for (const line of rtm.split('\n')) {
+            if (!line.startsWith('| URS-')) continue;
+            const cols = line.split('|').map(c => c.trim());
+            if (cols.length <= 5) continue;
+            for (const ref of cols[4].match(/\d+\.\d+(?:\.\d+)?/g) || []) cited.add(ref);
+        }
+        assert.ok(cited.size > 10, 'no design references found in RTM-001 — the parse is wrong');
+
+        const missing = [...cited].filter(ref => {
+            const top = ref.split('.').slice(0, 2).join('.');
+            return !new RegExp('^#{2,4} ' + top.replace('.', '\\.') + '[ .]', 'm').test(sdd);
+        });
+        assert.deepEqual(missing, [],
+            'RTM-001 cites SDD-001 sections that do not exist: ' + missing.join(', '));
+    });
+
+    it('UD-061: The design covers the calculations the engine performs', () => {
+        // Each of these decides a reported number. A design document silent on
+        // them cannot be used to review the implementation.
+        for (const topic of ['Wilson', 'confidence interval', 'threshold',
+                             'denominatorExcludes', 'per100', 'rounding',
+                             'largest-remainder', 'method statement']) {
+            assert.ok(new RegExp(topic.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i').test(sdd),
+                `SDD-001 does not mention "${topic}", which changes a reported number`);
+        }
+    });
+
+    it('UD-062: The superseded percentage formula is marked, not left standing', () => {
+        assert.ok(!/percentage = \(state\.counts\[cellType\] \/ total\) \* 100\s*```/.test(sdd),
+            'SDD-001 still presents the pre-DCR-006 percentage formula as current');
+        assert.match(sdd, /Superseded by/i,
+            'the withdrawn description must say so rather than be silently deleted');
+    });
+
+    it('UD-063: The design does not describe a CDN dependency the product removed', () => {
+        // URS-094 requires counting without an internet connection. Tailwind is
+        // vendored and precached; saying otherwise would mislead a reviewer
+        // assessing that requirement.
+        assert.ok(!/Tailwind CSS\*\* \(loaded via CDN\)/.test(sdd),
+            'SDD-001 still describes Tailwind as loaded from a CDN');
+        assert.match(sdd, /vendor\/tailwind\.js/,
+            'SDD-001 must record that Tailwind is vendored');
+    });
+});
+
+// ================================================================
 describe('SOP-001 tracks the shipped configuration (HA-097)', () => {
 
     /**

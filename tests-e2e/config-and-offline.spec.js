@@ -400,6 +400,160 @@ test.describe('Configuration editor round-trip (URS-102)', () => {
         if (await modal.isVisible())
             await expect(page.locator('#modal-message')).not.toContainText('newer built-in profile');
     });
+
+// ================================================================
+// Counting policy controls (DCR-013)
+//
+// Until DCR-013 the fields that decide what the reported numbers ARE — the
+// denominator, the rounding, the precision, the thresholds and the derived
+// ratio — could only be set by hand-editing the exported JSON. These tests
+// drive the new controls and then verify the COUNTER, not the saved file:
+// a control that writes the right JSON but does not change the count would
+// pass a round-trip test and still be useless.
+
+    /** Save the open editor and return to a counter that has picked it up. */
+    async function saveAndReturn(page) {
+        await Promise.all([page.waitForEvent('download'), page.click('#btnSaveProfile')]);
+        await expect(page.locator('#save-status')).toHaveAttribute('data-status', 'ok');
+        await page.goto('/counter.html');
+        await waitForAppReady(page);
+    }
+
+    async function openEditorOn(page, specimenLabel) {
+        await page.goto('/editor.html');
+        await expect(page.locator('#policy-editor')).toBeVisible();
+        if (specimenLabel) {
+            await page.locator('#specimen-tabs button', { hasText: specimenLabel }).click();
+        }
+    }
+
+    test('VV-SYS-065: The denominator policy can be set in the editor and changes the count', async ({ page }) => {
+        // The question that started DCR-012: where is denominatorExcludes set?
+        // Seed a profile that does NOT exclude NRBC, then exclude them here.
+        await page.goto('/counter.html');
+        await page.evaluate(cfg => {
+            const c = JSON.parse(JSON.stringify(cfg));
+            const pb = c.specimenTypes.find(s => s.specimenType === 'pb');
+            delete pb.denominatorExcludes;
+            delete pb.per100Reporting;
+            localStorage.setItem('wbcds_config', JSON.stringify(c));
+        }, SHIPPED);
+
+        await openEditorOn(page, 'Peripheral');
+        await page.check('.pol-excl[data-cell="nrbc"]');
+        // Excluding a category must also give it a per-100 line, or the count
+        // is simply lost. The control does both.
+        await expect(page.locator('.pol-per100-label[data-cell="nrbc"]')).toBeVisible();
+        await saveAndReturn(page);
+
+        await page.selectOption('#specimenType', 'pb');
+        await page.click('#btnStartCount');
+        for (let i = 0; i < 180; i++) await page.keyboard.press('f');   // segmented
+        for (let i = 0; i < 20; i++) await page.keyboard.press('b');    // NRBC
+        await page.click('#btnCountDone');
+
+        const summary = page.locator('#results-summary');
+        await expect(summary).toContainText('180 cells');          // not 200
+        await expect(summary).toContainText('/100');               // NRBC per 100 WBC
+        await expect(summary).toContainText('100.00%');            // segmented, undiluted
+    });
+
+    test('VV-SYS-066: Rounding and precision can be set in the editor and change the figures', async ({ page }) => {
+        // Three equal categories at whole-number precision: largest remainder
+        // gives 33/33/34 to reach 100%, independent gives 33/33/33 and a total
+        // of 99%. DCR-010 made this a policy; this makes it reachable.
+        await page.goto('/counter.html');
+        await page.evaluate(cfg => localStorage.setItem('wbcds_config', JSON.stringify(cfg)), SHIPPED);
+
+        await openEditorOn(page, 'Bone Marrow');
+        await page.selectOption('#pol-rounding', 'independent');
+        await page.fill('#pol-prec-display', '0');
+        await page.dispatchEvent('#pol-prec-display', 'change');
+        await saveAndReturn(page);
+
+        await page.click('#btnStartCount');
+        await page.keyboard.press('x');   // blasts
+        await page.keyboard.press('e');   // plasma
+        await page.keyboard.press('f');   // segmented
+        await page.click('#btnCountDone');
+
+        const text = await page.locator('#results-summary').innerText();
+        expect(text).toContain('33%');
+        expect(text, 'independent rounding must not top a category up to reach 100%')
+            .not.toContain('34%');
+    });
+
+    test('VV-SYS-067: A threshold added in the editor raises the advisory', async ({ page }) => {
+        await page.goto('/counter.html');
+        await page.evaluate(cfg => localStorage.setItem('wbcds_config', JSON.stringify(cfg)), SHIPPED);
+
+        await openEditorOn(page, 'Bone Marrow');
+        await page.click('#pol-thr-add');
+        const added = page.locator('[data-thr-idx]').last();
+        await page.locator('.pol-thr-target').last().selectOption('poly');
+        await page.locator('.pol-thr-value').last().fill('50');
+        await page.locator('.pol-thr-value').last().dispatchEvent('change');
+        await page.locator('.pol-thr-label').last().fill('editor poly threshold');
+        await saveAndReturn(page);
+
+        await page.click('#btnStartCount');
+        await page.keyboard.press('f');   // 1 segmented
+        await page.keyboard.press('x');   // 1 blast -> poly 50%, interval spans 50
+        await page.click('#btnCountDone');
+
+        await expect(page.locator('#threshold-note')).toBeVisible();
+        await expect(page.locator('#threshold-note')).toContainText('editor poly threshold');
+    });
+
+    test('VV-SYS-068: The M:E composition can be changed in the editor', async ({ page }) => {
+        // ICSH 2008 includes monocytes in the myeloid numerator; a widely
+        // taught alternative excludes them, and the two disagree. 150
+        // segmented + 60 monocytes over 90 erythroid: 2.3 with monocytes,
+        // 1.7 without. DCR-010 shipped both as presets; this makes the
+        // composition itself editable.
+        await page.goto('/counter.html');
+        await page.evaluate(cfg => localStorage.setItem('wbcds_config', JSON.stringify(cfg)), SHIPPED);
+
+        await openEditorOn(page, 'Bone Marrow');
+        await page.uncheck('.pol-f-member[data-formula="ME_ratio"][data-side="numerator"][data-cell="mono"]');
+        await saveAndReturn(page);
+
+        await page.click('#btnStartCount');
+        for (let i = 0; i < 150; i++) await page.keyboard.press('f');   // segmented
+        for (let i = 0; i < 60; i++) await page.keyboard.press('a');    // monocytes
+        for (let i = 0; i < 90; i++) await page.keyboard.press('b');    // erythroid
+        await page.click('#btnCountDone');
+
+        await expect(page.locator('#results-summary')).toContainText('1.7');
+        await expect(page.locator('#results-summary')).not.toContainText('2.3');
+    });
+
+    test('VV-SYS-069: The policy controls cannot produce a profile the counter rejects', async ({ page }) => {
+        // The schema refuses a threshold on a category that has no percentage
+        // left to test, and refuses per-100 reporting for a category still
+        // inside the denominator. Rather than let the operator build that and
+        // fail on save, excluding a category clears any threshold on it.
+        await page.goto('/counter.html');
+        await page.evaluate(cfg => localStorage.setItem('wbcds_config', JSON.stringify(cfg)), SHIPPED);
+
+        await openEditorOn(page, 'Bone Marrow');
+        await expect(page.locator('.pol-thr-target').first()).toHaveValue('blasts');
+        await page.check('.pol-excl[data-cell="blasts"]');
+
+        // Both blast thresholds are gone, and blasts is no longer offered as a target.
+        const targets = await page.locator('.pol-thr-target').evaluateAll(
+            els => els.flatMap(e => [...e.options].map(o => o.value)));
+        expect(targets).not.toContain('blasts');
+
+        await Promise.all([page.waitForEvent('download'), page.click('#btnSaveProfile')]);
+        await expect(page.locator('#save-status')).toHaveAttribute('data-status', 'ok');
+
+        // And the counter accepts it.
+        await page.goto('/counter.html');
+        await waitForAppReady(page);
+        expect(await page.evaluate(() => window.__wbcTestHooks.state.configMeta.profileId))
+            .toBe(SHIPPED.profileId);
+    });
 });
 
 // ================================================================

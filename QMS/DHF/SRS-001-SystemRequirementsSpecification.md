@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 2.8 |
+| **Version** | 2.9 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -347,6 +347,10 @@ Phase 2 item.
 | SYS-177 | The configuration editor SHALL allow the operator to view the full cell-type reference set, select categories, arrange their order, assign keyboard keys, set per-specimen target counts, edit output templates, and save the result as a JSON profile. | URS-102 |
 | SYS-178 | The editor SHALL validate a profile with the same engine the counter uses before making it active, and SHALL NOT activate a profile the counter would reject. | URS-102, HA-061 |
 | SYS-179 | When a profile fails validation the editor SHALL state that it was not made active and SHALL list the reasons; the draft MAY still be downloaded as work in progress. | URS-102 |
+| SYS-240 | The configuration editor SHALL allow the operator to set, per specimen type, the counting policy that determines the reported figures: the categories excluded from the percentage denominator and how each is then reported per 100, the rounding method, the display and report precision, whether a confidence interval is shown and at what level, the diagnostic thresholds, and the composition of derived figures. | URS-102, URS-030, URS-034, URS-037, URS-038 |
+| SYS-241 | The editor SHALL preserve every field of the profile it loads that it does not itself edit. | URS-102, HA-099 |
+| SYS-242 | A profile saved in the editor SHALL be the profile the counter uses; the editor SHALL NOT report a profile as active if the counter would discard it. | URS-102, HA-100 |
+| SYS-243 | The editor's counting-policy controls SHALL constrain their own inputs so that they cannot compose a profile the counter would reject. | URS-102, HA-061 |
 
 ### 4.22 Configuration Validation Requirements (URS-021, URS-022)
 

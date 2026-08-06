@@ -5,15 +5,15 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 3.9 |
+| **Version** | 4.0 |
 | **Product** | WBC ΔΣ v2.7.1 |
-| **Date Executed** | 2026-08-06 (09:10:48 UTC) |
+| **Date Executed** | 2026-08-06 (09:27:33 UTC) |
 | **Status** | **PASS** (test outcome) |
 | **Approval State** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-06_051048_config-fidelity-and-preset-denominator/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-06_052733_counting-policy-editor/` |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
@@ -21,14 +21,14 @@
 
 ## 1. Executive Summary
 
-**836 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
+**851 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
 
 | Metric | Value |
 |--------|-------|
 | Unit, static and behavioural tests | **585** |
-| System (browser) tests | **251** (86 specs x chromium, firefox, webkit, less 7 skips) |
-| **Total executed** | **836** |
-| Passed | **836** |
+| System (browser) tests | **266** (91 specs x chromium, firefox, webkit, less 7 skips) |
+| **Total executed** | **851** |
+| Passed | **851** |
 | Failed | **0** |
 | Skipped (documented, §6) | **7** |
 | Pass Rate | **100.00%** |
@@ -184,7 +184,7 @@ Regressions this layer now guards against:
 
 ---
 
-## 4. System Suite Results — Playwright (86 specs x 3 engines = 258, 7 skipped, 0 failures)
+## 4. System Suite Results — Playwright (91 specs x 3 engines = 273, 7 skipped, 0 failures)
 
 Each spec runs on Chromium, Firefox and WebKit. URS-093 names Chrome, Firefox
 and Edge; Edge shares the Chromium engine and is covered by the chromium
@@ -439,6 +439,43 @@ Recorded in DCR-012; hazards HA-099 and HA-100 added to RA-001.
 
 ---
 
+### 4.12 Counting policy editor (added v2.7.4)
+
+DCR-013 built editor controls for the fields DCR-012 could only preserve. Each
+test drives the control and then checks the **counter** — a control that writes
+correct JSON but does not change the count would pass a round-trip test and
+still be useless.
+
+| VV ID | Drives | Verifies | Result |
+|-------|--------|----------|--------|
+| VV-SYS-065 | Excluding NRBC from the peripheral blood denominator | 180 segmented + 20 NRBC gives 180 cells, segmented 100.00%, NRBC per 100 | PASS |
+| VV-SYS-066 | Rounding to independent, precision to 0 | Three equal categories report 33/33/33, not 33/33/34 | PASS |
+| VV-SYS-067 | Adding a threshold at 50% | The advisory appears, naming the label typed in the editor | PASS |
+| VV-SYS-068 | Removing monocytes from the M:E numerator | 150 segmented + 60 monocytes over 90 erythroid gives **1.7**, not 2.3 | PASS |
+| VV-SYS-069 | Excluding a category carrying thresholds | Those thresholds are cleared, the target list updates, and the counter accepts the profile | PASS |
+| UD-039 | — | The Calculation Reference's account of where each setting lives matches the editor source, in both directions | PASS |
+
+This also closes **URS-102 clause (g)** — "define derived formulas" — which was
+never implemented: `buildConfigJSON()` wrote `formulas: {}`. RTM-001 recorded
+URS-102 as Full coverage regardless. The row now traces to SYS-240–243 and
+VV-SYS-065–069 and records the correction.
+
+**Regression detection confirmed** by removing each write-back in turn:
+
+| Removed | Detected by |
+|---------|-------------|
+| `rounding` | VV-SYS-066 |
+| `denominatorExcludes` | VV-SYS-065, VV-SYS-069 |
+| `thresholds` | VV-SYS-067, VV-SYS-069 |
+| `formulas` | VV-SYS-068 |
+| The threshold-clearing guard on exclusion | VV-SYS-069 |
+
+UD-039 deserves its own note. Written under DCR-012 to assert the editor had
+**no** controls for these fields, it failed the moment they were added — which
+is what it was for. It now asserts the opposite, in both directions.
+
+---
+
 ## 5. Defect Detection Record
 
 | Defect | Found by | Now guarded by |
@@ -471,6 +508,8 @@ Recorded in DCR-012; hazards HA-099 and HA-100 added to RA-001.
 | HA-100 the editor's saved profile was discarded as superseded while reporting success | **Verifying the configuration UI (DCR-012)** | VV-SYS-064 |
 | No shipped preset carried the denominator policy — HA-092 reachable from the catalogue | **Verifying the configuration UI (DCR-012)** | Suite 09 denominator policy tests |
 | The Calculation Reference said "configurable" without saying where | **Reviewer question (DCR-012)** | UD-039 |
+| URS-102 clause (g) "define derived formulas" was never implemented, yet RTM-001 recorded URS-102 as Full coverage | **Building the editor controls (DCR-013)** | VV-SYS-068, SYS-240 |
+| The Calculation Reference still said the editor had no policy controls after they were built | **UD-039 (as designed)** | UD-039 |
 
 The last three were introduced or exposed during remediation and were caught by
 the new layers before release — the behaviour the previous suite could not
@@ -497,7 +536,7 @@ provide.
 
 ## 7. Conclusion
 
-All 836 executed automated tests pass with no failures, across three browser
+All 851 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -519,6 +558,12 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-06T09:27:33.630Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-06_052733_counting-policy-editor/`
+
 - Date (UTC): 2026-08-06T09:10:48.240Z
 - Command: `npm test`
 - Exit Code: 0

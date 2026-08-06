@@ -289,30 +289,45 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
         // UD-036 checks the field exists in the profile and that the engine
         // honours it. That is not the same as a reader being able to find it.
         // "denominatorExcludes is configurable" sent a reviewer looking for a
-        // control that does not exist: the calculation-policy fields are set
-        // by editing the exported JSON, not in the Configuration Editor.
+        // control that did not exist (DCR-012); DCR-013 built the controls.
+        // This pins the page's account of where they are to the editor source,
+        // in both directions — it failed, correctly, the moment the controls
+        // were added and the page still said there were none.
         assert.match(calcref, /Where these settings live/,
             'the reference must tell the reader where a setting is changed, not only that it can be');
-        assert.match(calcref, /Export Config/,
-            'and must name the route that actually reaches the calculation policy');
+        assert.match(calcref, /Counting Policy/,
+            'and must name the panel that holds the calculation policy');
 
-        const editor = fs.readFileSync(path.join(ROOT, 'web', 'scripts', 'config-editor.js'), 'utf-8')
-            + fs.readFileSync(path.join(ROOT, 'web', 'editor.html'), 'utf-8');
+        const editorHtml = fs.readFileSync(path.join(ROOT, 'web', 'editor.html'), 'utf-8');
+        const editorJs = fs.readFileSync(path.join(ROOT, 'web', 'scripts', 'config-editor.js'), 'utf-8');
 
-        // Claimed to be outside the editor. If a control is ever added for one
-        // of these, this fails and the reference has to be corrected with it.
-        for (const field of ['denominatorExcludes', 'per100Reporting', 'rounding',
-                             'precision', 'thresholds', 'confidenceIntervals']) {
-            assert.ok(calcref.includes('<code>' + field + '</code>'),
-                `the reference must list "${field}" among the fields it explains`);
-            assert.ok(!new RegExp('id="[^"]*' + field + '[^"]*"', 'i').test(editor),
-                `the editor now has a control for "${field}"; the reference still says it has none`);
+        assert.ok(editorHtml.includes('id="policy-editor"'),
+            'the reference describes a Counting Policy panel; the editor has no container for it');
+
+        // Every field the page says the editor now sets must have a control
+        // that writes it back into the saved profile.
+        const controls = {
+            denominatorExcludes: 'pol-excl',
+            per100Reporting: 'pol-per100-label',
+            rounding: 'pol-rounding',
+            precision: 'pol-prec-display',
+            confidenceIntervals: 'pol-ci-enabled',
+            thresholds: 'pol-thr-add',
+            formulas: 'pol-f-member'
+        };
+        for (const [field, control] of Object.entries(controls)) {
+            assert.ok(editorJs.includes(control),
+                `the reference says the editor sets "${field}", but control "${control}" does not exist`);
+            assert.ok(new RegExp('merged\\.' + field + '\\s*=').test(editorJs),
+                `"${field}" has a control but is never written back into the saved profile`);
         }
 
-        // Claimed to be inside the editor — these must really be editable.
-        for (const id of ['targetBm', 'targetPb', 'handedness', 'absoluteCounts']) {
-            assert.ok(editor.includes('id="' + id + '"'),
-                `the reference says the editor edits "${id}", but no such control exists`);
+        // And the fields it says are JSON-only must really have no control.
+        for (const field of ['constituents', 'categoryNotes', 'targetCountBasis', 'provenance']) {
+            assert.ok(calcref.includes('<code>' + field + '</code>'),
+                `the reference must list "${field}" among the fields reached by editing the JSON`);
+            assert.ok(!new RegExp('id="[^"]*' + field + '[^"]*"', 'i').test(editorHtml),
+                `the editor now has a control for "${field}"; the reference still says it has none`);
         }
     });
 

@@ -175,7 +175,7 @@ URS (User Need) -> SRS (System Req) -> SDD (Design) -> TP/VV (Verification)
 |--------|----------------|-----------|-----|------|--------------|-------|----------|
 | URS-100 | Load cell types, mappings, targets, formulas and display prefs from a JSON profile | SYS-100, SYS-102 | 3.8 | HA-060, HA-061 | suite 02, suite 08, TC-B001 | U, B | Full |
 | URS-101 | Catalogue of preset profiles | SYS-174–SYS-176 | 3.16 | — | VV-SYS-055, 056, 057, suite 09 | U, S | Full |
-| URS-102 | Visual configuration editor (view, select, arrange, aggregate, assign keys, set targets, define formulas, save) | SYS-177–SYS-179 | 3.17 | HA-061, HA-062 | VV-SYS-060, 061, 062, suite 10 | U, S | **Full for the shipped editor; drag-to-aggregate covered by inspection** |
+| URS-102 | Visual configuration editor (view, select, arrange, aggregate, assign keys, set targets, define formulas, save) | SYS-177–SYS-179, SYS-240–SYS-243 | 3.17 | HA-061, HA-062, HA-099, HA-100 | VV-SYS-060–069, suite 10 | U, S | **Full; clause (g) "define derived formulas" was previously unimplemented and is closed by DCR-013. Drag-to-aggregate remains covered by inspection** |
 | URS-103 | Import and export a configuration profile | SYS-105, SYS-106 | 3.11 | HA-061 | TC-B060..B064, VV-SYS-050..053 | B, S | Full |
 | URS-104 | Left- and right-hand default key mappings | SYS-154, SYS-155 | 3.17 | — | suite 09 (`right-hand` preset), suite 10 (auto-assign) | U | Full |
 | URS-105 | Configurable target count per specimen type; evidence-based defaults | SYS-103 | 3.8 | — | suite 04 (default targets), TC-B019, VV-SYS-016 | U, B, S | Full |

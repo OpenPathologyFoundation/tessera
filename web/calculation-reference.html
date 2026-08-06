@@ -86,28 +86,30 @@
         <p class="mt-1 text-slate-400">
             Every <span class="text-accent">Configurable</span> item below is a field in the
             configuration profile &mdash; a single JSON file that travels with your laboratory's
-            settings. There are two ways to reach it, and they cover different fields.
+            settings. There are three ways to reach it.
         </p>
         <table class="w-full mt-3 text-xs">
             <tbody>
             <tr>
                 <td class="font-semibold text-slate-200 align-top pr-3 whitespace-nowrap">Configuration&nbsp;Editor</td>
-                <td class="text-slate-400">Reached from the counter. Edits the cell layout, the keyboard
-                    assignment, target counts, report templates, the morphology checklist, handedness,
-                    audio and autosave. Everything else in the profile is carried through untouched
-                    when you save.</td>
+                <td class="text-slate-400"><strong class="text-slate-200">This is where the counting
+                    policy is set.</strong> Its <em>Counting Policy</em> panel holds the differential
+                    denominator and per-100 reporting, the rounding rule, the decimal precision, the
+                    confidence interval, the diagnostic thresholds and the composition of derived
+                    figures such as the myeloid-to-erythroid ratio. Each applies to the specimen type
+                    selected at the top of the editor. The panel also edits the cell layout, the
+                    keyboard assignment, target counts, report templates, the morphology checklist,
+                    handedness, audio and autosave.</td>
             </tr>
             <tr>
                 <td class="font-semibold text-slate-200 align-top pr-3 pt-2 whitespace-nowrap">Export&nbsp;&rarr;&nbsp;edit&nbsp;&rarr;&nbsp;Import</td>
-                <td class="text-slate-400 pt-2"><strong class="text-slate-200">This is where the
-                    calculation policy is set.</strong> Use <em>Export Config</em> on the counter, edit
-                    the JSON, then <em>Import Config</em>. The counting-policy fields &mdash;
-                    <code>denominatorExcludes</code>, <code>per100Reporting</code>,
-                    <code>rounding</code>, <code>precision</code>, <code>thresholds</code>,
-                    <code>confidenceIntervals</code> and the M:E <code>formulas</code> &mdash; are
-                    <strong class="text-slate-200">not yet exposed as controls in the editor</strong>.
-                    An imported profile is validated before it is accepted, and rejected with reasons
-                    if it cannot be counted with.</td>
+                <td class="text-slate-400 pt-2">Use <em>Export Config</em> on the counter, edit the
+                    JSON, then <em>Import Config</em>. This reaches the whole profile, including the
+                    few descriptive fields the editor does not surface &mdash;
+                    <code>constituents</code>, <code>categoryNotes</code>,
+                    <code>targetCountBasis</code>, <code>requireCaseNumber</code> and
+                    <code>provenance</code>. An imported profile is validated before it is accepted,
+                    and rejected with reasons if it cannot be counted with.</td>
             </tr>
             <tr>
                 <td class="font-semibold text-slate-200 align-top pr-3 pt-2 whitespace-nowrap">Preset&nbsp;catalogue</td>
@@ -118,6 +120,10 @@
             </tr>
             </tbody>
         </table>
+        <p class="mt-3 text-slate-400">
+            Whichever route you use, the profile is validated before it becomes active, and the
+            identifier and version of the profile that produced a count appear in every report.
+        </p>
     </div>
 
     <!-- ================= abbreviations ================= -->

@@ -66,10 +66,48 @@
                 handedness: 'left',
                 absoluteCounts: 'optional',
                 audioEnabled: true,
-                autosaveEnabled: true
+                autosaveEnabled: true,
+                rounding: 'largest-remainder',
+                precisionDisplay: 2,
+                precisionReport: 0,
+                ciEnabled: true,
+                ciLevel: 0.95,
+                denominatorExcludes: [],
+                per100Reporting: {},
+                thresholds: [],
+                formulas: {}
             }
         ]
     };
+
+
+    /**
+     * The counting-policy fields, with the defaults the engine itself applies.
+     *
+     * These decide what the reported numbers ARE, not how they look: which
+     * categories sit in the percentage denominator, how percentages are
+     * rounded, whether a confidence interval is shown, which diagnostic
+     * thresholds raise an advisory, and how a derived ratio is composed.
+     * Until DCR-013 they could only be set by hand-editing the exported JSON.
+     */
+    function policyDefaults(spec) {
+        spec = spec || {};
+        var prec = spec.precision || {};
+        var ci = spec.confidenceIntervals || {};
+        return {
+            rounding: spec.rounding || 'largest-remainder',
+            precisionDisplay: prec.display === undefined ? 2 : prec.display,
+            precisionReport: prec.report === undefined ? 0 : prec.report,
+            ciEnabled: ci.enabled !== false,
+            ciLevel: ci.level === undefined ? 0.95 : ci.level,
+            denominatorExcludes: (spec.denominatorExcludes || []).slice(),
+            per100Reporting: clone(spec.per100Reporting || {}),
+            thresholds: clone(spec.thresholds || []),
+            formulas: clone(spec.formulas || {})
+        };
+    }
+
+    function clone(v) { return JSON.parse(JSON.stringify(v)); }
 
     // ================================================================
     // INITIALIZATION
@@ -89,6 +127,7 @@
         renderLayout();
         renderKeyAssignment();
         renderSettings();
+        renderPolicyEditor();
         renderTemplateEditor();
         renderMorphChecklist();
         updatePlaceholderList();
@@ -98,6 +137,7 @@
         wireDropZones();
         wireButtons();
         wireSettings();
+        wirePolicyEditor();
     }
 
     function loadExistingConfig() {
@@ -123,7 +163,7 @@
 
             editorState.specimenTypes = specimenTypes.map(function (spec) {
                 var outCodes = spec.outCodes || {};
-                return {
+                var modelled = {
                     raw: spec,
                     specimenType: spec.specimenType,
                     specimenLabel: spec.specimenLabel || spec.specimenType.toUpperCase(),
@@ -139,6 +179,10 @@
                     audioEnabled: spec.audio ? spec.audio.enabled : true,
                     autosaveEnabled: spec.autosave !== false
                 };
+                Object.keys(policyDefaults(spec)).forEach(function (k) {
+                    modelled[k] = policyDefaults(spec)[k];
+                });
+                return modelled;
             });
         } catch (e) { /* ignore */ }
     }
@@ -192,6 +236,7 @@
                 renderLayout();
                 renderKeyAssignment();
                 renderSettings();
+                renderPolicyEditor();
                 renderTemplateEditor();
                 renderMorphChecklist();
                 updatePlaceholderList();
@@ -530,6 +575,350 @@
         });
     }
 
+
+    // ================================================================
+    // COUNTING POLICY EDITOR (DCR-013)
+    //
+    // Every control here is constrained so it cannot produce a profile that
+    // Core.validateConfig would reject:
+    //   - the denominator cannot be emptied of every category
+    //   - a category reported per 100 must be outside the denominator, so the
+    //     two are edited as one control rather than two that can disagree
+    //   - a threshold target is chosen from the categories that actually have
+    //     a percentage to test, which excludes those outside the denominator
+    //   - formula members are chosen from displayed categories, which the
+    //     schema already requires to be key-mapped
+    // ================================================================
+
+    var ROUNDING_CHOICES = [
+        ['largest-remainder', 'Largest remainder (default)', 'Totals 100% with the least distortion of any single figure.'],
+        ['largest-count', 'Largest count', 'Gives the whole residual to the biggest category; totals 100%.'],
+        ['independent', 'Independent', 'Each figure rounded alone. Honest, but the total may not be 100%.']
+    ];
+    var CI_LEVELS = [[0.9, '90%'], [0.95, '95% (default)'], [0.99, '99%']];
+
+    function displayedCells(spec) { return spec.upper.concat(spec.lower); }
+
+    function cellLabel(id) {
+        var ref = CELL_REFERENCE.filter(function (c) { return c.id === id; })[0];
+        return ref ? ref.label : id;
+    }
+
+    function fieldsetOpen(title, hint) {
+        return '<div class="p-3 bg-slate-800/50 border border-slate-700 rounded-lg">' +
+            '<p class="text-xs font-semibold text-slate-200">' + escHtml(title) + '</p>' +
+            (hint ? '<p class="text-[11px] text-slate-500 mt-0.5">' + hint + '</p>' : '');
+    }
+
+    function renderPolicyEditor() {
+        var spec = getActiveSpec();
+        var shown = displayedCells(spec);
+        var html = '';
+
+        // ---- rounding + precision + intervals ----
+        html += fieldsetOpen('Percentages',
+            'How each figure is rounded, to how many places, and whether it carries a sampling interval.');
+        html += '<div class="grid grid-cols-2 gap-3 mt-2">';
+        html += '<div class="col-span-2"><label class="block text-[11px] text-slate-500 mb-1">Rounding policy</label>' +
+            '<select id="pol-rounding" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-100">';
+        ROUNDING_CHOICES.forEach(function (c) {
+            html += '<option value="' + c[0] + '"' + (spec.rounding === c[0] ? ' selected' : '') + '>' +
+                escHtml(c[1]) + '</option>';
+        });
+        html += '</select>';
+        ROUNDING_CHOICES.forEach(function (c) {
+            if (spec.rounding === c[0]) {
+                html += '<p class="text-[11px] text-slate-500 mt-1">' + escHtml(c[2]) + '</p>';
+            }
+        });
+        html += '</div>';
+        html += '<div><label class="block text-[11px] text-slate-500 mb-1">Decimals on screen</label>' +
+            '<input type="number" id="pol-prec-display" min="0" max="4" value="' + spec.precisionDisplay +
+            '" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-100 font-mono"></div>';
+        html += '<div><label class="block text-[11px] text-slate-500 mb-1">Decimals in the report</label>' +
+            '<input type="number" id="pol-prec-report" min="0" max="4" value="' + spec.precisionReport +
+            '" class="w-full px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm text-slate-100 font-mono"></div>';
+        html += '<div class="col-span-2 flex items-center gap-3">' +
+            '<label class="inline-flex items-center gap-2 text-sm text-slate-300 cursor-pointer">' +
+            '<input type="checkbox" id="pol-ci-enabled" class="accent-accent"' + (spec.ciEnabled ? ' checked' : '') + '>' +
+            'Show a confidence interval</label>' +
+            '<select id="pol-ci-level" class="px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-slate-100"' +
+            (spec.ciEnabled ? '' : ' disabled') + '>';
+        CI_LEVELS.forEach(function (l) {
+            html += '<option value="' + l[0] + '"' + (Number(spec.ciLevel) === l[0] ? ' selected' : '') + '>' +
+                l[1] + '</option>';
+        });
+        html += '</select></div>';
+        html += '</div></div>';
+
+        // ---- denominator policy ----
+        html += fieldsetOpen('Differential denominator',
+            'A ticked category is still counted, but sits outside the percentage denominator and is ' +
+            'reported per 100 of it instead. Nucleated red cells in peripheral blood are the standard case.');
+        if (shown.length === 0) {
+            html += '<p class="text-[11px] text-slate-500 mt-2">Add categories to the layout first.</p>';
+        } else {
+            html += '<div class="mt-2 space-y-1">';
+            shown.forEach(function (id) {
+                var excluded = spec.denominatorExcludes.indexOf(id) !== -1;
+                var lastOne = !excluded && shown.length - spec.denominatorExcludes.length <= 1;
+                var per = spec.per100Reporting[id] || {};
+                html += '<div class="flex flex-wrap items-center gap-2">';
+                html += '<label class="inline-flex items-center gap-2 text-xs text-slate-300 cursor-pointer w-44">' +
+                    '<input type="checkbox" class="pol-excl accent-accent" data-cell="' + escHtml(id) + '"' +
+                    (excluded ? ' checked' : '') + (lastOne ? ' disabled' : '') + '>' +
+                    '<span class="font-mono text-accent">' + escHtml(id) + '</span>' +
+                    '<span class="text-slate-500">' + escHtml(cellLabel(id)) + '</span></label>';
+                if (excluded) {
+                    html += '<input type="text" class="pol-per100-label flex-1 min-w-40 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-slate-100" ' +
+                        'data-cell="' + escHtml(id) + '" value="' + escHtml(per.label || '') +
+                        '" placeholder="Reported as, e.g. NRBC per 100 WBC">';
+                    html += '<input type="number" class="pol-per100-precision w-16 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-slate-100 font-mono" ' +
+                        'data-cell="' + escHtml(id) + '" min="0" max="4" value="' +
+                        (per.precision === undefined ? 1 : per.precision) + '" title="Decimal places">';
+                }
+                html += '</div>';
+            });
+            html += '</div>';
+            html += '<p class="text-[11px] text-slate-500 mt-2">At least one category must remain in the denominator.</p>';
+        }
+        html += '</div>';
+
+        // ---- thresholds ----
+        var targets = shown.filter(function (id) { return spec.denominatorExcludes.indexOf(id) === -1; });
+        Object.keys(spec.formulas).forEach(function (fname) {
+            if ((spec.formulas[fname].type || 'ratio') === 'percentage') targets.push(fname);
+        });
+        html += fieldsetOpen('Diagnostic thresholds',
+            'When a confidence interval spans one of these, the results screen says so. It never blocks ' +
+            'or alters the count.');
+        html += '<div class="mt-2 space-y-2">';
+        spec.thresholds.forEach(function (t, idx) {
+            html += '<div class="p-2 bg-slate-800 border border-slate-700 rounded space-y-1" data-thr-idx="' + idx + '">';
+            html += '<div class="flex flex-wrap items-center gap-2">';
+            html += '<select class="pol-thr-target px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-slate-100 font-mono" data-thr-idx="' + idx + '">';
+            if (targets.indexOf(t.target) === -1) {
+                html += '<option value="' + escHtml(t.target) + '" selected>' + escHtml(t.target) + ' (not available)</option>';
+            }
+            targets.forEach(function (id) {
+                html += '<option value="' + escHtml(id) + '"' + (t.target === id ? ' selected' : '') + '>' + escHtml(id) + '</option>';
+            });
+            html += '</select>';
+            html += '<input type="number" class="pol-thr-value w-20 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-slate-100 font-mono" ' +
+                'data-thr-idx="' + idx + '" min="0" max="100" step="0.1" value="' + escHtml(String(t.value)) + '" title="Percent">';
+            html += '<span class="text-[11px] text-slate-500">%</span>';
+            html += '<input type="text" class="pol-thr-label flex-1 min-w-40 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-slate-100" ' +
+                'data-thr-idx="' + idx + '" value="' + escHtml(t.label || '') + '" placeholder="Name, e.g. AML blast threshold">';
+            html += '<button class="pol-thr-remove text-slate-500 hover:text-red-400 text-xs" data-thr-idx="' + idx + '">&times; Remove</button>';
+            html += '</div>';
+            html += '<input type="text" class="pol-thr-basis w-full px-2 py-1 bg-slate-800 border border-slate-600 rounded text-[11px] text-slate-400" ' +
+                'data-thr-idx="' + idx + '" value="' + escHtml(t.basis || '') + '" placeholder="Citation shown to the operator, e.g. WHO 2022 / ICC 2022">';
+            html += '</div>';
+        });
+        html += '</div>';
+        html += '<button id="pol-thr-add" class="mt-2 text-xs text-slate-500 hover:text-slate-400 transition-colors"' +
+            (targets.length ? '' : ' disabled') + '>+ Add threshold</button>';
+        html += '</div>';
+
+        // ---- derived formulas ----
+        html += fieldsetOpen('Derived figures',
+            'A ratio (such as myeloid-to-erythroid) or a percentage of a subset. Both conventions for ' +
+            'M:E are in use and disagree, so the composition is stated here rather than assumed.');
+        html += '<div class="mt-2 space-y-3">';
+        Object.keys(spec.formulas).forEach(function (fname) {
+            var f = spec.formulas[fname];
+            var type = f.type || 'ratio';
+            html += '<div class="p-2 bg-slate-800 border border-slate-700 rounded space-y-2" data-formula="' + escHtml(fname) + '">';
+            html += '<div class="flex flex-wrap items-center gap-2">';
+            html += '<span class="font-mono text-accent text-xs">' + escHtml(fname) + '</span>';
+            html += '<input type="text" class="pol-f-label flex-1 min-w-32 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-slate-100" ' +
+                'data-formula="' + escHtml(fname) + '" value="' + escHtml(f.label || '') + '" placeholder="Label in the report">';
+            html += '<select class="pol-f-type px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-slate-100" data-formula="' + escHtml(fname) + '">' +
+                '<option value="ratio"' + (type === 'ratio' ? ' selected' : '') + '>Ratio</option>' +
+                '<option value="percentage"' + (type === 'percentage' ? ' selected' : '') + '>Percentage</option></select>';
+            html += '<input type="number" class="pol-f-precision w-16 px-2 py-1 bg-slate-800 border border-slate-600 rounded text-xs text-slate-100 font-mono" ' +
+                'data-formula="' + escHtml(fname) + '" min="0" max="4" value="' + (f.precision === undefined ? 1 : f.precision) + '" title="Decimal places">';
+            html += '<button class="pol-f-remove text-slate-500 hover:text-red-400 text-xs" data-formula="' + escHtml(fname) + '">&times; Remove</button>';
+            html += '</div>';
+            ['numerator', 'denominator'].forEach(function (side) {
+                html += '<div><p class="text-[11px] text-slate-500 mb-1">' +
+                    (side === 'numerator' ? 'Numerator' : 'Denominator') + '</p>';
+                html += '<div class="flex flex-wrap gap-x-3 gap-y-1">';
+                shown.forEach(function (id) {
+                    var on = (f[side] || []).indexOf(id) !== -1;
+                    html += '<label class="inline-flex items-center gap-1 text-[11px] text-slate-300 cursor-pointer">' +
+                        '<input type="checkbox" class="pol-f-member accent-accent" data-formula="' + escHtml(fname) +
+                        '" data-side="' + side + '" data-cell="' + escHtml(id) + '"' + (on ? ' checked' : '') + '>' +
+                        '<span class="font-mono">' + escHtml(id) + '</span></label>';
+                });
+                html += '</div></div>';
+            });
+            if (type === 'percentage') {
+                html += '<p class="text-[11px] text-slate-500">Every numerator category must also be in the denominator, ' +
+                    'or the percentage could exceed 100%.</p>';
+            }
+            html += '<input type="text" class="pol-f-basis w-full px-2 py-1 bg-slate-800 border border-slate-600 rounded text-[11px] text-slate-400" ' +
+                'data-formula="' + escHtml(fname) + '" value="' + escHtml(f.basis || '') + '" placeholder="Citation, shown with the method statement">';
+            html += '</div>';
+        });
+        html += '</div>';
+        html += '<button id="pol-f-add" class="mt-2 text-xs text-slate-500 hover:text-slate-400 transition-colors">+ Add derived figure</button>';
+        html += '</div>';
+
+        document.getElementById('policy-editor').innerHTML = html;
+    }
+
+
+    /**
+     * One delegated listener set on the container, because the panel re-renders
+     * itself whenever a change alters what the other controls may offer —
+     * excluding a category from the denominator removes it from the threshold
+     * targets, and adding a percentage formula adds one.
+     */
+    function wirePolicyEditor() {
+        var root = document.getElementById('policy-editor');
+
+        function refresh() {
+            renderPolicyEditor();
+            updatePreview();
+        }
+
+        root.addEventListener('change', function (ev) {
+            var spec = getActiveSpec();
+            var el = ev.target;
+
+            if (el.id === 'pol-rounding') { spec.rounding = el.value; return refresh(); }
+            if (el.id === 'pol-ci-enabled') { spec.ciEnabled = el.checked; return refresh(); }
+            if (el.id === 'pol-ci-level') { spec.ciLevel = parseFloat(el.value); return; }
+
+            if (el.id === 'pol-prec-display' || el.id === 'pol-prec-report') {
+                var v = clampInt(el.value, 0, 4, el.id === 'pol-prec-display' ? 2 : 0);
+                el.value = v;
+                if (el.id === 'pol-prec-display') spec.precisionDisplay = v; else spec.precisionReport = v;
+                return updatePreview();
+            }
+
+            // Excluding a category from the denominator and reporting it per
+            // 100 are the same decision: the schema rejects one without the
+            // other, so the checkbox drives both.
+            if (el.classList.contains('pol-excl')) {
+                var cell = el.getAttribute('data-cell');
+                var at = spec.denominatorExcludes.indexOf(cell);
+                if (el.checked && at === -1) {
+                    spec.denominatorExcludes.push(cell);
+                    if (!spec.per100Reporting[cell]) {
+                        spec.per100Reporting[cell] = {
+                            label: cellLabel(cell) + ' per 100 counted',
+                            precision: 1
+                        };
+                    }
+                    // A threshold on a category with no percentage left to test
+                    // is not merely useless, it fails validation.
+                    spec.thresholds = spec.thresholds.filter(function (t) { return t.target !== cell; });
+                } else if (!el.checked && at !== -1) {
+                    spec.denominatorExcludes.splice(at, 1);
+                    delete spec.per100Reporting[cell];
+                }
+                return refresh();
+            }
+
+            if (el.classList.contains('pol-thr-target')) {
+                spec.thresholds[+el.getAttribute('data-thr-idx')].target = el.value;
+                return updatePreview();
+            }
+            if (el.classList.contains('pol-thr-value')) {
+                var pct = parseFloat(el.value);
+                if (!isFinite(pct)) pct = 0;
+                pct = Math.min(100, Math.max(0, pct));
+                el.value = pct;
+                spec.thresholds[+el.getAttribute('data-thr-idx')].value = pct;
+                return updatePreview();
+            }
+
+            if (el.classList.contains('pol-f-type')) {
+                spec.formulas[el.getAttribute('data-formula')].type = el.value;
+                return refresh();
+            }
+            if (el.classList.contains('pol-f-precision')) {
+                el.value = clampInt(el.value, 0, 4, 1);
+                spec.formulas[el.getAttribute('data-formula')].precision = +el.value;
+                return updatePreview();
+            }
+            if (el.classList.contains('pol-f-member')) {
+                var f = spec.formulas[el.getAttribute('data-formula')];
+                var side = el.getAttribute('data-side');
+                var id = el.getAttribute('data-cell');
+                f[side] = f[side] || [];
+                var i = f[side].indexOf(id);
+                if (el.checked && i === -1) f[side].push(id);
+                if (!el.checked && i !== -1) f[side].splice(i, 1);
+                return updatePreview();
+            }
+            if (el.classList.contains('pol-per100-precision')) {
+                el.value = clampInt(el.value, 0, 4, 1);
+                spec.per100Reporting[el.getAttribute('data-cell')].precision = +el.value;
+                return updatePreview();
+            }
+        });
+
+        root.addEventListener('input', function (ev) {
+            var spec = getActiveSpec();
+            var el = ev.target;
+            if (el.classList.contains('pol-per100-label')) {
+                spec.per100Reporting[el.getAttribute('data-cell')].label = el.value;
+            } else if (el.classList.contains('pol-thr-label')) {
+                spec.thresholds[+el.getAttribute('data-thr-idx')].label = el.value;
+            } else if (el.classList.contains('pol-thr-basis')) {
+                spec.thresholds[+el.getAttribute('data-thr-idx')].basis = el.value;
+            } else if (el.classList.contains('pol-f-label')) {
+                spec.formulas[el.getAttribute('data-formula')].label = el.value;
+            } else if (el.classList.contains('pol-f-basis')) {
+                spec.formulas[el.getAttribute('data-formula')].basis = el.value;
+            } else {
+                return;
+            }
+            updatePreview();
+        });
+
+        root.addEventListener('click', function (ev) {
+            var spec = getActiveSpec();
+            var el = ev.target;
+
+            if (el.id === 'pol-thr-add') {
+                var shown = displayedCells(spec).filter(function (id) {
+                    return spec.denominatorExcludes.indexOf(id) === -1;
+                });
+                if (!shown.length) return;
+                spec.thresholds.push({ target: shown[0], value: 20, label: '', basis: '' });
+                return refresh();
+            }
+            if (el.classList.contains('pol-thr-remove')) {
+                spec.thresholds.splice(+el.getAttribute('data-thr-idx'), 1);
+                return refresh();
+            }
+            if (el.id === 'pol-f-add') {
+                var key = prompt('Identifier for the derived figure (e.g. "ME_ratio"):');
+                if (!key) return;
+                key = String(key).trim();
+                if (!key || spec.formulas[key]) return;
+                spec.formulas[key] = {
+                    label: key, type: 'ratio', numerator: [], denominator: [], precision: 1, basis: ''
+                };
+                return refresh();
+            }
+            if (el.classList.contains('pol-f-remove')) {
+                delete spec.formulas[el.getAttribute('data-formula')];
+                return refresh();
+            }
+        });
+    }
+
+    function clampInt(value, lo, hi, fallback) {
+        var n = parseInt(value, 10);
+        if (!isFinite(n)) n = fallback;
+        return Math.min(hi, Math.max(lo, n));
+    }
+
     // ================================================================
     // TEMPLATE EDITOR
     // ================================================================
@@ -758,6 +1147,7 @@
                     renderLayout();
                     renderKeyAssignment();
                     renderSettings();
+                    renderPolicyEditor();
                     renderTemplateEditor();
                     renderMorphChecklist();
                     updatePlaceholderList();
@@ -789,13 +1179,23 @@
                 handedness: 'left',
                 absoluteCounts: 'optional',
                 audioEnabled: true,
-                autosaveEnabled: true
+                autosaveEnabled: true,
+                rounding: 'largest-remainder',
+                precisionDisplay: 2,
+                precisionReport: 0,
+                ciEnabled: true,
+                ciLevel: 0.95,
+                denominatorExcludes: [],
+                per100Reporting: {},
+                thresholds: [],
+                formulas: {}
             });
             editorState.activeSpecimenIdx = editorState.specimenTypes.length - 1;
             renderSpecimenTabs();
             renderLayout();
             renderKeyAssignment();
             renderSettings();
+            renderPolicyEditor();
             renderTemplateEditor();
             renderMorphChecklist();
             updatePlaceholderList();
@@ -891,8 +1291,32 @@
             merged.handedness = spec.handedness || 'left';
             merged.morphologyChecklist = spec.morphologyChecklist.slice();
             if (merged.requireCaseNumber === undefined) merged.requireCaseNumber = false;
-            if (merged.formulas === undefined) merged.formulas = {};
             if (merged.constituents === undefined) merged.constituents = {};
+
+            // Counting policy (DCR-013). These are now edited, so they are
+            // written from the editor rather than carried through. Empty
+            // collections are omitted rather than written as empty ones, so a
+            // profile states only the policy it actually sets.
+            merged.rounding = spec.rounding || 'largest-remainder';
+            merged.precision = { display: spec.precisionDisplay, report: spec.precisionReport };
+            merged.confidenceIntervals = { enabled: spec.ciEnabled !== false, level: Number(spec.ciLevel) };
+            merged.formulas = clone(spec.formulas || {});
+
+            if (spec.denominatorExcludes && spec.denominatorExcludes.length) {
+                merged.denominatorExcludes = spec.denominatorExcludes.slice();
+            } else {
+                delete merged.denominatorExcludes;
+            }
+            if (spec.per100Reporting && Object.keys(spec.per100Reporting).length) {
+                merged.per100Reporting = clone(spec.per100Reporting);
+            } else {
+                delete merged.per100Reporting;
+            }
+            if (spec.thresholds && spec.thresholds.length) {
+                merged.thresholds = clone(spec.thresholds);
+            } else {
+                delete merged.thresholds;
+            }
             return merged;
         });
         return out;

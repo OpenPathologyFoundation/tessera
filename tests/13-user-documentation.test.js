@@ -225,6 +225,51 @@ describe('SAD-001 describes the architecture that exists (URS-092)', () => {
             'the reset flow still claims it re-enables a selector that is never disabled');
     });
 
+    it('UD-079: §6 documents every field of the real state object', () => {
+        // Extracted from the source, so a field added to `state` without being
+        // documented fails here rather than at the next review.
+        const app = fs.readFileSync(path.join(ROOT, 'web', 'scripts', 'mdc-app.js'), 'utf-8');
+        const block = app.slice(app.indexOf('const state = {'));
+        const fields = [...block.slice(0, block.indexOf('};')).matchAll(/^\s{8}(\w+):/gm)]
+            .map(m => m[1]);
+        assert.ok(fields.length > 10, `only ${fields.length} state fields parsed — the parse is wrong`);
+
+        const section = sad.slice(sad.indexOf('### 6.2'), sad.indexOf('### 6.4'));
+        const missing = fields.filter(f => !section.includes(f));
+        assert.deepEqual(missing, [],
+            'SAD-001 §6.2 does not document these state fields: ' + missing.join(', '));
+    });
+
+    it('UD-080: §6 documents every storage key, and which hold patient data', () => {
+        const app = fs.readFileSync(path.join(ROOT, 'web', 'scripts', 'mdc-app.js'), 'utf-8');
+        const keys = [...app.matchAll(/const \w+_KEY = '(wbcds_\w+)'/g)].map(m => m[1]);
+        assert.ok(keys.length >= 5, `only ${keys.length} storage keys parsed`);
+
+        const section = sad.slice(sad.indexOf('### 6.3'), sad.indexOf('### 6.4'));
+        const missing = keys.filter(k => !section.includes(k));
+        assert.deepEqual(missing, [],
+            'SAD-001 §6.3 does not document these storage keys: ' + missing.join(', '));
+
+        // The two that carry patient data must be marked as such.
+        for (const key of ['wbcds_autosave', 'wbcds_history']) {
+            const row = section.split('\n').find(l => l.includes(key));
+            assert.match(row, /\*\*Yes\*\*/,
+                `${key} holds patient data; §6.3 does not say so`);
+        }
+    });
+
+    it('UD-081: §6 does not claim the tally is lost on page close', () => {
+        // It said "closure state, lost on page close". Autosave persists an
+        // interrupted count across a browser restart — that is the feature.
+        const section = sad.slice(sad.indexOf('## 6. State Management'),
+                                  sad.indexOf('## 7. Security'));
+        const claims = section.split('\n').filter(l => !l.trimStart().startsWith('>')).join('\n');
+        assert.ok(!/lost on page close/i.test(claims),
+            'SAD-001 §6 still claims the tally is lost when the page closes');
+        assert.match(section, /12 hours/i,
+            'the bound on the recovery snapshot must be stated where it is described');
+    });
+
     it('UD-074: It does not fix the key mapping that configuration owns', () => {
         assert.ok(!/R=nrbc, L=blasts/.test(sad),
             'SAD-001 still states a literal key mapping withdrawn at v2.0');

@@ -612,36 +612,95 @@ record now states the bump.
 ### 6.1 Application States
 
 ```
-                                  +---(Continue Counting)---+
-                                  |                         |
-                                  v                         |
-[IDLE] ──(Start Count)──> [COUNTING] ──(Count Done)──> [COMPLETED]
-  ^                                                         |
-  |                                                         |
-  +──────────────────(Reset)────────────────────────────────+
+                        (Continue Counting — tally intact)
+                    +---------------------------------------+
+                    |                                       |
+                    v                                       |
+  [IDLE] --(Start Count)--> [COUNTING] --(Count Done)--> [RESULTS]
+    ^  ^                     |     ^                        |
+    |  |                     |     |                        |
+    |  |    (Switch specimen:|     |                        |
+    |  |     save to history,+-----+                        |
+    |  |     fresh tally)                                   |
+    |  |                                                    |
+    |  +--(Restore an interrupted count, on load)-----------+
+    |                                                       |
+    +---------------------(Reset / New Case)----------------+
 ```
 
-| State | Phase Value | Description | Active Controls |
-|-------|-------------|-------------|-----------------|
-| IDLE | `case-entry` | Welcome screen; case number input (optional), specimen type selector | Case number input, specimen type selector, Start Count button |
-| COUNTING | `counting` | Active keydown listener; counting in progress | Keyboard input, Count Done, Reset, Morphology Comments |
-| COMPLETED | `results` | Count finalized; output displayed | Output tabs, Copy to Clipboard, Continue Counting, Reset, Session History |
+| State | `phase` | What is live | Controls |
+|-------|---------|--------------|----------|
+| IDLE | `case-entry` | Nothing counted. Case number optional; Start Count always enabled | Case field, specimen selector, Start Count, configuration controls |
+| COUNTING | `counting` | Document keydown listener attached; autosave written on every keystroke | Counting keys, specimen switcher, Count Done, Reset, morphology comments |
+| RESULTS | `results` | Keydown detached — keystrokes can no longer alter the tally | Output tabs, Copy, Print, analyser WBC, Continue Counting, New Case, history |
 
-Note: There is no separate CASE_ENTERED state. The case number is optional, and Start Count is always enabled. The COMPLETED state allows transition back to COUNTING via the "Continue Counting" button.
+Three transitions the previous revision omitted:
 
-### 6.2 Data in Memory
+- **Specimen switch during counting.** The selector is *not* locked. Switching
+  saves the count in progress to session history and starts a fresh tally
+  (URS-013), so work is never silently discarded.
+- **Crash recovery into COUNTING.** A surviving autosave snapshot offers Restore
+  on load, which re-enters COUNTING with the tally intact. That dialog is
+  non-dismissible: its Cancel is *Discard* (§7.1, HA-102).
+- **Continue Counting** is why URS-043 (locking after completion) was withdrawn.
+  A near-threshold advisory is only useful if the operator can act on it.
 
-| Data Item | Type | Scope | Persistence |
-|-----------|------|-------|-------------|
-| Cell counts | Object `{ cellType: number }` | Per counting session | Closure state, lost on page close |
-| Percentages | Computed on the fly | Per counting session | Calculated from counts, not stored independently |
-| Case number | String | Per counting session | Closure state |
-| Specimen type | String (`bm` or `pb`) | Per counting session | Closure state |
-| Morphology comments | String | Per counting session | Closure state; preserved across resume cycles |
-| Application phase | String (`case-entry`, `counting`, `results`) | Application lifetime | Closure state |
-| Template configuration | JSON array | Application lifetime | Loaded from file via `fetch()` on page load |
-| Session history | Array of objects | Browser session | sessionStorage (`wbcds_history`) |
-| Theme preference | String (`dark` or `light`) | Browser session | sessionStorage (`wbcds_theme`) |
+There is still no separate CASE_ENTERED state: the case number is optional.
+
+### 6.2 State in Memory
+
+The single closure-scoped `state` object in `mdc-app.js`:
+
+| Field | Type | Notes |
+|-------|------|-------|
+| `phase` | string | `case-entry` \| `counting` \| `results` |
+| `caseNumber` | string | Optional; **patient-identifying** |
+| `specimenType` | string | Profile-defined, not a fixed `bm`/`pb` pair |
+| `isCountingActive` | boolean | Gates the keydown handler |
+| `commentFieldFocused` | boolean | Keeps counting keys out of the textarea |
+| `config` | array | The **normalised, validated** specimenTypes of the active profile |
+| `configMeta` | object | `{ profileId, profileName, version }` — stamped into every report (URS-052) |
+| `counts` | object | `{ cellType: number }` — the tally |
+| `morphChecked` | array | Morphology checklist selections (URS-073) |
+| `sessionHistory` | array | Completed sessions this browser session |
+| `activeTab`, `theme`, `audioEnabled`, `autosaveEnabled`, `targetReachedNotified` | — | Presentation and one-shot flags |
+
+Percentages, intervals, per-100 values, derived figures and the method statement
+are **not stored in `state`**. They are computed from `counts` by `wbc-core.js`
+on demand, so there is no second copy to fall out of step with the tally. They
+are materialised once, into the immutable session object, at Count Done.
+
+### 6.3 State at Rest
+
+| Key | Store | Holds | Lifetime | Patient data |
+|-----|-------|-------|----------|--------------|
+| `wbcds_history` | sessionStorage | Completed sessions, for review and export | Until the tab closes | **Yes** — case numbers, comments |
+| `wbcds_theme` | sessionStorage | Presentation theme | Until the tab closes | No |
+| `wbcds_audio` | sessionStorage | Operator's audio choice, overriding the profile default | Until the tab closes | No |
+| `wbcds_config` | **localStorage** | The active configuration profile | Until replaced or reset | No |
+| `wbcds_autosave` | **localStorage** | Crash-recovery snapshot: case number, specimen, counts, comments, checklist, timestamp | Discarded on completion, on reset, and on load if older than **12 hours** | **Yes** |
+
+The previous revision recorded the tally as *"closure state, lost on page
+close"*. That has not been true since autosave: an interrupted count survives a
+browser restart on that workstation, which is the point of the feature and also
+the residual exposure recorded in §7.1 and RA-001.
+
+**Why two stores.** sessionStorage is the right home for anything whose lifetime
+should be the sitting — the history list, the theme. localStorage is required
+for the two things that must outlive a crash or a restart: the configuration a
+laboratory has adopted, and a count that was interrupted. The second is the only
+patient data the product deliberately persists beyond the tab, and it is bounded
+in time for that reason.
+
+### 6.4 Configuration State
+
+`state.config` is the **normalised** profile, not the file. Normalisation and
+validation happen once, at resolution (§4.5), so no consumer re-parses or
+re-checks. `state.configMeta` carries the identity into every report, which is
+what makes a figure traceable to the conventions that produced it (URS-052).
+
+Neither is mutated during counting. A specimen switch selects a different entry
+within the same profile; changing the profile itself returns to IDLE.
 
 ---
 
@@ -705,6 +764,7 @@ Note: There is no separate CASE_ENTERED state. The case number is optional, and 
 |-----|------|--------|-------------|
 | 3.0 | 2026-08-06 | QMS | **Revised for drift.** §7.1 stated "sessionStorage only … no localStorage" and that output avoided `innerHTML`; both false, and the same privacy claim corrected in README.md under DCR-015 had not been propagated. §3.2.3 and §7.2 carried the key mapping withdrawn at v2.0. Tailwind was described as CDN-delivered in three places, which would defeat URS-094. §5.2 listed a file that does not exist and omitted three of four scripts, the service worker, the stylesheet, the vendored bundle and the preset catalogue; §5.3 described a single script tag. §3.2.9 to §3.2.13 added for the calculation engine, configuration lifecycle, dialog, editor and offline shell — five components previously absent. See DCR-021. |
 | 3.1 | 2026-08-06 | QMS | §3.1 redrawn by layer — the previous diagram was a flat grid of counter features that omitted every module added since DCR-006, including the engine that computes every number in it. §4 flows rewritten: they stopped at "recalculate percentages" and "compile the template", omitting the denominator policy, rounding, confidence intervals, the threshold advisory, the method statement, autosave and every keyboard guard. §4.4 claimed reset clears the specimen type and re-enables a locked selector; it preserves the type and nothing is ever locked. §4.5 (configuration resolution) added, previously absent. UD-075 to UD-078. |
+| 3.2 | 2026-08-06 | QMS | §6 rewritten. §6.1 omitted three transitions that exist — the mid-count specimen switch, crash recovery back into COUNTING, and the reason URS-043 was withdrawn — and implied the specimen selector locks. §6.2 documented nine of fifteen state fields and recorded the tally as "closure state, lost on page close", which autosave made false. §6.3 (state at rest) and §6.4 (configuration state) added: both localStorage keys were undocumented, including the recovery snapshot that holds patient data. UD-079 to UD-081 extract the state fields and storage keys from the source, so an undocumented field fails the build. |
 | A | 2026-02-18 | QMS | Initial draft — architecture defined |
 | B | 2026-02-19 | QMS | Component descriptions refined |
 | C | 2026-02-20 | QMS | Data flow diagrams updated |

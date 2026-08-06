@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | DCR-021 |
-| **Version** | 1.1 |
+| **Version** | 1.2 |
 | **Date Created** | 2026-08-06 |
 | **Status** | **In Review** — engineering approvals complete; clinical approval outstanding |
 | **Parent Document** | DHF-001 |
@@ -163,11 +163,50 @@ selector" fails UD-078.
 
 ---
 
-## 4a. What This Still Does Not Address
+## 4b. Rev C — §6 Completed
 
-- **§6 (state management)** was read but not revised.
+**§6.1** omitted three transitions the product performs: the specimen switch
+during counting (which saves the count in progress to history and starts a fresh
+tally), crash recovery back into COUNTING from a surviving snapshot, and why
+URS-043 was withdrawn. It also implied the specimen selector locks. It does not.
+
+**§6.2** documented nine of the fifteen fields on `state`, and recorded the
+tally as *"closure state, lost on page close"* — which autosave made false. An
+interrupted count survives a browser restart; that is the feature.
+
+**§6.3 State at Rest** and **§6.4 Configuration State** were absent. Both
+`localStorage` keys were undocumented, including `wbcds_autosave` — the only
+patient data the product deliberately persists beyond the tab. §6.3 now records
+every key, its store, its lifetime, and **whether it holds patient data**,
+consistent with the §7.1 correction.
+
+§6.2 also records what is deliberately *not* in `state`: percentages, intervals,
+per-100 values, derived figures and the method statement are computed from the
+tally on demand, so there is no second copy to fall out of step with it.
+
+### Guarded by extraction, not by reading
+
+| ID | Verifies |
+|----|----------|
+| UD-079 | Every field of the real `state` object is documented — parsed from `mdc-app.js` |
+| UD-080 | Every `wbcds_*` storage key is documented, and the two holding patient data are marked as such |
+| UD-081 | §6 does not claim the tally is lost on page close, and states the 12-hour bound |
+
+These are stronger than the other SAD guards: they read the source and fail on a
+field or key that exists but is undocumented, rather than checking that a topic
+is mentioned. Revert-checked — adding an undocumented field to `state` fails
+UD-079; removing a key from §6.3 fails UD-080; and marking the recovery snapshot
+as holding no patient data fails UD-080 too.
+
+---
+
+## 4c. What This Still Does Not Address
+
 - UD-070 and UD-075 check a module is *named* and *drawn*, not that what is said
-  about it is true. No test can check prose against code.
+  about it is true. No test can check prose against code. UD-079 to UD-081 are
+  the exception, and only because state fields and storage keys are extractable.
+- §2 (architecture overview) and §8 (deployment) were read during this work and
+  found broadly accurate, but were not audited line by line.
 
 ---
 
@@ -177,6 +216,7 @@ selector" fails UD-078.
 |-----|------|--------|-------------|
 | A | 2026-08-06 | QMS | Initial issue. SAD-001 v3.0: §7.1 privacy claims corrected, five components added, file layout and script loading replaced, CDN and key-mapping claims withdrawn. UD-070 to UD-074 added. |
 | B | 2026-08-06 | QMS | SAD-001 Rev 3.1: §3.1 redrawn by layer, §4 flows rewritten, §4.4 reset corrected, §4.5 added. UD-075 to UD-078. |
+| C | 2026-08-06 | QMS | SAD-001 Rev 3.2: §6 rewritten; §6.3 and §6.4 added. UD-079 to UD-081 extract state fields and storage keys from the source. |
 
 ---
 

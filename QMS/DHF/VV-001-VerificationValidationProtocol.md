@@ -68,14 +68,14 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**391 identified verification cases** across 18 series and 4 layers.  344 further tests carry no identifier and are not registered.
+**394 identified verification cases** across 18 series and 4 layers.  344 further tests carry no identifier and are not registered.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 7 (001–010) | Static | QMS counted quantities |
 | `SC-*` | 20 (001–043) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
-| `UD-*` | 42 (001–078) | Static | User-facing documentation |
+| `UD-*` | 45 (001–081) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-CALC-*` | 23 (001–029) | Unit | Calculation engine vectors |
 | `VV-CI-*` | 12 (001–012) | Unit | Wilson confidence intervals |
@@ -270,6 +270,9 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | UD-076 | The counting flow shows the guards that protect the tally | Static | `tests/13-user-documentation.test.js` |
 | UD-077 | The completion flow shows what the results screen computes | Static | `tests/13-user-documentation.test.js` |
 | UD-078 | The reset flow does not claim behaviour the code does not have | Static | `tests/13-user-documentation.test.js` |
+| UD-079 | §6 documents every field of the real state object | Static | `tests/13-user-documentation.test.js` |
+| UD-080 | §6 documents every storage key, and which hold patient data | Static | `tests/13-user-documentation.test.js` |
+| UD-081 | §6 does not claim the tally is lost on page close | Static | `tests/13-user-documentation.test.js` |
 
 #### VV-ABS-* — Absolute counts and the analyser WBC
 

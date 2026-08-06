@@ -20,6 +20,7 @@ const assert = require('node:assert/strict');
 const path = require('node:path');
 
 const { measureDocuments, apply } = require(path.join(__dirname, '..', 'scripts', 'qms-counts.js'));
+const vindex = require(path.join(__dirname, '..', 'scripts', 'qms-verification-index.js'));
 
 describe('Counted quantities match the documents they describe (URS-092)', () => {
 
@@ -55,5 +56,45 @@ describe('Counted quantities match the documents they describe (URS-092)', () =>
         const c = measureDocuments();
         assert.ok(c.srs > c.urs, 'there should be more system requirements than user requirements');
         assert.ok(c.testCases > c.scenarios, 'there should be more test cases than validation scenarios');
+    });
+});
+
+// ================================================================
+describe('Verification identifiers exist (URS-092)', () => {
+
+    /**
+     * An independent review found 61 identifiers cited by RTM-001 and TR-001
+     * that existed in no protocol document, and 106 TC-0xx numbers in TP-001
+     * that appeared in no test file. The gap then widened to 98 as new suites
+     * cited new identifiers without touching the protocol.
+     *
+     * A traceability matrix citing identifiers that do not exist is worse than
+     * no matrix: it manufactures the appearance of coverage. These tests make
+     * that impossible to leave unnoticed.
+     *
+     * They read the COMMITTED register rather than re-extracting, because
+     * extraction spawns both test runners and this suite runs inside one.
+     */
+
+    it('QC-004: VV-001 and TP-001 carry a generated register', () => {
+        for (const file of vindex.TARGETS) {
+            const ids = vindex.parseRegister(file);
+            assert.ok(ids, `${file} has no generated register block`);
+            assert.ok(ids.size > 200,
+                `${file} registers only ${ids ? ids.size : 0} identifiers — the register looks truncated`);
+        }
+    });
+
+    it('QC-005: Every identifier cited by RTM-001 and TR-001 is registered', () => {
+        const dangling = vindex.danglingCitations();
+        assert.deepEqual(dangling, [],
+            'traceability documents cite identifiers that no test implements:\n  ' +
+            dangling.join('\n  '));
+    });
+
+    it('QC-006: The two registers agree', () => {
+        const [a, b] = vindex.TARGETS.map(f => vindex.parseRegister(f));
+        assert.deepEqual([...a].sort(), [...b].sort(),
+            'VV-001 and TP-001 register different identifiers');
     });
 });

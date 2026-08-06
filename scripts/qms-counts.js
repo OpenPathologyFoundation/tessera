@@ -30,7 +30,12 @@ function measureDocuments() {
     const urs = read('QMS', 'DHF', 'URS-001_UserRequirementsSpecification_v2.0.md');
     const srs = read('QMS', 'DHF', 'SRS-001-SystemRequirementsSpecification.md');
     const ra = read('QMS', 'DHF', 'RA-001-RiskAnalysis-FMEA.md');
-    const tp = read('QMS', 'DHF', 'TP-001-TestPlan.md');
+    // TP-001's TC-0xx numbering was withdrawn (DCR-018): none of those
+    // identifiers appeared in any test file. The countable quantity is now the
+    // register of implemented verification cases, which both TP-001 and VV-001
+    // carry and which is generated from the runners.
+    const { parseRegister, TARGETS } =
+        require(path.join(__dirname, 'qms-verification-index.js'));
     const vv = read('QMS', 'DHF', 'VV-001-VerificationValidationProtocol.md');
 
     // Requirement and hazard IDs are counted from their table rows, so prose
@@ -38,14 +43,14 @@ function measureDocuments() {
     const ursIds = uniq(urs, /^\| URS-\d+ \|/gm);
     const srsIds = uniq(srs, /^\| SYS-[\w-]+ \|/gm);
     const hazards = uniq(ra, /^\| HA-\d+ \|/gm);
-    const testCases = uniq(tp, /TC-\d+/g);
+    const registered = parseRegister(TARGETS[0]);
     const scenarios = uniq(vv, /\bV[1-9]\d?\b(?=[ :.—-])/g);
 
     return {
         urs: ursIds.size,
         srs: srsIds.size,
         hazards: hazards.size,
-        testCases: testCases.size,
+        testCases: registered ? registered.size : 0,
         scenarios: scenarios.size
     };
 }
@@ -108,7 +113,7 @@ function edits(c) {
         ['README.md', /(\*\*URS-001\*\* \| )\d+( user requirements)/, `$1${c.urs}$2`],
         ['README.md', /(\*\*SRS-001\*\* \| )\d+( testable system requirements)/, `$1${c.srs}$2`],
         ['README.md', /(FMEA risk analysis: )\d+( hazards)/, `$1${c.hazards}$2`],
-        ['README.md', /(Test plan with )\d+( test cases)/, `$1${c.testCases}$2`],
+        ['README.md', /(register of )\d+( implemented verification cases)/, `$1${c.testCases}$2`],
         ['README.md', /(protocol with 15 calculation vectors and )\d+( clinical validation scenarios)/,
             `$1${c.scenarios}$2`],
         ['README.md', /(jsdom &mdash; |jsdom — )\d+( tests)/, `$1${c.suite11}$2`],

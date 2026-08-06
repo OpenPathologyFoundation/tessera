@@ -17,6 +17,7 @@
 
 const { describe, it } = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
 const path = require('node:path');
 
 const { measureDocuments, apply } = require(path.join(__dirname, '..', 'scripts', 'qms-counts.js'));
@@ -90,6 +91,29 @@ describe('Verification identifiers exist (URS-092)', () => {
         assert.deepEqual(dangling, [],
             'traceability documents cite identifiers that no test implements:\n  ' +
             dangling.join('\n  '));
+    });
+
+    it('QC-011: Every test carries a verification identifier', () => {
+        // 328 tests — the entire static structural layer — ran and passed but
+        // could not be cited by a traceability document, because a citation
+        // needs an identifier to point at. They are named now, and this keeps
+        // it that way: a new test without one is a coverage gap that RTM-001
+        // cannot express.
+        //
+        // Reads the committed register rather than re-extracting; extraction
+        // spawns both runners and this suite runs inside one.
+        const registered = vindex.parseRegister(vindex.TARGETS[0]);
+        assert.ok(registered && registered.size > 600,
+            `the register holds only ${registered ? registered.size : 0} cases — it looks truncated`);
+
+        const src = fs.readFileSync(vindex.TARGETS[0], 'utf-8');
+        const claim = /\*\*(\d+) verification cases\*\*.*?run as (\d+) tests\.\s*(.*?)$/m.exec(src);
+        assert.ok(claim, 'the register does not state its own totals');
+        assert.equal(Number(claim[1]), registered.size,
+            'the register headline disagrees with the rows beneath it');
+        assert.match(claim[3], /Every test carries an identifier/,
+            'the register reports tests with no identifier — name them, or the ' +
+            'traceability matrix cannot cite them');
     });
 
     it('QC-006: The two registers agree', () => {

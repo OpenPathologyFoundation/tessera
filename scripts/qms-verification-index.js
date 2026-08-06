@@ -65,6 +65,11 @@ function extract() {
     const { spawnSync } = require('node:child_process');
     const seen = new Map();
     const entries = [];
+    // Counted as instances-with-an-id, then subtracted from the runners' own
+    // totals. Counting "lines without an id" directly does not work: the Node
+    // reporter prints a line with a duration for every `describe` block too,
+    // and those were being reported as unidentified tests.
+    let idNode = 0, idE2e = 0;
     // Unique test titles. Playwright lists each case once per engine, so
     // counting raw lines would report 375 where 125 cases exist and make the
     // unidentified figure meaningless.
@@ -101,7 +106,7 @@ function extract() {
             const m = /^\s*[✔✖]\s+(.+?)\s+\([\d.]+m?s\)\s*$/.exec(line);
             if (!m) continue;
             const idm = /^([A-Z]{2,4}(?:-[A-Z0-9]+)*?-[A-Z]?\d+)\s*(?:\([^)]*\))?\s*:\s*(.*)$/.exec(m[1]);
-            if (idm) add(idm[1], idm[2].trim(), file);
+            if (idm) { add(idm[1], idm[2].trim(), file); idNode++; }
         }
     }
 
@@ -114,7 +119,7 @@ function extract() {
         const title = m[2].split(' › ').pop();
         distinct.add(file + '::' + title);
         const idm = /^([A-Z]{2,4}(?:-[A-Z0-9]+)*?-[A-Z]?\d+)\s*(?:\([^)]*\))?\s*:\s*(.*)$/.exec(title);
-        if (idm) add(idm[1], idm[2].trim(), file);
+        if (idm) { add(idm[1], idm[2].trim(), file); idE2e++; }
     }
 
     entries.sort((a, b) => {
@@ -122,8 +127,13 @@ function extract() {
         if (pa !== pb) return pa.localeCompare(pb);
         return Number(a.id.match(/\d+$/)[0]) - Number(b.id.match(/\d+$/)[0]);
     });
+    // A parametrised case — one per shipped preset, per theme, per contrast
+    // surface — is ONE verification case run several times. Counting those
+    // extra runs as "unidentified" misdescribed them; `noId` counts only
+    // tests whose title carries no identifier.
     const total = nodeTotal + distinct.size;
-    return { entries, unidentified: total - entries.length, total };
+    const noId = Math.max(0, nodeTotal - idNode) + Math.max(0, distinct.size - idE2e);
+    return { entries, unidentified: noId, instances: total, total };
 }
 
 /** Identifiers cited by the traceability documents. */
@@ -157,7 +167,7 @@ function addCite(map, id, file) {
 
 // ---------------------------------------------------------------- render
 
-function renderRegister({ entries, unidentified }) {
+function renderRegister({ entries, unidentified, instances }) {
     const byPrefix = new Map();
     for (const e of entries) {
         const prefix = e.id.replace(/-?\d+$/, '');
@@ -173,9 +183,12 @@ function renderRegister({ entries, unidentified }) {
     lines.push('> the test files. Suite 14 fails the build if it is stale, and if any identifier');
     lines.push('> cited by RTM-001 or TR-001 does not exist here.');
     lines.push('');
-    lines.push(`**${entries.length} identified verification cases** across ` +
-        `${byPrefix.size} series and 4 layers.` +
-        (unidentified ? `  ${unidentified} further tests carry no identifier and are not registered.` : ''));
+    lines.push(`**${entries.length} verification cases** across ${byPrefix.size} series and 4 layers, ` +
+        `run as ${instances} tests.` +
+        (unidentified
+            ? `  ${unidentified} tests carry no identifier and are not registered.`
+            : '  Every test carries an identifier; a case running more than once is ' +
+              'parametrised — one per shipped preset, per theme, or per surface.'));
     lines.push('');
 
     lines.push('| Series | Cases | Layer(s) | Covers |');
@@ -224,7 +237,15 @@ const SERIES = {
     'TC-B': 'Application behaviour in a DOM',
     'UD': 'User-facing documentation',
     'QC': 'QMS counted quantities',
-    'SC': 'Standards conformance (ICSH)'
+    'SC': 'Standards conformance (ICSH)',
+    'VV-CFG': 'Configuration profile integrity',
+    'VV-DOM': 'Counter markup and required elements',
+    'VV-SRC': 'Application source integrity (static)',
+    'VV-AUD': 'Audio engine structure',
+    'VV-SAV': 'Autosave and crash recovery (static)',
+    'VV-SCH': 'v2 configuration schema',
+    'VV-PRE': 'Preset catalogue integrity',
+    'VV-EDT': 'Configuration editor structure'
 };
 
 /**
@@ -241,7 +262,9 @@ function parseRegister(file) {
     if (from === -1 || to === -1) return null;
     const block = src.slice(from, to);
     const ids = new Set();
-    for (const m of block.matchAll(/^\| ([A-Z]{2,4}(?:-[A-Z0-9]+)*-\d+) \|/gm)) ids.add(m[1]);
+    // `-[A-Z]?\d+`: TC-B012 fuses its letter to the digits, and a pattern
+    // requiring a hyphen before them silently dropped all 91 of them.
+    for (const m of block.matchAll(/^\| ([A-Z]{2,4}(?:-[A-Z0-9]+)*?-[A-Z]?\d+) \|/gm)) ids.add(m[1]);
     return ids;
 }
 
@@ -308,8 +331,8 @@ if (require.main === module) {
     const { problems, dangling, dups, index } = apply({ write });
 
     if (!check) {
-        console.log(`${index.entries.length} identified verification cases; ` +
-            `${index.unidentified} unidentified tests.`);
+        console.log(`${index.entries.length} verification cases, run as ${index.instances} tests; ` +
+            `${index.unidentified} carry no identifier.`);
     }
     if (write) {
         console.log(problems.length ? 'Regenerated:' : 'Registers already current.');

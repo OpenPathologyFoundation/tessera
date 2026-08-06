@@ -23,12 +23,12 @@ const expectedPresets = [
 
 describe('Preset Catalog — File Existence', () => {
 
-    it('Presets directory exists', () => {
+    it('VV-PRE-001: Presets directory exists', () => {
         assert.ok(fs.existsSync(PRESETS_DIR), 'web/settings/presets/ must exist');
     });
 
     expectedPresets.forEach(function (filename) {
-        it('Preset file exists: ' + filename, () => {
+        it('VV-PRE-002: Preset file exists: ' + filename, () => {
             const fp = path.join(PRESETS_DIR, filename);
             assert.ok(fs.existsSync(fp), filename + ' must exist in presets directory');
         });
@@ -38,7 +38,7 @@ describe('Preset Catalog — File Existence', () => {
 describe('Preset Catalog — JSON Validity', () => {
 
     expectedPresets.forEach(function (filename) {
-        it(filename + ' is valid JSON', () => {
+        it('VV-PRE-003: ' + filename + ' is valid JSON', () => {
             const fp = path.join(PRESETS_DIR, filename);
             const raw = fs.readFileSync(fp, 'utf-8');
             assert.doesNotThrow(() => JSON.parse(raw), filename + ' must be valid JSON');
@@ -49,7 +49,7 @@ describe('Preset Catalog — JSON Validity', () => {
 describe('Preset Catalog — Schema Conformance', () => {
 
     expectedPresets.forEach(function (filename) {
-        it(filename + ' has required v2 wrapper fields', () => {
+        it('VV-PRE-004: ' + filename + ' has required v2 wrapper fields', () => {
             const fp = path.join(PRESETS_DIR, filename);
             const config = JSON.parse(fs.readFileSync(fp, 'utf-8'));
 
@@ -60,7 +60,7 @@ describe('Preset Catalog — Schema Conformance', () => {
             assert.ok(config.specimenTypes.length >= 1, filename + ': must have at least 1 specimen type');
         });
 
-        it(filename + ' specimen types have required fields', () => {
+        it('VV-PRE-005: ' + filename + ' specimen types have required fields', () => {
             const fp = path.join(PRESETS_DIR, filename);
             const config = JSON.parse(fs.readFileSync(fp, 'utf-8'));
 
@@ -82,7 +82,7 @@ describe('Preset Catalog — Schema Conformance', () => {
             }
         });
 
-        it(filename + ' outCodes values match category cell types (except custom)', () => {
+        it('VV-PRE-006: ' + filename + ' outCodes values match category cell types (except custom)', () => {
             if (filename === 'custom.json') return; // Custom template is empty by design
             const fp = path.join(PRESETS_DIR, filename);
             const config = JSON.parse(fs.readFileSync(fp, 'utf-8'));
@@ -98,7 +98,7 @@ describe('Preset Catalog — Schema Conformance', () => {
             }
         });
 
-        it(filename + ' has no duplicate outCode keys per specimen', () => {
+        it('VV-PRE-007: ' + filename + ' has no duplicate outCode keys per specimen', () => {
             const fp = path.join(PRESETS_DIR, filename);
             const config = JSON.parse(fs.readFileSync(fp, 'utf-8'));
 
@@ -122,7 +122,7 @@ describe('Preset Catalog — Ergonomic Zone Validation', () => {
     const leftPresets = ['consensus-14.json', 'harmonized-9.json', 'legacy-9.json', 'minimal-5.json', 'body-fluid.json'];
 
     leftPresets.forEach(function (filename) {
-        it(filename + ' left-hand preset keys are within left ergonomic zone', () => {
+        it('VV-PRE-008: ' + filename + ' left-hand preset keys are within left ergonomic zone', () => {
             const fp = path.join(PRESETS_DIR, filename);
             const config = JSON.parse(fs.readFileSync(fp, 'utf-8'));
             for (const spec of config.specimenTypes) {
@@ -135,7 +135,7 @@ describe('Preset Catalog — Ergonomic Zone Validation', () => {
         });
     });
 
-    it('The right-hand key layout is still reachable, as an editor action', () => {
+    it('VV-PRE-009: The right-hand key layout is still reachable, as an editor action', () => {
         // The `right-hand` preset was a fork of consensus-14 differing only in
         // key assignment — and it shipped with four categories that could not
         // be un-counted (HA-104), because a forked file is a place for a defect
@@ -152,7 +152,7 @@ describe('Preset Catalog — Ergonomic Zone Validation', () => {
 
 describe('Preset Catalog — Specific Presets', () => {
 
-    it('consensus-14 has 14 cell types per specimen', () => {
+    it('VV-PRE-010: consensus-14 has 14 cell types per specimen', () => {
         const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'consensus-14.json'), 'utf-8'));
         for (const spec of config.specimenTypes) {
             assert.equal(Object.keys(spec.outCodes).length, 14,
@@ -160,13 +160,13 @@ describe('Preset Catalog — Specific Presets', () => {
         }
     });
 
-    it('minimal-5 has 5 cell types', () => {
+    it('VV-PRE-011: minimal-5 has 5 cell types', () => {
         const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'minimal-5.json'), 'utf-8'));
         const spec = config.specimenTypes[0];
         assert.equal(Object.keys(spec.outCodes).length, 5, 'Must have 5 key mappings');
     });
 
-    it('Handedness remains a per-profile field', () => {
+    it('VV-PRE-012: Handedness remains a per-profile field', () => {
         // Not dead schema: it drives the editor's "key outside the ergonomic
         // zone" warning. It is editor-scoped, which is not the same as unused.
         const editor = fs.readFileSync(
@@ -175,25 +175,25 @@ describe('Preset Catalog — Specific Presets', () => {
             'handedness must still select the ergonomic zone');
     });
 
-    it('body-fluid has bf specimen type', () => {
+    it('VV-PRE-013: body-fluid has bf specimen type', () => {
         const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'body-fluid.json'), 'utf-8'));
         assert.ok(config.specimenTypes.some(s => s.specimenType === 'bf'), 'Must have bf specimen');
     });
 
-    it('body-fluid has morphology checklist items', () => {
+    it('VV-PRE-014: body-fluid has morphology checklist items', () => {
         const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'body-fluid.json'), 'utf-8'));
         const bf = config.specimenTypes.find(s => s.specimenType === 'bf');
         assert.ok(bf.morphologyChecklist.length > 0, 'Body fluid must have morph checklist items');
     });
 
-    it('harmonized-9 has constituents defined', () => {
+    it('VV-PRE-015: harmonized-9 has constituents defined', () => {
         const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'harmonized-9.json'), 'utf-8'));
         const bm = config.specimenTypes.find(s => s.specimenType === 'bm');
         assert.ok(bm.constituents && bm.constituents.gran, 'Harmonized-9 BM must have gran constituent');
         assert.ok(Array.isArray(bm.constituents.gran.members), 'Gran constituent must have members array');
     });
 
-    it('custom preset has empty categories', () => {
+    it('VV-PRE-016: custom preset has empty categories', () => {
         const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'custom.json'), 'utf-8'));
         const spec = config.specimenTypes[0];
         assert.equal(spec.categories.upper.length, 0, 'Custom upper must be empty');
@@ -231,7 +231,7 @@ describe('Preset Catalog — Denominator Policy (URS-030, HA-092)', () => {
     }
 
     expectedPresets.forEach(function (filename) {
-        it(filename + ' excludes NRBC from any non-marrow differential', () => {
+        it('VV-PRE-017: ' + filename + ' excludes NRBC from any non-marrow differential', () => {
             const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, filename), 'utf-8'));
             for (const spec of nucleatedRedInNonMarrow(config)) {
                 assert.ok(Array.isArray(spec.denominatorExcludes) &&
@@ -245,7 +245,7 @@ describe('Preset Catalog — Denominator Policy (URS-030, HA-092)', () => {
         });
     });
 
-    it('A preset sharing the built-in profileId is the built-in profile', () => {
+    it('VV-PRE-018: A preset sharing the built-in profileId is the built-in profile', () => {
         // isCacheSuperseded discards a cached profile when a built-in one with
         // the SAME profileId carries a higher version. consensus-14.json was
         // v2.0 against the built-in v2.5, so choosing it from the catalogue
@@ -294,7 +294,7 @@ describe('Preset Catalog — No Redundant Forks', () => {
      * categories that could not be un-counted (HA-104), and six of eight
      * presets silently omitted `confidenceIntervals` (P0-9).
      */
-    it('No two presets are the same layout with the same keys', () => {
+    it('VV-PRE-019: No two presets are the same layout with the same keys', () => {
         // Compared ACROSS files, not within one. A profile deliberately uses
         // the same keys for bone marrow and peripheral blood — an operator
         // should not relearn the keyboard when the specimen changes.
@@ -321,7 +321,7 @@ describe('Preset Catalog — No Redundant Forks', () => {
         }
     });
 
-    it('Every selectable preset configures confidence intervals (P0-9)', () => {
+    it('VV-PRE-020: Every selectable preset configures confidence intervals (P0-9)', () => {
         // Intervals displayed at the 0.95 default while the method statement
         // omitted the disclosure, because only one preset set the field.
         for (const filename of expectedPresets) {

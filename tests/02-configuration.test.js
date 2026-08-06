@@ -27,11 +27,11 @@ function normalizeConfig(raw) {
 
 describe('Configuration — File Loading (SYS-100, SYS-101)', () => {
 
-    it('templates.json exists and is readable', () => {
+    it('VV-CFG-001: templates.json exists and is readable', () => {
         assert.ok(fs.existsSync(CONFIG_PATH), 'templates.json must exist at web/settings/templates.json');
     });
 
-    it('templates.json contains valid JSON', () => {
+    it('VV-CFG-002: templates.json contains valid JSON', () => {
         const raw = fs.readFileSync(CONFIG_PATH, 'utf-8');
         assert.doesNotThrow(() => {
             rawConfig = JSON.parse(raw);
@@ -39,12 +39,12 @@ describe('Configuration — File Loading (SYS-100, SYS-101)', () => {
         }, 'templates.json must be valid JSON');
     });
 
-    it('Configuration has at least 1 specimen type (SYS-102)', () => {
+    it('VV-CFG-003: Configuration has at least 1 specimen type (SYS-102)', () => {
         assert.ok(Array.isArray(config), 'Normalized config must be an array');
         assert.ok(config.length >= 1, 'Must have at least 1 specimen type');
     });
 
-    it('V2 config has version and profileId fields', () => {
+    it('VV-CFG-004: V2 config has version and profileId fields', () => {
         if (!Array.isArray(rawConfig)) {
             assert.ok(typeof rawConfig.version === 'string', 'V2 config must have version');
             assert.ok(typeof rawConfig.profileId === 'string', 'V2 config must have profileId');
@@ -55,7 +55,7 @@ describe('Configuration — File Loading (SYS-100, SYS-101)', () => {
 
 describe('Configuration — Schema Validation (SYS-102, SYS-103)', () => {
 
-    it('Each entry has required fields: specimenType, targetCount, categories, outCodes, templates', () => {
+    it('VV-CFG-005: Each entry has required fields: specimenType, targetCount, categories, outCodes, templates', () => {
         for (const entry of config) {
             assert.ok(typeof entry.specimenType === 'string', 'specimenType must be a string');
             assert.ok(entry.specimenType.length > 0, 'specimenType must not be empty');
@@ -69,18 +69,18 @@ describe('Configuration — Schema Validation (SYS-102, SYS-103)', () => {
         }
     });
 
-    it('specimenType values are unique (no duplicates)', () => {
+    it('VV-CFG-006: specimenType values are unique (no duplicates)', () => {
         const types = config.map(e => e.specimenType);
         const unique = new Set(types);
         assert.equal(unique.size, types.length, 'Duplicate specimenType values found: ' + types.join(', '));
     });
 
-    it('Bone Marrow (bm) specimen type is configured', () => {
+    it('VV-CFG-007: Bone Marrow (bm) specimen type is configured', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         assert.ok(bm, 'Must have a "bm" specimen type');
     });
 
-    it('Peripheral Blood (pb) specimen type is configured', () => {
+    it('VV-CFG-008: Peripheral Blood (pb) specimen type is configured', () => {
         const pb = config.find(e => e.specimenType === 'pb');
         assert.ok(pb, 'Must have a "pb" specimen type');
     });
@@ -88,7 +88,7 @@ describe('Configuration — Schema Validation (SYS-102, SYS-103)', () => {
 
 describe('Configuration — Categories Validation (SYS-102)', () => {
 
-    it('Each entry has categories with upper and lower arrays', () => {
+    it('VV-CFG-009: Each entry has categories with upper and lower arrays', () => {
         for (const entry of config) {
             assert.ok(Array.isArray(entry.categories.upper),
                 `${entry.specimenType}: categories.upper must be an array`);
@@ -101,7 +101,7 @@ describe('Configuration — Categories Validation (SYS-102)', () => {
         }
     });
 
-    it('All category cell types exist in outCodes values', () => {
+    it('VV-CFG-010: All category cell types exist in outCodes values', () => {
         for (const entry of config) {
             const outValues = new Set(Object.values(entry.outCodes));
             const allCats = [...entry.categories.upper, ...entry.categories.lower];
@@ -112,7 +112,7 @@ describe('Configuration — Categories Validation (SYS-102)', () => {
         }
     });
 
-    it('Categories cover all outCodes values (no orphaned cell types)', () => {
+    it('VV-CFG-011: Categories cover all outCodes values (no orphaned cell types)', () => {
         for (const entry of config) {
             const catSet = new Set([...entry.categories.upper, ...entry.categories.lower]);
             for (const val of Object.values(entry.outCodes)) {
@@ -122,24 +122,24 @@ describe('Configuration — Categories Validation (SYS-102)', () => {
         }
     });
 
-    it('BM categories: 7 upper, 7 lower', () => {
+    it('VV-CFG-012: BM categories: 7 upper, 7 lower', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         assert.equal(bm.categories.upper.length, 7, 'BM must have 7 upper row cell types');
         assert.equal(bm.categories.lower.length, 7, 'BM must have 7 lower row cell types');
     });
 
-    it('PB categories: 7 upper, 7 lower', () => {
+    it('VV-CFG-013: PB categories: 7 upper, 7 lower', () => {
         const pb = config.find(e => e.specimenType === 'pb');
         assert.equal(pb.categories.upper.length, 7, 'PB must have 7 upper row cell types');
         assert.equal(pb.categories.lower.length, 7, 'PB must have 7 lower row cell types');
     });
 
-    it('BM upperRowAbnormal is false', () => {
+    it('VV-CFG-014: BM upperRowAbnormal is false', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         assert.equal(bm.upperRowAbnormal, false, 'BM upperRowAbnormal must be false');
     });
 
-    it('PB upperRowAbnormal is true', () => {
+    it('VV-CFG-015: PB upperRowAbnormal is true', () => {
         const pb = config.find(e => e.specimenType === 'pb');
         assert.equal(pb.upperRowAbnormal, true, 'PB upperRowAbnormal must be true');
     });
@@ -147,13 +147,13 @@ describe('Configuration — Categories Validation (SYS-102)', () => {
 
 describe('Configuration — Formulas Validation (SYS-102)', () => {
 
-    it('BM has a formulas object with ME_ratio', () => {
+    it('VV-CFG-016: BM has a formulas object with ME_ratio', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         assert.ok(typeof bm.formulas === 'object', 'BM must have a formulas object');
         assert.ok(typeof bm.formulas.ME_ratio === 'object', 'BM must have ME_ratio formula');
     });
 
-    it('ME_ratio has required fields: label, numerator, denominator, precision', () => {
+    it('VV-CFG-017: ME_ratio has required fields: label, numerator, denominator, precision', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         const me = bm.formulas.ME_ratio;
         assert.ok(typeof me.label === 'string' && me.label.length > 0, 'ME_ratio must have a label');
@@ -163,7 +163,7 @@ describe('Configuration — Formulas Validation (SYS-102)', () => {
             'ME_ratio precision must be an integer');
     });
 
-    it('ME_ratio numerator and denominator reference valid outCodes cell types', () => {
+    it('VV-CFG-018: ME_ratio numerator and denominator reference valid outCodes cell types', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         const me = bm.formulas.ME_ratio;
         const outValues = new Set(Object.values(bm.outCodes));
@@ -175,7 +175,7 @@ describe('Configuration — Formulas Validation (SYS-102)', () => {
         }
     });
 
-    it('ME_ratio numerator contains myeloid lineage cells', () => {
+    it('VV-CFG-019: ME_ratio numerator contains myeloid lineage cells', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         const me = bm.formulas.ME_ratio;
         const expected = ['blasts', 'pro', 'myelo', 'meta', 'bands', 'poly', 'baso', 'eos', 'mono'];
@@ -183,14 +183,14 @@ describe('Configuration — Formulas Validation (SYS-102)', () => {
             'ME_ratio numerator must contain the 9 myeloid lineage cell types');
     });
 
-    it('ME_ratio denominator contains erythroid precursors', () => {
+    it('VV-CFG-020: ME_ratio denominator contains erythroid precursors', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         const me = bm.formulas.ME_ratio;
         assert.deepEqual(me.denominator, ['nrbc'],
             'ME_ratio denominator must be ["nrbc"]');
     });
 
-    it('PB does not have formulas (or formulas is absent)', () => {
+    it('VV-CFG-021: PB does not have formulas (or formulas is absent)', () => {
         const pb = config.find(e => e.specimenType === 'pb');
         assert.ok(pb.formulas === undefined || pb.formulas === null ||
             Object.keys(pb.formulas || {}).length === 0,
@@ -200,7 +200,7 @@ describe('Configuration — Formulas Validation (SYS-102)', () => {
 
 describe('Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)', () => {
 
-    it('outCodes keys are single characters (letters or punctuation)', () => {
+    it('VV-CFG-022: outCodes keys are single characters (letters or punctuation)', () => {
         for (const entry of config) {
             for (const key of Object.keys(entry.outCodes)) {
                 assert.ok(key.length === 1,
@@ -209,7 +209,7 @@ describe('Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)', () 
         }
     });
 
-    it('outCodes values are non-empty strings', () => {
+    it('VV-CFG-023: outCodes values are non-empty strings', () => {
         for (const entry of config) {
             for (const [key, val] of Object.entries(entry.outCodes)) {
                 assert.ok(typeof val === 'string' && val.length > 0,
@@ -218,7 +218,7 @@ describe('Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)', () 
         }
     });
 
-    it('No duplicate keys within a specimen type (HA-062)', () => {
+    it('VV-CFG-024: No duplicate keys within a specimen type (HA-062)', () => {
         for (const entry of config) {
             const keys = Object.keys(entry.outCodes);
             const unique = new Set(keys);
@@ -227,7 +227,7 @@ describe('Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)', () 
         }
     });
 
-    it('No duplicate cell type values within a specimen type', () => {
+    it('VV-CFG-025: No duplicate cell type values within a specimen type', () => {
         for (const entry of config) {
             const values = Object.values(entry.outCodes);
             const unique = new Set(values);
@@ -236,7 +236,7 @@ describe('Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)', () 
         }
     });
 
-    it('BM has exactly 14 cell types mapped to ergonomic left-hand keys (SYS-014, SYS-038)', () => {
+    it('VV-CFG-026: BM has exactly 14 cell types mapped to ergonomic left-hand keys (SYS-014, SYS-038)', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         const codes = bm.outCodes;
 
@@ -257,7 +257,7 @@ describe('Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)', () 
         assert.equal(codes.Q, 'other');
     });
 
-    it('PB has exactly 14 cell types mapped to ergonomic left-hand keys (SYS-015, SYS-039)', () => {
+    it('VV-CFG-027: PB has exactly 14 cell types mapped to ergonomic left-hand keys (SYS-015, SYS-039)', () => {
         const pb = config.find(e => e.specimenType === 'pb');
         const codes = pb.outCodes;
 
@@ -278,7 +278,7 @@ describe('Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)', () 
         assert.equal(codes.Q, 'other');
     });
 
-    it('BM and PB outCodes are identical', () => {
+    it('VV-CFG-028: BM and PB outCodes are identical', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         const pb = config.find(e => e.specimenType === 'pb');
         assert.deepEqual(bm.outCodes, pb.outCodes,
@@ -288,7 +288,7 @@ describe('Configuration — outCodes Validation (SYS-038, SYS-039, HA-062)', () 
 
 describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
 
-    it('Each template has tplCode, tplName, and outSentence', () => {
+    it('VV-CFG-029: Each template has tplCode, tplName, and outSentence', () => {
         for (const entry of config) {
             for (const tpl of entry.templates) {
                 assert.ok(typeof tpl.tplCode === 'string' && tpl.tplCode.length > 0,
@@ -301,7 +301,7 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
         }
     });
 
-    it('Every template contains {{total}} placeholder', () => {
+    it('VV-CFG-030: Every template contains {{total}} placeholder', () => {
         for (const entry of config) {
             for (const tpl of entry.templates) {
                 assert.ok(tpl.outSentence.includes('{{total}}'),
@@ -310,7 +310,7 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
         }
     });
 
-    it('Every template reports every cell type, in its correct form', () => {
+    it('VV-CFG-031: Every template reports every cell type, in its correct form', () => {
         // A category inside the differential is reported as a percentage,
         // {{ct}}. A category the profile excludes from the denominator has no
         // percentage of the differential and is reported per 100 of it,
@@ -327,7 +327,7 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
         }
     });
 
-    it('A category outside the differential is not also reported as a percentage', () => {
+    it('VV-CFG-032: A category outside the differential is not also reported as a percentage', () => {
         for (const entry of config) {
             for (const ct of (entry.denominatorExcludes || [])) {
                 for (const tpl of entry.templates) {
@@ -339,7 +339,7 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
         }
     });
 
-    it('BM templates contain {{ME_ratio}} placeholder', () => {
+    it('VV-CFG-033: BM templates contain {{ME_ratio}} placeholder', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         for (const tpl of bm.templates) {
             assert.ok(tpl.outSentence.includes('{{ME_ratio}}'),
@@ -347,7 +347,7 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
         }
     });
 
-    it('PB templates do not contain {{ME_ratio}} placeholder', () => {
+    it('VV-CFG-034: PB templates do not contain {{ME_ratio}} placeholder', () => {
         const pb = config.find(e => e.specimenType === 'pb');
         for (const tpl of pb.templates) {
             assert.ok(!tpl.outSentence.includes('{{ME_ratio}}'),
@@ -355,7 +355,7 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
         }
     });
 
-    it('BM has 3 templates (Yale SOM, Precipio DX, MGH)', () => {
+    it('VV-CFG-035: BM has 3 templates (Yale SOM, Precipio DX, MGH)', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         assert.equal(bm.templates.length, 3);
         assert.ok(bm.templates.some(t => t.tplCode === 'ysm'), 'Missing Yale SOM template');
@@ -363,7 +363,7 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
         assert.ok(bm.templates.some(t => t.tplCode === 'mgh'), 'Missing MGH template');
     });
 
-    it('PB has 1 template (MGH)', () => {
+    it('VV-CFG-036: PB has 1 template (MGH)', () => {
         const pb = config.find(e => e.specimenType === 'pb');
         assert.equal(pb.templates.length, 1);
         assert.equal(pb.templates[0].tplCode, 'mgh');
@@ -372,17 +372,17 @@ describe('Configuration — Template Validation (SYS-060, HA-050)', () => {
 
 describe('Configuration — Target Count (SYS-052, SYS-103)', () => {
 
-    it('BM targetCount is 500', () => {
+    it('VV-CFG-037: BM targetCount is 500', () => {
         const bm = config.find(e => e.specimenType === 'bm');
         assert.equal(bm.targetCount, 500);
     });
 
-    it('PB targetCount is 200', () => {
+    it('VV-CFG-038: PB targetCount is 200', () => {
         const pb = config.find(e => e.specimenType === 'pb');
         assert.equal(pb.targetCount, 200);
     });
 
-    it('targetCount values are positive integers', () => {
+    it('VV-CFG-039: targetCount values are positive integers', () => {
         for (const entry of config) {
             assert.ok(Number.isInteger(entry.targetCount),
                 `${entry.specimenType}: targetCount must be integer`);

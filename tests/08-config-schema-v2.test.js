@@ -20,11 +20,11 @@ const specimenTypes = isV2 ? rawConfig.specimenTypes : rawConfig;
 
 describe('Config Schema V2 — Wrapper Fields', () => {
 
-    it('Config is in v2 object format', () => {
+    it('VV-SCH-001: Config is in v2 object format', () => {
         assert.ok(isV2, 'Config must be v2 object format');
     });
 
-    it('Has a dotted profile version', () => {
+    it('VV-SCH-002: Has a dotted profile version', () => {
         // Pinned to a shape, not a literal: the version is what drives the
         // supersede check that delivers a corrected profile to an installed
         // browser, so it is expected to change.
@@ -33,15 +33,15 @@ describe('Config Schema V2 — Wrapper Fields', () => {
             'shipped profile must not regress below the 2.0 baseline');
     });
 
-    it('Has profileId field', () => {
+    it('VV-SCH-003: Has profileId field', () => {
         assert.ok(typeof rawConfig.profileId === 'string' && rawConfig.profileId.length > 0, 'Must have profileId');
     });
 
-    it('Has profileName field', () => {
+    it('VV-SCH-004: Has profileName field', () => {
         assert.ok(typeof rawConfig.profileName === 'string' && rawConfig.profileName.length > 0, 'Must have profileName');
     });
 
-    it('Has specimenTypes array', () => {
+    it('VV-SCH-005: Has specimenTypes array', () => {
         assert.ok(Array.isArray(rawConfig.specimenTypes), 'Must have specimenTypes array');
         assert.ok(rawConfig.specimenTypes.length >= 1, 'Must have at least 1 specimen type');
     });
@@ -49,19 +49,19 @@ describe('Config Schema V2 — Wrapper Fields', () => {
 
 describe('Config Schema V2 — specimenLabel Field', () => {
 
-    it('Each entry has specimenLabel', () => {
+    it('VV-SCH-006: Each entry has specimenLabel', () => {
         for (const spec of specimenTypes) {
             assert.ok(typeof spec.specimenLabel === 'string' && spec.specimenLabel.length > 0,
                 `${spec.specimenType}: must have specimenLabel`);
         }
     });
 
-    it('BM specimenLabel is "Bone Marrow"', () => {
+    it('VV-SCH-007: BM specimenLabel is "Bone Marrow"', () => {
         const bm = specimenTypes.find(s => s.specimenType === 'bm');
         assert.equal(bm.specimenLabel, 'Bone Marrow');
     });
 
-    it('PB specimenLabel is "Peripheral Blood"', () => {
+    it('VV-SCH-008: PB specimenLabel is "Peripheral Blood"', () => {
         const pb = specimenTypes.find(s => s.specimenType === 'pb');
         assert.equal(pb.specimenLabel, 'Peripheral Blood');
     });
@@ -69,21 +69,21 @@ describe('Config Schema V2 — specimenLabel Field', () => {
 
 describe('Config Schema V2 — Audio Config', () => {
 
-    it('Each entry has audio object', () => {
+    it('VV-SCH-009: Each entry has audio object', () => {
         for (const spec of specimenTypes) {
             assert.ok(typeof spec.audio === 'object' && spec.audio !== null,
                 `${spec.specimenType}: must have audio object`);
         }
     });
 
-    it('Audio config has enabled boolean', () => {
+    it('VV-SCH-010: Audio config has enabled boolean', () => {
         for (const spec of specimenTypes) {
             assert.ok(typeof spec.audio.enabled === 'boolean',
                 `${spec.specimenType}: audio.enabled must be boolean`);
         }
     });
 
-    it('Audio config has sound type strings', () => {
+    it('VV-SCH-011: Audio config has sound type strings', () => {
         for (const spec of specimenTypes) {
             assert.ok(typeof spec.audio.countSound === 'string',
                 `${spec.specimenType}: audio.countSound must be string`);
@@ -97,7 +97,7 @@ describe('Config Schema V2 — Audio Config', () => {
 
 describe('Config Schema V2 — Autosave Field', () => {
 
-    it('Each entry has autosave boolean', () => {
+    it('VV-SCH-012: Each entry has autosave boolean', () => {
         for (const spec of specimenTypes) {
             assert.ok(typeof spec.autosave === 'boolean',
                 `${spec.specimenType}: autosave must be boolean`);
@@ -107,7 +107,7 @@ describe('Config Schema V2 — Autosave Field', () => {
 
 describe('Config Schema V2 — absoluteCounts Field', () => {
 
-    it('Each entry has absoluteCounts string', () => {
+    it('VV-SCH-013: Each entry has absoluteCounts string', () => {
         for (const spec of specimenTypes) {
             assert.ok(typeof spec.absoluteCounts === 'string',
                 `${spec.specimenType}: absoluteCounts must be string`);
@@ -119,7 +119,7 @@ describe('Config Schema V2 — absoluteCounts Field', () => {
 
 describe('Config Schema V2 — Handedness Field', () => {
 
-    it('Each entry has handedness string', () => {
+    it('VV-SCH-014: Each entry has handedness string', () => {
         for (const spec of specimenTypes) {
             assert.ok(typeof spec.handedness === 'string',
                 `${spec.specimenType}: handedness must be string`);
@@ -131,7 +131,7 @@ describe('Config Schema V2 — Handedness Field', () => {
 
 describe('Config Schema V2 — Constituents Field', () => {
 
-    it('Each entry has constituents object (may be empty)', () => {
+    it('VV-SCH-015: Each entry has constituents object (may be empty)', () => {
         for (const spec of specimenTypes) {
             assert.ok(typeof spec.constituents === 'object' && spec.constituents !== null,
                 `${spec.specimenType}: constituents must be an object`);
@@ -141,7 +141,7 @@ describe('Config Schema V2 — Constituents Field', () => {
 
 describe('Config Schema V2 — Morphology Checklist Field', () => {
 
-    it('Each entry has morphologyChecklist array (may be empty)', () => {
+    it('VV-SCH-016: Each entry has morphologyChecklist array (may be empty)', () => {
         for (const spec of specimenTypes) {
             assert.ok(Array.isArray(spec.morphologyChecklist),
                 `${spec.specimenType}: morphologyChecklist must be an array`);
@@ -153,7 +153,7 @@ describe('Config Schema V2 — Backward Compatibility', () => {
 
     // Behavioural: normalizeConfig now lives in wbc-core.js and is called
     // directly rather than grepped for (DCR-004).
-    it('normalizeConfig accepts the legacy bare-array format', () => {
+    it('VV-SCH-017: normalizeConfig accepts the legacy bare-array format', () => {
         const legacy = [{
             specimenType: 'bm',
             categories: { upper: ['blasts'], lower: ['poly'] },
@@ -169,7 +169,7 @@ describe('Config Schema V2 — Backward Compatibility', () => {
         assert.equal(Core.validateConfig(norm.specimenTypes).length, 0);
     });
 
-    it('normalizeConfig accepts the v2 envelope and preserves its metadata', () => {
+    it('VV-SCH-018: normalizeConfig accepts the v2 envelope and preserves its metadata', () => {
         const norm = Core.normalizeConfig({
             version: '2.0', profileId: 'consensus-14', profileName: 'Full 14-Part Consensus',
             specimenTypes: [{
@@ -186,7 +186,7 @@ describe('Config Schema V2 — Backward Compatibility', () => {
         assert.equal(norm.specimenTypes[0].targetCount, 200);
     });
 
-    it('validateConfig rejects a cell type that shadows a template placeholder', () => {
+    it('VV-SCH-019: validateConfig rejects a cell type that shadows a template placeholder', () => {
         // A category literally named "total" would make {{total}} render that
         // category's percentage instead of the cell count, silently corrupting
         // every report produced from the profile.
@@ -200,7 +200,7 @@ describe('Config Schema V2 — Backward Compatibility', () => {
         assert.match(errs[0], /reserved template placeholder/);
     });
 
-    it('Every reserved placeholder name is rejected as a cell type', () => {
+    it('VV-SCH-020: Every reserved placeholder name is rejected as a cell type', () => {
         for (const reserved of Core.RESERVED_PLACEHOLDERS) {
             const errs = Core.validateConfig([{
                 specimenType: 'bm', targetCount: 100,
@@ -213,7 +213,7 @@ describe('Config Schema V2 — Backward Compatibility', () => {
         }
     });
 
-    it('No shipped profile uses a reserved placeholder as a cell type', () => {
+    it('VV-SCH-021: No shipped profile uses a reserved placeholder as a cell type', () => {
         const presetDir = path.join(__dirname, '..', 'web', 'settings', 'presets');
         const files = [CONFIG_PATH].concat(
             fs.readdirSync(presetDir)
@@ -231,13 +231,13 @@ describe('Config Schema V2 — Backward Compatibility', () => {
         }
     });
 
-    it('normalizeConfig rejects a structure that is neither format', () => {
+    it('VV-SCH-022: normalizeConfig rejects a structure that is neither format', () => {
         assert.throws(() => Core.normalizeConfig({ nope: true }), /Invalid config format/);
         assert.throws(() => Core.normalizeConfig(null), /Invalid config format/);
         assert.throws(() => Core.normalizeConfig('a string'), /Invalid config format/);
     });
 
-    it('JS loadConfig uses cache-first strategy', () => {
+    it('VV-SCH-023: JS loadConfig uses cache-first strategy', () => {
         const jsPath = path.join(__dirname, '..', 'web', 'scripts', 'mdc-app.js');
         const jsCode = fs.readFileSync(jsPath, 'utf-8');
         assert.ok(jsCode.includes('loadCachedConfig'), 'Must have cache loading function');

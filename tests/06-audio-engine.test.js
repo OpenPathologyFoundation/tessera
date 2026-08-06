@@ -15,62 +15,62 @@ const jsCode = fs.readFileSync(JS_PATH, 'utf-8');
 
 describe('Audio Engine — Object Structure (URS-027)', () => {
 
-    it('AudioEngine object is defined', () => {
+    it('VV-AUD-001: AudioEngine object is defined', () => {
         assert.ok(jsCode.includes('var AudioEngine'), 'Must define AudioEngine object');
     });
 
-    it('AudioEngine has init method', () => {
+    it('VV-AUD-002: AudioEngine has init method', () => {
         assert.ok(jsCode.includes('init: function'), 'AudioEngine must have init method');
     });
 
-    it('AudioEngine has playClick method for count increment', () => {
+    it('VV-AUD-003: AudioEngine has playClick method for count increment', () => {
         assert.ok(jsCode.includes('playClick'), 'AudioEngine must have playClick method');
     });
 
-    it('AudioEngine has playUndo method for decrement', () => {
+    it('VV-AUD-004: AudioEngine has playUndo method for decrement', () => {
         assert.ok(jsCode.includes('playUndo'), 'AudioEngine must have playUndo method');
     });
 
-    it('AudioEngine has playChime method for target reached', () => {
+    it('VV-AUD-005: AudioEngine has playChime method for target reached', () => {
         assert.ok(jsCode.includes('playChime'), 'AudioEngine must have playChime method');
     });
 
-    it('AudioEngine has playTypewriter method for comments', () => {
+    it('VV-AUD-006: AudioEngine has playTypewriter method for comments', () => {
         assert.ok(jsCode.includes('playTypewriter'), 'AudioEngine must have playTypewriter method');
     });
 
-    it('AudioEngine has toggle method', () => {
+    it('VV-AUD-007: AudioEngine has toggle method', () => {
         assert.ok(jsCode.includes('toggle: function'), 'AudioEngine must have toggle method');
     });
 
-    it('AudioEngine uses Web Audio API (AudioContext)', () => {
+    it('VV-AUD-008: AudioEngine uses Web Audio API (AudioContext)', () => {
         assert.ok(jsCode.includes('AudioContext'), 'Must reference AudioContext');
     });
 
-    it('AudioEngine uses OscillatorNode for sound generation', () => {
+    it('VV-AUD-009: AudioEngine uses OscillatorNode for sound generation', () => {
         assert.ok(jsCode.includes('createOscillator'), 'Must create oscillator nodes');
     });
 
-    it('AudioEngine uses GainNode for volume control', () => {
+    it('VV-AUD-010: AudioEngine uses GainNode for volume control', () => {
         assert.ok(jsCode.includes('createGain'), 'Must create gain nodes');
     });
 });
 
 describe('Audio Engine — Toggle State (URS-097)', () => {
 
-    it('Audio state is persisted via sessionStorage', () => {
+    it('VV-AUD-011: Audio state is persisted via sessionStorage', () => {
         assert.ok(jsCode.includes('wbcds_audio'), 'Must use wbcds_audio storage key');
     });
 
-    it('AudioEngine.enabled property exists', () => {
+    it('VV-AUD-012: AudioEngine.enabled property exists', () => {
         assert.ok(jsCode.includes('enabled: true'), 'AudioEngine must have enabled property');
     });
 
-    it('Toggle updates the audio label', () => {
+    it('VV-AUD-013: Toggle updates the audio label', () => {
         assert.ok(jsCode.includes('updateAudioToggle'), 'Must call updateAudioToggle');
     });
 
-    it('Audio toggle button is referenced in HTML', () => {
+    it('VV-AUD-014: Audio toggle button is referenced in HTML', () => {
         const htmlPath = path.join(__dirname, '..', 'web', 'counter.html');
         const html = fs.readFileSync(htmlPath, 'utf-8');
         assert.ok(html.includes('id="btnToggleAudio"'), 'Must have audio toggle button');
@@ -80,25 +80,25 @@ describe('Audio Engine — Toggle State (URS-097)', () => {
 
 describe('Audio Engine — Integration Points', () => {
 
-    it('playClick is called on increment in onKeyDown', () => {
+    it('VV-AUD-015: playClick is called on increment in onKeyDown', () => {
         // Verify the pattern: increment followed by playClick
         assert.ok(jsCode.includes('AudioEngine.playClick()'), 'Must call playClick on increment');
     });
 
-    it('playUndo is called on decrement in onKeyDown', () => {
+    it('VV-AUD-016: playUndo is called on decrement in onKeyDown', () => {
         assert.ok(jsCode.includes('AudioEngine.playUndo()'), 'Must call playUndo on decrement');
     });
 
-    it('playChime is called when target is first reached', () => {
+    it('VV-AUD-017: playChime is called when target is first reached', () => {
         assert.ok(jsCode.includes('AudioEngine.playChime()'), 'Must call playChime on target reached');
         assert.ok(jsCode.includes('targetReachedNotified'), 'Must track target notification state');
     });
 
-    it('playTypewriter is called on morphology comment input', () => {
+    it('VV-AUD-018: playTypewriter is called on morphology comment input', () => {
         assert.ok(jsCode.includes('AudioEngine.playTypewriter()'), 'Must call playTypewriter on comment input');
     });
 
-    it('Sound frequency values are defined for each sound type', () => {
+    it('VV-AUD-019: Sound frequency values are defined for each sound type', () => {
         assert.ok(jsCode.includes('800'), 'Click uses 800Hz');
         assert.ok(jsCode.includes('400'), 'Undo uses 400Hz');
         assert.ok(jsCode.includes('600'), 'Typewriter uses 600Hz');

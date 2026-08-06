@@ -134,7 +134,7 @@ describe('Calculation Engine — Percentage Computation (SYS-040 to SYS-045)', (
         assert.equal(differential.nrbc, null, 'an excluded category has no percentage');
     });
 
-    it('Non-numeric and missing values do not corrupt the total', () => {
+    it('VV-CALC-030: Non-numeric and missing values do not corrupt the total', () => {
         assert.equal(Core.getTotal({ a: 5, b: undefined, c: null, d: NaN, e: 3 }), 8);
         assert.equal(Core.getTotal({}), 0);
         assert.equal(Core.getTotal(null), 0);

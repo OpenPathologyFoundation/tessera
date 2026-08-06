@@ -68,24 +68,32 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**400 identified verification cases** across 18 series and 4 layers.  345 further tests carry no identifier and are not registered.
+**688 verification cases** across 26 series and 4 layers, run as 746 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
-| `QC-*` | 7 (001–010) | Static | QMS counted quantities |
+| `QC-*` | 8 (001–011) | Static | QMS counted quantities |
 | `SC-*` | 20 (001–043) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 48 (001–092) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
-| `VV-CALC-*` | 23 (001–029) | Unit | Calculation engine vectors |
+| `VV-AUD-*` | 19 (001–019) | Static | Audio engine structure |
+| `VV-CALC-*` | 24 (001–030) | Unit | Calculation engine vectors |
+| `VV-CFG-*` | 39 (001–039) | Unit | Configuration profile integrity |
 | `VV-CI-*` | 12 (001–012) | Unit | Wilson confidence intervals |
 | `VV-DEN-*` | 6 (001–006) | Unit | Denominator policy |
+| `VV-DOM-*` | 51 (001–051) | Static | Counter markup and required elements |
 | `VV-E2E-*` | 23 (001–050) | Unit | End-to-end data integrity |
+| `VV-EDT-*` | 40 (001–040) | Static | Configuration editor structure |
 | `VV-INC-*` | 3 (001–006) | Unit | Increment and decrement |
 | `VV-LOW-*` | 6 (001–006) | Unit | Sub-target advisory |
 | `VV-ME-*` | 6 (001–006) | Unit | Myeloid-to-erythroid ratio |
+| `VV-PRE-*` | 20 (001–020) | Unit | Preset catalogue integrity |
 | `VV-PROV-*` | 8 (001–008) | Unit | Method provenance |
 | `VV-RND-*` | 7 (001–007) | Unit | Rounding policy |
+| `VV-SAV-*` | 18 (001–018) | Static | Autosave and crash recovery (static) |
+| `VV-SCH-*` | 23 (001–023) | Unit | v2 configuration schema |
+| `VV-SRC-*` | 76 (001–076) | Static | Application source integrity (static) |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
 | `VV-SYS-*` | 113 (001–199) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
@@ -102,6 +110,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | QC-005 | Every identifier cited by RTM-001 and TR-001 is registered | Static | `tests/14-qms-counts.test.js` |
 | QC-006 | The two registers agree | Static | `tests/14-qms-counts.test.js` |
 | QC-010 | No asset under web/ is referenced by nothing | Static | `tests/14-qms-counts.test.js` |
+| QC-011 | Every test carries a verification identifier | Static | `tests/14-qms-counts.test.js` |
 
 #### SC-* — Standards conformance (ICSH)
 
@@ -289,6 +298,30 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-ABS-023 | An unusable WBC yields null, never a silent zero | Unit | `tests/01-calculation-engine.test.js` |
 | VV-ABS-024 | The correction is monotonic and bounded | Unit | `tests/01-calculation-engine.test.js` |
 
+#### VV-AUD-* — Audio engine structure
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-AUD-001 | AudioEngine object is defined | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-002 | AudioEngine has init method | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-003 | AudioEngine has playClick method for count increment | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-004 | AudioEngine has playUndo method for decrement | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-005 | AudioEngine has playChime method for target reached | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-006 | AudioEngine has playTypewriter method for comments | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-007 | AudioEngine has toggle method | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-008 | AudioEngine uses Web Audio API (AudioContext) | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-009 | AudioEngine uses OscillatorNode for sound generation | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-010 | AudioEngine uses GainNode for volume control | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-011 | Audio state is persisted via sessionStorage | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-012 | AudioEngine.enabled property exists | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-013 | Toggle updates the audio label | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-014 | Audio toggle button is referenced in HTML | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-015 | playClick is called on increment in onKeyDown | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-016 | playUndo is called on decrement in onKeyDown | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-017 | playChime is called when target is first reached | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-018 | playTypewriter is called on morphology comment input | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-019 | Sound frequency values are defined for each sound type | Static | `tests/06-audio-engine.test.js` |
+
 #### VV-CALC-* — Calculation engine vectors
 
 | ID | Verifies | Layer | File |
@@ -316,6 +349,51 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-CALC-027 | Extreme ratios still sum to exactly 100 | Unit | `tests/01-calculation-engine.test.js` |
 | VV-CALC-028 | getTotal ignores negative and non-finite entries | Unit | `tests/01-calculation-engine.test.js` |
 | VV-CALC-029 | The live path honours the denominator, which the deleted one did not | Unit | `tests/01-calculation-engine.test.js` |
+| VV-CALC-030 | Non-numeric and missing values do not corrupt the total | Unit | `tests/01-calculation-engine.test.js` |
+
+#### VV-CFG-* — Configuration profile integrity
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-CFG-001 | templates.json exists and is readable | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-002 | templates.json contains valid JSON | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-003 | Configuration has at least 1 specimen type (SYS-102) | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-004 | V2 config has version and profileId fields | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-005 | Each entry has required fields: specimenType, targetCount, categories, outCodes, templates | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-006 | specimenType values are unique (no duplicates) | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-007 | Bone Marrow (bm) specimen type is configured | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-008 | Peripheral Blood (pb) specimen type is configured | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-009 | Each entry has categories with upper and lower arrays | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-010 | All category cell types exist in outCodes values | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-011 | Categories cover all outCodes values (no orphaned cell types) | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-012 | BM categories: 7 upper, 7 lower | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-013 | PB categories: 7 upper, 7 lower | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-014 | BM upperRowAbnormal is false | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-015 | PB upperRowAbnormal is true | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-016 | BM has a formulas object with ME_ratio | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-017 | ME_ratio has required fields: label, numerator, denominator, precision | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-018 | ME_ratio numerator and denominator reference valid outCodes cell types | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-019 | ME_ratio numerator contains myeloid lineage cells | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-020 | ME_ratio denominator contains erythroid precursors | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-021 | PB does not have formulas (or formulas is absent) | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-022 | outCodes keys are single characters (letters or punctuation) | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-023 | outCodes values are non-empty strings | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-024 | No duplicate keys within a specimen type (HA-062) | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-025 | No duplicate cell type values within a specimen type | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-026 | BM has exactly 14 cell types mapped to ergonomic left-hand keys (SYS-014, SYS-038) | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-027 | PB has exactly 14 cell types mapped to ergonomic left-hand keys (SYS-015, SYS-039) | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-028 | BM and PB outCodes are identical | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-029 | Each template has tplCode, tplName, and outSentence | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-030 | Every template contains {{total}} placeholder | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-031 | Every template reports every cell type, in its correct form | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-032 | A category outside the differential is not also reported as a percentage | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-033 | BM templates contain {{ME_ratio}} placeholder | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-034 | PB templates do not contain {{ME_ratio}} placeholder | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-035 | BM has 3 templates (Yale SOM, Precipio DX, MGH) | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-036 | PB has 1 template (MGH) | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-037 | BM targetCount is 500 | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-038 | PB targetCount is 200 | Unit | `tests/02-configuration.test.js` |
+| VV-CFG-039 | targetCount values are positive integers | Unit | `tests/02-configuration.test.js` |
 
 #### VV-CI-* — Wilson confidence intervals
 
@@ -345,6 +423,62 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-DEN-005 | The advisory measures the differential, not the overall tally | Unit | `tests/05-end-to-end-data-integrity.test.js` |
 | VV-DEN-006 | A zero denominator does not divide by zero | Unit | `tests/05-end-to-end-data-integrity.test.js` |
 
+#### VV-DOM-* — Counter markup and required elements
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-DOM-001 | counter.html exists and is readable | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-002 | HTML has correct doctype and lang attribute | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-003 | HTML includes Tailwind CSS from a local asset (URS-094) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-004 | No render-blocking asset is loaded from a third-party CDN (URS-094) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-005 | Registers a service worker for offline operation (URS-094) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-006 | HTML includes the application script mdc-app.js | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-007 | HTML does not include old Backbone/jQuery dependencies | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-008 | Case number input has maxlength="30" (SYS-002) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-009 | Case number input has autocomplete="off" (prevents browser autofill) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-010 | Specimen type select element exists with id="specimenType" | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-011 | Bone Marrow option with value="bm" exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-012 | Peripheral Blood option with value="pb" exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-013 | Start Count button exists and is enabled by default | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-014 | Count Done button exists (SYS-050) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-015 | Reset button exists (SYS-080) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-016 | Copy to Clipboard button exists (SYS-064) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-017 | New Case button exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-018 | Resume Counting button exists (btnResumeCounting) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-019 | Phase 1: Case entry section exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-020 | Phase 2: Counting section exists (hidden initially) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-021 | Phase 3: Results section exists (hidden initially) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-022 | Counter table rendering area exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-023 | Morphology comments textarea exists with id="morphComments" | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-024 | Comments textarea has maxlength="500" (SYS-071) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-025 | Character counter exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-026 | Tab navigation area exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-027 | Tab panels area exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-028 | Results summary area exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-029 | Session history section exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-030 | History list container exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-031 | History count badge exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-032 | Export session buttons exist | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-033 | Temporary data notice is present (SYS-094) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-034 | Confirmation modal overlay exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-035 | Modal has title, message, confirm, and cancel elements | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-036 | History detail modal exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-037 | Labels are associated with inputs via "for" attribute | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-038 | Status indicator elements exist | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-039 | Theme toggle button exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-040 | Keyboard hint text is present for users | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-041 | Audio toggle button exists (URS-027) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-042 | Print button exists in results phase (URS-054) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-043 | Absolute count section exists in results phase (URS-036) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-044 | Morphology checklist area exists (URS-072) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-045 | Config export button exists (URS-103) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-046 | Config import file input exists (URS-103) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-047 | Reset to Default Config button exists | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-048 | Print media styles are defined (URS-054) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-049 | The theme is applied before first paint, on the root element (URS-095) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-050 | Case number input field exists with id="caseNumber" (SYS-001) | Static | `tests/03-html-structure.test.js` |
+| VV-DOM-051 | Case badge display element exists (SYS-004) | Static | `tests/03-html-structure.test.js` |
+
 #### VV-E2E-* — End-to-end data integrity
 
 | ID | Verifies | Layer | File |
@@ -372,6 +506,51 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-E2E-040 | Comments reach the report when the template references them | Unit | `tests/05-end-to-end-data-integrity.test.js` |
 | VV-E2E-041 | Comments survive CSV round-trip including commas and quotes | Unit | `tests/05-end-to-end-data-integrity.test.js` |
 | VV-E2E-050 | Resuming and adding cells extends rather than restarts the count | Unit | `tests/05-end-to-end-data-integrity.test.js` |
+
+#### VV-EDT-* — Configuration editor structure
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-EDT-001 | editor.html exists | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-002 | config-editor.js exists | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-003 | editor.html is readable and non-empty | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-004 | Has correct doctype and lang | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-005 | Includes Tailwind CSS from a local asset (URS-094) | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-006 | References config-editor.js | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-007 | Has cell reference panel | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-008 | Has drop zones for upper and lower rows | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-009 | Has key assignment area | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-010 | Has settings inputs | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-011 | Has template editor | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-012 | Has live preview | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-013 | Has save/load buttons | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-014 | Has back link to counter | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-015 | Has specimen tabs area | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-016 | Has morphology checklist editor | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-017 | config-editor.js has valid syntax | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-018 | Uses strict mode | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-019 | Wraps in IIFE | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-020 | Defines CELL_REFERENCE array | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-021 | Defines editorState object | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-022 | Has drag-and-drop support | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-023 | Has buildConfigJSON function | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-024 | Has renderCellReference function | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-025 | Has renderLayout function | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-026 | Has renderKeyAssignment function | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-027 | Has updatePreview function | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-028 | Has loadExistingConfig function | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-029 | Escapes HTML in output | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-030 | Defines ERGO_ZONES constant | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-031 | Defines autoAssignKeys function | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-032 | Defines resetAllKeys function | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-033 | Defines isInErgoZone function | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-034 | Has listeningCell state for click-to-assign | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-035 | Has keydown listener for key assignment | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-036 | Defines startListening and stopListening functions | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-037 | Has Reset All Keys button | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-038 | Has Auto-Assign Left Hand button | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-039 | Has Auto-Assign Right Hand button | Static | `tests/10-config-editor.test.js` |
+| VV-EDT-040 | Has CSS for listening state animation | Static | `tests/10-config-editor.test.js` |
 
 #### VV-INC-* — Increment and decrement
 
@@ -403,6 +582,31 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-ME-005 | Absent formula returns null so no ratio row is rendered | Unit | `tests/01-calculation-engine.test.js` |
 | VV-ME-006 | Every numerator member contributes to the ratio | Unit | `tests/01-calculation-engine.test.js` |
 
+#### VV-PRE-* — Preset catalogue integrity
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-PRE-001 | Presets directory exists | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-002 | Preset file exists: consensus-14.json | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-003 | consensus-14.json is valid JSON | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-004 | consensus-14.json has required v2 wrapper fields | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-005 | consensus-14.json specimen types have required fields | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-006 | consensus-14.json outCodes values match category cell types (except custom) | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-007 | consensus-14.json has no duplicate outCode keys per specimen | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-008 | consensus-14.json left-hand preset keys are within left ergonomic zone | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-009 | The right-hand key layout is still reachable, as an editor action | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-010 | consensus-14 has 14 cell types per specimen | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-011 | minimal-5 has 5 cell types | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-012 | Handedness remains a per-profile field | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-013 | body-fluid has bf specimen type | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-014 | body-fluid has morphology checklist items | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-015 | harmonized-9 has constituents defined | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-016 | custom preset has empty categories | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-017 | consensus-14.json excludes NRBC from any non-marrow differential | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-018 | A preset sharing the built-in profileId is the built-in profile | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-019 | No two presets are the same layout with the same keys | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-020 | Every selectable preset configures confidence intervals (P0-9) | Unit | `tests/09-preset-catalog.test.js` |
+
 #### VV-PROV-* — Method provenance
 
 | ID | Verifies | Layer | File |
@@ -427,6 +631,138 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-RND-005 | Validation rejects an unknown policy | Unit | `tests/01-calculation-engine.test.js` |
 | VV-RND-006 | Validation rejects an impossible precision | Unit | `tests/01-calculation-engine.test.js` |
 | VV-RND-007 | The method statement declares which policy is in force | Unit | `tests/01-calculation-engine.test.js` |
+
+#### VV-SAV-* — Autosave and crash recovery (static)
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-SAV-001 | saveAutosaveState function is defined | Static | `tests/07-autosave.test.js` |
+| VV-SAV-002 | loadAutosaveState function is defined | Static | `tests/07-autosave.test.js` |
+| VV-SAV-003 | clearAutosaveState function is defined | Static | `tests/07-autosave.test.js` |
+| VV-SAV-004 | showRecoveryModal function is defined | Static | `tests/07-autosave.test.js` |
+| VV-SAV-005 | restoreAutosaveState function is defined | Static | `tests/07-autosave.test.js` |
+| VV-SAV-006 | Uses localStorage with wbcds_autosave key | Static | `tests/07-autosave.test.js` |
+| VV-SAV-007 | Uses localStorage (not sessionStorage) for autosave | Static | `tests/07-autosave.test.js` |
+| VV-SAV-008 | Saves caseNumber in autosave state | Static | `tests/07-autosave.test.js` |
+| VV-SAV-009 | Saves specimenType in autosave state | Static | `tests/07-autosave.test.js` |
+| VV-SAV-010 | Saves counts in autosave state | Static | `tests/07-autosave.test.js` |
+| VV-SAV-011 | Saves timestamp in autosave state | Static | `tests/07-autosave.test.js` |
+| VV-SAV-012 | Saves phase in autosave state | Static | `tests/07-autosave.test.js` |
+| VV-SAV-013 | Saves morphologyComments in autosave state | Static | `tests/07-autosave.test.js` |
+| VV-SAV-014 | Autosave is called after keypress in onKeyDown | Static | `tests/07-autosave.test.js` |
+| VV-SAV-015 | Autosave is cleared on finalizeCount | Static | `tests/07-autosave.test.js` |
+| VV-SAV-016 | Autosave is cleared on resetToStart | Static | `tests/07-autosave.test.js` |
+| VV-SAV-017 | Recovery check happens during init | Static | `tests/07-autosave.test.js` |
+| VV-SAV-018 | Recovery modal offers Restore and Discard options | Static | `tests/07-autosave.test.js` |
+
+#### VV-SCH-* — v2 configuration schema
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-SCH-001 | Config is in v2 object format | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-002 | Has a dotted profile version | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-003 | Has profileId field | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-004 | Has profileName field | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-005 | Has specimenTypes array | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-006 | Each entry has specimenLabel | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-007 | BM specimenLabel is "Bone Marrow" | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-008 | PB specimenLabel is "Peripheral Blood" | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-009 | Each entry has audio object | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-010 | Audio config has enabled boolean | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-011 | Audio config has sound type strings | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-012 | Each entry has autosave boolean | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-013 | Each entry has absoluteCounts string | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-014 | Each entry has handedness string | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-015 | Each entry has constituents object (may be empty) | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-016 | Each entry has morphologyChecklist array (may be empty) | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-017 | normalizeConfig accepts the legacy bare-array format | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-018 | normalizeConfig accepts the v2 envelope and preserves its metadata | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-019 | validateConfig rejects a cell type that shadows a template placeholder | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-020 | Every reserved placeholder name is rejected as a cell type | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-021 | No shipped profile uses a reserved placeholder as a cell type | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-022 | normalizeConfig rejects a structure that is neither format | Unit | `tests/08-config-schema-v2.test.js` |
+| VV-SCH-023 | JS loadConfig uses cache-first strategy | Unit | `tests/08-config-schema-v2.test.js` |
+
+#### VV-SRC-* — Application source integrity (static)
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-SRC-001 | mdc-app.js exists and is readable | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-002 | mdc-app.js has valid syntax (no parse errors) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-003 | Uses strict mode | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-004 | Wraps in IIFE to avoid global namespace pollution | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-005 | State object initializes phase to "case-entry" | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-006 | State tracks isCountingActive flag | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-007 | State tracks commentFieldFocused flag (SYS-073) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-008 | Has keydown event handler function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-009 | Checks isCountingActive before processing keypresses (HA-015) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-010 | Ignores keypresses when comment field is focused (SYS-073) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-011 | Ignores Ctrl, Alt, Meta modifier keys (SYS-036) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-012 | Checks shiftKey for decrement operation (SYS-032) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-013 | Prevents event default on mapped keys | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-014 | Detaches keydown listener on count completion (SYS-054) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-015 | Has decrement guard: count > 0 check | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-016 | Decrement uses -- operator (subtracts exactly 1) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-017 | Increment uses ++ operator (adds exactly 1) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-018 | Checks total === 0 before percentage calculation | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-019 | Returns 0.00 when total is 0 (not NaN) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-020 | References targetCount from config | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-021 | Applies the evidence-based default target when a profile omits it (URS-105) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-022 | An explicit targetCount is never overridden by the default | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-023 | Shows confirmation before reset when data exists | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-024 | Checks if total > 0 before showing confirmation | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-025 | Uses navigator.clipboard API | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-026 | Has fallback for clipboard API failure | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-027 | Shows "Copied!" confirmation text (SYS-066) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-028 | Clears clipboard on new case start | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-029 | Case input has keydown listener for Enter key (SYS-009) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-030 | Enter key triggers btnStart.click() when not disabled | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-031 | Enter key calls preventDefault to avoid form submission | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-032 | Uses sessionStorage for history (SYS-095) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-033 | Uses localStorage for config caching and autosave (URS-106, URS-085) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-034 | Saves to sessionStorage with a key prefix | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-035 | Has try/catch around sessionStorage operations (graceful degradation) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-036 | Defines export handlers for CSV and JSON | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-037 | Creates downloadable files using Blob and object URLs | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-038 | Defines theme toggle controls and storage key | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-039 | Applies data-theme attribute for light/dark modes | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-040 | Escapes HTML in user-provided content (XSS prevention) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-041 | The HTML escaper neutralizes every markup-significant character | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-042 | Template sanitization keeps formatting tags and drops everything else | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-043 | Fetches templates.json | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-044 | Handles fetch failure with error display (SYS-101) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-045 | Loads wbc-core.js before mdc-app.js so the engine is available | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-046 | No control is wired from an inline script outside the app module | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-047 | Has flash/animation function for keypress feedback | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-048 | Distinguishes increment and decrement visually | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-049 | Defines resumeCounting function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-050 | References btnResumeCounting button | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-051 | Defines computeMERatio function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-052 | Handles ME_ratio placeholder in templates | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-053 | Defines AudioEngine object | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-054 | AudioEngine has all required sound methods | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-055 | Defines autosave functions | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-056 | Defines recovery modal function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-057 | Defines switchSpecimenType function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-058 | Defines config cache functions | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-059 | Uses wbcds_config localStorage key | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-060 | loadConfig uses cache-first strategy (user config persists) | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-061 | Defines resetConfigToDefault function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-062 | resetConfigToDefault removes cache and reloads | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-063 | importConfig caches the imported config | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-064 | Defines normalizeConfig function for backward compat | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-065 | Handles both array and object config formats | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-066 | Defines export and import functions | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-067 | Defines validateConfig function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-068 | Defines populateSpecimenSelect function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-069 | Uses specimenLabel from config | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-070 | Defines renderAbsoluteCountsSection function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-071 | Defines renderMorphologyChecklist function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-072 | Defines buildMorphologyOutput function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-073 | Defines printResults function | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-074 | mdc-app.js calls no native dialog | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-075 | Both pages load the shared dialog module | Static | `tests/04-javascript-integrity.test.js` |
+| VV-SRC-076 | The dialog is a cached shell asset | Static | `tests/04-javascript-integrity.test.js` |
 
 #### VV-SUB-* — Subset percentages
 

@@ -165,7 +165,7 @@ URS (User Need) -> SRS (System Req) -> SDD (Design) -> TP/VV (Verification)
 | URS-092 | Clear workflow instructions | SYS-077 | 3.4.4 | — | Inspection, `help.html` | I | Full |
 | URS-093 | Chrome/Firefox/Edge without plugins | SYS-I01–SYS-I03 | 5.1 | — | VV-SYS suite executed on Chromium, Firefox and WebKit | S | Full |
 | URS-094 | No internet connection required after initial load | SYS-I04, SYS-170–SYS-173 | 5.1, 3.15 | — | TC-B072, VV-SYS-090, VV-SYS-091, suite 03 | B, S | Full |
-| URS-095 | Light/Dark themes via control and keyboard shortcut | SYS-110–SYS-114 | 3.4.7, 3.4.11 | HA-098 | TC-B090, TC-B091, VV-SYS-160–168 | B | Full |
+| URS-095 | Light/Dark themes via control and keyboard shortcut | SYS-110–SYS-114 | 3.4.7, 3.4.11 | HA-098 | TC-B090, TC-B091, VV-SYS-160–169, VV-SYS-177–178 | B | Full |
 | URS-096 | Aggregated categories show constituent cell types on hover | SYS-027 | 3.4.2 | — | suite 03, suite 08 (`constituents`) | U, I | Full |
 | URS-097 | Distinct audio for count, undo and text entry; independently togglable | SYS-140–SYS-144 | 3.12 | — | TC-B092, TC-B093, suite 06 | B | Full |
 
@@ -175,7 +175,7 @@ URS (User Need) -> SRS (System Req) -> SDD (Design) -> TP/VV (Verification)
 |--------|----------------|-----------|-----|------|--------------|-------|----------|
 | URS-100 | Load cell types, mappings, targets, formulas and display prefs from a JSON profile | SYS-100, SYS-102 | 3.8 | HA-060, HA-061 | suite 02, suite 08, TC-B001 | U, B | Full |
 | URS-101 | Catalogue of preset profiles | SYS-174–SYS-176 | 3.16 | — | VV-SYS-055, 056, 057, suite 09 | U, S | Full |
-| URS-102 | Visual configuration editor (view, select, arrange, aggregate, assign keys, set targets, define formulas, save) | SYS-177–SYS-179, SYS-240–SYS-243 | 3.17 | HA-061, HA-062, HA-099, HA-100 | VV-SYS-060–069, suite 10 | U, S | **Full; clause (g) "define derived formulas" was previously unimplemented and is closed by DCR-013. Drag-to-aggregate remains covered by inspection** |
+| URS-102 | Visual configuration editor (view, select, arrange, aggregate, assign keys, set targets, define formulas, save) | SYS-177–SYS-179, SYS-240–SYS-247 | 3.17 | HA-061, HA-062, HA-099, HA-100, HA-101, HA-102 | VV-SYS-060–069, VV-SYS-170–176, suite 10 | U, S | **Full; clause (g) "define derived formulas" was previously unimplemented and is closed by DCR-013. Drag-to-aggregate remains covered by inspection** |
 | URS-103 | Import and export a configuration profile | SYS-105, SYS-106 | 3.11 | HA-061 | TC-B060..B064, VV-SYS-050..053 | B, S | Full |
 | URS-104 | Left- and right-hand default key mappings | SYS-154, SYS-155 | 3.17 | — | suite 09 (`right-hand` preset), suite 10 (auto-assign) | U | Full |
 | URS-105 | Configurable target count per specimen type; evidence-based defaults | SYS-103 | 3.8 | — | suite 04 (default targets), TC-B019, VV-SYS-016 | U, B, S | Full |

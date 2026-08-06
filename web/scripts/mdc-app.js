@@ -428,7 +428,10 @@
             function () {
                 clearAutosaveState();
                 el('caseNumber').focus();
-            }
+            },
+            // Both branches are consequential: Discard throws away a recovered
+            // count. Escape must not choose one of them by accident.
+            { dismissible: false }
         );
     }
 
@@ -950,6 +953,12 @@
     function onKeyDown(ev) {
         if (!state.isCountingActive) return;
         if (state.commentFieldFocused) return;
+
+        // A dialog is modal: while one is open the keyboard belongs to it.
+        // Form controls were already excluded below, but the Reset
+        // confirmation opens during counting with focus on a button, so a
+        // counting key pressed over it was still tallied.
+        if (window.WBCDialog && WBCDialog.isOpen()) return;
 
         // Ignore modifier combos except Shift (SYS-036)
         if (ev.ctrlKey || ev.altKey || ev.metaKey) return;
@@ -2064,38 +2073,17 @@
     // ================================================================
     // MODAL (confirmation dialogs)
     // ================================================================
-    function showModal(title, message, confirmText, onConfirm, cancelText, onCancel) {
-        var overlay = el('modal-overlay');
-        el('modal-title').textContent = title;
-        el('modal-message').textContent = message;
-
-        var confirmBtn = el('modal-confirm');
-        var cancelBtn = el('modal-cancel');
-
-        // Replace nodes to drop listeners from any previous invocation
-        var newConfirm = confirmBtn.cloneNode(true);
-        var newCancel = cancelBtn.cloneNode(true);
-        confirmBtn.parentNode.replaceChild(newConfirm, confirmBtn);
-        cancelBtn.parentNode.replaceChild(newCancel, cancelBtn);
-
-        newConfirm.textContent = confirmText;
-        newCancel.textContent = cancelText || 'Cancel';
-        // Cancel is always offered on a confirmation dialog. Only showAlert()
+    function showModal(title, message, confirmText, onConfirm, cancelText, onCancel, opts) {
+        // One dialog implementation for the whole product (wbc-dialog.js).
+        // The counter and the configuration editor previously disagreed: this
+        // one was styled and modal, the editor used the browser's prompt().
+        //
+        // Cancel is always offered on a confirmation. Only showAlert()
         // suppresses it, and it does so explicitly — inferring "no cancel
         // handler means no cancel button" would strip the escape route from
         // destructive confirmations such as Reset (URS-061).
-        newCancel.classList.remove('hidden');
-
-        overlay.classList.remove('hidden');
-
-        newConfirm.addEventListener('click', function () {
-            overlay.classList.add('hidden');
-            if (onConfirm) onConfirm();
-        });
-        newCancel.addEventListener('click', function () {
-            overlay.classList.add('hidden');
-            if (onCancel) onCancel();
-        });
+        WBCDialog.confirm(title, message, confirmText, onConfirm,
+            cancelText || 'Cancel', onCancel, opts || {});
     }
 
     /**
@@ -2103,8 +2091,7 @@
      * decide — an error to read, or a result to confirm.
      */
     function showAlert(title, message, onOk) {
-        showModal(title, message, 'OK', onOk);
-        el('modal-cancel').classList.add('hidden');
+        WBCDialog.alert(title, message, onOk);
     }
 
     // ================================================================

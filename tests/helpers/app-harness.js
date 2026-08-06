@@ -2,8 +2,9 @@
  * jsdom harness for the WBC ΔΣ application.
  * =========================================
  *
- * Boots the REAL counter.html together with the REAL wbc-core.js and
- * mdc-app.js inside jsdom, so behavioural tests exercise shipped code paths —
+ * Boots the REAL counter.html together with the REAL wbc-core.js,
+ * wbc-dialog.js and mdc-app.js inside jsdom, so behavioural tests exercise
+ * shipped code paths —
  * the phase machine, keyboard handler, autosave and DOM rendering — rather
  * than a re-implementation of them. See DCR-004.
  *
@@ -22,6 +23,7 @@ const WEB = path.join(ROOT, 'web');
 
 const HTML = fs.readFileSync(path.join(WEB, 'counter.html'), 'utf-8');
 const CORE_JS = fs.readFileSync(path.join(WEB, 'scripts', 'wbc-core.js'), 'utf-8');
+const DIALOG_JS = fs.readFileSync(path.join(WEB, 'scripts', 'wbc-dialog.js'), 'utf-8');
 const APP_JS = fs.readFileSync(path.join(WEB, 'scripts', 'mdc-app.js'), 'utf-8');
 const DEFAULT_CONFIG = JSON.parse(
     fs.readFileSync(path.join(WEB, 'settings', 'templates.json'), 'utf-8'));
@@ -113,7 +115,7 @@ async function boot(opts = {}) {
     // --- inject application scripts in load order --------------------------
     // Appended to <head>, not <body>: a script element's source counts toward
     // body.textContent, which would pollute every text assertion in the suite.
-    for (const src of [CORE_JS, APP_JS]) {
+    for (const src of [CORE_JS, DIALOG_JS, APP_JS]) {
         const s = w.document.createElement('script');
         s.textContent = src;
         w.document.head.appendChild(s);

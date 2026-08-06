@@ -505,3 +505,65 @@ describe('JavaScript — Print Support (URS-054)', () => {
             'Must have print support');
     });
 });
+
+// ================================================================
+describe('No native browser dialogs (SYS-244)', () => {
+
+    /**
+     * `prompt()`, `confirm()` and `alert()` are banned from shipped code.
+     *
+     * They ignore the selected theme, cannot state a rule or show a validation
+     * message, cannot refuse bad input except by reopening, and suspend the
+     * page while open. The configuration editor used two chained prompts to
+     * ask for a specimen type identifier and its label — neither of which
+     * could enforce the identifier rules the schema depends on.
+     *
+     * VV-SYS-170..174 verify the replacements behave. This is the cheap guard
+     * that catches a native call reappearing anywhere, including in code paths
+     * no system test happens to drive.
+     */
+    const SHIPPED = ['mdc-app.js', 'config-editor.js', 'wbc-core.js', 'wbc-dialog.js'];
+
+    /** Strip comments and string literals so prose about prompt() is not a hit. */
+    function executableSource(src) {
+        return src
+            .replace(/\/\*[\s\S]*?\*\//g, ' ')
+            .replace(/(^|[^:])\/\/[^\n]*/g, '$1 ')
+            .replace(/'(?:[^'\\\n]|\\.)*'/g, "''")
+            .replace(/"(?:[^"\\\n]|\\.)*"/g, '""');
+    }
+
+    SHIPPED.forEach(function (file) {
+        it(file + ' calls no native dialog', () => {
+            const src = executableSource(
+                fs.readFileSync(path.join(__dirname, '..', 'web', 'scripts', file), 'utf-8'));
+            for (const fn of ['prompt', 'confirm', 'alert']) {
+                // Bare calls and window-qualified ones. The product's own
+                // WBCDialog.alert / .confirm are properties, so the preceding
+                // character test excludes them.
+                const bare = new RegExp('(^|[^.\\w])' + fn + '\\s*\\(', 'm');
+                const qualified = new RegExp('window\\s*\\.\\s*' + fn + '\\s*\\(');
+                assert.ok(!bare.test(src),
+                    `${file} calls ${fn}() — use WBCDialog instead (SYS-244)`);
+                assert.ok(!qualified.test(src),
+                    `${file} calls window.${fn}() — use WBCDialog instead (SYS-244)`);
+            }
+        });
+    });
+
+    it('Both pages load the shared dialog module', () => {
+        for (const page of ['counter.html', 'editor.html']) {
+            const html = fs.readFileSync(path.join(__dirname, '..', 'web', page), 'utf-8');
+            assert.ok(html.includes('scripts/wbc-dialog.js'),
+                `${page} must load the shared dialog module`);
+        }
+    });
+
+    it('The dialog is a cached shell asset', () => {
+        // Without this an installed browser keeps serving a page that still
+        // calls prompt(), because the shell is cache-first.
+        const sw = fs.readFileSync(path.join(__dirname, '..', 'web', 'sw.js'), 'utf-8');
+        assert.ok(sw.includes('wbc-dialog.js'),
+            'wbc-dialog.js must be in the service worker shell asset list');
+    });
+});

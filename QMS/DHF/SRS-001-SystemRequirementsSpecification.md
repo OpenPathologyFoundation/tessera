@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 2.9 |
+| **Version** | 3.0 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -173,7 +173,7 @@ This SRS covers the functional, performance, interface, data, and security requi
 | SYS-110 | The system SHALL provide a visible control to toggle between Light and Dark themes without altering count data or session state. | URS-095 | Test |
 | SYS-111 | The system SHALL provide a keyboard shortcut (Ctrl/Cmd+Shift+L) to toggle themes and SHALL NOT interfere with counting key inputs. | URS-095 | Test |
 | SYS-112 | The system SHALL remember the selected theme for the duration of the browser session using sessionStorage. | URS-095 | Test |
-| SYS-113 | All text rendered by the system SHALL meet WCAG 2.1 AA contrast against its effective background — 4.5:1 for body text, 3:1 for large text — in **both** themes, on every page and in every phase. Semi-transparent backgrounds SHALL be composited to the underlying surface when this is assessed. | URS-095, URS-091 | Test |
+| SYS-113 | All text rendered by the system SHALL meet WCAG 2.1 AA contrast against its effective background — 4.5:1 for body text, 3:1 for large text — in **both** themes, on every page, in every phase, and in every interaction state including hover. Semi-transparent backgrounds SHALL be composited to the underlying surface when this is assessed. | URS-095, URS-091 | Test |
 | SYS-114 | The selected theme SHALL be applied before the first paint of any page, so that no page renders in a theme other than the selected one, however briefly. | URS-095 | Test |
 
 ### 4.12 Configuration Module
@@ -351,6 +351,15 @@ Phase 2 item.
 | SYS-241 | The editor SHALL preserve every field of the profile it loads that it does not itself edit. | URS-102, HA-099 |
 | SYS-242 | A profile saved in the editor SHALL be the profile the counter uses; the editor SHALL NOT report a profile as active if the counter would discard it. | URS-102, HA-100 |
 | SYS-243 | The editor's counting-policy controls SHALL constrain their own inputs so that they cannot compose a profile the counter would reject. | URS-102, HA-061 |
+
+### 4.24 Dialogs (URS-092, URS-102)
+
+| ID | Requirement | Trace |
+|----|------------|-------|
+| SYS-244 | The system SHALL NOT use the browser's native `prompt()`, `confirm()` or `alert()`. Every question SHALL be asked in the product's own dialog, in the selected theme. | URS-092, URS-095 |
+| SYS-245 | A dialog that collects input SHALL state the rules for each field, validate on submission, and report the reason beneath the offending field without discarding what was typed. | URS-092, HA-101 |
+| SYS-246 | A dialog SHALL be modal for the keyboard: focus SHALL move into it, SHALL be confined to it, and SHALL return to the element that opened it on close. Keystrokes SHALL NOT reach the counting tally while a dialog is open. | URS-092, HA-015 |
+| SYS-247 | Escape SHALL cancel a dialog, EXCEPT where both branches are consequential; such a dialog SHALL require an explicit choice. | URS-061, HA-102 |
 
 ### 4.22 Configuration Validation Requirements (URS-021, URS-022)
 

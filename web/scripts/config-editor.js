@@ -897,14 +897,52 @@
                 return refresh();
             }
             if (el.id === 'pol-f-add') {
-                var key = prompt('Identifier for the derived figure (e.g. "ME_ratio"):');
-                if (!key) return;
-                key = String(key).trim();
-                if (!key || spec.formulas[key]) return;
-                spec.formulas[key] = {
-                    label: key, type: 'ratio', numerator: [], denominator: [], precision: 1, basis: ''
-                };
-                return refresh();
+                var used = Object.keys(spec.formulas);
+                WBCDialog.form({
+                    title: 'Add Derived Figure',
+                    message: 'A ratio or a percentage of a subset, computed from the categories you ' +
+                        'choose next and reported alongside the differential.',
+                    confirmText: 'Add Figure',
+                    fields: [
+                        {
+                            name: 'key',
+                            label: 'Identifier',
+                            hint: 'Used as a template placeholder, so no spaces. ' +
+                                (used.length ? 'Already defined: ' + used.join(', ') : ''),
+                            placeholder: 'ME_ratio',
+                            mono: true,
+                            required: true,
+                            transform: function (v) { return v.trim(); },
+                            validate: function (v) {
+                                if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(v)) {
+                                    return 'Start with a letter, then letters, digits or underscores.';
+                                }
+                                if (used.indexOf(v) !== -1) return 'That identifier is already defined.';
+                                // A formula named after a reserved placeholder
+                                // would shadow it in every report template.
+                                var reserved = window.WBCCore && window.WBCCore.RESERVED_PLACEHOLDERS;
+                                if (reserved && reserved.indexOf(v) !== -1) {
+                                    return '"' + v + '" is a reserved placeholder name.';
+                                }
+                                return null;
+                            }
+                        },
+                        {
+                            name: 'label',
+                            label: 'Label in the report',
+                            placeholder: 'M:E Ratio',
+                            required: true
+                        }
+                    ],
+                    onSubmit: function (values) {
+                        getActiveSpec().formulas[values.key] = {
+                            label: values.label, type: 'ratio',
+                            numerator: [], denominator: [], precision: 1, basis: ''
+                        };
+                        refresh();
+                    }
+                });
+                return;
             }
             if (el.classList.contains('pol-f-remove')) {
                 delete spec.formulas[el.getAttribute('data-formula')];
@@ -1162,10 +1200,50 @@
         });
 
         // Add specimen type
+        //
+        // Two chained prompt() dialogs previously asked for these. A prompt
+        // cannot state the rules, cannot show which identifiers are taken, and
+        // cannot refuse bad input except by reopening itself — so an identifier
+        // with a space or a capital in it was accepted and produced a profile
+        // that behaved oddly later. Both values are now asked for at once, in
+        // the product's own dialog, and validated before anything is created.
         document.getElementById('btnAddSpecimen').addEventListener('click', function () {
-            var name = prompt('Specimen type ID (e.g., "bf" for body fluid):');
-            if (!name) return;
-            var label = prompt('Display label (e.g., "Body Fluid"):');
+            var taken = editorState.specimenTypes.map(function (sp) { return sp.specimenType; });
+            WBCDialog.form({
+                title: 'Add Specimen Type',
+                message: 'A specimen type has its own layout, keys, target count and counting policy.',
+                confirmText: 'Add Specimen Type',
+                fields: [
+                    {
+                        name: 'id',
+                        label: 'Identifier',
+                        hint: 'Lower case, no spaces. Used in exports and in the profile file. ' +
+                            (taken.length ? 'Already in use: ' + taken.join(', ') : ''),
+                        placeholder: 'bf',
+                        mono: true,
+                        required: true,
+                        transform: function (v) { return v.trim().toLowerCase(); },
+                        validate: function (v) {
+                            if (!/^[a-z][a-z0-9_-]*$/.test(v)) {
+                                return 'Start with a letter, then letters, digits, hyphen or underscore.';
+                            }
+                            if (taken.indexOf(v) !== -1) return 'That identifier is already in use.';
+                            return null;
+                        }
+                    },
+                    {
+                        name: 'label',
+                        label: 'Display name',
+                        hint: 'Shown on the specimen selector in the counter.',
+                        placeholder: 'Body Fluid',
+                        required: true
+                    }
+                ],
+                onSubmit: function (values) { addSpecimenType(values.id, values.label); }
+            });
+        });
+
+        function addSpecimenType(name, label) {
             editorState.specimenTypes.push({
                 specimenType: name,
                 specimenLabel: label || name.toUpperCase(),
@@ -1200,7 +1278,7 @@
             renderMorphChecklist();
             updatePlaceholderList();
             updatePreview();
-        });
+        }
 
         // Key assignment buttons
         document.getElementById('btnResetKeys').addEventListener('click', function () {

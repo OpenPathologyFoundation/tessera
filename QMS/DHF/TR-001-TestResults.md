@@ -5,15 +5,15 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 4.0 |
+| **Version** | 4.1 |
 | **Product** | WBC ΔΣ v2.7.1 |
-| **Date Executed** | 2026-08-06 (09:27:33 UTC) |
+| **Date Executed** | 2026-08-06 (10:26:56 UTC) |
 | **Status** | **PASS** (test outcome) |
 | **Approval State** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-06_052733_counting-policy-editor/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-06_062656_shared-dialog-and-hover-contrast/` |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
@@ -21,14 +21,14 @@
 
 ## 1. Executive Summary
 
-**851 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
+**896 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **585** |
-| System (browser) tests | **266** (91 specs x chromium, firefox, webkit, less 7 skips) |
-| **Total executed** | **851** |
-| Passed | **851** |
+| Unit, static and behavioural tests | **591** |
+| System (browser) tests | **305** (104 specs x chromium, firefox, webkit, less 7 skips) |
+| **Total executed** | **896** |
+| Passed | **896** |
 | Failed | **0** |
 | Skipped (documented, §6) | **7** |
 | Pass Rate | **100.00%** |
@@ -68,7 +68,7 @@ shipped code can cause a test to fail.
 
 ---
 
-## 3. Node Suite Results (585 tests, 115 suites, 0 failures)
+## 3. Node Suite Results (591 tests, 116 suites, 0 failures)
 
 ### Suite 01 — Calculation Engine
 
@@ -184,7 +184,7 @@ Regressions this layer now guards against:
 
 ---
 
-## 4. System Suite Results — Playwright (91 specs x 3 engines = 273, 7 skipped, 0 failures)
+## 4. System Suite Results — Playwright (104 specs x 3 engines = 312, 7 skipped, 0 failures)
 
 Each spec runs on Chromium, Firefox and WebKit. URS-093 names Chrome, Firefox
 and Edge; Edge shares the Chromium engine and is covered by the chromium
@@ -476,6 +476,54 @@ is what it was for. It now asserts the opposite, in both directions.
 
 ---
 
+### 4.13 Dialogs and hover contrast (added v2.7.5)
+
+The configuration editor asked three questions with the browser's `prompt()`.
+Replacing them with the product's own dialog exposed two modality defects and,
+indirectly, a contrast defect in every primary button.
+
+| VV ID / Suite | Verifies | Result |
+|---------------|----------|--------|
+| VV-SYS-170 | Adding a specimen type uses the product dialog; both values at once; identifiers in use shown; **no native dialog raised** | PASS |
+| VV-SYS-171 | Adding a derived figure likewise | PASS |
+| VV-SYS-172 | Invalid input refused with a reason, both fields at once, dialog stays open, nothing created | PASS |
+| VV-SYS-173 | Focus enters the dialog, Escape cancels, Enter confirms, focus returns to the opener | PASS |
+| VV-SYS-174 | Tab is confined to the dialog | PASS |
+| VV-SYS-175 | A counting key pressed while a dialog is open does not count | PASS |
+| VV-SYS-176 | Escape cannot discard an interrupted count | PASS |
+| VV-SYS-169 | The dialog, with validation errors shown, meets AA in both themes | PASS |
+| VV-SYS-177/178 | Every hoverable control meets AA **under the pointer**, both themes | PASS |
+| Suite 04 | No shipped script calls `prompt()`, `confirm()` or `alert()`; both pages load the module; it is a cached shell asset | PASS |
+
+**What was found:**
+
+| Defect | Effect |
+|--------|--------|
+| Two chained `prompt()` calls for a specimen type | `Body Fluid` accepted as an identifier; a duplicate silently shadowed an existing specimen; cancelling the second prompt discarded the first (HA-101) |
+| A counting key pressed over an open dialog was still tallied | The Reset confirmation opens during counting with focus on a button, so the counter's "ignore form controls" guard did not apply and the tally moved behind the dialog (HA-102) |
+| Escape on the interrupted-count prompt | Cancel there means Discard; a stray Escape would have thrown away a recovered count (HA-102) |
+| **`hover:bg-blue-500` on every primary button** | White on `blue-500` is **3.68:1**. Start Count, Save Profile and every dialog's confirming action fell below AA at the moment the pointer was on them. The resting-state sweep could not see it |
+| Orphaned CSS in `counter.html` | Two declarations without a selector, left by the DCR-011 theme strip |
+
+The hover defect was found only because VV-SYS-169 caught the confirm button
+mid-transition at 4.15:1 — a value matching neither state — and the
+intermediate reading was traced rather than retried.
+
+**Regression detection confirmed** by reverting each fix:
+
+| Reverted | Detected by |
+|----------|-------------|
+| `prompt()` restored for Add Specimen Type | VV-SYS-170, 172, 173 |
+| The counter's keyboard guard removed | VV-SYS-175 |
+| The recovery prompt made dismissible | VV-SYS-176 |
+| The dialog's error tone set below AA | VV-SYS-169, at 1.41:1 |
+
+Two engine differences were characterised and are not product defects: WebKit
+omits buttons from the tab order, and blurs a button on mousedown. Both are
+recorded in DCR-014 §5.
+
+---
+
 ## 5. Defect Detection Record
 
 | Defect | Found by | Now guarded by |
@@ -510,6 +558,10 @@ is what it was for. It now asserts the opposite, in both directions.
 | The Calculation Reference said "configurable" without saying where | **Reviewer question (DCR-012)** | UD-039 |
 | URS-102 clause (g) "define derived formulas" was never implemented, yet RTM-001 recorded URS-102 as Full coverage | **Building the editor controls (DCR-013)** | VV-SYS-068, SYS-240 |
 | The Calculation Reference still said the editor had no policy controls after they were built | **UD-039 (as designed)** | UD-039 |
+| HA-101 native prompts accepted invalid and duplicate identifiers with no way to say why | **Reviewer request to remove browser input controls** | VV-SYS-170, 172; suite 04 |
+| HA-102 a counting key pressed over an open dialog was tallied | **Writing the dialog suite (DCR-014)** | VV-SYS-175 |
+| HA-102 Escape would have discarded a recovered count | **Writing the dialog suite (DCR-014)** | VV-SYS-176 |
+| Every primary button was 3.68:1 under the pointer | **A mid-transition reading in VV-SYS-169, traced rather than retried** | VV-SYS-177, VV-SYS-178 |
 
 The last three were introduced or exposed during remediation and were caught by
 the new layers before release — the behaviour the previous suite could not
@@ -536,7 +588,7 @@ provide.
 
 ## 7. Conclusion
 
-All 851 executed automated tests pass with no failures, across three browser
+All 896 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -558,6 +610,12 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-06T10:26:56.634Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-06_062656_shared-dialog-and-hover-contrast/`
+
 - Date (UTC): 2026-08-06T09:27:33.630Z
 - Command: `npm test`
 - Exit Code: 0

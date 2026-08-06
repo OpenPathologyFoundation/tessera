@@ -140,7 +140,37 @@ const SURFACES = [
     { id: 'VV-SYS-165', page: 'methods.html', name: 'methods and limitations' },
     { id: 'VV-SYS-166', page: 'calculation-reference.html', name: 'calculation reference' },
     { id: 'VV-SYS-167', page: 'help.html', name: 'quick start guide' },
-    { id: 'VV-SYS-168', page: 'editor.html', name: 'configuration editor' }
+    { id: 'VV-SYS-168', page: 'editor.html', name: 'configuration editor' },
+    {
+        id: 'VV-SYS-169', page: 'editor.html', name: 'dialog, with validation errors shown',
+        setup: async page => {
+            // The dialog is a surface in its own right — its own panel colour,
+            // its own hint and error tones — and none of it is on screen until
+            // something opens it. Errors are provoked deliberately: red-on-panel
+            // is the pairing most likely to fail, and it only ever renders here.
+            await page.click('#btnAddSpecimen');
+            await expect(page.locator('#modal-box')).toBeVisible();
+            await page.fill('#modal-field-0', 'Not An Id');
+            await page.click('#modal-confirm');
+            await expect(page.locator('#modal-field-error-0')).toBeVisible();
+
+            // Take the pointer off the button that was just clicked. This
+            // sweep measures RESTING colours; leaving the mouse on the confirm
+            // button caught it mid-hover-transition and reported an
+            // intermediate 4.15:1 that is neither state. Hover is measured
+            // deliberately, and settled, by VV-SYS-177/178.
+            await page.mouse.move(0, 0);
+
+            // The panel fades in over 300ms, and the hover transition needs to
+            // unwind. Measuring either mid-flight reads a composited value
+            // rather than the settled colour.
+            await page.waitForFunction(() =>
+                getComputedStyle(document.getElementById('modal-box')).opacity === '1');
+            await page.waitForFunction(() =>
+                getComputedStyle(document.getElementById('modal-confirm')).backgroundColor
+                    === 'rgb(37, 99, 235)');
+        }
+    }
 ];
 
 // Service workers off: measure the files on disk, not the offline cache.

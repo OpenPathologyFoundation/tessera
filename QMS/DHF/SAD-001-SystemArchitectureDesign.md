@@ -5,13 +5,13 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SAD-001 |
-| **Version** | 2.0 |
+| **Version** | 3.0 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
-| **Date Revised** | 2026-02-24 |
+| **Date Revised** | 2026-08-06 |
 | **Status** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
-| **Input Documents** | URS-001 v2.0, SRS-001 v2.0 |
+| **Input Documents** | URS-001 v2.0 Rev M, SRS-001 v3.1, SDD-001 v3.0, DCR-006 to DCR-020 |
 
 ---
 
@@ -86,7 +86,7 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a vanilla JavaScr
 | `{{placeholder}}` templates | Simple string replacement is sufficient for output formatting. No template engine dependency needed. |
 | No database | The tool is a counting aid, not a system of record. Session-only data eliminates PHI storage concerns. |
 | Keyboard-driven input | Matches clinical workflow where operator's eyes are on the microscope. |
-| Tailwind CSS via CDN | Utility-first styling eliminates custom CSS maintenance. CDN delivery avoids local build steps. |
+| Tailwind CSS, **vendored** | Utility-first styling with no build step. Served from `web/vendor/tailwind.js` and precached: URS-094 requires counting to work with no internet connection, which a CDN would defeat. |
 | Node.js static server | Minimal footprint. No servlet container, no WAR file, no Java dependency. A single `npm start` command launches the server. |
 
 ---
@@ -184,7 +184,7 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a vanilla JavaScr
 - **SRS Trace**: SYS-010 through SYS-017
 
 #### 3.2.3 Counting Engine
-- **Responsibility**: Captures keyboard input and dispatches count changes. Uses a unified 14-key mapping: R=nrbc, L=blasts, O=pro, M=myelo, T=meta, C=plasma, S=mast, B=bands, P=poly, A=baso, E=eos, N=mono, Y=lymph, X=other. Triggers M:E ratio recalculation on every keypress.
+- **Responsibility**: Captures keyboard input and dispatches count changes. The key mapping comes from the active profile's `outCodes` and is **not fixed in code** — the literal mapping previously given here was withdrawn at v2.0. A key is resolved from the character produced, then from the physical key position, so Shift-decrement works for punctuation mappings (HA-104). Auto-repeat is rejected (HA-103). Derived figures recalculate on every keypress.
 - **Inputs**: Document-level keydown events
 - **Outputs**: Increment/decrement signals to specific cell types; updated M:E ratio
 - **SRS Trace**: SYS-030 through SYS-039
@@ -250,6 +250,63 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a vanilla JavaScr
 - **Inputs**: Current total count; target count from configuration
 - **Outputs**: Rendered progress text in the counting UI
 - **SRS Trace**: SYS-040
+
+---
+
+#### 3.2.9 Calculation Engine (`wbc-core.js`)
+
+- **Responsibility**: Every reported number. Denominator policy, rounding,
+  confidence intervals, thresholds, derived figures, template rendering,
+  serialisation, configuration validation and the method statement.
+- **Architectural significance**: it is a **UMD module with no DOM access**.
+  Nothing in it touches `document`, `window` or storage. That boundary is why
+  the unit layer executes the shipped calculation rather than a reimplementation
+  of it — the same file is `require`d by Node and loaded by a `<script>` tag.
+- **Inputs**: raw counts, a specimen configuration
+- **Outputs**: percentages, intervals, ratios, rendered templates, validation errors
+- **Design detail**: SDD-001 §3.10
+- **SRS Trace**: SYS-040 to SYS-045, SYS-180 to SYS-185
+
+#### 3.2.10 Configuration Lifecycle
+
+- **Responsibility**: Resolve the active profile from the shipped file and the
+  `localStorage` cache, validate both, apply the supersede rule, and support
+  import and export.
+- **Architectural significance**: `validateConfig` is the **single gate**. Load,
+  import and editor-save all pass through it, so a profile cannot enter by one
+  route that another would refuse.
+- **Design detail**: SDD-001 §3.11
+- **SRS Trace**: SYS-100 to SYS-103
+
+#### 3.2.11 Dialog (`wbc-dialog.js`)
+
+- **Responsibility**: Acknowledgement, confirmation and short forms, for both
+  the counter and the editor.
+- **Architectural significance**: one widget, shared. It replaced the browser's
+  `prompt()`, which ignores the theme, cannot state a rule and suspends the
+  page. It also owns the keyboard while open — counting keys do not reach the
+  tally (HA-102).
+- **Design detail**: SDD-001 §3.18
+
+#### 3.2.12 Configuration Editor (`config-editor.js`)
+
+- **Responsibility**: Drag-and-drop layout, key capture, report templates, the
+  morphology checklist, and the Counting Policy panel.
+- **Architectural significance**: it **merges into the loaded profile rather
+  than rebuilding it**. Rebuilding from its own form fields destroyed every
+  field it did not model — the denominator policy, the thresholds, the M:E
+  formula — while reporting success (HA-099).
+- **Design detail**: SDD-001 §3.17
+- **SRS Trace**: SYS-177 to SYS-179, SYS-240 to SYS-243
+
+#### 3.2.13 Offline Shell (`sw.js`)
+
+- **Responsibility**: Precache the application shell; serve profiles
+  network-first.
+- **Architectural significance**: it is what makes URS-094 true rather than
+  aspirational, and it is also why a stale `CACHE_VERSION` can hide a fix from
+  every installed browser.
+- **Design detail**: SDD-001 §3.15, §5.4 below
 
 ---
 
@@ -409,29 +466,68 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a vanilla JavaScr
 | Framework | None — vanilla JavaScript IIFE (`mdc-app.js`) | Complete application logic |
 | DOM Manipulation | Native DOM API | Element creation, updates, event handling |
 | Templating | `{{placeholder}}` string replacement | Output template rendering |
-| Styling | Tailwind CSS via CDN + inline styles | Utility-first responsive styling |
+| Styling | Vendored Tailwind + `web/styles/theme.css` | Utility-first styling; one shared stylesheet carries the light theme, the muted-tone corrections and the print rules |
 | Fonts | Google Fonts (Inter, JetBrains Mono, Libre Franklin) | Typography |
 
 ### 5.2 File Organization
 
 ```
 web/
-├── counter.html              # Main SPA entry point
-├── help.html                 # Quick start guide
-├── logo-showcase.html        # Logo showcase
-├── settings/
-│   └── templates.json        # Configuration (14 cell types, unified keys, formulas, templates)
-└── scripts/
-    └── mdc-app.js            # Complete application logic (single IIFE)
+├── counter.html                  # The counting application
+├── editor.html                   # Configuration editor
+├── methods.html                  # Methods and Limitations (MAL-001)
+├── calculation-reference.html    # Calculation Reference (CAL-001)
+├── help.html                     # Quick start guide
+├── sw.js                         # Service worker — offline shell (§5.4)
+├── styles/
+│   └── theme.css                 # One shared stylesheet: themes, print, primitives
+├── vendor/
+│   └── tailwind.js               # Vendored, not fetched from a CDN
+├── scripts/
+│   ├── wbc-core.js               # Calculation engine — DOM-free (§3.2.9)
+│   ├── wbc-dialog.js             # Shared dialog widget (§3.2.11)
+│   ├── mdc-app.js                # Counter: state and rendering
+│   └── config-editor.js          # Editor: layout, keys, counting policy
+└── settings/
+    ├── templates.json            # The built-in configuration profile
+    └── presets/                  # Catalogue of alternative profiles + index.json
 ```
+
+The earlier revision of this section listed `logo-showcase.html`, **which does
+not exist**, and omitted the editor, both documentation pages, the service
+worker, the stylesheet, the vendored bundle, the preset catalogue and three of
+the four scripts.
 
 ### 5.3 Script Loading
 
-A single `<script>` tag loads `mdc-app.js`. The IIFE executes immediately, calling `fetch()` to load `settings/templates.json` asynchronously before initializing the application. There are no framework libraries to load, no dependency ordering concerns, and no module bundler.
+Load order matters and is fixed:
 
-External resources loaded via CDN:
-1. Tailwind CSS (`cdn.tailwindcss.com`) — utility-first CSS framework
-2. Google Fonts (Inter, JetBrains Mono, Libre Franklin) — typography
+```
+wbc-core.js      →   wbc-dialog.js   →   mdc-app.js        (counter.html)
+wbc-core.js      →   wbc-dialog.js   →   config-editor.js  (editor.html)
+```
+
+`wbc-core.js` first because both consumers call it; `wbc-dialog.js` before the
+application so `showModal` has something to delegate to. No bundler, no module
+loader, no dependency resolution — the tags are the dependency graph.
+
+The earlier revision described "a single `<script>` tag" loading `mdc-app.js`.
+
+**Nothing render-blocking is fetched from a third party.** Google Fonts are
+requested and are a progressive enhancement: absent, the local font stack
+applies and nothing else changes. This is verified, not asserted — VV-SYS-091
+and VV-SYS-155 fail if any third-party script is requested.
+
+### 5.4 Offline Delivery
+
+`sw.js` precaches the shell — every page, all four scripts, the stylesheet and
+the vendored Tailwind — **cache-first**. Configuration profiles are
+**network-first with a cache fallback**, so a corrected profile is seen when the
+network is available and the application still boots when it is not.
+
+`CACHE_VERSION` is the release lever: an installed browser keeps serving the old
+shell until it changes. It has been forgotten twice, which is why every change
+record now states the bump.
 
 ---
 
@@ -480,16 +576,25 @@ Note: There is no separate CASE_ENTERED state. The case number is optional, and 
 | Concern | Mitigation |
 |---------|-----------|
 | Patient data transmission | No network transmission of patient data. All processing is client-side. The server serves static assets only. |
-| Data at rest | sessionStorage only; cleared on tab/window close. No localStorage, no cookies, no IndexedDB. |
-| Cross-site scripting (XSS) | Output templates use string replacement without `innerHTML` injection of user input. Case number and comment inputs are escaped on output. |
+| **Data at rest — sessionStorage** | Session history and the theme. Cleared when the tab closes. |
+| **Data at rest — localStorage** | Two things. The active configuration profile (`wbcds_config`), which holds no patient data. And, while a count is in progress, a crash-recovery snapshot (`wbcds_autosave`) which **does**: the accession number and the free-text morphology comments. It survives a browser restart, is discarded on completion, on reset, and on load if older than 12 hours. On a shared workstation this is residual data at rest; the control is local policy — a per-user profile, or clearing browsing data between operators. Recorded in RA-001. |
+| Cookies, IndexedDB | Not used. |
+| Cross-site scripting (XSS) | Rendered output **is** inserted with `innerHTML`, so the control is sanitisation rather than avoidance: `WBCCore.sanitizeTemplateHtml` escapes the rendered template before insertion, and `escapeHtml` / `escapeAttr` escape every interpolated value. Profiles are shared between institutions as JSON files, which is the delivery path this defends against. |
 | Server-side data exposure | No server-side processing of patient data. Node.js server serves static files only with path traversal protection. |
+
+> **Corrected 2026-08-06 (DCR-021).** This table previously stated
+> *"sessionStorage only … No localStorage, no cookies, no IndexedDB"* and that
+> output avoided `innerHTML`. Neither was true. The same false privacy claim was
+> found in `README.md` by independent review and corrected under DCR-015; it was
+> not propagated here, which is the `HA-097` failure mode applied to a document
+> a privacy officer reads.
 
 ### 7.2 Input Validation
 
 | Input | Validation Rule |
 |-------|----------------|
 | Case number | Free text, optional. Trimmed before use. |
-| Keyboard input | Only mapped keys (R, L, O, M, T, C, S, B, P, A, E, N, Y, X) are processed; all others ignored. Shift modifier triggers decrement. |
+| Keyboard input | Only keys mapped by the **active profile** are processed; all others are ignored. The key set is configuration, not a constant — the literal list previously given here (`R, L, O, M, …`) was withdrawn at v2.0. Shift decrements. Auto-repeat and input-method composition are rejected (HA-103), and no keystroke reaches the tally while a dialog is open (HA-102). |
 | Morphology comments | Free text. Keyboard isolation prevents counting keypresses from being captured while textarea is focused. |
 | Configuration JSON | Loaded via `fetch()`. Application displays a full-page error if the configuration fails to load. |
 
@@ -522,6 +627,7 @@ Note: There is no separate CASE_ENTERED state. The case number is optional, and 
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| 3.0 | 2026-08-06 | QMS | **Revised for drift.** §7.1 stated "sessionStorage only … no localStorage" and that output avoided `innerHTML`; both false, and the same privacy claim corrected in README.md under DCR-015 had not been propagated. §3.2.3 and §7.2 carried the key mapping withdrawn at v2.0. Tailwind was described as CDN-delivered in three places, which would defeat URS-094. §5.2 listed a file that does not exist and omitted three of four scripts, the service worker, the stylesheet, the vendored bundle and the preset catalogue; §5.3 described a single script tag. §3.2.9 to §3.2.13 added for the calculation engine, configuration lifecycle, dialog, editor and offline shell — five components previously absent. See DCR-021. |
 | A | 2026-02-18 | QMS | Initial draft — architecture defined |
 | B | 2026-02-19 | QMS | Component descriptions refined |
 | C | 2026-02-20 | QMS | Data flow diagrams updated |

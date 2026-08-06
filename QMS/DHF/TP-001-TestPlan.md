@@ -97,14 +97,14 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**382 identified verification cases** across 18 series and 4 layers.  344 further tests carry no identifier and are not registered.
+**387 identified verification cases** across 18 series and 4 layers.  344 further tests carry no identifier and are not registered.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 7 (001–010) | Static | QMS counted quantities |
 | `SC-*` | 20 (001–043) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
-| `UD-*` | 33 (001–063) | Static | User-facing documentation |
+| `UD-*` | 38 (001–074) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-CALC-*` | 23 (001–029) | Unit | Calculation engine vectors |
 | `VV-CI-*` | 12 (001–012) | Unit | Wilson confidence intervals |
@@ -290,6 +290,11 @@ auditing how the plan changed.
 | UD-061 | The design covers the calculations the engine performs | Static | `tests/13-user-documentation.test.js` |
 | UD-062 | The superseded percentage formula is marked, not left standing | Static | `tests/13-user-documentation.test.js` |
 | UD-063 | The design does not describe a CDN dependency the product removed | Static | `tests/13-user-documentation.test.js` |
+| UD-070 | The architecture names every shipped module | Static | `tests/13-user-documentation.test.js` |
+| UD-071 | It does not deny the data at rest that the product holds | Static | `tests/13-user-documentation.test.js` |
+| UD-072 | It does not describe a CDN dependency the product removed | Static | `tests/13-user-documentation.test.js` |
+| UD-073 | Every file it lists in the layout actually exists | Static | `tests/13-user-documentation.test.js` |
+| UD-074 | It does not fix the key mapping that configuration owns | Static | `tests/13-user-documentation.test.js` |
 
 #### VV-ABS-* — Absolute counts and the analyser WBC
 

@@ -100,6 +100,86 @@ describe('SDD-001 describes the software that exists (URS-092)', () => {
 });
 
 // ================================================================
+describe('SAD-001 describes the architecture that exists (URS-092)', () => {
+
+    /**
+     * SAD-001 carried the same drift as SDD-001 and one defect neither the
+     * README nor SDD-001 had reached: §7.1 stated "sessionStorage only … No
+     * localStorage, no cookies, no IndexedDB". Four sites write to
+     * localStorage, one of them a crash-recovery snapshot holding the
+     * accession number and the free-text morphology comments.
+     *
+     * That is the claim a privacy officer reads. The identical false claim was
+     * found in README.md by independent review and corrected under DCR-015 —
+     * and not propagated here, which is HA-097 applied to the architecture.
+     */
+    const sad = fs.readFileSync(
+        path.join(ROOT, 'QMS', 'DHF', 'SAD-001-SystemArchitectureDesign.md'), 'utf-8');
+
+    it('UD-070: The architecture names every shipped module', () => {
+        const scripts = fs.readdirSync(path.join(ROOT, 'web', 'scripts'));
+        for (const file of scripts) {
+            assert.ok(sad.includes(file),
+                `SAD-001 does not mention ${file}, which ships`);
+        }
+        for (const file of ['sw.js', 'theme.css']) {
+            assert.ok(sad.includes(file), `SAD-001 does not mention ${file}`);
+        }
+    });
+
+    it('UD-071: It does not deny the data at rest that the product holds', () => {
+        // Only assertions the document makes in its own voice. A correction
+        // note and a revision-history row both QUOTE the withdrawn claim, and
+        // must be allowed to — erasing the quotation would remove the evidence
+        // that the correction happened.
+        const claims = sad.split('\n')
+            .filter(line => !line.trimStart().startsWith('>'))     // block quotes
+            .filter(line => !/^\|\s*\d+\.\d+\s*\|/.test(line))      // revision rows
+            .join('\n');
+
+        assert.ok(!/sessionStorage only/i.test(claims),
+            'SAD-001 still claims sessionStorage is the only storage used');
+        assert.ok(!/No localStorage/i.test(claims),
+            'SAD-001 still denies using localStorage; four sites write to it');
+        assert.match(sad, /wbcds_autosave/,
+            'the crash-recovery snapshot holds patient data and must be named');
+        assert.match(sad, /accession number/i,
+            'and what it holds must be stated, not implied');
+    });
+
+    it('UD-072: It does not describe a CDN dependency the product removed', () => {
+        assert.ok(!/Tailwind CSS via CDN/i.test(sad),
+            'SAD-001 still describes Tailwind as CDN-delivered, which would defeat URS-094');
+        assert.match(sad, /vendor\/tailwind\.js/,
+            'SAD-001 must record that Tailwind is vendored');
+    });
+
+    it('UD-073: Every file it lists in the layout actually exists', () => {
+        // It listed `logo-showcase.html`, which does not exist.
+        // `json` before `js`: regex alternation is ordered, so `js` otherwise
+        // matches inside `templates.json` and the test looks for `templates.js`.
+        const listed = [...sad.matchAll(/^\s*[├└]──\s+([A-Za-z0-9._-]+\.(?:html|json|js|css))\b/gm)]
+            .map(m => m[1]);
+        assert.ok(listed.length > 5, 'no file layout found in SAD-001 — the parse is wrong');
+        const present = new Set();
+        for (const dir of ['', 'scripts', 'styles', 'vendor', 'settings']) {
+            const full = path.join(ROOT, 'web', dir);
+            if (fs.existsSync(full)) for (const f of fs.readdirSync(full)) present.add(f);
+        }
+        const missing = listed.filter(f => !present.has(f));
+        assert.deepEqual(missing, [],
+            'SAD-001 lists files that do not exist: ' + missing.join(', '));
+    });
+
+    it('UD-074: It does not fix the key mapping that configuration owns', () => {
+        assert.ok(!/R=nrbc, L=blasts/.test(sad),
+            'SAD-001 still states a literal key mapping withdrawn at v2.0');
+        assert.ok(!/\(R, L, O, M, T, C, S, B, P, A, E, N, Y, X\)/.test(sad),
+            'SAD-001 still lists the withdrawn key set as the accepted input');
+    });
+});
+
+// ================================================================
 describe('SOP-001 tracks the shipped configuration (HA-097)', () => {
 
     /**

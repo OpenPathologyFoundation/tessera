@@ -330,18 +330,31 @@
 
                 <!-- Absolute Counts (URS-036) -->
                 <div id="absolute-count-section" class="hidden mb-6 p-4 bg-slate-800/50 border border-slate-700 rounded-lg">
-                    <div class="flex items-center gap-3">
-                        <label for="wbcTotal" class="text-xs font-medium text-slate-400 uppercase tracking-wider whitespace-nowrap">
-                            Total WBC (&times;10&#8313;/L):
+                    <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
+                        <div class="flex items-center gap-3">
+                            <label for="wbcTotal" class="text-xs font-medium text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                                Analyser WBC (&times;10&#8313;/L):
+                            </label>
+                            <input
+                                type="number"
+                                id="wbcTotal"
+                                step="0.1"
+                                min="0"
+                                placeholder="e.g. 7.5"
+                                class="w-32 px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm font-mono text-slate-100 placeholder-slate-600 focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
+                            />
+                        </div>
+                        <!-- Shown only when nucleated red cells were counted, since
+                             that is the only case in which the correction applies. -->
+                        <label id="wbc-corrected-wrap" for="wbcAlreadyCorrected"
+                               class="hidden items-center gap-2 text-xs text-slate-400 cursor-pointer">
+                            <input type="checkbox" id="wbcAlreadyCorrected" class="accent-accent">
+                            Value is already corrected for NRBC
                         </label>
-                        <input
-                            type="number"
-                            id="wbcTotal"
-                            step="0.1"
-                            min="0"
-                            placeholder="e.g. 7.5"
-                            class="w-32 px-3 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm font-mono text-slate-100 placeholder-slate-600 focus:border-accent focus:ring-1 focus:ring-accent transition-colors"
-                        />
+                    </div>
+                    <div id="wbc-correction-note" class="hidden mt-3 p-3 bg-amber-500/10 border border-amber-500/40 rounded text-xs"
+                         role="status" aria-live="polite">
+                        <!-- Correction working, shown rather than applied silently -->
                     </div>
                     <div id="abs-results" class="mt-2">
                         <!-- Absolute count badges injected by JS -->

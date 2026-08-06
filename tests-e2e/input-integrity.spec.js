@@ -227,3 +227,105 @@ test.describe('Crash-recovery snapshot is bounded (URS-080)', () => {
         await expect(page.locator('#modal-title')).toHaveText('Recover Interrupted Count');
     });
 });
+
+// ================================================================
+test.describe('Absolute counts are corrected for nucleated red cells (HA-105)', () => {
+
+    /**
+     * The application held the NRBC per-100 figure, printed the correction
+     * formula in its own reference document, and multiplied by the uncorrected
+     * WBC anyway. At 20 NRBC/100 WBC every absolute count was overstated by
+     * 20% — and the absolute neutrophil count drives neutropenia grading, in
+     * exactly the population where nucleated red cells circulate.
+     *
+     * The correction is SHOWN, never applied silently: only the operator knows
+     * whether the analyser already performed it.
+     */
+    async function countWithNrbc(page) {
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.selectOption('#specimenType', 'pb');
+        await page.fill('#caseNumber', 'S25-ANC');
+        await page.click('#btnStartCount');
+        for (let i = 0; i < 120; i++) await page.keyboard.press('f');   // segmented
+        for (let i = 0; i < 80; i++) await page.keyboard.press('s');    // lymphocytes
+        for (let i = 0; i < 40; i++) await page.keyboard.press('b');    // NRBC -> 20 per 100
+        await page.click('#btnCountDone');
+    }
+
+    const polyAbs = page => page.locator('#abs-results').innerText()
+        .then(t => parseFloat((t.match(/POLY\s+([\d.]+)/) || [])[1]));
+
+    test('VV-SYS-186: The entered WBC is corrected before any absolute count', async ({ page }) => {
+        await countWithNrbc(page);
+        await page.fill('#wbcTotal', '10');
+
+        // 200 leucocytes, 40 NRBC -> 20 per 100. 10.0 x 100/120 = 8.33.
+        // Segmented neutrophils are 60% of the leucocyte differential, so the
+        // ANC is 5.00 and not the 6.00 an uncorrected WBC would give.
+        await expect(page.locator('#wbc-correction-note')).toBeVisible();
+        await expect(page.locator('#wbc-correction-note')).toContainText('8.33');
+        expect(await polyAbs(page)).toBeCloseTo(5.00, 2);
+    });
+
+    test('VV-SYS-187: The correction is shown, not applied silently', async ({ page }) => {
+        await countWithNrbc(page);
+        await page.fill('#wbcTotal', '10');
+        const note = page.locator('#wbc-correction-note');
+        // The value entered, the arithmetic, and the result — so the reader can
+        // check it rather than take it on trust.
+        await expect(note).toContainText('10.00');
+        await expect(note).toContainText('100 + 20.0');
+        await expect(note).toContainText('8.33');
+    });
+
+    test('VV-SYS-188: An already-corrected value is used as entered', async ({ page }) => {
+        await countWithNrbc(page);
+        await page.fill('#wbcTotal', '10');
+        expect(await polyAbs(page)).toBeCloseTo(5.00, 2);
+
+        await page.check('#wbcAlreadyCorrected');
+        await expect(page.locator('#wbc-correction-note')).toContainText('already');
+        expect(await polyAbs(page)).toBeCloseTo(6.00, 2);
+
+        // And unticking returns to the corrected figure.
+        await page.uncheck('#wbcAlreadyCorrected');
+        expect(await polyAbs(page)).toBeCloseTo(5.00, 2);
+    });
+
+    test('VV-SYS-189: With no nucleated red cells the control is not offered', async ({ page }) => {
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.selectOption('#specimenType', 'pb');
+        await page.click('#btnStartCount');
+        for (let i = 0; i < 200; i++) await page.keyboard.press('f');
+        await page.click('#btnCountDone');
+        await page.fill('#wbcTotal', '10');
+
+        // Offering a correction where it does not apply invites it to be used
+        // where it is wrong.
+        await expect(page.locator('#wbc-corrected-wrap')).toBeHidden();
+        await expect(page.locator('#wbc-correction-note')).toBeHidden();
+        expect(await polyAbs(page)).toBeCloseTo(10.00, 2);
+    });
+
+    test('VV-SYS-190: Bone marrow gets no correction — erythroblasts belong in the count', async ({ page }) => {
+        // ICSH 2008 places erythroblasts inside the nucleated differential
+        // count, so they are not excluded from the denominator and the
+        // analyser-WBC correction does not apply.
+        await page.goto('/counter.html');
+        await page.waitForFunction(() =>
+            !!(window.__wbcTestHooks && window.__wbcTestHooks.state.configMeta));
+        await page.selectOption('#specimenType', 'bm');
+        await page.click('#btnStartCount');
+        for (let i = 0; i < 160; i++) await page.keyboard.press('f');
+        for (let i = 0; i < 40; i++) await page.keyboard.press('b');   // erythroid
+        await page.click('#btnCountDone');
+        await page.fill('#wbcTotal', '10');
+
+        await expect(page.locator('#wbc-corrected-wrap')).toBeHidden();
+        expect(await polyAbs(page)).toBeCloseTo(8.00, 2);   // 80% of 10, uncorrected
+    });
+});

@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 3.0 |
+| **Version** | 3.1 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -360,6 +360,14 @@ Phase 2 item.
 | SYS-245 | A dialog that collects input SHALL state the rules for each field, validate on submission, and report the reason beneath the offending field without discarding what was typed. | URS-092, HA-101 |
 | SYS-246 | A dialog SHALL be modal for the keyboard: focus SHALL move into it, SHALL be confined to it, and SHALL return to the element that opened it on close. Keystrokes SHALL NOT reach the counting tally while a dialog is open. | URS-092, HA-015 |
 | SYS-247 | Escape SHALL cancel a dialog, EXCEPT where both branches are consequential; such a dialog SHALL require an explicit choice. | URS-061, HA-102 |
+
+### 4.25 Absolute Counts and the Analyser WBC (URS-036)
+
+| ID | Requirement | Trace |
+|----|------------|-------|
+| SYS-248 | Where a category is counted but excluded from the differential denominator and reported per 100, the system SHALL correct the entered analyser WBC by `WBC x 100 / (100 + per-100 value)` before deriving any absolute count. | URS-036, URS-030, HA-105 |
+| SYS-249 | The system SHALL NOT apply that correction silently: it SHALL display the value entered, the arithmetic and the result, and SHALL allow the operator to declare the entered value already corrected, in which case it is used unchanged. | URS-036, HA-105 |
+| SYS-250 | The correction control SHALL be offered only where the correction applies, and the basis of the absolute counts SHALL be stated whenever it does. | URS-036 |
 
 ### 4.22 Configuration Validation Requirements (URS-021, URS-022)
 

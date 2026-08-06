@@ -1860,8 +1860,40 @@
         wbcInput.addEventListener('input', onWbcTotalInput);
         wbcInput._session = session;
 
+        // The NRBC correction only applies where nucleated red cells were
+        // actually counted and kept out of the leucocyte denominator. Offering
+        // the control otherwise would invite it to be used where it is wrong.
+        var corrected = el('wbcAlreadyCorrected');
+        var wrap = el('wbc-corrected-wrap');
+        if (corrected && wrap) {
+            corrected.checked = false;
+            corrected.removeEventListener('change', onWbcTotalInput);
+            corrected.addEventListener('change', onWbcTotalInput);
+            wrap.classList.toggle('hidden', !(nrbcPer100For(session) > 0));
+            wrap.classList.toggle('flex', nrbcPer100For(session) > 0);
+        }
+
+        var note = el('wbc-correction-note');
+        if (note) { note.innerHTML = ''; note.classList.add('hidden'); }
+
         var absResults = el('abs-results');
         if (absResults) absResults.innerHTML = '';
+    }
+
+    /**
+     * Nucleated red cells per 100 leucocytes for this session, or 0.
+     *
+     * Only a category that is counted but held OUTSIDE the differential
+     * denominator inflates an analyser WBC in the way the correction assumes.
+     * In a marrow profile erythroblasts sit inside the nucleated differential
+     * count and no such correction applies.
+     */
+    function nrbcPer100For(session) {
+        if (!session || !session.per100) return 0;
+        var excl = session.denominatorExcludes || [];
+        if (excl.indexOf('nrbc') === -1) return 0;
+        var v = session.per100.nrbc;
+        return (typeof v === 'number' && isFinite(v) && v > 0) ? v : 0;
     }
 
     function onWbcTotalInput() {
@@ -1881,6 +1913,19 @@
         var specConfig = getSpecConfigForType(session.specimenType) || getSpecConfig();
         var allCells = specConfig.categories.upper.concat(specConfig.categories.lower);
 
+        // An analyser counts nucleated red cells as leucocytes, so its WBC is
+        // inflated whenever they circulate and every absolute count derived
+        // from it is overstated by the same factor. The correction is SHOWN,
+        // never applied silently: changing a number the operator typed without
+        // saying so is its own hazard, and only the operator knows whether the
+        // analyser already corrected it.
+        var nrbcPer100 = nrbcPer100For(session);
+        var alreadyCorrected = !!(el('wbcAlreadyCorrected') && el('wbcAlreadyCorrected').checked);
+        var applyCorrection = nrbcPer100 > 0 && !alreadyCorrected;
+        var leucocyteWbc = applyCorrection ? Core.correctWbcForNrbc(wbc, nrbcPer100) : wbc;
+
+        renderWbcCorrectionNote(wbc, leucocyteWbc, nrbcPer100, alreadyCorrected);
+
         var html = '<div class="flex flex-wrap gap-2 mt-2">';
         allCells.forEach(function (ct) {
             // A category outside the differential has no percentage of the WBC
@@ -1888,7 +1933,7 @@
             if (session.percentages[ct] === null) return;
             // Derived from the same displayed percentages as the table and the
             // report, so the three can never disagree (FMEA HA-024).
-            var abs = Core.computeAbsolute(wbc, session.percentages[ct] || 0);
+            var abs = Core.computeAbsolute(leucocyteWbc, session.percentages[ct] || 0);
             html += '<div class="flex items-baseline gap-1 px-2 py-1 bg-slate-800 rounded text-xs">';
             html += '<span class="text-slate-500 uppercase">' + Core.escapeHtml(ct) + '</span>';
             html += '<span class="font-mono font-semibold text-emerald-400">' + abs.toFixed(2) + '</span>';
@@ -1896,6 +1941,43 @@
         });
         html += '</div>';
         absResults.innerHTML = html;
+    }
+
+    /**
+     * State the basis of the absolute counts, always — including when no
+     * correction was applied. A figure whose basis is unstated cannot be
+     * checked by whoever reads it next.
+     */
+    function renderWbcCorrectionNote(entered, used, nrbcPer100, alreadyCorrected) {
+        var note = el('wbc-correction-note');
+        if (!note) return;
+
+        if (!(nrbcPer100 > 0)) {
+            note.innerHTML = '';
+            note.classList.add('hidden');
+            return;
+        }
+
+        var html = '';
+        if (alreadyCorrected) {
+            html += '<p class="text-amber-200/90"><strong>Taken as a corrected leucocyte count.</strong></p>';
+            html += '<p class="mt-1 text-amber-200/70">' +
+                nrbcPer100.toFixed(1) + ' NRBC per 100 WBC were counted. You have indicated the ' +
+                'entered value already excludes them, so it is used as it stands.</p>';
+        } else {
+            var factor = 100 / (100 + nrbcPer100);
+            html += '<p class="text-amber-200/90"><strong>Corrected for nucleated red cells.</strong></p>';
+            html += '<p class="mt-1 font-mono text-amber-200/90">' +
+                entered.toFixed(2) + ' &times; 100 &divide; (100 + ' + nrbcPer100.toFixed(1) + ') = ' +
+                '<strong>' + used.toFixed(2) + '</strong> &times;10&#8313;/L';
+            html += '</p>';
+            html += '<p class="mt-1 text-amber-200/70">Analysers count NRBC as leucocytes, so the ' +
+                'reported WBC is inflated when they circulate. Absolute counts below use the ' +
+                'corrected value &mdash; ' + Math.round((1 - factor) * 100) + '% lower than the ' +
+                'figure entered. If your analyser already corrected it, tick the box above.</p>';
+        }
+        note.innerHTML = html;
+        note.classList.remove('hidden');
     }
 
     // ================================================================

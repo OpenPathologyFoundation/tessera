@@ -840,3 +840,62 @@ describe('Selectable rounding policy (URS-034, DCR-010)', () => {
         }
     });
 });
+
+// ================================================================
+describe('Corrected WBC for nucleated red cells (URS-036, HA-105)', () => {
+
+    /**
+     * Analysers count nucleated red cells as leucocytes, so a reported WBC is
+     * inflated whenever they circulate and every absolute count derived from it
+     * is overstated by the same factor. The application computed the NRBC
+     * per-100 figure whose only clinical purpose is to feed this correction,
+     * displayed the formula in its own reference document, and then multiplied
+     * by the uncorrected value anyway.
+     */
+
+    it('VV-ABS-020: The published formula is implemented exactly', () => {
+        // corrected = reported x 100 / (100 + NRBC per 100 WBC)
+        assert.equal(Core.correctWbcForNrbc(10, 20).toFixed(4), '8.3333');
+        assert.equal(Core.correctWbcForNrbc(7.5, 11.1).toFixed(4), '6.7507');
+        assert.equal(Core.correctWbcForNrbc(12, 100).toFixed(4), '6.0000');
+    });
+
+    it('VV-ABS-021: A 20% overstatement is removed, at the ANC thresholds that matter', () => {
+        // 1.8 reported with 20 NRBC/100 is truly 1.5 — the neutropenia boundary.
+        const reported = 1.8;
+        const corrected = Core.correctWbcForNrbc(reported, 20);
+        assert.equal(corrected.toFixed(2), '1.50');
+        // At 100% neutrophils the ANC is the WBC; the uncorrected figure sits
+        // above the 1.5 boundary and the corrected figure sits on it.
+        assert.ok(Core.computeAbsolute(reported, 100) > 1.5);
+        assert.equal(Core.computeAbsolute(corrected, 100).toFixed(2), '1.50');
+        // Stated as a ratio: uncorrected overstates by exactly 20%.
+        assert.equal((Core.computeAbsolute(reported, 100) /
+                      Core.computeAbsolute(corrected, 100)).toFixed(3), '1.200');
+    });
+
+    it('VV-ABS-022: No nucleated red cells means no correction', () => {
+        assert.equal(Core.correctWbcForNrbc(7.5, 0), 7.5);
+        assert.equal(Core.correctWbcForNrbc(7.5, null), 7.5);
+        assert.equal(Core.correctWbcForNrbc(7.5, undefined), 7.5);
+        assert.equal(Core.correctWbcForNrbc(7.5, NaN), 7.5);
+    });
+
+    it('VV-ABS-023: An unusable WBC yields null, never a silent zero', () => {
+        for (const bad of [0, -1, NaN, null, undefined, '10']) {
+            assert.equal(Core.correctWbcForNrbc(bad, 20), null, String(bad));
+        }
+    });
+
+    it('VV-ABS-024: The correction is monotonic and bounded', () => {
+        // More nucleated red cells can only reduce the leucocyte count, and
+        // never below zero.
+        let previous = Core.correctWbcForNrbc(10, 0);
+        for (const n of [1, 5, 20, 50, 100, 500]) {
+            const value = Core.correctWbcForNrbc(10, n);
+            assert.ok(value < previous, `not monotonic at ${n}`);
+            assert.ok(value > 0, `not positive at ${n}`);
+            previous = value;
+        }
+    });
+});

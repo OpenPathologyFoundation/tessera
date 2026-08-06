@@ -615,12 +615,49 @@
     }
 
     /**
-     * Absolute count for a cell type given an analyser WBC (URS-036).
+     * Absolute count for a cell type given a leucocyte concentration (URS-036).
      * WBC x percentage / 100.
+     *
+     * The WBC passed here must be the LEUCOCYTE count. Where nucleated red
+     * cells circulate, an analyser's reported WBC is not that — see
+     * correctWbcForNrbc below.
      */
     function computeAbsolute(wbcTotal, percentage) {
         if (typeof wbcTotal !== 'number' || !isFinite(wbcTotal) || wbcTotal <= 0) return null;
         return (wbcTotal * percentage) / 100;
+    }
+
+    /**
+     * The leucocyte concentration implied by an analyser WBC that counted
+     * nucleated red cells as leucocytes.
+     *
+     *     corrected WBC = reported WBC x 100 / (100 + NRBC per 100 WBC)
+     *
+     * Nucleated red cells resist the lysing reagent and are counted as
+     * leucocytes by impedance analysers, so a reported WBC is inflated whenever
+     * they circulate. Every absolute count derived from it is overstated by the
+     * same factor: at 20 NRBC per 100 WBC, by 20%.
+     *
+     * That matters because the absolute neutrophil count drives neutropenia
+     * grading and chemotherapy decisions, and a 20% overstatement moves values
+     * across the 1.5 and 0.5 x10^9/L boundaries. The population in which
+     * nucleated red cells circulate — neonates, severe haemolysis, marrow
+     * infiltration — is exactly the population in which that decision is being
+     * made.
+     *
+     * The identity holds because the differential percentages this multiplies
+     * are computed over the leucocyte denominator, with NRBC excluded
+     * (denominatorExcludes, DCR-006). Correcting the WBC and excluding NRBC
+     * from the denominator are two halves of the same convention; performing
+     * one without the other is what produces the error.
+     *
+     * Returns the input unchanged when no correction applies, and null for an
+     * unusable WBC, so a caller can always multiply the result.
+     */
+    function correctWbcForNrbc(wbcReported, nrbcPer100) {
+        if (typeof wbcReported !== 'number' || !isFinite(wbcReported) || wbcReported <= 0) return null;
+        if (typeof nrbcPer100 !== 'number' || !isFinite(nrbcPer100) || nrbcPer100 <= 0) return wbcReported;
+        return wbcReported * 100 / (100 + nrbcPer100);
     }
 
     // ================================================================
@@ -1283,6 +1320,7 @@
         computeFormula: computeFormula,
         evaluateThresholds: evaluateThresholds,
         computeAbsolute: computeAbsolute,
+        correctWbcForNrbc: correctWbcForNrbc,
         renderTemplate: renderTemplate,
         buildTemplateValues: buildTemplateValues,
         buildLowCountNote: buildLowCountNote,

@@ -183,6 +183,28 @@
     <p class="mt-2">&mdash; and that formula requires NRBC expressed <em>per 100 WBC</em>, not as a
     percentage of all nucleated cells. Reporting it the other way makes the correction wrong.</p>
 
+    <div class="mt-3 p-4 cfg bg-slate-800/50 rounded text-xs">
+        <p class="font-semibold text-accent">The tool performs this correction, and shows its working</p>
+        <p class="mt-1 text-slate-400">
+            When you enter an analyser WBC on the results screen and nucleated red cells were counted,
+            the correction above is applied before any absolute count is derived, and the arithmetic is
+            displayed &mdash; the value entered, the factor, and the result. It is never applied
+            silently, because only you know whether your analyser already corrected it; a checkbox says
+            so and the entered value is then used as it stands.
+        </p>
+        <p class="mt-2 text-slate-400">
+            <strong class="text-slate-200">Why it matters.</strong> At 20 NRBC per 100 WBC an
+            uncorrected value overstates every absolute count by 20%. The absolute neutrophil count
+            drives neutropenia grading, and a 20% overstatement moves values across the 1.5 and
+            0.5 &times;10&#8313;/L boundaries &mdash; in exactly the population where nucleated red
+            cells circulate.
+        </p>
+        <p class="mt-2 text-slate-400">
+            Correcting the WBC and excluding NRBC from the differential denominator are two halves of
+            one convention. Doing either alone is what produces the error.
+        </p>
+    </div>
+
     <p class="mt-4 font-semibold text-slate-200">A blood film with 180 leucocytes and 20 nucleated red cells</p>
     <div class="mt-2 overflow-x-auto">
     <table class="w-full text-xs">

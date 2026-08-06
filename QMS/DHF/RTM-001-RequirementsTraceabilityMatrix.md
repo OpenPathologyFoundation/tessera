@@ -106,7 +106,7 @@ URS (User Need) -> SRS (System Req) -> SDD (Design) -> TP/VV (Verification)
 | URS-033 | Division-by-zero handled (0.00%, never NaN) | SYS-042 | 3.5.2 | HA-021 | VV-CALC-001, VV-CALC-018 | U | Full |
 | URS-034 | Reported percentages sum to exactly 100% by largest-remainder distribution; error bounded at one unit | SYS-044 | 3.5.2 | HA-022 | VV-CALC-011, 012, 016–021, VV-E2E-011, VV-SYS-014 | U, B, S | Full |
 | URS-035 | Config-defined derived formulas; "N/A" on zero denominator | SYS-046, SYS-047 | 3.5.4 | HA-070, HA-072 | VV-ME-001..006, VV-SYS-017 | U, S | Full |
-| URS-036 | Optional absolute counts from an analyser WBC; configurable | SYS-150–SYS-153 | 3.13 | HA-024 | VV-ABS-001, VV-ABS-002, TC-B085, TC-B086 | U, B | Full |
+| URS-036 | Optional absolute counts from an analyser WBC; configurable | SYS-150–SYS-153, SYS-248–SYS-250 | 3.13 | HA-024, HA-105 | VV-ABS-001, VV-ABS-002, VV-ABS-020–024, VV-SYS-186–190, TC-B085, TC-B086 | U, B | Full |
 
 ### 5.5 Count Completion and Resumption (URS §5.5)
 

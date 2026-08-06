@@ -171,6 +171,60 @@ describe('SAD-001 describes the architecture that exists (URS-092)', () => {
             'SAD-001 lists files that do not exist: ' + missing.join(', '));
     });
 
+    it('UD-075: The component diagram shows every layer that exists', () => {
+        // The previous diagram drew a flat grid of counter features and omitted
+        // every module added since DCR-006 — including the engine that computes
+        // every number in it.
+        const diagram = sad.slice(sad.indexOf('### 3.1'), sad.indexOf('### 3.2'));
+        for (const part of ['wbc-core.js', 'wbc-dialog.js', 'config-editor.js',
+                            'mdc-app.js', 'sw.js', 'validateConfig',
+                            'wbcds_autosave', 'wbcds_config']) {
+            assert.ok(diagram.includes(part),
+                `the component diagram does not show ${part}`);
+        }
+    });
+
+    it('UD-076: The counting flow shows the guards that protect the tally', () => {
+        const flow = sad.slice(sad.indexOf('### 4.1'), sad.indexOf('### 4.2'));
+        // Each of these rejects a keystroke that would otherwise change a
+        // clinical number, and each was a recorded hazard.
+        for (const [needle, hazard] of [['ev.repeat', 'HA-103 auto-repeat'],
+                                        ['isComposing', 'input-method composition'],
+                                        ['dialog', 'HA-102 dialog owns the keyboard'],
+                                        ['physical key', 'HA-104 Shift-decrement']]) {
+            assert.ok(new RegExp(needle, 'i').test(flow),
+                `the counting flow does not show ${hazard}`);
+        }
+        // And the arithmetic it actually performs.
+        for (const needle of ['getDenominator', 'percentagesSummingTo100', 'autosave']) {
+            assert.ok(new RegExp(needle, 'i').test(flow),
+                `the counting flow does not show ${needle}`);
+        }
+    });
+
+    it('UD-077: The completion flow shows what the results screen computes', () => {
+        const flow = sad.slice(sad.indexOf('### 4.2'), sad.indexOf('### 4.3'));
+        for (const needle of ['wilsonInterval', 'evaluateThresholds',
+                              'buildMethodStatement', 'correctWbcForNrbc']) {
+            assert.ok(flow.includes(needle),
+                `the completion flow does not show ${needle}`);
+        }
+        assert.match(flow, /advisory, never blocking/i,
+            'the flow must record that the advisories do not block (URS-041)');
+    });
+
+    it('UD-078: The reset flow does not claim behaviour the code does not have', () => {
+        const flow = sad.slice(sad.indexOf('### 4.4'), sad.indexOf('### 4.5'));
+        // resetToStart preserves the specimen type and clears the autosave.
+        // Nothing locks the specimen selector, so nothing re-enables it.
+        assert.match(flow, /PRESERVE the specimen type/i,
+            'the reset flow must record that the specimen type survives (URS-063)');
+        assert.match(flow, /autosave/i,
+            'the reset flow must record that the recovery snapshot is discarded');
+        assert.ok(!/Enable specimen type selector/i.test(flow),
+            'the reset flow still claims it re-enables a selector that is never disabled');
+    });
+
     it('UD-074: It does not fix the key mapping that configuration owns', () => {
         assert.ok(!/R=nrbc, L=blasts/.test(sad),
             'SAD-001 still states a literal key mapping withdrawn at v2.0');

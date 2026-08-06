@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | DCR-021 |
-| **Version** | 1.0 |
+| **Version** | 1.1 |
 | **Date Created** | 2026-08-06 |
 | **Status** | **In Review** — engineering approvals complete; clinical approval outstanding |
 | **Parent Document** | DHF-001 |
@@ -117,15 +117,57 @@ before `json`. Both were fixed until they failed for the right reason.
 
 ---
 
-## 4. What This Does Not Address
+## 4. Rev B — §3.1 and §4 Completed
 
-- §4 (data flows) and §6 (state management) were read but not revised. They
-  describe flows that still exist, though §4 predates the denominator policy and
-  the confidence intervals, so the completion flow is incomplete rather than
-  wrong.
-- The §3.1 component diagram is unchanged and still shows only the original
-  components; the new components are described in §3.2 but not drawn.
-- UD-070 checks a module is *named*, not that what is said about it is true.
+Rev A left the component diagram and the data flows unrevised, and said so.
+Both are now done.
+
+**§3.1 is redrawn by layer.** The previous diagram was a flat grid of counter
+features — case identification, counting engine, output generator — that omitted
+every module added since DCR-006, including the calculation engine that produces
+every number in it. Layering is the architecturally significant fact: the engine
+sits below both applications and touches no DOM, which is what allows the
+verification suite to execute shipped code rather than a copy of it. The diagram
+now shows pages, the two applications, the shared engine and dialog,
+configuration and storage, and delivery.
+
+**§4 flows stopped at "recalculate percentages" and "compile the template".**
+Everything DCR-006 onward added was absent: the denominator policy, the rounding
+policy, the Wilson intervals, the threshold advisory, the method statement,
+autosave, and every guard on the keyboard.
+
+§4.1 now shows the six conditions under which a keystroke is rejected before it
+reaches the tally — three of them recorded hazards (HA-102, HA-103, HA-104) —
+and the engine calls made per keystroke. §4.2 shows what the results screen
+computes, that the advisories never block, and the analyser-WBC correction.
+
+**§4.4 described a reset the code does not perform.** It cleared the specimen
+type and re-enabled a locked selector. `resetToStart()` preserves the specimen
+type (URS-063) and discards the autosave snapshot, and nothing locks the
+selector — the specimen type is switchable mid-count, which saves the count in
+progress to history first (URS-013).
+
+**§4.5 Configuration Resolution** added; it was absent entirely, though it is
+the flow that decides which profile produces every number.
+
+| ID | Verifies |
+|----|----------|
+| UD-075 | The diagram shows every module, the validation gate and both storage keys |
+| UD-076 | The counting flow shows the guards that protect the tally, and the arithmetic |
+| UD-077 | The completion flow shows the intervals, thresholds, provenance and WBC correction, and that advisories never block |
+| UD-078 | The reset flow does not claim behaviour the code does not have |
+
+Revert-checked: removing the engine from the diagram fails UD-075; removing the
+auto-repeat guard from the flow fails UD-076; restoring "Enable specimen type
+selector" fails UD-078.
+
+---
+
+## 4a. What This Still Does Not Address
+
+- **§6 (state management)** was read but not revised.
+- UD-070 and UD-075 check a module is *named* and *drawn*, not that what is said
+  about it is true. No test can check prose against code.
 
 ---
 
@@ -134,6 +176,7 @@ before `json`. Both were fixed until they failed for the right reason.
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-08-06 | QMS | Initial issue. SAD-001 v3.0: §7.1 privacy claims corrected, five components added, file layout and script loading replaced, CDN and key-mapping claims withdrawn. UD-070 to UD-074 added. |
+| B | 2026-08-06 | QMS | SAD-001 Rev 3.1: §3.1 redrawn by layer, §4 flows rewritten, §4.4 reset corrected, §4.5 added. UD-075 to UD-078. |
 
 ---
 

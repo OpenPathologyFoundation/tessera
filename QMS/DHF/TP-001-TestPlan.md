@@ -97,14 +97,14 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**387 identified verification cases** across 18 series and 4 layers.  344 further tests carry no identifier and are not registered.
+**391 identified verification cases** across 18 series and 4 layers.  344 further tests carry no identifier and are not registered.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 7 (001–010) | Static | QMS counted quantities |
 | `SC-*` | 20 (001–043) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
-| `UD-*` | 38 (001–074) | Static | User-facing documentation |
+| `UD-*` | 42 (001–078) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-CALC-*` | 23 (001–029) | Unit | Calculation engine vectors |
 | `VV-CI-*` | 12 (001–012) | Unit | Wilson confidence intervals |
@@ -295,6 +295,10 @@ auditing how the plan changed.
 | UD-072 | It does not describe a CDN dependency the product removed | Static | `tests/13-user-documentation.test.js` |
 | UD-073 | Every file it lists in the layout actually exists | Static | `tests/13-user-documentation.test.js` |
 | UD-074 | It does not fix the key mapping that configuration owns | Static | `tests/13-user-documentation.test.js` |
+| UD-075 | The component diagram shows every layer that exists | Static | `tests/13-user-documentation.test.js` |
+| UD-076 | The counting flow shows the guards that protect the tally | Static | `tests/13-user-documentation.test.js` |
+| UD-077 | The completion flow shows what the results screen computes | Static | `tests/13-user-documentation.test.js` |
+| UD-078 | The reset flow does not claim behaviour the code does not have | Static | `tests/13-user-documentation.test.js` |
 
 #### VV-ABS-* — Absolute counts and the analyser WBC
 

@@ -95,79 +95,94 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a vanilla JavaScr
 
 ### 3.1 Component Diagram
 
+The previous diagram drew a flat grid of counter features and omitted every
+module added since DCR-006. It is redrawn by **layer**, because the layering is
+the architecturally significant fact: the calculation engine sits below both
+applications and touches no DOM, which is what allows the verification suite to
+execute shipped code rather than a copy of it.
+
 ```
-+-------------------------------------------------------------------+
-|                     APPLICATION COMPONENTS                         |
-|                                                                    |
-|  +-----------------------+     +------------------------------+    |
-|  | CASE IDENTIFICATION   |     | SPECIMEN TYPE CONTROLLER     |    |
-|  | - Case number input   |     | - BM/PB selector            |    |
-|  | - Optional (not       |     | - Both use identical         |    |
-|  |   mandatory)          |     |   14-cell layout             |    |
-|  | - Start Count always  |     | - Lock after start           |    |
-|  |   enabled             |     |                              |    |
-|  +-----------+-----------+     +-------------+----------------+    |
-|              |                               |                     |
-|              v                               v                     |
-|  +-----------------------+     +------------------------------+    |
-|  | COUNTING ENGINE       |     | COUNTING TABLE RENDERER      |    |
-|  | - Document keydown    |     | - Upper row (7 precursors    |    |
-|  |   listener            |     |   + subtotal)                |    |
-|  | - Unified 14-key map  |     | - Lower row (7 mature       |    |
-|  | - Increment/Decrement |     |   + subtotal)                |    |
-|  | - Visual feedback     |     | - Grand total                |    |
-|  | - M:E ratio update    |     | - Amber border on upper row  |    |
-|  |   on every keypress   |     |   when upperRowAbnormal=true |    |
-|  +-----------+-----------+     +-------------+----------------+    |
-|              |                               |                     |
-|              v                               v                     |
-|  +-----------------------+     +------------------------------+    |
-|  | CALCULATION ENGINE    |     | MORPHOLOGY COMMENTS          |    |
-|  | - Percentage calc     |     | - Collapsible text area      |    |
-|  | - Division by zero    |     | - Keyboard isolation         |    |
-|  | - Rounding            |     | - Preserved across resume    |    |
-|  | - M:E ratio from      |     |   cycles                     |    |
-|  |   config formulas     |     | - Output integration         |    |
-|  +-----------+-----------+     +------------------------------+    |
-|              |                                                     |
-|              v                                                     |
-|  +-----------------------+     +------------------------------+    |
-|  | COUNT COMPLETION      |     | OUTPUT GENERATOR             |    |
-|  | - Direct finalization |     | - {{placeholder}} template   |    |
-|  |   (no blocking modal) |     |   compilation                |    |
-|  | - Non-blocking note   |     | - {{ME_ratio}} support       |    |
-|  |   if below target     |     | - Tabbed display             |    |
-|  | - Detach keydown      |     | - Copy to clipboard          |    |
-|  +-----------+-----------+     +------------------------------+    |
-|              |                                                     |
-|              v                                                     |
-|  +-----------------------+     +------------------------------+    |
-|  | COUNT RESUMPTION      |     | SESSION HISTORY MANAGER      |    |
-|  | - Continue Counting   |     | - sessionStorage-based       |    |
-|  |   from results phase  |     | - CSV/JSON export            |    |
-|  | - Preserve all tallies|     | - Read-only review           |    |
-|  | - Re-attach keydown   |     +------------------------------+    |
-|  +-----------+-----------+                                         |
-|              |                                                     |
-|              v                                                     |
-|  +-----------------------+     +------------------------------+    |
-|  | RESET CONTROLLER      |     | PROGRESS INDICATOR           |    |
-|  | - Confirmation dialog |     | - "N / target" format        |    |
-|  | - State clearing      |     | - Updates live on each       |    |
-|  | - Focus management    |     |   keypress                   |    |
-|  +-----------------------+     +------------------------------+    |
-|                                                                    |
-|  +-----------------------+                                         |
-|  | CONFIGURATION LOADER  |                                         |
-|  | - fetch() to          |                                         |
-|  |   templates.json      |                                         |
-|  | - Schema: categories, |                                         |
-|  |   formulas, targetCount,                                        |
-|  |   upperRowAbnormal    |                                         |
-|  | - Error handling      |                                         |
-|  +-----------------------+                                         |
-+-------------------------------------------------------------------+
++---------------------------------------------------------------------------+
+|  PAGES (static, no build step)                                            |
+|                                                                            |
+|   counter.html      editor.html      methods.html                          |
+|                                      calculation-reference.html            |
+|                                      help.html                             |
++-------------------+--------------------+----------------------------------+
+                    |                    |
+                    v                    v
++---------------------------+  +------------------------------------------+
+|  COUNTER  (mdc-app.js)    |  |  EDITOR  (config-editor.js)              |
+|                           |  |                                          |
+|  Phase machine            |  |  Layout: drag and drop                   |
+|   case-entry -> counting  |  |  Key capture + ergonomic zones           |
+|   -> results              |  |  Report templates                        |
+|                           |  |  COUNTING POLICY panel:                  |
+|  Keyboard handler         |  |    denominator / per-100                 |
+|   repeat + IME rejected   |  |    rounding, precision                   |
+|   dialog owns the keys    |  |    confidence level                      |
+|   printed key, then       |  |    thresholds                            |
+|     physical position     |  |    derived figures                       |
+|                           |  |                                          |
+|  Rendering + autosave     |  |  Merges into the loaded profile;         |
+|                           |  |  never rebuilds it  (HA-099)             |
++------------+--------------+  +--------------------+---------------------+
+             |                                      |
+             |        +-----------------------------+
+             |        |
+             v        v
++---------------------------------------------------------------------------+
+|  SHARED (no DOM below this line, except the dialog which owns one)         |
+|                                                                            |
+|  +--------------------------------+   +--------------------------------+   |
+|  |  wbc-core.js   CALCULATION     |   |  wbc-dialog.js   DIALOG        |   |
+|  |                                |   |                                |   |
+|  |  denominator policy            |   |  alert / confirm / form        |   |
+|  |  rounding (3 policies)         |   |  focus trapped and restored    |   |
+|  |  Wilson intervals              |   |  owns the keyboard while open  |   |
+|  |  diagnostic thresholds         |   |  Escape, except where both     |   |
+|  |  derived figures               |   |    branches are consequential  |   |
+|  |  template render + sanitise    |   +--------------------------------+   |
+|  |  method provenance             |                                        |
+|  |  validateConfig  <- the ONE    |   Shared by BOTH applications, so       |
+|  |    gate every profile passes   |   they cannot diverge in appearance     |
+|  |                                |   or behaviour.                        |
+|  |  UMD, DOM-free: the same file  |                                        |
+|  |  is require()d by the Node     |                                        |
+|  |  suites and <script>-loaded    |                                        |
+|  |  by the browser.               |                                        |
+|  +----------------+---------------+                                        |
++-------------------+--------------------------------------------------------+
+                    |
+                    v
++---------------------------------------------------------------------------+
+|  CONFIGURATION AND STORAGE                                                 |
+|                                                                            |
+|   settings/templates.json  -----+                                          |
+|   settings/presets/*.json  -----+---> validateConfig ---> active profile    |
+|   localStorage wbcds_config ----+          ^                               |
+|                                            |                               |
+|   supersede: shipped beats cached at the same profileId, higher version     |
+|                                                                            |
+|   localStorage  wbcds_autosave   crash recovery — HOLDS PATIENT DATA,       |
+|                                  discarded after 12 h (§7.1)               |
+|   sessionStorage wbcds_history   session list, theme, audio choice          |
++---------------------------------------------------------------------------+
+                    |
+                    v
++---------------------------------------------------------------------------+
+|  DELIVERY                                                                  |
+|   sw.js   shell cache-first  |  profiles network-first  |  CACHE_VERSION    |
+|   vendor/tailwind.js, styles/theme.css — nothing render-blocking is remote  |
++---------------------------------------------------------------------------+
 ```
+
+**What the layering buys.** The engine has no DOM, so it is testable directly
+and cannot acquire hidden dependencies on the page. Both applications share it
+and the dialog, so a fix reaches both. `validateConfig` is the single entry gate,
+so a profile cannot arrive by one route that another would refuse. Everything
+below the pages is a static file, so the shipped artefact and the verified
+artefact are the same bytes.
 
 ### 3.2 Component Descriptions
 
@@ -312,51 +327,69 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a vanilla JavaScr
 
 ## 4. Data Flow
 
+These flows previously stopped at "recalculate percentages" and "compile the
+template". Everything DCR-006 onward added — the denominator policy, the
+rounding policy, the confidence intervals, the threshold advisory, the method
+statement, autosave, and the guards on the keyboard — was absent, and §4.4
+described a reset that clears the specimen type and re-enables a locked
+selector. Neither happens.
+
 ### 4.1 Primary Counting Data Flow
 
 ```
-[User presses key]
+[User presses a key]
        |
        v
-[Document keydown event]
+[Document keydown]
+       |
+       +--> [Counting not active?] ------------------> ignore
+       +--> [Comment field focused?] ----------------> key goes to the textarea
+       +--> [A dialog is open?] --------------------->  the dialog owns the
+       |                                                keyboard  (HA-102)
+       +--> [Ctrl / Alt / Meta held?] ---------------> ignore
+       +--> [ev.repeat] ----------------------------->  auto-repeat is not a
+       |                                                deliberate act (HA-103)
+       +--> [ev.isComposing] ------------------------>  belongs to the input
+       |                                                method editor
+       +--> [target is INPUT / TEXTAREA / SELECT] ---> ignore
        |
        v
-[Comment field focused?] --Yes--> [Key goes to textarea; counting suspended]
+[Resolve the key against the profile's outCodes]
+   printed character first  (AZERTY / QWERTZ keep their labels)
+   then the physical key position, which Shift does not change  (HA-104)
        |
-       No
+       +--> no match ---------------------------------> ignore
        |
        v
-[Counting Engine: map key to cell type via outCodes]
+[Shift held?] -- yes --> [Decrement, floored at zero]
        |
-       +---> [Is Shift held?]
-       |         |
-       |    Yes  |  No
-       |         |
-       v         v
-  [Decrement] [Increment]
-       |         |
-       +----+----+
-            |
-            v
-  [Update cell count in closure state]
-            |
-            v
-  [Update total count + subtotals]
-            |
-            v
-  [Calculation Engine: recalculate all percentages]
-            |
-            v
-  [Calculation Engine: recalculate M:E ratio from formula]
-            |
-            v
-  [Update DOM: cell counts, percentages, subtotals, grand total, M:E ratio]
-            |
-            v
-  [Update progress indicator: "N / target"]
-            |
-            v
-  [Visual feedback flash on affected cell]
+       no
+       v
+[Increment]
+       |
+       v
+[AudioEngine: click, or undo — profile default, session override]
+       |
+       v
++---------------- wbc-core.js, per keystroke -------------------------+
+|  getDenominator(counts, denominatorExcludes)                        |
+|  percentagesSummingTo100(counts, precision.display, {exclude,       |
+|                          method})        <- rounding policy         |
+|  computePer100 for each excluded category                           |
+|  computeFormula for each derived figure                             |
++---------------------------------------------------------------------+
+       |
+       v
+[Render: cell counts, percentages, per-100 values, subtotals,
+         grand total split as "N cells (+M outside differential)",
+         derived figures, progress "N / target"]
+       |
+       v
+[Flash the affected cell]
+       |
+       v
+[saveAutosaveState() -> localStorage wbcds_autosave]
+   case number, specimen, counts, comments, checklist, timestamp
 ```
 
 ### 4.2 Count Completion Data Flow
@@ -365,62 +398,76 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a vanilla JavaScr
 [User clicks "Count Done"]
        |
        v
-[Total below advisory target?]
+[Detach the keydown listener — keystrokes can no longer alter the tally]
        |
-  Yes  |  No
+       v
+[Set phase to RESULTS]
        |
-       v         |
-[Display non-blocking   |
- informational note]    |
-       |                |
-       +-------+--------+
-               |
-               v
-  [Detach keydown listener]
-               |
-               v
-  [Set phase to COMPLETED]
-               |
-               v
-  [For each output template:]
-  [  Compile {{placeholder}} template with:]
-  [    - case number                       ]
-  [    - total count                       ]
-  [    - per-cell percentages              ]
-  [    - morphology comments               ]
-  [    - M:E ratio                         ]
-               |
-               v
-  [Render tabbed output display]
-               |
-               v
-  [Save to session history (sessionStorage)]
+       v
++---------------- wbc-core.js, once -----------------------------------+
+|  percentagesSummingTo100(counts, precision.report, {exclude,        |
+|                          method})                                    |
+|  wilsonInterval(count, denominator, level) for each category         |
+|  evaluateThresholds  -> which thresholds the intervals SPAN          |
+|  buildLowCountNote   -> sub-target advisory, quantified              |
+|  computeFormula      -> ratios and subset percentages                |
+|  buildMethodStatement-> profile, denominator, rounding, precision,   |
+|                         interval level, M:E composition, citations   |
+|  renderTemplate + sanitizeTemplateHtml for each output template      |
++----------------------------------------------------------------------+
+       |
+       v
+[Render the results screen]
+   percentages with intervals
+   NEAR A DIAGNOSTIC THRESHOLD advisory, if any interval spans one
+   sub-target advisory, if below target        <- both ADVISORY, never blocking
+   method statement (disclosure)
+   tabbed output, each carrying "[profileId vX.Y · timestamp]"  (URS-052)
+       |
+       v
+[Append to session history -> sessionStorage]
+       |
+       v
+[Discard the autosave snapshot — the count is no longer interrupted]
+       |
+       v
+[Operator may enter an analyser WBC]
+       |
+       v
+[nrbc per 100 > 0 and not declared already corrected?]
+       |                              |
+      yes                            no
+       |                              |
+       v                              v
+[correctWbcForNrbc]              [use as entered]
+   WBC x 100 / (100 + nrbc/100)
+       |                              |
+       +--------------+---------------+
+                      |
+                      v
+[Show the arithmetic, then computeAbsolute per category]
+[If absoluteCountsInReport: re-render the templates with {{*_abs}}]
 ```
 
 ### 4.3 Resume Counting Data Flow
 
 ```
-[User clicks "Continue Counting" from results phase]
+[User clicks "Continue Counting" from the results screen]
        |
        v
-[Set phase to COUNTING]
+[Set phase to COUNTING; re-attach the keydown listener]
        |
        v
-[Preserve all existing state:]
-[  - cell counts (unchanged)  ]
-[  - case number (unchanged)  ]
-[  - specimen type (unchanged)]
-[  - morphology comments      ]
+[Preserve every tally, the case number, the specimen type,
+ the comments and the morphology checklist]
        |
        v
-[Re-attach document keydown listener]
-       |
-       v
-[Re-render counting table with current data]
-       |
-       v
-[User resumes keyboard counting]
+[Re-render the counting grid; autosave resumes on the next keystroke]
 ```
+
+`Continue Counting` is why URS-043 (locking the table after completion) was
+withdrawn: a near-threshold advisory is only useful if the operator can act on
+it, and acting on it means counting more cells into the same tally.
 
 ### 4.4 Reset / New Case Data Flow
 
@@ -428,30 +475,59 @@ WBC ΔΣ is a single-page web application (SPA) implemented as a vanilla JavaScr
 [User clicks "Reset"]
        |
        v
-[Any count data > 0?]
+[Any cells counted?] -- no --> [reset immediately]
        |
-  Yes  |  No
+      yes
+       v
+[Confirmation dialog — Cancel is ALWAYS offered]
        |
-       v         |
-[Confirmation dialog]  |
-       |               |
-[User confirms?]       |
-       |               |
-  No:  |  Yes:         |
-[Abort] |              |
-       +--------+------+
-                |
-                v
-  [Clear all cell counts to 0]
-  [Clear all percentages to 0.00%]
-  [Clear total to 0]
-  [Clear output text]
-  [Clear morphology comments]
-  [Clear case number]
-  [Set phase to IDLE (case-entry)]
-  [Enable specimen type selector]
-  [Focus case number input]
+[Confirmed?] -- no --> [abort, nothing changes]
+       |
+      yes
+       v
+[Detach the keydown listener]
+[Clear counts, case number, comments, morphology checklist]
+[Discard the autosave snapshot]
+[PRESERVE the specimen type — the next case on a bench is usually the same]
+[Set phase to case-entry; focus the case field]
 ```
+
+Two corrections to the previous revision: reset **preserves** the specimen type
+(URS-063), and there is no selector to re-enable — the specimen type can be
+changed during counting, which saves the count in progress to history first
+(URS-013).
+
+### 4.5 Configuration Resolution Data Flow
+
+Absent from the previous revision entirely.
+
+```
+[Page load]
+       |
+       +--> fetch settings/templates.json  (network-first via sw.js)
+       +--> read localStorage wbcds_config
+       |
+       v
+[validateConfig on BOTH]
+       |
+       +--> neither valid --> [full-page error; refuse to count]
+       |
+       v
+[cached valid, and shipped has the same profileId at a HIGHER version?]
+       |                          |
+      yes                        no
+       |                          |
+       v                          v
+[use shipped, tell the       [use cached, else shipped]
+ operator, replace cache]
+       |                          |
+       +------------+-------------+
+                    v
+             [active profile]
+```
+
+Import, editor-save and load all pass through the same `validateConfig`, so a
+profile cannot enter by one route that another would refuse.
 
 ---
 
@@ -628,6 +704,7 @@ Note: There is no separate CASE_ENTERED state. The case number is optional, and 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | 3.0 | 2026-08-06 | QMS | **Revised for drift.** §7.1 stated "sessionStorage only … no localStorage" and that output avoided `innerHTML`; both false, and the same privacy claim corrected in README.md under DCR-015 had not been propagated. §3.2.3 and §7.2 carried the key mapping withdrawn at v2.0. Tailwind was described as CDN-delivered in three places, which would defeat URS-094. §5.2 listed a file that does not exist and omitted three of four scripts, the service worker, the stylesheet, the vendored bundle and the preset catalogue; §5.3 described a single script tag. §3.2.9 to §3.2.13 added for the calculation engine, configuration lifecycle, dialog, editor and offline shell — five components previously absent. See DCR-021. |
+| 3.1 | 2026-08-06 | QMS | §3.1 redrawn by layer — the previous diagram was a flat grid of counter features that omitted every module added since DCR-006, including the engine that computes every number in it. §4 flows rewritten: they stopped at "recalculate percentages" and "compile the template", omitting the denominator policy, rounding, confidence intervals, the threshold advisory, the method statement, autosave and every keyboard guard. §4.4 claimed reset clears the specimen type and re-enables a locked selector; it preserves the type and nothing is ever locked. §4.5 (configuration resolution) added, previously absent. UD-075 to UD-078. |
 | A | 2026-02-18 | QMS | Initial draft — architecture defined |
 | B | 2026-02-19 | QMS | Component descriptions refined |
 | C | 2026-02-20 | QMS | Data flow diagrams updated |

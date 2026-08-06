@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 2.7 |
+| **Version** | 2.8 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -173,6 +173,8 @@ This SRS covers the functional, performance, interface, data, and security requi
 | SYS-110 | The system SHALL provide a visible control to toggle between Light and Dark themes without altering count data or session state. | URS-095 | Test |
 | SYS-111 | The system SHALL provide a keyboard shortcut (Ctrl/Cmd+Shift+L) to toggle themes and SHALL NOT interfere with counting key inputs. | URS-095 | Test |
 | SYS-112 | The system SHALL remember the selected theme for the duration of the browser session using sessionStorage. | URS-095 | Test |
+| SYS-113 | All text rendered by the system SHALL meet WCAG 2.1 AA contrast against its effective background — 4.5:1 for body text, 3:1 for large text — in **both** themes, on every page and in every phase. Semi-transparent backgrounds SHALL be composited to the underlying surface when this is assessed. | URS-095, URS-091 | Test |
+| SYS-114 | The selected theme SHALL be applied before the first paint of any page, so that no page renders in a theme other than the selected one, however briefly. | URS-095 | Test |
 
 ### 4.12 Configuration Module
 

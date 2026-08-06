@@ -26,6 +26,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <!-- Optional webfonts: absent offline, the local font stacks in tailwind.config apply -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Libre+Franklin:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/theme.css">
     <style>
         *:focus-visible { outline: 2px solid #60a5fa; outline-offset: 2px; }
         ::-webkit-scrollbar { width: 6px; }
@@ -38,19 +39,21 @@
         .cell-chip.dragging { opacity: 0.5; }
         .key-listening { border-color: #60a5fa !important; box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.4); animation: pulse-ring 1.5s ease-in-out infinite; }
         @keyframes pulse-ring { 0%, 100% { box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.4); } 50% { box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.2); } }
-        body[data-theme="light"] { background-color: #f8fafc; color: #0f172a; }
-        body[data-theme="light"] .bg-slate-950 { background-color: #f8fafc !important; }
-        body[data-theme="light"] .bg-slate-900 { background-color: #f1f5f9 !important; }
-        body[data-theme="light"] .bg-slate-800 { background-color: #e2e8f0 !important; }
-        body[data-theme="light"] .bg-slate-700 { background-color: #cbd5e1 !important; }
-        body[data-theme="light"] .border-slate-700 { border-color: #cbd5e1 !important; }
-        body[data-theme="light"] .border-slate-600 { border-color: #94a3b8 !important; }
-        body[data-theme="light"] .text-slate-100, body[data-theme="light"] .text-slate-200 { color: #0f172a !important; }
-        body[data-theme="light"] .text-slate-300 { color: #1e293b !important; }
-        body[data-theme="light"] .text-slate-400 { color: #334155 !important; }
-        body[data-theme="light"] .text-slate-500 { color: #475569 !important; }
-        body[data-theme="light"] .text-accent { color: #2563eb !important; }
     </style>
+    <script>
+        // Follow the theme chosen in the counter.
+        //
+        // This runs in <head>, before the body is parsed, and targets <html>
+        // rather than <body>. Applying it at the end of the document instead
+        // let the page paint dark and then transition to light: a visible
+        // flash, and — because many controls carry `transition-colors` — a
+        // window in which text really is below WCAG AA mid-transition.
+        // VV-SYS-162..168 measure the rendered page and caught exactly that.
+        try {
+            var t = sessionStorage.getItem('wbcds_theme');
+            if (t) document.documentElement.setAttribute('data-theme', t);
+        } catch (e) { /* default theme */ }
+    </script>
 </head>
 <body class="bg-slate-950 text-slate-200 font-sans min-h-screen antialiased">
 

@@ -152,6 +152,7 @@ requires the classification to be reassessed before release.
 | DCR-008 | Design Change Record — Derived Quantities and Thresholds (module M5) | Change Control | Draft |
 | DCR-009 | Design Change Record — Method Provenance (module M2) | Change Control | Draft |
 | DCR-010 | Design Change Record — Selectable Reporting Policy | Change Control | Draft |
+| DCR-011 | Design Change Record — Presentation Legibility | Change Control | Draft |
 
 **Document control note (DCR-004)**: two files previously carried Document ID
 URS-001 with neither marked as superseded, and RTM-001 v2.0 was keyed to the
@@ -167,6 +168,7 @@ superseded banner and RTM-001 v3.0 is re-keyed to v2.0.
 | C | 2026-02-20 | QMS | Added design change record entry |
 | D | 2026-02-24 | QMS | Updated to v2.0: 14-cell unified layout, advisory targets, M:E ratio, Continue Counting |
 | M | 2026-08-05 | QMS | v2.7.1: CAL-001 moved from a Markdown file in this directory to `web/calculation-reference.html`, so that it ships with the product, is reachable from the case-entry screen, the Methods page and the results screen, and is available offline. The Markdown file is retained as the document control record. Held in one place to avoid the drift recorded as HA-097. |
+| M | 2026-08-06 | QMS | v2.7.2 (DCR-011): presentation legibility. Five per-page theme blocks consolidated into one stylesheet; every muted tone recalibrated against the lightest surface it is used on; both primary action buttons corrected (they failed WCAG AA in **both** themes); the theme moved to `<html>` and applied before first paint. SYS-113 and SYS-114 added — HA-098 previously had mitigations but no requirement behind them. Verified by VV-SYS-162..168, a full-surface sweep that found 330 failures the region-scoped checks could not see. |
 | L | 2026-08-05 | QMS | v2.7.0 (DCR-010): rounding policy, decimal precision and the M:E convention become selections rather than fixed behaviour — three choices the tool had been making on the laboratory's behalf. Calculation Reference issued. |
 | K | 2026-08-05 | QMS | v2.6.0: **IEC 62304 Class A confirmed** and **RA-001 severity ratings reviewed and accepted** by the Document Owner, closing the two open sign-offs. CLSI H20-A2 resolved without purchase — its specification is quoted in Hedley 2025 (REF-001 §2.1). Operator-facing Methods and Limitations page added and pinned to the shipped configuration by test suite 13. HA-097 added: USER-GUIDE.md was found describing a superseded nine-category layout. |
 | J | 2026-08-05 | QMS | v2.5.0 (DCR-009): method provenance. A result now states the conventions that produced it, not only which profile did. Closes a URS-052 gap — the clipboard path, the primary route into the LIS, carried no profile attribution while file export did (HA-096). Completes the five-module standards-review plan. |

@@ -283,6 +283,26 @@ describe('HTML Structure — Accessibility & Usability', () => {
     });
 
     it('Print media styles are defined (URS-054)', () => {
-        assert.ok(html.includes('@media print'), 'Must have print media styles');
+        // Print rules live in the shared stylesheet rather than inline: they
+        // were previously duplicated per page and drifted. What matters for
+        // URS-054 is that the page actually reaches them, so assert the link
+        // and the rules, not their location.
+        assert.ok(html.includes('styles/theme.css'),
+            'counter.html must link the shared stylesheet');
+        const theme = fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'styles', 'theme.css'), 'utf-8');
+        assert.ok(theme.includes('@media print'),
+            'the shared stylesheet must define print media styles');
+    });
+
+    it('The theme is applied before first paint, on the root element (URS-095)', () => {
+        // Applying it at the end of <body> painted the wrong theme first and
+        // then transitioned, which put text below WCAG AA mid-transition
+        // (RA-001 HA-098; caught by VV-SYS-162..168).
+        const head = html.slice(0, html.indexOf('</head>'));
+        assert.ok(head.includes("document.documentElement.setAttribute('data-theme'"),
+            'the stored theme must be applied to <html> from within <head>');
+        assert.ok(!html.includes("document.body.setAttribute('data-theme'"),
+            'the theme must not be applied to <body> — the root element carries it');
     });
 });

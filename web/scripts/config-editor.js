@@ -78,7 +78,7 @@
         // Apply theme from sessionStorage
         try {
             var theme = sessionStorage.getItem('wbcds_theme');
-            if (theme) document.body.setAttribute('data-theme', theme);
+            if (theme) document.documentElement.setAttribute('data-theme', theme);
         } catch (e) { /* ignore */ }
 
         // Try to load existing config from localStorage

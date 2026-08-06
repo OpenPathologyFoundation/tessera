@@ -660,15 +660,18 @@ test.describe('Calculation reference (CAL-001)', () => {
         await context.setOffline(false);
     });
 
-    test('VV-SYS-155: Loads no third-party script (URS-094)', async ({ page }) => {
+    test('VV-SYS-155: Loads no third-party script (URS-094)', async ({ page, baseURL }) => {
+        // Compare against baseURL, not page.url(). The request event can fire
+        // while the page is still about:blank — origin "null" — which made
+        // Firefox report the locally vendored Tailwind build as third-party.
+        const local = new URL(baseURL).origin;
         const remote = [];
         page.on('request', r => {
-            const u = new URL(r.url());
-            if (u.origin !== new URL(page.url() || 'http://127.0.0.1').origin &&
-                r.resourceType() === 'script') remote.push(r.url());
+            if (r.resourceType() !== 'script') return;
+            if (new URL(r.url()).origin !== local) remote.push(r.url());
         });
         await page.goto('/calculation-reference.html');
         await expect(page.locator('h1')).toBeVisible();
-        expect(remote).toHaveLength(0);
+        expect(remote, 'third-party scripts: ' + remote.join(', ')).toHaveLength(0);
     });
 });

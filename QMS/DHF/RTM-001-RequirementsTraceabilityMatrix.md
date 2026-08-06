@@ -165,7 +165,7 @@ URS (User Need) -> SRS (System Req) -> SDD (Design) -> TP/VV (Verification)
 | URS-092 | Clear workflow instructions | SYS-077 | 3.4.4 | — | Inspection, `help.html` | I | Full |
 | URS-093 | Chrome/Firefox/Edge without plugins | SYS-I01–SYS-I03 | 5.1 | — | VV-SYS suite executed on Chromium, Firefox and WebKit | S | Full |
 | URS-094 | No internet connection required after initial load | SYS-I04, SYS-170–SYS-173 | 5.1, 3.15 | — | TC-B072, VV-SYS-090, VV-SYS-091, suite 03 | B, S | Full |
-| URS-095 | Light/Dark themes via control and keyboard shortcut | SYS-110–SYS-112 | 3.4.7 | — | TC-B090, TC-B091 | B | Full |
+| URS-095 | Light/Dark themes via control and keyboard shortcut | SYS-110–SYS-114 | 3.4.7, 3.4.11 | HA-098 | TC-B090, TC-B091, VV-SYS-160–168 | B | Full |
 | URS-096 | Aggregated categories show constituent cell types on hover | SYS-027 | 3.4.2 | — | suite 03, suite 08 (`constituents`) | U, I | Full |
 | URS-097 | Distinct audio for count, undo and text entry; independently togglable | SYS-140–SYS-144 | 3.12 | — | TC-B092, TC-B093, suite 06 | B | Full |
 

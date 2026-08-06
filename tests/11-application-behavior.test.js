@@ -771,9 +771,9 @@ describe('Behaviour — Theme and Audio (URS-095, URS-097)', () => {
 
     it('TC-B090: Theme toggles and persists to sessionStorage', async () => {
         const h = await boot();
-        const before = h.document.body.getAttribute('data-theme');
+        const before = h.document.documentElement.getAttribute('data-theme');
         h.click('btnToggleTheme');
-        const after = h.document.body.getAttribute('data-theme');
+        const after = h.document.documentElement.getAttribute('data-theme');
         assert.notEqual(before, after);
         assert.equal(h.window.sessionStorage.getItem('wbcds_theme'), after);
         h.close();
@@ -782,9 +782,9 @@ describe('Behaviour — Theme and Audio (URS-095, URS-097)', () => {
     it('TC-B091: Ctrl+Shift+L toggles the theme without disturbing counting', async () => {
         const h = await counting({ caseNumber: 'C1' });
         h.press('X', 3);
-        const before = h.document.body.getAttribute('data-theme');
+        const before = h.document.documentElement.getAttribute('data-theme');
         h.key('L', { ctrl: true, shift: true });
-        assert.notEqual(h.document.body.getAttribute('data-theme'), before);
+        assert.notEqual(h.document.documentElement.getAttribute('data-theme'), before);
         assert.equal(h.hooks.state.counts.blasts, 3, 'the shortcut must not alter the count');
         h.close();
     });

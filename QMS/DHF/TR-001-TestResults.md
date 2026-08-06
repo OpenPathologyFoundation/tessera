@@ -5,15 +5,15 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | TR-001 |
-| **Version** | 3.7 |
+| **Version** | 3.8 |
 | **Product** | WBC ΔΣ v2.7.1 |
-| **Date Executed** | 2026-08-06 (00:25:44 UTC) |
+| **Date Executed** | 2026-08-06 (02:38:03 UTC) |
 | **Status** | **PASS** (test outcome) |
 | **Approval State** | **Approved** 2026-08-05 |
 | **Parent Document** | DHF-001 |
 | **Input Documents** | TP-001, VV-001, SRS-001 v2.1, RTM-001 v3.0 |
 | **Change Record** | DCR-004 |
-| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_211104_run/` |
+| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-05_223803_theme-consolidation-and-contrast-sweep/` |
 | **Runners** | Node.js v26.5.0 built-in test runner; Playwright 1.62.1 / Chromium, Firefox, WebKit |
 | **Platform** | macOS (darwin, arm64), Node.js v26.5.0, npm 11.17.0 |
 
@@ -21,14 +21,14 @@
 
 ## 1. Executive Summary
 
-**768 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
+**820 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **574** |
-| System (browser) tests | **194** (67 specs x chromium, firefox, webkit, less 7 skips) |
-| **Total executed** | **768** |
-| Passed | **768** |
+| Unit, static and behavioural tests | **575** |
+| System (browser) tests | **245** (84 specs x chromium, firefox, webkit, less 7 skips) |
+| **Total executed** | **820** |
+| Passed | **820** |
 | Failed | **0** |
 | Skipped (documented, §6) | **7** |
 | Pass Rate | **100.00%** |
@@ -68,7 +68,7 @@ shipped code can cause a test to fail.
 
 ---
 
-## 3. Node Suite Results (574 tests, 114 suites, 0 failures)
+## 3. Node Suite Results (575 tests, 114 suites, 0 failures)
 
 ### Suite 01 — Calculation Engine
 
@@ -184,7 +184,7 @@ Regressions this layer now guards against:
 
 ---
 
-## 4. System Suite Results — Playwright (44 tests x 3 engines = 132, 0 failures)
+## 4. System Suite Results — Playwright (84 specs x 3 engines = 252, 7 skipped, 0 failures)
 
 Each spec runs on Chromium, Firefox and WebKit. URS-093 names Chrome, Firefox
 and Edge; Edge shares the Chromium engine and is covered by the chromium
@@ -349,6 +349,58 @@ see DCR-007 §5.1 and §5.2.
 
 ---
 
+### 4.10 Full-surface contrast sweep (added v2.7.2)
+
+`tests-e2e/contrast-sweep.spec.js` — 14 specs x 3 engines.
+
+| VV ID | Surface | Result |
+|-------|---------|--------|
+| VV-SYS-162 | Counter, case entry | PASS |
+| VV-SYS-163 | Counter, counting phase | PASS |
+| VV-SYS-164 | Counter, results with both advisories raised | PASS |
+| VV-SYS-165 | Methods and Limitations (MAL-001) | PASS |
+| VV-SYS-166 | Calculation Reference (CAL-001) | PASS |
+| VV-SYS-167 | Quick Start guide | PASS |
+| VV-SYS-168 | Configuration editor | PASS |
+
+Each runs in both themes. Unlike VV-SYS-160/161, which measure named regions,
+this walks **every** text-bearing leaf element on the page, composites
+semi-transparent backgrounds down the ancestor chain, and applies the WCAG AA
+threshold appropriate to each element's computed font size and weight. Service
+workers are blocked so it measures the served files rather than the offline
+cache.
+
+**What it found on first execution: 330 failures**, on surfaces no
+content-based or region-scoped test could reach:
+
+| Defect | Measured | Cause |
+|--------|----------|-------|
+| Keyboard-map labels, help page | 1.93:1 | `help.html` carried no theme overrides at all |
+| Documentation body text | below 4.5:1 | `methods.html` and `calculation-reference.html` each maintained their own partial copy |
+| Configuration editor, 28 elements | 3.66–4.07:1 | tones calibrated against the panel colour, not the lighter chip colour also in use |
+| **Continue Counting button** | **3.19:1 in *both* themes** | white on `amber-600`; a light-theme-only check could never have seen it |
+| **Count Done button** | **3.77:1 in *both* themes** | white on `emerald-600` |
+| Every page during theme application | transient, below AA | the theme was applied at the end of `<body>`, so the page painted dark and then transitioned |
+
+Root cause of the first three: five pages each hand-maintaining their own theme
+block (39, 20, 22, 12 and 0 overrides respectively). Corrected by consolidating
+into `web/styles/theme.css`, which reduced 330 failures to 35; the remaining 35
+were the two buttons and the editor tones, corrected by recomputing every muted
+tone against the **lightest** dark surface rather than the darkest.
+
+The theme attribute was moved from `<body>` to `<html>` and is now applied by a
+script in `<head>`, before first paint.
+
+**Regression detection confirmed** by reverting each fix in turn:
+
+| Reverted | Detected by |
+|----------|-------------|
+| Accent blue to `#60a5fa` | VV-SYS-168 (dark) |
+| Amber and emerald button backgrounds | VV-SYS-163, 164 (both themes) |
+| Theme applied at end of `<body>` | VV-SYS-168 (light) |
+
+---
+
 ## 5. Defect Detection Record
 
 | Defect | Found by | Now guarded by |
@@ -373,6 +425,10 @@ see DCR-007 §5.1 and §5.2.
 | HA-096 clipboard output carried no profile attribution (URS-052) | **Wiring provenance (DCR-009)** | TC-B131, VV-SYS-130 |
 | `totalCounted` / `denominator` placeholders were never reserved | **VV-PROV-008 (DCR-009)** | VV-PROV-008 |
 | HA-097 USER-GUIDE.md documented a superseded nine-category layout | **Writing operator documentation** | UD-001, UD-002, UD-003 |
+| HA-098 clinical advisories unreadable in the light theme (1.28:1) | **Operator report** | VV-SYS-160, VV-SYS-161 |
+| 330 further contrast failures across every page, incl. two action buttons failing in *both* themes | **VV-SYS-162..168 (full-surface sweep)** | VV-SYS-162 to 168 |
+| Theme applied after first paint — flash of wrong theme, text transiently below AA | **VV-SYS-168 (Playwright)** | VV-SYS-162 to 168, suite 03 |
+| VV-SYS-155 misreported the vendored Tailwind build as third-party on Firefox | **Evidence capture run** | VV-SYS-155 (now compares against `baseURL`) |
 
 The last three were introduced or exposed during remediation and were caught by
 the new layers before release — the behaviour the previous suite could not
@@ -399,7 +455,7 @@ provide.
 
 ## 7. Conclusion
 
-All 768 executed automated tests pass with no failures, across three browser
+All 820 executed automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -421,6 +477,18 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-06T02:38:03.528Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-05_223803_theme-consolidation-and-contrast-sweep/`
+
+- Date (UTC): 2026-08-06T02:35:22.148Z
+- Command: `npm test`
+- Exit Code: 0
+- Result: **PASS**
+- Evidence: `QMS/DHF/TestEvidence/2026-08-05_223522_theme-consolidation-and-contrast-sweep/`
+
 - Date (UTC): 2026-08-06T01:11:04.922Z
 - Command: `npm run test:all`
 - Exit Code: 0

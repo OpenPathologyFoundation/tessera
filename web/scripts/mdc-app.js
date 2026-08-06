@@ -61,7 +61,7 @@
 
     function applyTheme(theme) {
         state.theme = theme;
-        document.body.setAttribute('data-theme', theme);
+        document.documentElement.setAttribute('data-theme', theme);
         updateThemeToggle();
     }
 

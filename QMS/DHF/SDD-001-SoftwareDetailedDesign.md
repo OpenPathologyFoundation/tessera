@@ -407,7 +407,7 @@ Manages phase transitions by toggling visibility of the three phase containers. 
 
 Four functions manage the light/dark theme:
 - `getPreferredTheme()`: Checks sessionStorage, falls back to `prefers-color-scheme` media query, defaults to `'dark'`
-- `applyTheme(theme)`: Sets `data-theme` attribute on `<body>`, updates toggle button label
+- `applyTheme(theme)`: Sets the `data-theme` attribute on `<html>` (`document.documentElement`), updates toggle button label
 - `setTheme(theme, persist)`: Applies theme and optionally persists to sessionStorage (key: `wbcds_theme`)
 - `toggleTheme()`: Switches between light and dark
 
@@ -731,7 +731,14 @@ The application uses **Tailwind CSS** (loaded via CDN) for all styling. There is
 | `tab-active` | Active tab indicator (border-bottom accent color) |
 | `counting-active` | Applied to `<body>` during counting phase |
 
-**Theme system**: `data-theme="light"` or `data-theme="dark"` attribute on `<body>` drives CSS variable overrides for background, text, and accent colors.
+**Theme system**: a `data-theme="light"` or `data-theme="dark"` attribute on the **root `<html>` element** drives the overrides in `web/styles/theme.css`, one stylesheet shared by every page.
+
+Two design points are load-bearing and were both established by defect:
+
+- **The attribute is on `<html>`, not `<body>`, and is set by an inline script in `<head>`.** It must apply before the first paint. Applied at the end of `<body>` — as it originally was — the page painted in the dark theme and then transitioned to light, which is both a visible flash and, because many controls carry `transition-colors`, a window in which text is genuinely below WCAG AA.
+- **One stylesheet, not one block per page.** Each page previously carried its own overrides (39, 20, 22, 12 and 0 of them). They drifted, and the drift was clinical: advisories at 1.28:1 and keyboard labels at 1.93:1. See RA-001 HA-098.
+
+Tones are calibrated against the **lightest** surface each class is used on, not the darkest, and verified on the rendered page by VV-SYS-160..168.
 
 ---
 

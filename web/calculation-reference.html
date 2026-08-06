@@ -13,43 +13,29 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <!-- Optional webfonts: absent offline, the local font stacks apply -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles/theme.css">
     <style>
-        body[data-theme="light"] { background-color:#f8fafc; color:#0f172a; }
-        body[data-theme="light"] .bg-slate-950 { background-color:#f8fafc !important; }
-        body[data-theme="light"] .bg-slate-900\/60 { background-color:#f1f5f9 !important; }
-        body[data-theme="light"] .bg-slate-800\/50 { background-color:rgba(226,232,240,.7) !important; }
-        body[data-theme="light"] .text-slate-100,
-        body[data-theme="light"] .text-slate-200 { color:#0f172a !important; }
-        body[data-theme="light"] .text-slate-300 { color:#1e293b !important; }
-        body[data-theme="light"] .text-slate-400 { color:#334155 !important; }
-        body[data-theme="light"] .text-slate-500 { color:#475569 !important; }
-        body[data-theme="light"] .border-slate-700 { border-color:#cbd5e1 !important; }
-        body[data-theme="light"] .border-slate-800 { border-color:#e2e8f0 !important; }
         table { border-collapse: collapse; }
         th, td { text-align: left; padding: .45rem .6rem; vertical-align: top; }
         thead th { border-bottom: 1px solid #334155; font-weight: 600; }
         tbody tr { border-bottom: 1px solid rgba(51,65,85,.4); }
         .cfg { border-left: 3px solid #60a5fa; }
         .warn { border-left: 3px solid #f59e0b; }
-        /* Warning and alert colours. The amber and red scales used here are
-           chosen for a dark background; on the light theme they are near-white
-           and effectively invisible. A clinical advisory that cannot be read is
-           worse than none, because the system has recorded that it warned. */
-        body[data-theme="light"] .text-amber-300 { color: #b45309 !important; }
-        body[data-theme="light"] .text-amber-400 { color: #b45309 !important; }
-        body[data-theme="light"] .text-amber-400\/80 { color: #b45309 !important; }
-        body[data-theme="light"] .text-amber-200\/90 { color: #92400e !important; }
-        body[data-theme="light"] .text-amber-200\/70 { color: #854d0e !important; }
-        body[data-theme="light"] .text-amber-200\/60 { color: #854d0e !important; }
-        body[data-theme="light"] .bg-amber-500\/10 { background-color: #fef3c7 !important; }
-        body[data-theme="light"] .border-amber-500\/30 { border-color: #f59e0b !important; }
-        body[data-theme="light"] .border-amber-500\/40 { border-color: #d97706 !important; }
-        body[data-theme="light"] .border-amber-500\/50 { border-color: #d97706 !important; }
-        body[data-theme="light"] .text-red-400 { color: #b91c1c !important; }
-        @media print { nav, .no-print { display:none !important; }
-            body { background:#fff !important; color:#000 !important; }
-            h2 { break-after: avoid; } table { break-inside: avoid; } }
     </style>
+    <script>
+        // Follow the theme chosen in the counter.
+        //
+        // This runs in <head>, before the body is parsed, and targets <html>
+        // rather than <body>. Applying it at the end of the document instead
+        // let the page paint dark and then transition to light: a visible
+        // flash, and — because many controls carry `transition-colors` — a
+        // window in which text really is below WCAG AA mid-transition.
+        // VV-SYS-162..168 measure the rendered page and caught exactly that.
+        try {
+            var t = sessionStorage.getItem('wbcds_theme');
+            if (t) document.documentElement.setAttribute('data-theme', t);
+        } catch (e) { /* default theme */ }
+    </script>
 </head>
 <body class="bg-slate-950 text-slate-300 font-sans min-h-screen antialiased">
 
@@ -522,13 +508,6 @@ M:E =  ────────────────────────�
     </p>
 
 </main>
-
-<script>
-    try {
-        var t = sessionStorage.getItem('wbcds_theme');
-        if (t) document.body.setAttribute('data-theme', t);
-    } catch (e) { /* default theme */ }
-</script>
 
 </body>
 </html>

@@ -1,0 +1,159 @@
+/*
+ * WBC ΔΣ — shared theme
+ * =====================
+ * Implements: URS-095 (light and dark presentation themes)
+ *
+ * ONE stylesheet for every page. Previously each page carried its own
+ * hand-maintained block of theme overrides: counter.html had 39, the
+ * documentation pages had 20 and 22, the configuration editor had 12, and the
+ * quick-start guide had none at all. They drifted, and the drift was not
+ * cosmetic — clinical advisories rendered at 1.28:1 against their panel in the
+ * light theme, and keyboard-map labels at 1.93:1 in both. See RA-001 HA-098.
+ *
+ * CONTRAST. Every value below was computed against the backgrounds it is
+ * actually used on, not chosen by eye:
+ *
+ *   dark  page  #0c1220   panel #1e293b   chip #334155
+ *   light page  #f8fafc   panel #e2e8f0
+ *
+ * The target is WCAG AA — 4.5:1 for body text, 3:1 for large text — against
+ * the WORST of those surfaces, because the same utility class is used over all
+ * of them. Calibrating against only the darkest surface is what left the
+ * configuration editor failing after the rest of the product passed.
+ *
+ * Muted greys are the recurring trap. Tailwind's slate-500 (#64748b) gives
+ * 3.07:1 on a dark panel and slate-600 (#475569) only 1.93:1 — both fail. They
+ * are raised here rather than removed, so text intended to read as secondary
+ * still does, but legibly.
+ *
+ * VERIFIED BY tests-e2e/contrast-sweep.spec.js (VV-SYS-162..168), which walks
+ * every text node on every page in both themes. VV-SYS-160/161 additionally
+ * pin the two advisory panels that failed in the field.
+ *
+ * THE THEME ATTRIBUTE LIVES ON <html>, not <body>, and is set by a script in
+ * <head> so it applies before first paint. At the end of <body> it produced a
+ * flash of the wrong theme, and mid-transition text genuinely below AA.
+ */
+
+/* ============================================================
+   DARK THEME (default)
+   Raise the muted tones that fail against dark backgrounds.
+   ============================================================ */
+
+/* The muted ladder, calibrated against the LIGHTEST dark surface (#334155 —
+   the configuration editor's cell chips), so each tone clears 4.5:1 wherever
+   it is used rather than only on the panel it was first drawn on. Ordering is
+   preserved: 400 reads brighter than 500, which reads brighter than 600.
+
+                       page    panel    chip
+     slate-400  #b6c2d2  10.36   8.11    5.74   (was 4.04 on chip)
+     slate-500  #adbaca   9.49   7.42    5.25   (was 3.07 on panel)
+     slate-600  #a4b2c4   8.68   6.79    4.80   (was 1.93 on panel)  */
+:root:not([data-theme="light"]) .text-slate-400 { color: #b6c2d2; }
+:root:not([data-theme="light"]) .text-slate-500 { color: #adbaca; }
+:root:not([data-theme="light"]) .text-slate-600 { color: #a4b2c4; }
+
+/* Accent blue. #60a5fa clears the page and panel but gives only 4.07:1 on the
+   chips; blue-300 clears all three at 5.74:1. */
+:root:not([data-theme="light"]) .text-accent { color: #93c5fd; }
+
+/* ============================================================
+   LIGHT THEME
+   ============================================================ */
+
+:root[data-theme="light"] body {
+    background-color: #f8fafc;
+    color: #0f172a;
+}
+
+/* --- surfaces --- */
+:root[data-theme="light"] .bg-slate-950        { background-color: #f8fafc !important; }
+:root[data-theme="light"] .bg-slate-900        { background-color: #f1f5f9 !important; }
+:root[data-theme="light"] .bg-slate-900\/95    { background-color: rgba(241,245,249,.95) !important; }
+:root[data-theme="light"] .bg-slate-900\/60    { background-color: #f1f5f9 !important; }
+:root[data-theme="light"] .bg-slate-800        { background-color: #e2e8f0 !important; }
+:root[data-theme="light"] .bg-slate-800\/50    { background-color: rgba(226,232,240,.7) !important; }
+:root[data-theme="light"] .bg-slate-800\/30    { background-color: rgba(226,232,240,.5) !important; }
+:root[data-theme="light"] .bg-slate-700        { background-color: #cbd5e1 !important; }
+:root[data-theme="light"] .bg-slate-700\/50    { background-color: rgba(203,213,225,.7) !important; }
+:root[data-theme="light"] .bg-slate-600        { background-color: #94a3b8 !important; }
+
+/* --- borders --- */
+:root[data-theme="light"] .border-slate-800     { border-color: #e2e8f0 !important; }
+:root[data-theme="light"] .border-slate-800\/70 { border-color: #e2e8f0 !important; }
+:root[data-theme="light"] .border-slate-800\/50 { border-color: rgba(226,232,240,.6) !important; }
+:root[data-theme="light"] .border-slate-700     { border-color: #cbd5e1 !important; }
+:root[data-theme="light"] .border-slate-700\/50 { border-color: rgba(203,213,225,.7) !important; }
+:root[data-theme="light"] .border-slate-600     { border-color: #94a3b8 !important; }
+
+/* --- text. #475569 clears 4.5:1 on both the page and the panel --- */
+:root[data-theme="light"] .text-slate-100 { color: #0f172a !important; }
+:root[data-theme="light"] .text-slate-200 { color: #0f172a !important; }
+:root[data-theme="light"] .text-slate-300 { color: #1e293b !important; }
+:root[data-theme="light"] .text-slate-400 { color: #334155 !important; }
+:root[data-theme="light"] .text-slate-500 { color: #475569 !important; }
+:root[data-theme="light"] .text-slate-600 { color: #475569 !important; }
+:root[data-theme="light"] .text-slate-700 { color: #334155 !important; }
+
+/* --- accent. #60a5fa is 2.43:1 on light; #1d4ed8 clears both surfaces --- */
+:root[data-theme="light"] .text-accent  { color: #1d4ed8 !important; }
+:root[data-theme="light"] .bg-accent    { background-color: #1d4ed8 !important; }
+:root[data-theme="light"] .tab-active   { color: #1d4ed8 !important; border-bottom-color: #1d4ed8 !important; }
+:root[data-theme="light"] .text-blue-400 { color: #1d4ed8 !important; }
+
+/* --- success --- */
+:root[data-theme="light"] .text-emerald-400 { color: #047857 !important; }
+:root[data-theme="light"] .bg-emerald-500   { background-color: #10b981 !important; }
+
+/* --- warnings. The amber scale is built for dark backgrounds; unmodified it
+       renders near-white on light and the advisory disappears (HA-098). --- */
+:root[data-theme="light"] .text-amber-300      { color: #b45309 !important; }
+:root[data-theme="light"] .text-amber-400      { color: #b45309 !important; }
+:root[data-theme="light"] .text-amber-400\/80  { color: #b45309 !important; }
+:root[data-theme="light"] .text-amber-200\/90  { color: #92400e !important; }
+:root[data-theme="light"] .text-amber-200\/70  { color: #854d0e !important; }
+:root[data-theme="light"] .text-amber-200\/60  { color: #854d0e !important; }
+:root[data-theme="light"] .bg-amber-500\/10    { background-color: #fef3c7 !important; }
+:root[data-theme="light"] .border-amber-500\/30 { border-color: #f59e0b !important; }
+:root[data-theme="light"] .border-amber-500\/40 { border-color: #d97706 !important; }
+:root[data-theme="light"] .border-amber-500\/50 { border-color: #d97706 !important; }
+
+/* --- error --- */
+:root[data-theme="light"] .text-red-400 { color: #b91c1c !important; }
+
+/* --- form controls and scrollbars --- */
+:root[data-theme="light"] .placeholder-slate-600::placeholder { color: #64748b !important; }
+:root[data-theme="light"] ::-webkit-scrollbar-track { background: #e2e8f0; }
+:root[data-theme="light"] ::-webkit-scrollbar-thumb { background: #cbd5e1; }
+
+/* --- documentation pages: the left-rule callouts --- */
+:root[data-theme="light"] .cfg  { border-left-color: #1d4ed8; }
+:root[data-theme="light"] .warn { border-left-color: #d97706; }
+
+/* --- Amber buttons carry white text. amber-600 gives only 3.19:1 against it,
+       in both themes; amber-700 clears AA at 5.02:1. Applied to both themes
+       because a button is equally hard to read in either. --- */
+.bg-amber-600  { background-color: #b45309 !important; }
+.hover\:bg-amber-500:hover { background-color: #a16207 !important; }
+
+/* --- The green action button also carries white text: emerald-600 gives
+       3.77:1, emerald-700 clears AA at 5.48:1. --- */
+.bg-emerald-600 { background-color: #047857 !important; }
+.hover\:bg-emerald-500:hover { background-color: #036c4c !important; }
+
+
+/* ============================================================
+   PRINT — always ink on white, whichever theme is active
+   ============================================================ */
+@media print {
+    body, :root[data-theme="light"] { background: #fff !important; color: #000 !important; }
+    nav, .no-print { display: none !important; }
+    .bg-slate-800, .bg-slate-800\/50 { background: #f3f4f6 !important; }
+    .border-slate-700, .border-slate-600 { border-color: #d1d5db !important; }
+    .text-slate-300, .text-slate-400, .text-slate-500, .text-slate-600,
+    .text-accent { color: #111827 !important; }
+    .text-amber-300, .text-amber-200\/90, .text-amber-200\/70 { color: #78350f !important; }
+    .font-mono { font-family: 'Courier New', monospace !important; }
+    h2 { break-after: avoid; }
+    table { break-inside: avoid; }
+}

@@ -19,7 +19,11 @@
  */
 'use strict';
 
-const CACHE_VERSION = 'wbcds-v2.1.0';
+// v2.2.0 — shared theme stylesheet and the move of data-theme onto <html>.
+// Both are shell assets, so an installed browser keeps serving the old ones
+// until this string changes. The legibility fixes in RA-001 HA-098 do not
+// reach an existing installation without it.
+const CACHE_VERSION = 'wbcds-v2.2.0';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const DATA_CACHE = CACHE_VERSION + '-data';
 
@@ -31,6 +35,7 @@ const SHELL_ASSETS = [
     './methods.html',
     './calculation-reference.html',
     './vendor/tailwind.js',
+    './styles/theme.css',
     './scripts/wbc-core.js',
     './scripts/mdc-app.js',
     './scripts/config-editor.js'

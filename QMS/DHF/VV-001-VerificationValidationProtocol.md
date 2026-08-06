@@ -323,6 +323,8 @@ System verification confirms that each SRS requirement is met. The following tab
 | SYS-110 | Theme toggle control | Test | TC-120 | |
 | SYS-111 | Theme toggle shortcut | Test | TC-121 | |
 | SYS-112 | Theme persists for session | Test | TC-122 | |
+| SYS-113 | All text meets WCAG AA in both themes, every page and phase | Test | VV-SYS-160 to 168 | |
+| SYS-114 | Theme applied before first paint | Test | VV-SYS-162 to 168; suite 03 | |
 | SYS-120 | Progress indicator display | Test | TC-125, TC-126 | |
 | SYS-121 | Progress indicator target per specimen | Test | TC-127 | |
 
@@ -473,6 +475,7 @@ Demonstrate that WBC ΔΣ v2.0 meets user needs as defined in URS-001 v2.0 when 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - V&V protocol |
+| C | 2026-08-06 | QMS | SYS-113 and SYS-114 added to the system verification table, covering rendered contrast in both themes and theme application before first paint. Verified by VV-SYS-160..168 (`tests-e2e/contrast-sweep.spec.js`). See DCR-011 and RA-001 HA-098. |
 | B | 2026-02-24 | QMS | v2.0 - Major update: 14-cell vectors (nrbc,blasts,pro,myelo,meta,plasma,mast,bands,poly,baso,eos,mono,lymph,other), M:E ratio verification (VV-ME-001 to 004), updated key references ('L' for blasts), 14-key E2E test, Continue Counting checkpoint, VV-TPL-006 for M:E in output, advisory target (non-blocking), validation scenarios V5 (Continue Counting) and V6 (M:E ratio), updated system verification table with new SYS IDs, Node.js test environment |
 
 ## 7. Approval Signatures

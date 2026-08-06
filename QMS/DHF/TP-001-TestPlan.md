@@ -97,14 +97,14 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**394 identified verification cases** across 18 series and 4 layers.  344 further tests carry no identifier and are not registered.
+**397 identified verification cases** across 18 series and 4 layers.  344 further tests carry no identifier and are not registered.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 7 (001–010) | Static | QMS counted quantities |
 | `SC-*` | 20 (001–043) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
-| `UD-*` | 45 (001–081) | Static | User-facing documentation |
+| `UD-*` | 48 (001–092) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-CALC-*` | 23 (001–029) | Unit | Calculation engine vectors |
 | `VV-CI-*` | 12 (001–012) | Unit | Wilson confidence intervals |
@@ -302,6 +302,9 @@ auditing how the plan changed.
 | UD-079 | §6 documents every field of the real state object | Static | `tests/13-user-documentation.test.js` |
 | UD-080 | §6 documents every storage key, and which hold patient data | Static | `tests/13-user-documentation.test.js` |
 | UD-081 | §6 does not claim the tally is lost on page close | Static | `tests/13-user-documentation.test.js` |
+| UD-090 | All four statutory criteria are assessed, not just the easy ones | Static | `tests/13-user-documentation.test.js` |
+| UD-091 | The features the argument depends on still exist | Static | `tests/13-user-documentation.test.js` |
+| UD-092 | It is labelled unreviewed until a qualified reviewer signs it | Static | `tests/13-user-documentation.test.js` |
 
 #### VV-ABS-* — Absolute counts and the analyser WBC
 

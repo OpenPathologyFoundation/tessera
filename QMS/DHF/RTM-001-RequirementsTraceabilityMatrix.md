@@ -283,8 +283,8 @@ editor (URS-102).
 | FMEA → Verification | 51 hazards (5 new in RA-001 v2.1) | 34 | **100%** | RA-001 v2.1 re-scored under DCR-004; see RA-001 §5.2.1 |
 | URS → Validation | 52 | 52 | **100%** | Scenario V1 executed end to end as VV-SYS-020 |
 
-**Automated test totals**: 613 unit + behavioural, 375 system (125 x 3 browser
-engines), **988 executed, 0 failures, 3 documented skips** (see TR-001).
+**Automated test totals**: 616 unit + behavioural, 375 system (125 x 3 browser
+engines), **991 executed, 0 failures, 3 documented skips** (see TR-001).
 
 ### 8.1 Qualifications on the coverage claim
 

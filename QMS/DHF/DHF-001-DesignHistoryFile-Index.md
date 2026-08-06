@@ -29,6 +29,174 @@ WBC ΔΣ is a web-based clinical laboratory software tool that enables hematolog
 
 WBC ΔΣ is intended to be used by trained clinical laboratory personnel (medical technologists, pathologists, and hematology fellows) as a counting and calculation aid during manual microscopic review of bone marrow aspirate and peripheral blood smears. The software tallies operator-entered cell classifications and computes differential percentages. **The software does not perform autonomous cell identification or classification.** All cell identification decisions are made by the operator.
 
+## 3.0 Device Status Analysis (FD&C Act §520(o)(1)(E))
+
+> **This is not regulatory advice.** It is an engineering reading of published
+> FDA guidance, prepared so that a qualified regulatory reviewer has something
+> concrete to confirm or reject. **No regulatory position should be taken on it
+> until that review has happened.** It is recorded here because the question was
+> never asked, and §3.1 answers a question that only arises if the answer here is
+> "device".
+
+### 3.0.1 The prior question
+
+The remainder of this file assumes the software is a medical device and reasons
+carefully about its IEC 62304 safety class. It never asks whether the device
+definition is met at all.
+
+**21 CFR 864.5220** classifies an *automated differential cell counter* — a
+device that **identifies** formed elements — as Class II. This software
+explicitly does not do that, and §3 says so twice. It records classifications a
+pathologist has already made at a microscope.
+
+That does not by itself put it outside the device definition: software
+"intended for use in the diagnosis of disease" is a device under §201(h)
+regardless of how much of the work a human does. The exclusion, if it applies,
+comes from **§520(o)(1)(E)**, added by the 21st Century Cures Act and
+interpreted in FDA's final guidance ***Clinical Decision Support Software*
+(September 2022)**.
+
+### 3.0.2 The four criteria
+
+All four must be met. Each is assessed below against the intended use in §3.
+
+| # | Criterion (paraphrased from §520(o)(1)(E)) | Assessment |
+|---|---|---|
+| (i) | Not intended to acquire, process or analyse a medical image, a signal from an IVD device, or a pattern or signal from a signal acquisition system | **Met, with a qualification — see §3.0.3** |
+| (ii) | Intended to display, analyse or print medical information about a patient | **Met.** It displays and analyses a differential count |
+| (iii) | Intended to support or provide recommendations to a health care professional about prevention, diagnosis or treatment | **Met.** The user is a qualified professional, never a patient or caregiver |
+| (iv) | Intended to enable that professional to independently review the basis, so that they are not expected to rely primarily on the software | **Met, and unusually strongly — see §3.0.4** |
+
+### 3.0.3 Criterion (i) is the weakest, and where a reviewer should look first
+
+The inputs are keystrokes. The operator looks down a microscope, decides what
+each cell is, and presses a key. Nothing is acquired from an instrument: there
+is no image, no waveform, no continuous data stream, and no connection to an
+analyser. On the ordinary reading of "signal", and on the examples FDA's
+guidance uses, this is not signal processing.
+
+**The qualification.** The absolute-count feature (§URS-036, DCR-016) accepts a
+white cell concentration that the operator **types in**, having read it from a
+haematology analyser — an IVD device. The software then corrects it for
+nucleated red cells and multiplies it by the differential percentages.
+
+Two readings are possible, and a reviewer should decide between them rather than
+be told:
+
+- **A number transcribed by a human is not a "signal from an IVD device."** The
+  statute and the guidance are concerned with software that *acquires* or
+  *processes* signals and patterns. A discrete result re-entered by a
+  professional who has read and judged it is medical information, which is
+  criterion (ii) territory, not signal acquisition.
+- **The value nonetheless originates from an IVD**, and the software performs
+  arithmetic on it that changes a clinically actionable number — the absolute
+  neutrophil count.
+
+The first reading is, in our view, the better one. Two design choices support it
+and were made for other reasons: the correction is **displayed rather than
+applied silently**, with the entered value, the arithmetic and the result all
+shown; and the feature is **optional** and off by default in the report
+(`absoluteCountsInReport`). The professional sees the input they supplied, the
+operation performed on it, and the output.
+
+If a reviewer takes the second reading, the conclusion of this section does not
+survive for the configuration with absolute counts enabled. That is a bounded
+outcome: the feature is separable.
+
+### 3.0.4 Criterion (iv) is the strongest
+
+FDA's 2022 guidance treats criterion (iv) as the demanding one, and asks in
+substance whether the professional can see and evaluate the basis for the output
+rather than take it on trust. Four things this software already does bear
+directly on it, none of them built for this purpose:
+
+| Feature | Why it bears on (iv) |
+|---|---|
+| **The inputs are the professional's own decisions** | Every cell counted was identified by the operator. There is no hidden input to evaluate |
+| **The method statement** (URS-055, DCR-009) | Every report states the profile, the denominator convention, the rounding policy, the precision, the interval level and the M:E composition, with citations |
+| **`calculation-reference.html`** (CAL-001) | The full derivation of every number, its alternatives, the professional disagreement, and the citations — written for a pathologist who is not a haematopathologist |
+| **Confidence intervals and the threshold advisory** (DCR-007, DCR-008) | The software states the *precision* of its own output, and says explicitly when a count does not resolve a diagnostic threshold. It reports uncertainty rather than concealing it |
+
+The output is also not a directive. The software reports percentages, a ratio
+and, where a threshold is nearby, that the count does not settle the question.
+It does not state a diagnosis, does not recommend an action, and does not rank
+possibilities. Nothing about the workflow is time-critical: the count is
+reviewed and released under the laboratory's quality system before it reaches
+the record.
+
+The arithmetic is reproducible by hand. A pathologist who doubts a percentage
+can divide two integers they can see on screen.
+
+### 3.0.5 What would break this conclusion
+
+The same boundary conditions as §3.1.2, plus two of its own. Any of these
+requires the analysis to be redone **before** release:
+
+- **Automated cell identification.** This ends the analysis immediately: it
+  would remove risk control measure E2, defeat criterion (iv) — the professional
+  could no longer review the basis of a classification the software made — and
+  bring the software within 21 CFR 864.5220.
+- **Direct instrument connection.** Reading a WBC from an analyser over an
+  interface, rather than from an operator's keyboard, engages criterion (i)
+  directly.
+- **Any diagnostic output.** Stating or ranking a diagnosis, or issuing a
+  recommendation to act, engages criterion (iv) and probably (iii).
+- **Concealing the basis.** Removing the method statement, the calculation
+  reference or the confidence intervals would weaken the strongest part of this
+  analysis. They are load-bearing for it, not decorative.
+- **Labelling and promotion.** FDA assesses intended use partly from what the
+  manufacturer claims. Marketing this as diagnostic software could establish an
+  intended use the code does not have.
+
+### 3.0.6 Scope and limitations of this analysis
+
+- **United States only.** It says nothing about the EU. Under Regulation (EU)
+  2017/745 Annex VIII **Rule 11** and MDCG 2019-11, software providing
+  information used to take decisions with diagnostic purposes is generally a
+  device and frequently Class IIa. **The conclusion here does not travel**, and a
+  laboratory outside the US should not rely on it.
+- **Non-device is not enforcement discretion.** If the four criteria are met the
+  software is not a device. Some CDS is a device that FDA does not actively
+  regulate — a weaker position. This section claims the former, which is why it
+  needs confirming rather than assuming.
+- **Nothing here reduces liability**, or the obligations a laboratory has under
+  CLIA, CAP or ISO 15189 for a test it reports.
+- **It was not prepared by a regulatory professional.**
+
+### 3.0.7 If the analysis holds, what changes
+
+Very little, deliberately.
+
+The verification architecture, the risk file, the traceability and the change
+control **are retained regardless**. §3.1.3 already records that this project
+performs activities Class A does not require, because the classification depends
+on external measures the manufacturer does not control. The same reasoning
+applies with more force here: if the software is not a device, the quality
+system is the *only* control the manufacturer has, and the argument for keeping
+it is stronger, not weaker.
+
+What changes is the **framing**: the QMS becomes documented good practice
+undertaken voluntarily, rather than a compliance obligation this project is at
+risk of failing. That distinction matters for a public, Apache-2.0 project
+maintained by a small number of people, and it is the honest answer to whether
+the process around this software is disproportionate.
+
+**§3.1 (IEC 62304 Class A) is retained as a voluntary secondary position** and
+is not withdrawn by this section. If the device question is ever answered the
+other way, the safety classification is already in place.
+
+### 3.0.8 Status
+
+**Prepared 2026-08-06 (DCR-022). Not reviewed. Not relied upon.**
+
+| Action | Owner | Status |
+|--------|-------|--------|
+| Confirm or reject the §3.0.2 assessment | Qualified regulatory reviewer | **Outstanding** |
+| Decide criterion (i) on the transcribed analyser WBC (§3.0.3) | Qualified regulatory reviewer | **Outstanding** |
+| Confirm the EU position separately if distribution is contemplated | Qualified regulatory reviewer | **Outstanding** |
+
+---
+
 ## 3.1 Software Safety Classification (IEC 62304 §4.3)
 
 **Classification: Class A** — no injury or damage to health is possible.
@@ -163,6 +331,7 @@ requires the classification to be reassessed before release.
 | DCR-019 | Design Change Record — SDD-001 Revision | Change Control | Draft |
 | DCR-020 | Design Change Record — Scope Reduction | Change Control | Draft |
 | DCR-021 | Design Change Record — SAD-001 Revision | Change Control | Draft |
+| DCR-022 | Design Change Record — Device Status Analysis | Change Control | **Prepared, not reviewed** |
 
 **Document control note (DCR-004)**: two files previously carried Document ID
 URS-001 with neither marked as superseded, and RTM-001 v2.0 was keyed to the
@@ -178,6 +347,7 @@ superseded banner and RTM-001 v3.0 is re-keyed to v2.0.
 | C | 2026-02-20 | QMS | Added design change record entry |
 | D | 2026-02-24 | QMS | Updated to v2.0: 14-cell unified layout, advisory targets, M:E ratio, Continue Counting |
 | M | 2026-08-05 | QMS | v2.7.1: CAL-001 moved from a Markdown file in this directory to `web/calculation-reference.html`, so that it ships with the product, is reachable from the case-entry screen, the Methods page and the results screen, and is available offline. The Markdown file is retained as the document control record. Held in one place to avoid the drift recorded as HA-097. |
+| X | 2026-08-06 | QMS | v2.10.0 (DCR-022): §3.0 added — the prior question this file never asked. Whether the software is a device at all under FD&C Act §520(o)(1)(E) and FDA's 2022 Clinical Decision Support guidance. All four criteria assessed; criterion (i) flagged as the weakest, because the absolute-count feature accepts an analyser WBC the operator transcribes; criterion (iv) as the strongest, resting on the method statement, the calculation reference and the confidence intervals. **Prepared, not reviewed, not relied upon** — §3.1 Class A remains the operative position until a qualified regulatory reviewer closes §3.0.8. UD-090 to UD-092 tie the argument to the code. |
 | W | 2026-08-06 | QMS | v2.9.1 (DCR-021): SAD-001 re-issued at v3.0. Its drift was worse than SDD-001's: §7.1 stated "sessionStorage only … No localStorage", denying the crash-recovery snapshot that holds the accession number and morphology comments — the same false privacy claim corrected in README.md under DCR-015 and not propagated. Five of six shipped modules appeared zero times; Tailwind was described as CDN-delivered in three places; §5.2 listed a file that does not exist; §3.2.3 and §7.2 carried the key mapping withdrawn at v2.0. Guarded by UD-070 to UD-074. |
 | V | 2026-08-06 | QMS | v2.9.0 (DCR-020): scope reduction. 1.2 MB of assets referenced by nothing removed (web/ falls from 2.1 MB to 868 KB), along with calcPercentages — dead, and dangerous because it ignored denominatorExcludes; its seven test cases were re-pointed at the live path rather than deleted. The profile audio default is now honoured; it had been written by the editor and read by nothing. Three duplicate presets merged, two mislabelled 9-Part names corrected to 10-Part, and P0-9 closed. The three selectable clinical options are retained by decision of the Document Owner. |
 | U | 2026-08-06 | QMS | v2.8.0 (DCR-019): SDD-001 re-issued at v3.0. It contained zero occurrences of Wilson, confidence, threshold, denominatorExcludes, per100 or rounding — DCR-006 to DCR-018 were entirely undesigned — gave a percentage formula the product had not used since DCR-006, documented a key mapping withdrawn at v2.0, and stated that Tailwind loads from a CDN, which would defeat URS-094. RTM-001 cited nine design sections that did not exist. §3.9 to §3.18 added, including §3.10 on the calculation engine. Guarded by UD-060 to UD-063. |

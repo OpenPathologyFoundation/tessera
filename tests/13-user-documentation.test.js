@@ -100,6 +100,73 @@ describe('SDD-001 describes the software that exists (URS-092)', () => {
 });
 
 // ================================================================
+describe('The device-status analysis stays tied to the product (DHF-001 §3.0)', () => {
+
+    /**
+     * DHF-001 §3.0 argues the software is not a device under FD&C Act
+     * §520(o)(1)(E), and rests that argument on four things the product does:
+     * the operator identifies every cell, every report states the conventions
+     * that produced it, the calculation reference publishes the full
+     * derivation, and the software states the precision of its own output.
+     *
+     * §3.0.5 records those as load-bearing rather than decorative. These tests
+     * make that literal: remove one and the regulatory argument fails here,
+     * rather than silently becoming untrue.
+     *
+     * None of this validates the analysis. It is unreviewed, and UD-092 keeps
+     * it labelled that way.
+     */
+    const dhf = fs.readFileSync(
+        path.join(ROOT, 'QMS', 'DHF', 'DHF-001-DesignHistoryFile-Index.md'), 'utf-8');
+    const section = dhf.slice(dhf.indexOf('## 3.0 Device Status Analysis'),
+                              dhf.indexOf('## 3.1 Software Safety'));
+
+    it('UD-090: All four statutory criteria are assessed, not just the easy ones', () => {
+        assert.ok(section.length > 2000, 'the device-status analysis is missing or truncated');
+        for (const marker of ['520(o)(1)(E)', '864.5220', 'Clinical Decision Support']) {
+            assert.ok(section.includes(marker), `§3.0 does not cite ${marker}`);
+        }
+        for (const criterion of ['(i)', '(ii)', '(iii)', '(iv)']) {
+            assert.ok(section.includes(criterion), `§3.0 does not address criterion ${criterion}`);
+        }
+        // The two the analysis singles out must each have their own treatment.
+        assert.match(section, /Criterion \(i\) is the weakest/,
+            'the analysis must say which criterion is most open to challenge');
+        assert.match(section, /Criterion \(iv\) is the strongest/);
+    });
+
+    it('UD-091: The features the argument depends on still exist', () => {
+        // Each of these is cited in §3.0.4 as evidence that a professional can
+        // independently review the basis for the output.
+        const core = fs.readFileSync(path.join(ROOT, 'web', 'scripts', 'wbc-core.js'), 'utf-8');
+        assert.match(core, /function buildMethodStatement/,
+            'the method statement is load-bearing for criterion (iv) and has been removed');
+        assert.match(core, /function wilsonInterval/,
+            'the confidence interval is load-bearing for criterion (iv) and has been removed');
+        assert.match(core, /function evaluateThresholds/,
+            'the near-threshold advisory is load-bearing for criterion (iv) and has been removed');
+        assert.ok(fs.existsSync(path.join(ROOT, 'web', 'calculation-reference.html')),
+            'the calculation reference is load-bearing for criterion (iv) and has been removed');
+
+        // And the claim the whole analysis rests on: no cell identification.
+        assert.match(dhf, /does not perform autonomous cell identification/i,
+            'the intended-use statement no longer disclaims cell identification');
+    });
+
+    it('UD-092: It is labelled unreviewed until a qualified reviewer signs it', () => {
+        assert.match(section, /not regulatory advice/i,
+            'the analysis must disclaim being regulatory advice');
+        assert.match(section, /Not reviewed\. Not relied upon\./,
+            'the analysis must carry its unreviewed status');
+        assert.match(section, /Outstanding/,
+            'the reviewer actions must remain open until they are closed');
+        // It is a US reading only; the EU position differs and must be flagged.
+        assert.match(section, /Rule 11|2017\/745/,
+            'the analysis must record that it does not travel to the EU');
+    });
+});
+
+// ================================================================
 describe('SAD-001 describes the architecture that exists (URS-092)', () => {
 
     /**

@@ -53,7 +53,7 @@ Along the way the review found two errors that were live in the software and
 would have affected reported values. Both are described below because they are
 the things I most want a second opinion on.
 
-The software carries <!-- qms:fact tests_total -->1092<!-- /qms:fact --> automated tests across three browsers. It is classified
+The software carries <!-- qms:fact tests_total -->1104<!-- /qms:fact --> automated tests across three browsers. It is classified
 **IEC 62304 Class A** on the basis that a differential count is one input among
 several, is produced by a qualified operator who has identified every cell, and
 is reviewed before release under the laboratory's quality system. If you think

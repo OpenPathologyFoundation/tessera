@@ -1,0 +1,12 @@
+{
+  "tests_total": 1104,
+  "tests_node": 678,
+  "tests_browser": 426,
+  "tests_skipped": 7,
+  "evidence_run_id": "2026-08-07_111531_run",
+  "measured_at": "2026-08-07T15:15:31.824Z",
+  "git_commit": "472977e83475244cfc0bc7b5dd54af5395acf395",
+  "tree_state": "clean",
+  "layers": "node+playwright",
+  "status": "PASS"
+}

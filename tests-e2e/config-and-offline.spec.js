@@ -944,3 +944,96 @@ test.describe('Removing a category cleans up after itself (P0-7)', () => {
         }
     });
 });
+
+// ================================================================
+test.describe('The predecessor profile is reachable and countable (URS-101)', () => {
+
+    /**
+     * `legacy-mdc` reproduces the 2015 Backbone/JSP counter kept at `legacy/`,
+     * so an operator who used it can switch without relearning the keyboard.
+     * The unit layer holds the configuration to what that application was
+     * measured to do (VV-PRE-021..026, DCR-032). What only a browser can show
+     * is that the preset actually loads from the catalogue and that the
+     * familiar keys then count the familiar cells.
+     */
+    async function loadLegacyMdc(page) {
+        await page.goto('/counter.html');
+        await page.click('text=Preset Profiles');
+        await page.locator('div', { hasText: /^Legacy MDC \(2015\)/ })
+            .locator('button:has-text("Load")').last().click();
+        // A "Preset Loaded" confirmation follows, in #modal-overlay. It must
+        // be dismissed before anything else is clicked: while visible the
+        // overlay intercepts pointer events, so a later click waits out its
+        // own timeout without reporting anything about the dialog in the way.
+        // (The catalogue itself is NOT in this overlay — the overlay is
+        // hidden while the catalogue is open, which is why waiting on it
+        // earlier proved nothing.)
+        const overlay = page.locator('#modal-overlay');
+        await expect(overlay).toBeVisible();
+        await expect(overlay).toContainText('Legacy MDC (2015)');
+        await overlay.getByRole('button', { name: 'OK' }).click();
+        await expect(overlay).toBeHidden();
+    }
+
+    test('VV-SYS-210: The preset loads from the catalogue', async ({ page }) => {
+        await loadLegacyMdc(page);
+        await page.click('text=Start Count');
+        // The predecessor's nine categories, on the predecessor's nine keys.
+        // Read from the counting grid rather than asserted one label at a
+        // time: `text=PRO` is a substring match and finds hidden nodes on
+        // other phases, which says nothing about what the operator sees.
+        const shown = await page.locator('#phase-counting').innerText();
+        for (const label of ['BLASTS', 'PRO', 'GRAN', 'NRBC', 'BASO',
+            'EOS', 'PLASMA', 'LYMPH', 'MONO']) {
+            expect(shown).toContain(label);
+        }
+        // And not the categories this profile deliberately does not have.
+        for (const absent of ['META', 'MAST', 'BANDS']) {
+            expect(shown).not.toContain(absent);
+        }
+    });
+
+    test('VV-SYS-211: The predecessor keys count the predecessor cells', async ({ page }) => {
+        await loadLegacyMdc(page);
+        await page.click('text=Start Count');
+        // A→blasts, D→gran, F→nrbc, V→lymph, B→mono — the same count driven
+        // through the running predecessor when this profile was written.
+        const press = async (k, n) => { for (let i = 0; i < n; i++) await page.keyboard.press(k); };
+        await press('a', 1); await press('d', 99); await press('f', 50);
+        await press('v', 25); await press('b', 26);
+
+        const body = await page.locator('body').innerText();
+        expect(body).toContain('201');
+        // On-screen percentages match the predecessor's two-decimal display
+        // exactly — this is the continuity the profile exists to provide.
+        for (const pct of ['0.50%', '49.25%', '24.88%', '12.44%', '12.93%']) {
+            expect(body).toContain(pct);
+        }
+    });
+
+    test('VV-SYS-212: The report keeps a counted cell, and fills the M:E field', async ({ page }) => {
+        await loadLegacyMdc(page);
+        await page.click('text=Start Count');
+        const press = async (k, n) => { for (let i = 0; i < n; i++) await page.keyboard.press(k); };
+        await press('a', 1); await press('d', 99); await press('f', 50);
+        await press('v', 25); await press('b', 26);
+        await page.click('text=Count Done');
+
+        // The predecessor printed "0% blasts" here, and its figures summed to
+        // 99. Both are corrected; the wording is otherwise its own.
+        const report = await page.locator('body').innerText();
+        expect(report).toContain('0.5% blasts');
+        expect(report).not.toContain('0% blasts');
+        expect(report).toContain('maturing granulocyte forms');
+
+        // The three institutional templates it shipped.
+        for (const tab of ['Yale SOM', 'Precipio DX', 'MGH']) {
+            expect(report).toContain(tab);
+        }
+        // Its Precipio DX template reserved an M:E field and never filled it.
+        await page.getByRole('button', { name: 'Precipio DX' }).click();
+        const pdx = await page.locator('body').innerText();
+        expect(pdx).toMatch(/M:E ratio \| \d+\.\d:1/);
+        expect(pdx).not.toMatch(/M:E ratio \| _ \|/);
+    });
+});

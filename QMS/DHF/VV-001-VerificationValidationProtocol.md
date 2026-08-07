@@ -68,14 +68,14 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**730 verification cases** across 26 series and 4 layers, run as 787 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**741 verification cases** across 26 series and 4 layers, run as 807 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 24 (001–027) | Static | QMS counted quantities |
 | `SC-*` | 33 (001–064) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
-| `UD-*` | 50 (001–094) | Static | User-facing documentation |
+| `UD-*` | 52 (001–096) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-AUD-*` | 19 (001–019) | Static | Audio engine structure |
 | `VV-CALC-*` | 24 (001–030) | Unit | Calculation engine vectors |
@@ -88,14 +88,14 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | `VV-INC-*` | 3 (001–006) | Unit | Increment and decrement |
 | `VV-LOW-*` | 6 (001–006) | Unit | Sub-target advisory |
 | `VV-ME-*` | 13 (001–016) | Unit | Myeloid-to-erythroid ratio |
-| `VV-PRE-*` | 20 (001–020) | Unit | Preset catalogue integrity |
+| `VV-PRE-*` | 26 (001–026) | Unit | Preset catalogue integrity |
 | `VV-PROV-*` | 8 (001–008) | Unit | Method provenance |
 | `VV-RND-*` | 7 (001–007) | Unit | Rounding policy |
 | `VV-SAV-*` | 18 (001–018) | Static | Autosave and crash recovery (static) |
 | `VV-SCH-*` | 23 (001–023) | Unit | v2 configuration schema |
 | `VV-SRC-*` | 76 (001–076) | Static | Application source integrity (static) |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 117 (001–203) | System | System verification in a real browser |
+| `VV-SYS-*` | 120 (001–212) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
 
@@ -316,6 +316,8 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | UD-092 | It is labelled unreviewed until a qualified reviewer signs it | Static | `tests/13-user-documentation.test.js` |
 | UD-093 | The precision table is engine-produced (C-3) | Static | `tests/13-user-documentation.test.js` |
 | UD-094 | The ratio-interval table is engine-produced (G-2) | Static | `tests/13-user-documentation.test.js` |
+| UD-095 | The guide lists the presets the catalogue actually offers | Static | `tests/13-user-documentation.test.js` |
+| UD-096 | The predecessor profile is documented with its divergences | Static | `tests/13-user-documentation.test.js` |
 
 #### VV-ABS-* — Absolute counts and the analyser WBC
 
@@ -644,6 +646,12 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-PRE-018 | A preset sharing the built-in profileId is the built-in profile | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-019 | No two presets are the same layout with the same keys | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-020 | Every selectable preset configures confidence intervals (P0-9) | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-021 | Every key maps to the category the predecessor mapped it to | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-022 | The keys are the predecessor's nine, in its order | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-023 | The minimums and report templates are the predecessor's | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-024 | A counted cell is never reported as absent | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-025 | The M:E field the predecessor left blank is computed | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-026 | The profile declares that it is coarser than ICSH | Unit | `tests/09-preset-catalog.test.js` |
 
 #### VV-PROV-* — Method provenance
 
@@ -935,6 +943,9 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-SYS-201 | The displayed ratio is accompanied by its interval | System | `tests-e2e/input-integrity.spec.js` |
 | VV-SYS-202 | The same ratio at a tenth of the count reads far less precisely | System | `tests-e2e/input-integrity.spec.js` |
 | VV-SYS-203 | A profile with intervals disabled shows none | System | `tests-e2e/input-integrity.spec.js` |
+| VV-SYS-210 | The preset loads from the catalogue | System | `tests-e2e/config-and-offline.spec.js` |
+| VV-SYS-211 | The predecessor keys count the predecessor cells | System | `tests-e2e/config-and-offline.spec.js` |
+| VV-SYS-212 | The report keeps a counted cell, and fills the M:E field | System | `tests-e2e/config-and-offline.spec.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 

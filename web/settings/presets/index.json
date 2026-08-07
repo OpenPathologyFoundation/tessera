@@ -39,6 +39,13 @@
       "specimens": "BF (200)"
     },
     {
+      "profileId": "legacy-mdc",
+      "file": "legacy-mdc.json",
+      "name": "Legacy MDC (2015)",
+      "summary": "The 2015 predecessor counter's layout key-for-key, with its Yale SOM, Precipio DX and MGH templates. Categories are aggregated as that tool aggregated them and are coarser than ICSH \u2014 see the profile's provenance.",
+      "specimens": "BM (200) - PB (100)"
+    },
+    {
       "profileId": "custom",
       "file": "custom.json",
       "name": "Custom (Blank Template)",

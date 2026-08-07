@@ -104,8 +104,7 @@ Everything clinical is configurable without touching the software: cell
 categories, keys, target counts, derived formulas, diagnostic thresholds and
 report wording.
 
-- **Preset Profiles** — full 14-part consensus, harmonized 9-part, legacy 9-part,
-  minimal 5-part, body fluid, frequency-ergonomic, right-hand.
+- **Preset Profiles** — Full 14-Part Consensus, Harmonized 10-Part, Legacy 10-Part, Minimal 5-Part, Body Fluid, Legacy MDC (2015).
 - **Configuration Editor** — build or adapt a profile visually.
 - **Export / Import Config** — share a profile between workstations or colleagues.
 
@@ -114,6 +113,37 @@ than silently accepted.
 
 Every report names the profile and version that produced it. If two reports
 disagree, check that first.
+
+### If you used the 2015 counter
+
+**Preset Profiles → Legacy MDC (2015) → Load.**
+
+Your keys are unchanged: `A S D F` across the top, `Z X C V B` below, mapped to
+the same cell types in the same order. Bone marrow still targets 200 cells and
+peripheral blood 100, and the Yale SOM, Precipio DX and MGH report wordings are
+the ones you know.
+
+Three things are deliberately different, all of them corrections:
+
+| | Old counter | Here |
+|---|---|---|
+| A cell seen once in 201 | reported `0%` | reported `0.5%` |
+| The nine percentages | summed to 99 | sum to 100 |
+| M:E ratio in the Precipio report | printed `_` | computed, with its interval |
+
+**Read the profile's provenance before relying on it.** Its nine categories are
+coarser than the ICSH standard the other profiles follow: one key covers
+myelocytes, metamyelocytes, bands and segmented neutrophils together, another
+covers promyelocytes and myelocytes, another basophils and mast cells. Peripheral
+blood has no key for nucleated red cells at all, so this profile cannot report
+NRBC per 100 WBC. A count taken here cannot be re-expressed against ICSH
+categories without counting again. For new work, prefer **Full 14-Part
+Consensus**.
+
+**To make it your laboratory's default**, load it, adjust anything you want in
+the Configuration Editor, then **Export Config** and deploy that file as
+`web/settings/templates.json` on your workstations. The shipped default stays
+the 14-part consensus profile.
 
 ---
 

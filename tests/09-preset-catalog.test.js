@@ -18,6 +18,7 @@ const expectedPresets = [
     'legacy-9.json',
     'minimal-5.json',
     'body-fluid.json',
+    'legacy-mdc.json',
     'custom.json'
 ];
 
@@ -119,7 +120,8 @@ const ERGO_ZONES = {
 
 describe('Preset Catalog — Ergonomic Zone Validation', () => {
 
-    const leftPresets = ['consensus-14.json', 'harmonized-9.json', 'legacy-9.json', 'minimal-5.json', 'body-fluid.json'];
+    const leftPresets = ['consensus-14.json', 'harmonized-9.json', 'legacy-9.json', 'minimal-5.json',
+        'body-fluid.json', 'legacy-mdc.json'];
 
     leftPresets.forEach(function (filename) {
         it('VV-PRE-008: ' + filename + ' left-hand preset keys are within left ergonomic zone', () => {
@@ -334,5 +336,154 @@ describe('Preset Catalog — No Redundant Forks', () => {
                     'so intervals display at a default level the report never states');
             }
         }
+    });
+});
+
+// ================================================================
+describe('The predecessor profile reproduces the predecessor (URS-101)', () => {
+
+    /**
+     * `legacy-mdc` exists so an operator who used the 2015 Backbone/JSP counter
+     * — retained at `legacy/`, described in DCR-004 — can switch without
+     * relearning the keyboard.
+     *
+     * Its configuration was not transcribed from memory or from the old source
+     * by eye. It was recovered from `web/settings/templates.json` at commit
+     * aa88da4 and then confirmed by executing that application under Playwright
+     * and reading what it produced (DCR-032). The constants below are what the
+     * running predecessor was measured to do, and they are the specification
+     * this preset is held to.
+     *
+     * NOTE the deliberate divergence, decided by the Document Owner: the
+     * layout, keys, minimums and report sentences are the predecessor's; the
+     * arithmetic is this application's. VV-PRE-024 states why in the one case
+     * where it changes a reported value.
+     */
+    const Core = require(path.join(__dirname, '..', 'web', 'scripts', 'wbc-core.js'));
+    const raw = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'legacy-mdc.json'), 'utf-8'));
+    const cfg = Core.normalizeConfig(raw);
+    const spec = t => cfg.specimenTypes.find(s => s.specimenType === t);
+
+    /** Measured from the running predecessor, 2026-08-07. */
+    const PREDECESSOR = {
+        bm: {
+            minCellCount: 200,
+            outCodes: { A: 'blast', S: 'pro', D: 'gran', F: 'eryth', Z: 'baso',
+                        X: 'eos', C: 'plasma', V: 'lymph', B: 'mono' },
+            templates: ['ysm', 'pdx', 'mgh']
+        },
+        pb: {
+            minCellCount: 100,
+            outCodes: { A: 'poly', S: 'band', D: 'lymph', F: 'mono', Z: 'eos',
+                        X: 'baso', C: 'pro', V: 'blast', B: 'other' },
+            templates: ['mgh']
+        }
+    };
+
+    /** Predecessor cell id -> this application's vocabulary. */
+    const RENAMED = { blast: 'blasts', eryth: 'nrbc', band: 'bands' };
+    const canonical = id => RENAMED[id] || id;
+
+    it('VV-PRE-021: Every key maps to the category the predecessor mapped it to', () => {
+        for (const [type, want] of Object.entries(PREDECESSOR)) {
+            const got = spec(type).outCodes;
+            const expected = {};
+            for (const [k, v] of Object.entries(want.outCodes)) expected[k] = canonical(v);
+            assert.deepEqual(got, expected,
+                `${type}: the key layout differs from the predecessor's, so a returning ` +
+                'operator would be counting the wrong cell type on a familiar key');
+        }
+    });
+
+    it('VV-PRE-022: The keys are the predecessor\'s nine, in its order', () => {
+        for (const type of Object.keys(PREDECESSOR)) {
+            const s = spec(type);
+            assert.deepEqual(Object.keys(s.outCodes), ['A', 'S', 'D', 'F', 'Z', 'X', 'C', 'V', 'B']);
+            // The row split follows the physical keyboard rows the predecessor
+            // used: ASDF above, ZXCVB below.
+            assert.deepEqual(s.categories.upper.length, 4, `${type}: upper row is not ASDF`);
+            assert.deepEqual(s.categories.lower.length, 5, `${type}: lower row is not ZXCVB`);
+        }
+    });
+
+    it('VV-PRE-023: The minimums and report templates are the predecessor\'s', () => {
+        for (const [type, want] of Object.entries(PREDECESSOR)) {
+            const s = spec(type);
+            assert.equal(s.targetCount, want.minCellCount,
+                `${type}: target differs from the predecessor's minimum`);
+            assert.deepEqual(s.templates.map(t => t.tplCode), want.templates,
+                `${type}: the institutional report templates differ`);
+        }
+    });
+
+    it('VV-PRE-024: A counted cell is never reported as absent', () => {
+        /**
+         * The predecessor rounded each category independently to a whole
+         * number. Driven through it, a marrow with ONE blast in 201 cells
+         * printed "0% blasts", and its nine figures summed to 99.
+         *
+         * Both behaviours are reproducible by this engine — `independent`
+         * rounding at zero decimals gives exactly what the old tool printed,
+         * which is how the reading of its arithmetic was confirmed. The
+         * shipped profile deliberately does not use it.
+         */
+        const counts = { blasts: 1, pro: 0, gran: 99, nrbc: 50, baso: 0,
+                         eos: 0, plasma: 0, lymph: 25, mono: 26 };
+        const order = ['blasts', 'pro', 'gran', 'nrbc', 'baso', 'eos', 'plasma', 'lymph', 'mono'];
+
+        // What the predecessor printed, reproduced.
+        const old = Core.percentagesSummingTo100(counts, 0, { method: 'independent' });
+        assert.equal(old.blasts, 0, 'the predecessor reported the blast as 0% — if this ' +
+            'no longer reproduces, the comparison below is meaningless');
+        assert.equal(order.reduce((a, k) => a + old[k], 0), 99);
+
+        // What this profile reports.
+        const bm = spec('bm');
+        const now = Core.percentagesSummingTo100(counts, bm.precision.report, { method: bm.rounding });
+        assert.ok(now.blasts > 0,
+            'a blast that was counted is reported as 0% — the defect this profile exists not to inherit');
+        assert.equal(order.reduce((a, k) => a + now[k], 0).toFixed(1), '100.0',
+            'the reported percentages must sum to 100');
+    });
+
+    it('VV-PRE-025: The M:E field the predecessor left blank is computed', () => {
+        // Its Precipio DX template reserved "M:E ratio | _ | 2 - 4:1" and
+        // printed the underscore literally; the ratio was never implemented.
+        const bm = spec('bm');
+        const pdx = bm.templates.find(t => t.tplCode === 'pdx');
+        assert.ok(pdx, 'the Precipio DX template is missing');
+        assert.ok(!/M:E ratio \| _ \|/.test(pdx.outSentence),
+            'the M:E field is still the predecessor\'s literal underscore');
+        assert.match(pdx.outSentence, /\{\{ME_ratio\}\}/, 'the M:E field is not bound to the formula');
+
+        const counts = { blasts: 1, pro: 0, gran: 99, nrbc: 50, baso: 0,
+                         eos: 0, plasma: 0, lymph: 25, mono: 26 };
+        assert.match(Core.computeRatio(counts, bm.formulas.ME_ratio), /^\d+\.\d:1$/);
+        // Lymphocytes and plasma cells take no part, per ICSH §2.6.
+        for (const excluded of ['lymph', 'plasma']) {
+            assert.ok(!bm.formulas.ME_ratio.numerator.includes(excluded) &&
+                      !bm.formulas.ME_ratio.denominator.includes(excluded),
+                `${excluded} must not participate in the M:E ratio`);
+        }
+    });
+
+    it('VV-PRE-026: The profile declares that it is coarser than ICSH', () => {
+        // `gran` is one key for myelocytes, metamyelocytes, bands and segs. A
+        // count taken here cannot be reported against the ICSH nucleated
+        // differential without re-counting, and an operator choosing this
+        // profile for its familiarity must be told so.
+        assert.match(raw.provenance.notes, /COARSER|coarser/,
+            'the provenance does not warn that the categories are aggregated');
+        assert.match(raw.provenance.notes, /consensus-14/,
+            'the provenance does not name the profile to prefer for new work');
+        const bm = spec('bm');
+        assert.ok(bm.categoryNotes && bm.categoryNotes.gran,
+            'the aggregated granulocyte category carries no guidance');
+        assert.match(bm.categoryNotes.gran, /ICSH/);
+        // Peripheral blood has no NRBC key at all, which the ICSH denominator
+        // convention (DCR-006) depends on.
+        assert.ok(!Object.values(spec('pb').outCodes).includes('nrbc'));
+        assert.match(spec('pb').categoryNotes.other, /NRBC|nucleated red/i,
+            'nothing tells the operator this profile cannot report NRBC per 100 WBC');
     });
 });

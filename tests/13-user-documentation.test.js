@@ -407,6 +407,45 @@ describe('SOP-001 tracks the shipped configuration (HA-097)', () => {
 // ================================================================
 describe('User guide tracks the shipped configuration (URS-092)', () => {
 
+    it('UD-095: The guide lists the presets the catalogue actually offers', () => {
+        // It named `frequency-ergonomic` and `right-hand` for months after both
+        // were withdrawn (DCR-020, HA-104), and did not name `legacy-mdc` when
+        // that was added. A reader looking for a profile by the name the guide
+        // gives it finds nothing, and concludes the tool cannot do the thing.
+        const cat = JSON.parse(fs.readFileSync(path.join(
+            __dirname, '..', 'web', 'settings', 'presets', 'index.json'), 'utf-8'));
+        const section = /- \*\*Preset Profiles\*\* —([\s\S]*?)\n- \*\*/.exec(guide);
+        assert.ok(section, 'the guide no longer lists the preset profiles');
+
+        for (const preset of cat.presets) {
+            if (preset.editorOnly) continue;   // an editor template, not a profile
+            assert.ok(section[1].includes(preset.name),
+                `the guide does not list "${preset.name}", which the catalogue offers`);
+        }
+        // And nothing it lists may be absent from the catalogue.
+        const listed = section[1].replace(/\s+/g, ' ').replace(/\.$/, '')
+            .split(',').map(x => x.trim()).filter(Boolean);
+        const known = cat.presets.map(p => p.name);
+        for (const name of listed) {
+            assert.ok(known.includes(name),
+                `the guide lists "${name}", which is not in the preset catalogue`);
+        }
+    });
+
+    it('UD-096: The predecessor profile is documented with its divergences', () => {
+        // An operator switching for familiarity must be told where the
+        // familiarity stops. The profile is coarser than ICSH and its report
+        // figures differ from the old tool's in three specific ways.
+        assert.match(guide, /Legacy MDC \(2015\)/, 'the guide does not name the profile');
+        assert.match(guide, /coarser/i, 'the guide does not warn that the categories are aggregated');
+        assert.match(guide, /0\.5%/, 'the guide does not show the corrected figure for a rare cell');
+        assert.match(guide, /sum to 100/, 'the guide does not state that the percentages now sum');
+        assert.match(guide, /NRBC per 100 WBC/,
+            'the guide does not state that this profile cannot report NRBC per 100 WBC');
+        assert.match(guide, /Export Config/,
+            'the guide does not say how a laboratory makes it the default');
+    });
+
     it('UD-001: Every counting key in the shipped profile is documented', () => {
         for (const spec of config.specimenTypes) {
             for (const [key, cellType] of Object.entries(spec.outCodes)) {

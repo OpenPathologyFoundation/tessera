@@ -25,7 +25,7 @@ where an individual session is capable and thorough and has no memory of the
 other five documents. And it is the evidence base for the guards: each `QC-`
 identifier in the last column exists because of a specific row above it.
 
-**Counted here rather than described:** 24 incidents, of which 23 are now
+**Counted here rather than described:** 25 incidents, of which 24 are now
 prevented by an automated check. QC-027 checks both figures against the rows
 below, so this sentence cannot be the next thing to drift.
 
@@ -59,6 +59,7 @@ below, so this sentence cannot be the next thing to drift.
 | 22 | 2026-08-07 | "works offline after initial page load" — with an exception that defeated the case it was for | README offline note, Limitation 5 | The service worker cached fonts only after a successful fetch, so an air-gapped workstation never got them | An exception stated accurately, whose consequence was not followed through | Document Owner | DCR-030 | SC-060, SC-061, SC-062 |
 | 23 | 2026-08-07 | The vendored Tailwind bundle was redistributed with no licence declaration | `NOTICE` | Tailwind is MIT and requires attribution | Vendoring added the file without adding the notice | DCR-030 work | DCR-030 | SC-063 (fonts); Tailwind declared, unguarded |
 | 24 | 2026-08-07 | "It records 21 occasions … Sixteen were introduced by sessions doing correct work" | `CLAUDE.md` preamble | `DRIFT-LOG.md`, which had 23 rows | The document that forbids stating a measured fact from memory stated one from memory. DCR-030 appended rows 22–23 and did not sweep it: the closure sweep in `CLAUDE.md` §3 ends at "update DRIFT-LOG" and nothing pointed back at `CLAUDE.md` itself | Manuscript preparation | DCR-031 | QC-027; and the count is removed rather than corrected — a number that drifted once will drift again |
+| 25 | 2026-08-07 | "Preset Profiles — … frequency-ergonomic, right-hand" | `USER-GUIDE.md` §Configuration | `web/settings/presets/index.json`; both were withdrawn under DCR-020 and HA-104 | The catalogue is generated from `index.json`; the guide's copy of it was typed once and never swept. A reader looking for a profile by the name the guide gives it finds nothing and concludes the tool cannot do it | Adding `legacy-mdc` (DCR-032) | DCR-032 | UD-095 |
 
 ---
 
@@ -115,6 +116,7 @@ recurrence.
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| D | 2026-08-07 | QMS | Row 25 added (DCR-032): the user guide's preset list named two profiles withdrawn months earlier and omitted the one being added. UD-095 now checks it against the catalogue. |
 | C | 2026-08-07 | QMS | Row 24 added (DCR-031): `CLAUDE.md` stated this log's totals from memory and they went stale one change record later. The count is removed there and QC-027 now checks §1 and the row numbering against the rows themselves. §4 names the exceptions instead of counting the majority, for the same reason. |
 | B | 2026-08-07 | QMS | Rows 22–23 added (DCR-030): the offline claim whose exception defeated the case it was written for, and the undeclared Tailwind licence found while declaring the fonts. |
 | A | 2026-08-07 | QMS | Initial issue (DCR-029). Seeded with 21 incidents: the seven found in the drift remediation review, the four propagation failures DCR-022 §4 counts, the two DCR-027 records, and the earlier findings from the independent review of 2026-08-06 and the DCR-021 architecture review. |

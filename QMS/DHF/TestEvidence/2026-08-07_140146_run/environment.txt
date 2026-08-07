@@ -1,0 +1,9 @@
+date_utc=2026-08-07T18:01:46.941Z
+node=v26.5.0
+platform=darwin
+arch=arm64
+cwd=/Users/pg/IdeaProjects/tessera
+npm=11.17.0
+git_commit=5950cb4d932dd36987378da12aca27bcc94ebaaf
+git_branch=main
+tree_state=clean

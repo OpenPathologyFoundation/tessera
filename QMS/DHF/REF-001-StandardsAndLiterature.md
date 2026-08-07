@@ -36,7 +36,7 @@ solving it.
 | **[S1]** | Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the International Council for Standardization in Hematology. **ICSH guidelines for the standardization of bone marrow specimens and reports.** *Int J Lab Hematol* 2008;30(5):349–364. doi:10.1111/j.1751-553X.2008.01100.x | **Full text held** (`sources/`) | BM cell categories, target counts, M:E ratio definition, NDC exclusions, near-threshold recount |
 | **[S2]** | CLSI **H20-A2**: *Reference Leukocyte (WBC) Differential Count (Proportional) and Evaluation of Instrumental Methods*, 2nd ed. Wayne PA: Clinical and Laboratory Standards Institute; 2007. | **Not held (paid standard).** Its specification is quoted in [S8] and its scope described in [S9], both open access and both held in full text. | PB target count (200), reference method |
 | **[S3]** | CLSI **H56-A**: *Body Fluid Analysis for Cellular Composition; Approved Guideline*. Wayne PA: CLSI; 2006. | **Not held — summaries only** | Body fluid categories, reporting when <100 cells counted |
-| **[S4]** | Rümke CL. The imprecision of the ratio of two percentages observed in differential white blood cell counts: a warning. *Blood Cells* 1985;11(1):137–140. PMID 4074888 | **Not held — abstract only** | Binomial confidence intervals for differential percentages |
+| **[S4]** | ~~Rümke CL. The imprecision of the ratio of two percentages observed in differential white blood cell counts: a warning. *Blood Cells* 1985;11(1):137–140. PMID 4074888~~ | **WITHDRAWN 2026-08-06 — not obtainable** | Nothing. No requirement, calculation or claim rests on it. See §3.8 |
 | **[S5]** | Is a 500-Cell Count Necessary for Bone Marrow Differentials? *Am J Clin Pathol* 2018;150(1):84–89. | Summary read | Evidence that 300-cell counts are diagnostically non-inferior |
 | **[S6]** | WHO Classification of Haematolymphoid Tumours, 5th ed. (2022) and International Consensus Classification (2022). | Secondary sources | Diagnostic thresholds (20% blasts). **Not the source of the blast-denominator change — see [S10].** |
 | **[S10]** | Arber DA, Orazi A, Hasserjian R, Thiele J, Borowitz MJ, Le Beau MM, Bloomfield CD, Cazzola M, Vardiman JW. **The 2016 revision to the World Health Organization classification of myeloid neoplasms and acute leukemia.** *Blood* 2016;127(20):2391–2405. doi:10.1182/blood-2016-03-643544. **Open access.** | Summary read | Establishes that the non-erythroid-cell blast denominator was withdrawn in **2016**, not 2022, by the elimination of acute erythroid leukaemia, erythroid/myeloid subtype |
@@ -45,7 +45,7 @@ solving it.
 | **[S9]** | Comar SR, Malvezzi M, Pasquini R. **To follow or not to follow the recommendations regarding microscopic analysis of the CLSI H20-A2 to validate the criteria for blood smear review?** *Rev Bras Hematol Hemoter* 2015;37(1):69–70. **Open access.** | **Full text held** (`sources/`) | Scope of CLSI H20-A2; laboratory-specific criteria |
 
 **Sources not held in full text are marked as such deliberately.** Where a
-requirement rests on [S3], [S4] or [S6], the citation in URS-001 or SRS-001
+requirement rests on [S3] or [S6], the citation in URS-001 or SRS-001
 carries the same qualification.
 
 ### 2.1 CLSI H20-A2: resolved without purchase
@@ -275,12 +275,15 @@ shipped behaviour:
   condition, and is the foundation for the near-threshold prompt deferred to
   module M5.
 
-### 3.8 What [S4] actually warns about
+### 3.8 Why a ratio is less precise than the percentages behind it
 
-Rümke's 1985 title is *"The imprecision of the ratio of two percentages observed
-in differential white blood cell counts: a warning."* The subject is **ratios**,
-not single percentages — and the M:E ratio this application computes is exactly
-such a ratio.
+**This section previously rested on [S4] (Rümke 1985), which is withdrawn.** The
+paper is widely cited for this point and was not obtainable — not through the
+Yale library, and not through the usual routes. A citation that cannot be read
+cannot be checked, and a design file should not rest on one.
+
+Nothing is lost, because **the claim is derivable and is now derived in the
+software itself**. It needs no appeal to authority.
 
 A ratio of two counted proportions inherits the sampling error of both, and is
 materially less precise than either.
@@ -315,13 +318,22 @@ What the reader now sees, on the same 210 myeloid to 90 erythroid count:
 | 30 | 2.3:1 | 1.1–5.0 |
 | 10 | 2.3:1 | 0.7–8.3 |
 
-The identical displayed ratio, at three counts. That is Rümke's warning made
-legible, which the prose advisory could only assert. The advisory is retained
+The identical displayed ratio, at three counts — the imprecision made legible,
+where the prose advisory could only assert it. The advisory is retained
 alongside it. **RA-001 HA-093 is closed.**
 
-The primary text of [S4] is not held. The statistical claim above is standard
-and does not rest on it, but the specific tabulated values Rümke published
-should be checked against the paper before any of them are quoted.
+**What supports this section now.** The derivation above, which follows from the
+binomial model and needs no external source; [S7] (Brown, Cai & DasGupta, held)
+for the choice of interval applied to the proportion; and [S8] (Hedley et al.,
+held, open access) for the quantified limitations of manual differential
+counting generally.
+
+**On the withdrawal.** Rümke 1985 is cited in this literature for the
+proposition that a ratio of two counted proportions is materially less precise
+than either — which is true, standard, and reproduced above from first
+principles. It is not cited here any longer because it could not be obtained and
+therefore could not be verified. No tabulated value from it was ever used, and
+none should be introduced without the paper in hand.
 
 ---
 

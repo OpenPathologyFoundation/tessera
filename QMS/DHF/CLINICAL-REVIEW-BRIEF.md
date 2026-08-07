@@ -53,7 +53,7 @@ Along the way the review found two errors that were live in the software and
 would have affected reported values. Both are described below because they are
 the things I most want a second opinion on.
 
-The software carries 731 automated tests across three browsers. It is classified
+The software carries 1035 automated tests across three browsers. It is classified
 **IEC 62304 Class A** on the basis that a differential count is one input among
 several, is produced by a qualified operator who has identified every cell, and
 is reviewed before release under the laboratory's quality system. If you think
@@ -102,6 +102,16 @@ a different ratio from identical counts.
 > option? Every report states which convention produced it, which I did because
 > the two are not comparable — is that sufficient, or does it need to be more
 > prominent?
+
+The ratio now also carries a confidence interval, added after this brief was
+first written (DCR-026). It is the odds transform of a Wilson interval on the
+conditional binomial — the model treats M + E as fixed and asks what fraction of
+those cells were myeloid. At 30 cells a 2.3:1 ratio reads **1.1–5.0**, which is
+the honest width and a startling one.
+
+> **Q2a.** Is conditioning on M + E the right model, as against treating the two
+> counts as independent Poisson variables? And does a wide interval beside a
+> familiar figure invite appropriate caution, or unwarranted doubt?
 
 ### 3.3 Confidence intervals on every percentage
 
@@ -202,29 +212,32 @@ Suggested twenty minutes:
 
 ## 5. What I would ask you to sign
 
-Signature blocks are in each document under *Approval Signatures*. The
-engineering roles are already signed; **Clinical Reviewer** and **Clinical User
-Representative** are deliberately blank.
+**The list lives in [`SIGNOFF-REGISTER.md`](SIGNOFF-REGISTER.md), not here.**
 
-**The four that need your judgement:**
+This section used to name eleven documents. There are now thirty-one
+outstanding signatures, because the file kept growing after the brief was
+written and nothing made this list follow it. The register is generated from the
+*Approval Signatures* table of every document in the file, and a test fails the
+build if it falls out of step — so it is the one that will still be right when
+you read it.
 
-| Document | You would be attesting that |
-|---|---|
-| **URS-001 v2.0** | The user requirements describe what a haematopathologist actually needs, and the workflow decisions match clinical practice |
-| **RA-001** | The Severity ratings express clinical consequence correctly, and the accepted residual risks are acceptable |
-| **REF-001** | The standards are interpreted correctly — ICSH categories, the M:E convention, the stated limitations |
-| **DCR-006** | The NRBC denominator change (§3.1) is correct |
+What it will tell you:
 
-**Seven supporting**, which you can reasonably sign on the strength of the
-above: DHF-001, VV-001, DCR-004, DCR-005, DCR-007, DCR-008, DCR-009.
+- **Three change records carry a specific question**, and the register states
+  each one in full rather than asking you to find it. DCR-016 §4 (the corrected
+  white cell count — this one blocks clinical use of the feature), DCR-022 §5
+  (device status, which needs a **regulatory** reviewer, not you), and DCR-026 §6
+  (the M:E interval, Q2a above — invited, not blocking).
+- **The rest**, whose clinical content has been written and verified but not
+  independently reviewed. Signing one attests that its clinical reasoning is
+  sound — not that its arithmetic is correct, which is what the verification
+  suite is for.
+- **What is not for you**: `SOP-001`, whose signatories are the adopting
+  laboratory's own Director and Quality Manager, and any superseded document
+  retained for design history.
 
 Name and date is sufficient — these are not 21 CFR Part 11 electronic
 signatures, and the version control system provides the audit trail.
-
-Two further documents have empty clinical signature rows and are **not** for
-you: **SOP-001**, whose signatories are the adopting laboratory's own Director
-and Quality Manager, and **URS-001 v1.0**, which is superseded and retained for
-design history only.
 
 **Please do not sign anything you have not formed a view on.** A partial
 signature set that is honest is worth more to me than a complete one that is
@@ -239,14 +252,20 @@ not.
    open-access ICSH paper, but the NRBC reporting rule is not.
 2. **CLSI H56-A is not held**, so the body fluid profile rests on secondary
    sources. It affects that preset only.
-3. **No confidence interval is computed for the M:E ratio.** A ratio of two
-   counted proportions is less precise than either — Rümke's 1985 paper is
-   specifically about this — and the display carries a caveat, but the interval
-   itself needs statistical work not yet done.
+3. **The M:E interval is derived here, not borrowed.** This brief originally
+   said no interval was computed and pointed at Rümke 1985 for the underlying
+   claim. The interval now exists (§3.2, DCR-026). The citation does not: Rümke
+   is widely cited for the imprecision of a ratio of two proportions and could
+   not be obtained from any library available to me, so it has been **withdrawn**
+   (REF-001 [S4]) and the claim now rests on the binomial model in the software.
+   Nothing depends on the paper — but if you know it and think the derivation
+   misses something it says, that is worth knowing.
 4. **One person built and verified this.** The engineering roles in the file are
-   all mine. The verification is automated and reproducible, but there has been
-   no independent engineering review, and the quality assurance signature
-   attests to process followed rather than to a second pair of eyes.
+   all mine. An independent review was commissioned in August 2026 and its
+   findings are closed (DCR-015 through DCR-026), which is a second pair of eyes
+   on the code — but not a second engineer on the project, and the quality
+   assurance signature still attests to process followed rather than to
+   independent judgement.
 
 ---
 

@@ -365,3 +365,88 @@ describe('Target counts are attributed to what the sources say (C-2, C-4)', () =
             Core.buildLowCountNote(300, 500, 0.95, undefined) || ''));
     });
 });
+
+// ================================================================
+describe('A withdrawn citation stays withdrawn (REF-001 §3.8)', () => {
+
+    /**
+     * REF-001 [S4] — Rümke 1985, cited throughout this literature for the
+     * imprecision of a ratio of two counted proportions — could not be
+     * obtained from any library available to this project. It was withdrawn on
+     * 2026-08-06 and the claim re-derived from the binomial model in the
+     * engine, which needs no appeal to authority.
+     *
+     * The risk a withdrawal runs is quiet reinstatement: someone writes the
+     * familiar attribution back into a page because it reads well. These tests
+     * make that fail. They do NOT touch the design record — the revision
+     * histories and the change records that describe the withdrawal name the
+     * paper, and rewriting those would be falsifying the history.
+     */
+    const ROOT = path.join(__dirname, '..');
+    const NAME = /R[üu]mke/;
+
+    it('SC-054: REF-001 records the withdrawn source, struck through, with the reason', () => {
+        const ref = fs.readFileSync(path.join(ROOT, 'QMS', 'DHF', 'REF-001-StandardsAndLiterature.md'), 'utf-8');
+        const row = ref.split('\n').find(l => /^\| \*\*\[S4\]\*\*/.test(l));
+        assert.ok(row, 'REF-001 no longer carries an [S4] row');
+        assert.match(row, /WITHDRAWN/, '[S4] is no longer marked withdrawn');
+        assert.match(row, /not obtainable/i, 'the withdrawal does not state why');
+        assert.match(row, /~~.*~~/, 'the withdrawn citation is not struck through');
+        assert.match(row, /Nothing\. No requirement, calculation or claim rests on it/,
+            'the row must state that nothing depends on it');
+    });
+
+    it('SC-055: No operator-facing page cites it', () => {
+        // What an operator reads must not rest on a source that cannot be read.
+        const web = path.join(ROOT, 'web');
+        const pages = fs.readdirSync(web).filter(n => n.endsWith('.html'))
+            .map(n => path.join(web, n));
+        for (const page of pages) {
+            assert.ok(!NAME.test(fs.readFileSync(page, 'utf-8')),
+                `${path.basename(page)} cites a withdrawn source`);
+        }
+    });
+
+    it('SC-056: The engine names it only to record the withdrawal', () => {
+        // Two comments explain WHY the attribution went, which is worth keeping
+        // — it stops the next reader restoring it. Anything else is a citation.
+        const scripts = path.join(ROOT, 'web', 'scripts');
+        for (const name of fs.readdirSync(scripts).filter(n => n.endsWith('.js'))) {
+            const lines = fs.readFileSync(path.join(scripts, name), 'utf-8').split('\n');
+            lines.forEach((line, i) => {
+                if (!NAME.test(line)) return;
+                assert.match(line, /^\s*(\/\/|\*|\/\*)/,
+                    `${name}:${i + 1} names a withdrawn source outside a comment`);
+                const near = lines.slice(Math.max(0, i - 2), i + 3).join(' ');
+                assert.match(near, /withdraw/i,
+                    `${name}:${i + 1} names a withdrawn source without saying it was withdrawn`);
+            });
+        }
+    });
+
+    it('SC-057: No live requirement or specification cites the withdrawn source', () => {
+        // Note the wording of these test names: they avoid the tag itself,
+        // because every test name is written into the generated verification
+        // register and a name naming it would trip this assertion.
+        //
+        // URS-037 cited it as the basis for reporting sampling error, which was
+        // doubly wrong: the paper concerns ratios, and it is withdrawn. The
+        // change records and revision histories that describe the withdrawal
+        // are exempt — they are the design history of this decision.
+        const DHF = path.join(ROOT, 'QMS', 'DHF');
+        const exempt = /REF-001|SIGNOFF-REGISTER|CLINICAL-REVIEW-BRIEF/;
+        const offenders = [];
+        for (const dir of [DHF, path.join(DHF, 'DCR')]) {
+            for (const name of fs.readdirSync(dir).filter(n => n.endsWith('.md'))) {
+                if (exempt.test(name) || /^DCR-/.test(name)) continue;
+                fs.readFileSync(path.join(dir, name), 'utf-8').split('\n').forEach((line, i) => {
+                    // Revision-history rows record what was done and when.
+                    if (/^\| [A-Z]{1,2} \| \d{4}-\d{2}-\d{2} \|/.test(line)) return;
+                    if (/\[S4\]/.test(line)) offenders.push(`${name}:${i + 1}`);
+                });
+            }
+        }
+        assert.deepEqual(offenders, [],
+            'these cite a withdrawn source as live support:\n  ' + offenders.join('\n  '));
+    });
+});

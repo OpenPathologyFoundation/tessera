@@ -368,8 +368,8 @@
      * A differential count is a sample: 200 cells drawn from a smear containing
      * far more. The observed percentage therefore carries sampling error that
      * is large at the counts used in practice and largest for the rare
-     * populations that matter most diagnostically. Rümke's warning (REF-001
-     * [S4]) is the classic statement of this for differential counting.
+     * populations that matter most diagnostically. REF-001 §3.7 sets out why
+     * this matters at the counts a differential actually uses.
      *
      * METHOD CHOICE. The obvious implementation is the Wald interval,
      * p ± z·sqrt(p(1−p)/n). It is rejected here: its coverage is poor precisely
@@ -493,10 +493,14 @@
     /**
      * A confidence interval for a derived ratio (REF-001 §3.8, HA-093).
      *
-     * Rümke 1985 warned that a ratio of two counted proportions inherits the
-     * sampling error of both and is materially less precise than either. The
-     * application displayed the M:E ratio to one decimal place with only a
-     * prose advisory saying so. This quantifies it.
+     * A ratio of two counted proportions inherits the sampling error of both
+     * and is materially less precise than either. The application displayed the
+     * M:E ratio to one decimal place with only a prose advisory saying so; this
+     * quantifies it.
+     *
+     * The claim needs no citation — it falls out of the framing below. It was
+     * previously attributed to Rümke 1985, withdrawn from REF-001 as
+     * unobtainable: a source that cannot be read cannot be checked.
      *
      * THE FRAMING, which is what makes this exact rather than approximate.
      *

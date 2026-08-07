@@ -937,10 +937,12 @@ describe('Corrected WBC for nucleated red cells (URS-036, HA-105)', () => {
 describe('Confidence interval for a derived ratio (HA-093, REF-001 §3.8)', () => {
 
     /**
-     * Rümke 1985 — "The imprecision of the ratio of two percentages observed in
-     * differential white blood cell counts: a warning" — is about RATIOS, not
-     * single percentages. The application displayed the M:E ratio to one
-     * decimal place with only a prose advisory saying it was imprecise.
+     * A ratio of two counted proportions is materially less precise than
+     * either of them. The application displayed the M:E ratio to one decimal
+     * place with only a prose advisory saying so.
+     *
+     * The claim is derived here rather than cited: REF-001 [S4] (Rümke 1985),
+     * which the literature cites for it, was withdrawn as unobtainable.
      *
      * The interval is exact rather than approximate because of how the ratio
      * is framed. Conditioning on the cells that fall in either group leaves a
@@ -962,7 +964,7 @@ describe('Confidence interval for a derived ratio (HA-093, REF-001 §3.8)', () =
     });
 
     it('VV-ME-011: The same ratio is far less precise at a smaller count', () => {
-        // This is Rümke's warning made visible: an identical displayed ratio,
+        // The imprecision made visible: an identical displayed ratio at
         // materially different precision.
         const big = Core.ratioInterval(counts({ poly: 150, mono: 60, nrbc: 90 }), ME, 0.95);
         const small = Core.ratioInterval(counts({ poly: 15, mono: 6, nrbc: 9 }), ME, 0.95);
@@ -975,7 +977,7 @@ describe('Confidence interval for a derived ratio (HA-093, REF-001 §3.8)', () =
     });
 
     it('VV-ME-012: A ratio is much less precise than the percentages behind it', () => {
-        // The whole point of Rümke's warning.
+        // The proposition §3.8 derives, asserted as a test.
         const c = counts({ poly: 150, mono: 60, nrbc: 90 });
         const ratio = Core.ratioInterval(c, ME, 0.95);
         const pct = Core.wilsonInterval(90, 300, 0.95);          // erythroid %

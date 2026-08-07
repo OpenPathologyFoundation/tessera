@@ -124,6 +124,115 @@ describe('Verification identifiers exist (URS-092)', () => {
 });
 
 // ================================================================
+describe('The sign-off register describes the file as it stands (URS-092)', () => {
+
+    /**
+     * The clinical review brief named eleven documents needing a signature.
+     * There were thirty-one, and one of the items it listed as outstanding had
+     * since been closed — the M:E interval, which now exists.
+     *
+     * A reviewer is the last person able to notice that the list they were
+     * handed is out of date. `scripts/qms-signoffs.js` generates it from the
+     * signature tables themselves; these tests keep the generated block, the
+     * hand-written sections around it, and the brief that points at it from
+     * drifting apart again.
+     */
+    const signoffs = require(path.join(__dirname, '..', 'scripts', 'qms-signoffs.js'));
+    const DHF = path.join(__dirname, '..', 'QMS', 'DHF');
+    const register = () => fs.readFileSync(path.join(DHF, 'SIGNOFF-REGISTER.md'), 'utf-8');
+
+    it('QC-012: The register matches the signature tables it was generated from', () => {
+        const stale = signoffs.apply({ write: false });
+        assert.deepEqual(stale, [],
+            'the sign-off register is out of date — run `node scripts/qms-signoffs.js --write`:\n  ' +
+            stale.join('\n  '));
+    });
+
+    it('QC-013: The measurement reads real signature tables', () => {
+        // A guard on the measurement: a regex that stopped matching would
+        // report nothing outstanding, and QC-012 would then pass by writing an
+        // empty register — the most reassuring possible failure.
+        const { outstanding, signedDocs } = signoffs.collect();
+        assert.ok(signedDocs.length >= 5,
+            `only ${signedDocs.length} documents read as fully signed — the parser is probably broken`);
+        assert.ok(outstanding.has('Clinical Reviewer'),
+            'no clinical signatures read as outstanding, which is not the state of this file');
+        for (const [role, items] of outstanding) {
+            assert.ok(!/Laboratory Director|Quality Manager/i.test(role),
+                `${role} is the adopting laboratory's signature, not this project's`);
+            for (const it of items) {
+                assert.ok(fs.existsSync(path.join(DHF, it.doc)), `${it.doc} does not exist`);
+            }
+        }
+    });
+
+    it('QC-014: The three documents singled out for a question are still unsigned', () => {
+        // §2 states three specific asks in full rather than making the reviewer
+        // find them. If one gets signed, that section is answering a question
+        // nobody still has; if one is renamed, it points at nothing.
+        const src = register();
+        const asks = [...src.matchAll(/^### (DCR-\d+) §\d+/gm)].map(m => m[1]);
+        assert.ok(asks.length >= 3, 'the register no longer states its specific asks');
+
+        const open = new Set();
+        for (const items of signoffs.collect().outstanding.values()) {
+            items.forEach(i => open.add(i.doc));
+        }
+        for (const id of asks) {
+            const cited = [...open].filter(d => d.includes(id));
+            assert.ok(cited.length,
+                `${id} carries a specific question in §2 but is not outstanding — ` +
+                'either it has been signed and the section should say so, or it has been renamed');
+        }
+    });
+
+    it('QC-016: One product version, stated the same everywhere', () => {
+        // Four places carried three different answers: package.json and DHF-001
+        // said 2.7.1, the DHF revision history had reached v2.14.0 through
+        // eleven change records, and the service worker cache key was still on
+        // v2.3.0 — eleven releases of assets that could survive on a laboratory
+        // workstation, since the key is what invalidates them.
+        const pkg = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'package.json'), 'utf-8'));
+        const v = pkg.version;
+        assert.match(v, /^\d+\.\d+\.\d+$/, 'package.json carries no usable version');
+
+        const dhf = fs.readFileSync(path.join(DHF, 'DHF-001-DesignHistoryFile-Index.md'), 'utf-8');
+        const header = /\|\s*\*\*Product Version\*\*\s*\|\s*([\d.]+)/.exec(dhf);
+        assert.ok(header, 'DHF-001 states no product version');
+        assert.equal(header[1], v, 'DHF-001 disagrees with package.json');
+
+        const sw = fs.readFileSync(path.join(__dirname, '..', 'web', 'sw.js'), 'utf-8');
+        const cache = /CACHE_VERSION\s*=\s*'wbcds-v([\d.]+)'/.exec(sw);
+        assert.ok(cache, 'the service worker states no cache version');
+        assert.equal(cache[1], v,
+            'the service worker cache key is stale — cached assets from an older ' +
+            'release will survive on machines that already have it');
+
+        // The revision history must not have run ahead of the version again.
+        const latest = [...dhf.matchAll(/\|\s*v(\d+\.\d+\.\d+)\s*\(DCR-\d+\)/g)]
+            .map(m => m[1].split('.').map(Number));
+        if (latest.length) {
+            const top = latest.sort((a, b) => b[0] - a[0] || b[1] - a[1] || b[2] - a[2])[0];
+            const cur = v.split('.').map(Number);
+            const ahead = top[0] > cur[0] || (top[0] === cur[0] &&
+                (top[1] > cur[1] || (top[1] === cur[1] && top[2] > cur[2])));
+            assert.ok(!ahead,
+                `the revision history records v${top.join('.')} but the product is v${v}`);
+        }
+    });
+
+    it('QC-015: The clinical brief points at the register rather than restating it', () => {
+        // The brief is the invitation; the register is the checklist. The brief
+        // held its own copy of the list once, and that copy is what went stale.
+        const brief = fs.readFileSync(path.join(DHF, 'CLINICAL-REVIEW-BRIEF.md'), 'utf-8');
+        assert.match(brief, /SIGNOFF-REGISTER\.md/,
+            'the clinical review brief does not point at the sign-off register');
+        assert.ok(!/No confidence interval is computed for the M:E ratio/.test(brief),
+            'the brief still lists the M:E interval as outstanding — it was closed by DCR-026');
+    });
+});
+
+// ================================================================
 describe('Shipped assets are all reachable (URS-094)', () => {
 
     /**

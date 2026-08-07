@@ -1095,12 +1095,17 @@
         return Core.computeRatio(state.counts, specConfig.formulas.ME_ratio);
     }
 
-    // Rümke's warning (REF-001 §3.8) concerns ratios specifically: a ratio of
-    // two counted proportions carries the sampling error of both.
+    // A ratio of two counted proportions carries the sampling error of both
+    // (REF-001 §3.8). The interval displayed beside it quantifies that; this
+    // note covers what an interval cannot — cells are not distributed at random
+    // across a smear, so the real uncertainty is at least this wide.
+    //
+    // The attribution to Rümke 1985 was removed when that source was withdrawn
+    // as unobtainable. The claim is derived, not borrowed.
     var RATIO_IMPRECISION_NOTE = 'A ratio of two counted proportions carries the ' +
         'sampling error of both, and is therefore substantially less precise than ' +
-        'either percentage alone (Rumke 1985). Interpret alongside cellularity and ' +
-        'the trephine biopsy; treat small differences between successive ratios with caution.';
+        'either percentage alone. Interpret alongside cellularity and the trephine ' +
+        'biopsy; treat small differences between successive ratios with caution.';
 
     /** Every configured formula evaluated against the current counts. */
     function computeFormulaResults(specConfig) {
@@ -1112,7 +1117,7 @@
             var r = Core.computeFormula(state.counts, defs[fname]);
             if (!r) return;
             out[fname] = { label: defs[fname].label || fname, type: r.type, display: r.display, value: r.value };
-            // Rümke's warning quantified rather than only asserted (REF-001
+            // The imprecision quantified rather than only asserted (REF-001
             // §3.8, HA-093). Governed by the same setting as the percentage
             // intervals: a profile that suppresses one suppresses both.
             if (wantCi && r.type === 'ratio') {

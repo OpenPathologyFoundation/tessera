@@ -97,12 +97,12 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**705 verification cases** across 26 series and 4 layers, run as 762 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**714 verification cases** across 26 series and 4 layers, run as 771 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
-| `QC-*` | 8 (001–011) | Static | QMS counted quantities |
-| `SC-*` | 24 (001–053) | Unit | Standards conformance (ICSH) |
+| `QC-*` | 13 (001–016) | Static | QMS counted quantities |
+| `SC-*` | 28 (001–057) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 50 (001–094) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
@@ -140,6 +140,11 @@ auditing how the plan changed.
 | QC-006 | The two registers agree | Static | `tests/14-qms-counts.test.js` |
 | QC-010 | No asset under web/ is referenced by nothing | Static | `tests/14-qms-counts.test.js` |
 | QC-011 | Every test carries a verification identifier | Static | `tests/14-qms-counts.test.js` |
+| QC-012 | The register matches the signature tables it was generated from | Static | `tests/14-qms-counts.test.js` |
+| QC-013 | The measurement reads real signature tables | Static | `tests/14-qms-counts.test.js` |
+| QC-014 | The three documents singled out for a question are still unsigned | Static | `tests/14-qms-counts.test.js` |
+| QC-015 | The clinical brief points at the register rather than restating it | Static | `tests/14-qms-counts.test.js` |
+| QC-016 | One product version, stated the same everywhere | Static | `tests/14-qms-counts.test.js` |
 
 #### SC-* — Standards conformance (ICSH)
 
@@ -169,6 +174,10 @@ auditing how the plan changed.
 | SC-051 | The 500-cell marrow target is attributed to ICSH, not CAP | Unit | `tests/12-standards-conformance.test.js` |
 | SC-052 | The marrow target basis states the ICSH condition | Unit | `tests/12-standards-conformance.test.js` |
 | SC-053 | A sub-target advisory carries the basis for the target | Unit | `tests/12-standards-conformance.test.js` |
+| SC-054 | REF-001 records the withdrawn source, struck through, with the reason | Unit | `tests/12-standards-conformance.test.js` |
+| SC-055 | No operator-facing page cites it | Unit | `tests/12-standards-conformance.test.js` |
+| SC-056 | The engine names it only to record the withdrawal | Unit | `tests/12-standards-conformance.test.js` |
+| SC-057 | No live requirement or specification cites the withdrawn source | Unit | `tests/12-standards-conformance.test.js` |
 
 #### TC-B-* — Application behaviour in a DOM
 

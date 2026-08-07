@@ -120,6 +120,9 @@ function edits(c) {
         ['README.md', /(WebKit — )\d+( specs x 3 engines)/, `$1${c.e2eSpecs}$2`],
         ['README.md', /(\*\*)\d+( executed\*\* \()\d+( Node \+ )\d+( browser)/,
             `$1${c.nodeTests + c.e2eTotal}$2${c.nodeTests}$3${c.e2eTotal}$4`],
+        // The brief goes to a clinician who has no way to check it.
+        ['QMS/DHF/CLINICAL-REVIEW-BRIEF.md',
+            /(The software carries )\d+( automated tests)/, `$1${c.nodeTests + c.e2eTotal}$2`],
         ['QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md',
             /(\| URS v2\.0 → SRS \| )\d+( active requirements)/, `$1${c.urs}$2`],
         ['QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md',

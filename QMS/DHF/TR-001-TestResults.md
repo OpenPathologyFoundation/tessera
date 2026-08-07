@@ -37,7 +37,7 @@
 | Exit code | 0 |
 
 Command: see `command.txt` in the evidence bundle this reports —
-`<!-- qms:fact evidence_run_id -->(none yet)<!-- /qms:fact -->`.
+`<!-- qms:fact evidence_run_id -->2026-08-07_062604_run<!-- /qms:fact -->`.
 Regenerate this evidence with `npm run test:qms`. The figures above are written
 by that run and must not be edited by hand.
 
@@ -652,6 +652,13 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-07T10:26:04.725Z
+- Command: `npm test && npx playwright test`
+- Exit Code: 0
+- Result: **PASS**
+- Code identity: `3a3a084272cd5476fb58ecc55196eb174860b014` (clean tree)
+- Evidence: `QMS/DHF/TestEvidence/2026-08-07_062604_run/`
+
 - Date (UTC): 2026-08-07T10:21:24.423Z
 - Command: `npm test && npx playwright test`
 - Exit Code: 1

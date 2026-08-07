@@ -12,8 +12,10 @@
  *     cache fallback. The application's own version check needs to see a newer
  *     shipped profile when the network is available, but must still boot from
  *     the last known copy when it is not.
- *   - Anything cross-origin (webfonts): cached opportunistically, never
- *     required. A miss degrades to the local font stack.
+ *   - Cross-origin: nothing. The webfonts were the only external request and
+ *     are self-hosted since v2.17.0, so an air-gapped workstation renders
+ *     identically to a connected one. SC-060 fails the build if a page
+ *     acquires a new one.
  *
  * Bump CACHE_VERSION on every release so stale assets cannot survive.
  */
@@ -25,7 +27,10 @@
 // bump the editor would load a cached page that still calls prompt().
 //
 // v2.2.0 — shared theme stylesheet and the move of data-theme onto <html>.
-const CACHE_VERSION = 'wbcds-v2.16.0';
+// v2.17.0 — webfonts self-hosted. The cache key MUST change: an installed
+// browser would otherwise keep serving pages that still <link> to Google's
+// CDN, so the very workstation the change is for would not receive it.
+const CACHE_VERSION = 'wbcds-v2.17.0';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const DATA_CACHE = CACHE_VERSION + '-data';
 
@@ -37,6 +42,16 @@ const SHELL_ASSETS = [
     './methods.html',
     './calculation-reference.html',
     './vendor/tailwind.js',
+    // Self-hosted webfonts. Precached rather than cached on demand: a
+    // workstation that has never reached the network is the case URS-094
+    // exists for, and it must get the real typeface on first load.
+    './vendor/fonts/fonts.css',
+    './vendor/fonts/inter-latin.woff2',
+    './vendor/fonts/inter-latin-ext.woff2',
+    './vendor/fonts/jetbrains-mono-latin.woff2',
+    './vendor/fonts/jetbrains-mono-latin-ext.woff2',
+    './vendor/fonts/libre-franklin-latin.woff2',
+    './vendor/fonts/libre-franklin-latin-ext.woff2',
     './styles/theme.css',
     './scripts/wbc-core.js',
     './scripts/wbc-dialog.js',
@@ -84,17 +99,13 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Cross-origin (webfonts): opportunistic cache, never blocking.
+    // Cross-origin: not handled, because there is none. The webfonts were the
+    // only external request and are served from ./vendor/fonts since v2.17.0.
+    // Anything cross-origin that appears here is unintended, so it is left to
+    // the network rather than quietly cached into the offline shell — a
+    // silently cached third-party request is how an air-gap claim stops being
+    // true without anyone noticing.
     if (url.origin !== self.location.origin) {
-        event.respondWith(
-            caches.match(req).then((hit) => hit || fetch(req).then((resp) => {
-                if (resp && resp.ok) {
-                    const copy = resp.clone();
-                    caches.open(DATA_CACHE).then((c) => c.put(req, copy));
-                }
-                return resp;
-            }).catch(() => hit))
-        );
         return;
     }
 

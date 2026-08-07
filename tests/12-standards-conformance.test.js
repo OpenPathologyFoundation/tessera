@@ -367,6 +367,103 @@ describe('Target counts are attributed to what the sources say (C-2, C-4)', () =
 });
 
 // ================================================================
+describe('The application makes no external request (URS-094)', () => {
+
+    /**
+     * URS-094 exists because these are laboratory workstations on restricted
+     * networks. Every asset was local except the three webfonts, which came
+     * from Google's CDN — so an air-gapped machine fell back to system fonts,
+     * and a connected one announced every page load to a third party.
+     *
+     * The fonts are self-hosted since v2.17.0. The claim is now absolute,
+     * which means it can be tested absolutely: a single new `<link>` or
+     * `<script>` to another origin makes the offline guarantee false, and that
+     * is exactly the kind of change nobody re-reads the README after.
+     */
+    const ROOT = path.join(__dirname, '..');
+    const WEB = path.join(ROOT, 'web');
+    const pages = () => fs.readdirSync(WEB).filter(n => n.endsWith('.html'));
+
+    it('SC-060: No page references any other origin', () => {
+        // Matches an absolute URL in any attribute that causes a fetch.
+        const EXTERNAL = /(?:href|src)\s*=\s*["'](https?:)?\/\/[^"']+/gi;
+        const offenders = [];
+        for (const name of pages()) {
+            const src = fs.readFileSync(path.join(WEB, name), 'utf-8');
+            src.split('\n').forEach((line, i) => {
+                for (const m of line.matchAll(EXTERNAL)) {
+                    offenders.push(`${name}:${i + 1} — ${m[0].slice(0, 80)}`);
+                }
+            });
+        }
+        assert.deepEqual(offenders, [],
+            'these make the offline guarantee false:\n  ' + offenders.join('\n  '));
+    });
+
+    it('SC-061: Every page loads the self-hosted font stylesheet', () => {
+        // A page that dropped the stylesheet would still pass SC-060 while
+        // silently rendering in a system font — passing by being emptier.
+        //
+        // Matched as an actual <link>, not as the string anywhere in the file:
+        // the first version of this test looked for the path, and the comment
+        // that explains the path satisfied it. Removing the real <link> left
+        // the test passing, which the revert-check caught.
+        const LINK = /<link[^>]+href\s*=\s*["'][^"']*vendor\/fonts\/fonts\.css["']/i;
+        for (const name of pages()) {
+            const src = fs.readFileSync(path.join(WEB, name), 'utf-8');
+            assert.match(src, LINK, `${name} does not load the self-hosted fonts`);
+        }
+    });
+
+    it('SC-062: The fonts exist, are real WOFF2, and are precached', () => {
+        const css = fs.readFileSync(path.join(WEB, 'vendor', 'fonts', 'fonts.css'), 'utf-8');
+        const referenced = [...css.matchAll(/url\('([^']+\.woff2)'\)/g)].map(m => m[1]);
+        assert.ok(referenced.length >= 3,
+            `the stylesheet references only ${referenced.length} font files`);
+
+        const sw = fs.readFileSync(path.join(WEB, 'sw.js'), 'utf-8');
+        for (const file of new Set(referenced)) {
+            const full = path.join(WEB, 'vendor', 'fonts', file);
+            assert.ok(fs.existsSync(full), `${file} is referenced but not present`);
+            // wOF2 magic number — a truncated or HTML-error-page download
+            // would otherwise sit there looking like a font.
+            const head = fs.readFileSync(full).subarray(0, 4).toString('latin1');
+            assert.equal(head, 'wOF2', `${file} is not a WOFF2 file`);
+            assert.ok(sw.includes(`fonts/${file}`),
+                `${file} is not precached — an air-gapped first load would not get it`);
+        }
+        assert.ok(sw.includes('vendor/fonts/fonts.css'),
+            'the font stylesheet itself is not precached');
+    });
+
+    it('SC-063: Each bundled font ships its OFL licence and copyright', () => {
+        // The SIL Open Font License requires the licence and copyright to
+        // travel with the font files. This repository is public, and the
+        // fonts are not covered by its Apache-2.0 grant.
+        const dir = path.join(WEB, 'vendor', 'fonts');
+        const families = new Set(fs.readdirSync(dir)
+            .filter(n => n.endsWith('.woff2'))
+            .map(n => n.replace(/-latin(-ext)?\.woff2$/, '')));
+        assert.ok(families.size >= 3, `only ${families.size} font families found`);
+
+        const notice = fs.readFileSync(path.join(ROOT, 'NOTICE'), 'utf-8');
+        for (const family of families) {
+            const lic = path.join(dir, `${family}-OFL.txt`);
+            assert.ok(fs.existsSync(lic), `${family} ships no OFL licence file`);
+            const text = fs.readFileSync(lic, 'utf-8');
+            assert.match(text, /SIL OPEN FONT LICENSE Version 1\.1/i,
+                `${family}-OFL.txt is not the OFL text`);
+            assert.match(text, /^Copyright .*Project Authors/m,
+                `${family}-OFL.txt carries no copyright line`);
+            assert.ok(notice.includes(`${family}-OFL.txt`),
+                `NOTICE does not declare ${family} — the OFL requires attribution`);
+        }
+        assert.match(notice, /SIL OPEN FONT LICENSE 1\.1/i,
+            'NOTICE does not state the font licence');
+    });
+});
+
+// ================================================================
 describe('A withdrawn citation stays withdrawn (REF-001 §3.8)', () => {
 
     /**

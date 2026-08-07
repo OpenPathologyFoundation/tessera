@@ -25,7 +25,7 @@ where an individual session is capable and thorough and has no memory of the
 other five documents. And it is the evidence base for the guards: each `QC-`
 identifier in the last column exists because of a specific row above it.
 
-**Counted here rather than described:** 21 incidents, of which 18 are now
+**Counted here rather than described:** 23 incidents, of which 20 are now
 prevented by an automated check.
 
 ---
@@ -55,6 +55,8 @@ prevented by an automated check.
 | 19 | 2026-08-07 | A threshold cannot target a ratio "because no confidence interval is computed for a ratio" | `wbc-core.js` comment, its validation message, SRS-001 SYS-205 | `ratioInterval` has existed since DCR-026 | A correct rule whose stated reason had become false | Drift remediation review | DCR-029 | QC-025 |
 | 20 | 2026-08-07 | "the eleven documents listed as In Review"; "DCR-004 to DCR-009" | DHF-001 §7.2, §7.4 | 29 clinical signatures outstanding across 28 change records | DCR-027 forbade the brief restating the register; DHF-001 was doing the same thing and was not swept | Drift remediation review | DCR-029 | QC-012 (register is generated); pointer, not a count |
 | 21 | 2026-08-07 | "Tailwind CSS (CDN)"; "all assets served locally except Tailwind CSS CDN" | README stack table, offline note, Limitation 5 | `web/vendor/tailwind.js`; the fonts are the actual external request | Vendoring changed the code, not the description | Drift remediation review | DCR-029 | — (see §3) |
+| 22 | 2026-08-07 | "works offline after initial page load" — with an exception that defeated the case it was for | README offline note, Limitation 5 | The service worker cached fonts only after a successful fetch, so an air-gapped workstation never got them | An exception stated accurately, whose consequence was not followed through | Document Owner | DCR-030 | SC-060, SC-061, SC-062 |
+| 23 | 2026-08-07 | The vendored Tailwind bundle was redistributed with no licence declaration | `NOTICE` | Tailwind is MIT and requires attribution | Vendoring added the file without adding the notice | DCR-030 work | DCR-030 | SC-063 (fonts); Tailwind declared, unguarded |
 
 ---
 
@@ -62,10 +64,17 @@ prevented by an automated check.
 
 Honesty about the guards matters as much as the guards.
 
-- **Row 21 has no automated check.** Asserting that prose about asset delivery
-  matches the `<script>` and `<link>` tags is possible but would be brittle —
-  it would test the phrasing rather than the fact. It is listed here so the
-  next reviewer knows the claim is unguarded and should be re-read by eye.
+- **Row 21 is guarded only in part.** `SC-060` now makes the underlying fact
+  enforceable — no page may reference another origin — so the README's "no
+  external request" claim cannot silently become false. What is still
+  unguarded is the *prose*: a stack table could name the wrong delivery
+  mechanism for a local asset and no test would notice. Asserting phrasing
+  against `<script>` tags would test the wording rather than the fact.
+- **Row 23 is guarded for the fonts, not for Tailwind.** `SC-063` requires each
+  bundled font family to ship its licence and appear in `NOTICE`. The vendored
+  Tailwind bundle is now declared there, but nothing fails if a future vendored
+  dependency arrives undeclared. That check is worth building the next time
+  something is vendored.
 - **Rows 5–8 are guarded for SAD-001 specifically** (UD-070…UD-074), not as a
   class. A different architecture document drifting the same way would not be
   caught.
@@ -99,4 +108,5 @@ same machinery now prevents their recurrence.
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| B | 2026-08-07 | QMS | Rows 22–23 added (DCR-030): the offline claim whose exception defeated the case it was written for, and the undeclared Tailwind licence found while declaring the fonts. |
 | A | 2026-08-07 | QMS | Initial issue (DCR-029). Seeded with 21 incidents: the seven found in the drift remediation review, the four propagation failures DCR-022 §4 counts, the two DCR-027 records, and the earlier findings from the independent review of 2026-08-06 and the DCR-021 architecture review. |

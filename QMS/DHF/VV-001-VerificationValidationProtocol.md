@@ -68,12 +68,12 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**724 verification cases** across 26 series and 4 layers, run as 781 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**728 verification cases** across 26 series and 4 layers, run as 785 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 23 (001–026) | Static | QMS counted quantities |
-| `SC-*` | 28 (001–057) | Unit | Standards conformance (ICSH) |
+| `SC-*` | 32 (001–063) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 50 (001–094) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
@@ -159,6 +159,10 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | SC-055 | No operator-facing page cites it | Unit | `tests/12-standards-conformance.test.js` |
 | SC-056 | The engine names it only to record the withdrawal | Unit | `tests/12-standards-conformance.test.js` |
 | SC-057 | No live requirement or specification cites the withdrawn source | Unit | `tests/12-standards-conformance.test.js` |
+| SC-060 | No page references any other origin | Unit | `tests/12-standards-conformance.test.js` |
+| SC-061 | Every page loads the self-hosted font stylesheet | Unit | `tests/12-standards-conformance.test.js` |
+| SC-062 | The fonts exist, are real WOFF2, and are precached | Unit | `tests/12-standards-conformance.test.js` |
+| SC-063 | Each bundled font ships its OFL licence and copyright | Unit | `tests/12-standards-conformance.test.js` |
 
 #### TC-B-* — Application behaviour in a DOM
 

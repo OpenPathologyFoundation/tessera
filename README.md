@@ -356,7 +356,7 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
 | **RA-001** | FMEA risk analysis: 51 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan; register of 724 implemented verification cases, generated from the runners |
+| **TP-001** | Test plan; register of 728 implemented verification cases, generated from the runners |
 | **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |
@@ -379,7 +379,10 @@ For detailed quality checks and release steps, see `QMS/DHF/TP-001-TestPlan.md`,
 | Microsoft Edge | Latest 2 major | Supported |
 | Safari | Latest | Expected to work (not formally tested) |
 
-The application works offline after initial page load. Every asset is served locally except the three Google Fonts families, which the service worker caches opportunistically on first load.
+The application makes **no external request**. Every asset — scripts, styles, Tailwind and the three
+typefaces — is served from the same origin and precached by the service worker, so a workstation that
+has never reached the internet renders identically to one that has. This is verified rather than
+asserted: `SC-060` fails the build if any page acquires a cross-origin reference.
 
 ---
 
@@ -410,7 +413,7 @@ The application works offline after initial page load. Every asset is served loc
 2. **Session data is temporary.** It is lost when the browser tab or window is closed.
 3. **The application does not replace the LIS.** Always copy results to the system of record.
 4. **No multi-user or collaborative features.** It is a single-operator tool.
-5. **Google Fonts are loaded from a CDN.** Tailwind is vendored at `web/vendor/tailwind.js`; the fonts are the last remaining external request. The service worker caches them after first load, so the application runs offline thereafter — but a genuinely air-gapped workstation that has never reached the network will fall back to system fonts. Self-hosting the three families would close this.
+5. **Latin scripts only, for the bundled typefaces.** The self-hosted fonts carry the `latin` and `latin-ext` subsets. Text in Cyrillic, Greek or Vietnamese renders in a system fallback font rather than failing — a cosmetic difference in free-text comments, not a functional limit.
 
 ---
 

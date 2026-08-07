@@ -37,6 +37,29 @@ Full policy, including what needs no permission and what does: TRADEMARKS.md
 Permission requests: info@openpathology.tech
 
 --------------------------------------------------------------------------------
+BUNDLED THIRD-PARTY FONTS — SIL OPEN FONT LICENSE 1.1
+--------------------------------------------------------------------------------
+
+`web/vendor/fonts/` contains three typefaces, self-hosted so that the
+application makes no external request. They are NOT covered by the Apache
+License above, and they are NOT part of the WBC ΔΣ marks reserved above. Each
+is licensed under the SIL Open Font License, Version 1.1, whose full text and
+copyright line ship beside the font files:
+
+  - Inter — Copyright 2020 The Inter Project Authors
+    https://github.com/rsms/inter · `web/vendor/fonts/inter-OFL.txt`
+  - JetBrains Mono — Copyright 2020 The JetBrains Mono Project Authors
+    https://github.com/JetBrains/JetBrainsMono · `web/vendor/fonts/jetbrains-mono-OFL.txt`
+  - Libre Franklin — Copyright 2020 The Libre Franklin Project Authors
+    https://github.com/googlefonts/Libre-Franklin · `web/vendor/fonts/libre-franklin-OFL.txt`
+
+The OFL requires that these licence files and copyright notices travel with any
+redistribution of the font files, and that the fonts not be sold on their own.
+It also reserves the font names: a modified version must be renamed.
+
+`web/vendor/tailwind.js` is Tailwind CSS, MIT licensed, Copyright Tailwind Labs.
+
+--------------------------------------------------------------------------------
 
 WBC ΔΣ is a counting and calculation aid for trained laboratory personnel. It
 performs no cell identification and makes no diagnostic decision. It is provided

@@ -77,7 +77,7 @@ A **right-hand** preset is also available (HJKL; / NM,./ / YUIOP) for left-hande
 | Layer | Technology | Notes |
 |-------|-----------|-------|
 | Frontend | Vanilla JavaScript (ES5+) | Zero framework dependencies |
-| Styling | Tailwind CSS (CDN) | Utility-first, Bauhaus-minimal design |
+| Styling | Tailwind CSS (vendored, `web/vendor/tailwind.js`) | Utility-first, Bauhaus-minimal design |
 | Fonts | Inter + JetBrains Mono | Google Fonts (CDN) |
 | Server | Any static file server | No backend logic required |
 | Config | `settings/templates.json` | Cell types, keys, templates are all configurable |
@@ -324,7 +324,7 @@ CI can run `npm test` for quick feedback, but **QMS evidence requires `npm run t
 | 10 | `tests/10-config-editor.test.js` | Static | Editor structure, JS integrity, key assignment controls |
 | 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 91 tests |
 | E2E | `tests-e2e/*.spec.js` | **System** | The deployed application in Chromium, Firefox and WebKit — 132 specs x 3 engines |
-| **Total** | | | **1039 executed** (643 Node + 396 browser, 3 documented skips) |
+| **Total** | | | **<!-- qms:fact tests_total -->1045<!-- /qms:fact --> tests** (<!-- qms:fact tests_node -->649<!-- /qms:fact --> Node + <!-- qms:fact tests_browser -->396<!-- /qms:fact --> browser), of which <!-- qms:fact tests_skipped -->7<!-- /qms:fact --> are documented skips |
 
 See `QMS/DHF/DCR/DCR-004-Verification-Integrity-Remediation.md` for why the
 suite was restructured: prior to it, no test executed the application at all.
@@ -356,7 +356,7 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
 | **RA-001** | FMEA risk analysis: 51 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan; register of 718 implemented verification cases, generated from the runners |
+| **TP-001** | Test plan; register of 724 implemented verification cases, generated from the runners |
 | **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |
@@ -379,7 +379,7 @@ For detailed quality checks and release steps, see `QMS/DHF/TP-001-TestPlan.md`,
 | Microsoft Edge | Latest 2 major | Supported |
 | Safari | Latest | Expected to work (not formally tested) |
 
-The application works offline after initial page load (all assets served locally except Tailwind CSS CDN and Google Fonts).
+The application works offline after initial page load. Every asset is served locally except the three Google Fonts families, which the service worker caches opportunistically on first load.
 
 ---
 
@@ -410,7 +410,7 @@ The application works offline after initial page load (all assets served locally
 2. **Session data is temporary.** It is lost when the browser tab or window is closed.
 3. **The application does not replace the LIS.** Always copy results to the system of record.
 4. **No multi-user or collaborative features.** It is a single-operator tool.
-5. **Tailwind CSS is loaded from CDN.** For fully air-gapped deployment, download Tailwind CSS and serve it locally.
+5. **Google Fonts are loaded from a CDN.** Tailwind is vendored at `web/vendor/tailwind.js`; the fonts are the last remaining external request. The service worker caches them after first load, so the application runs offline thereafter — but a genuinely air-gapped workstation that has never reached the network will fall back to system fonts. Self-hosting the three families would close this.
 
 ---
 

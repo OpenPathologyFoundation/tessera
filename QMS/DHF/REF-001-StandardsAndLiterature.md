@@ -376,8 +376,8 @@ combined category and count what it can reliably distinguish.
 | Target count rule is unconditional; ICSH makes 500 vs 300 depend on diagnostic intent | [S1] §2.6 | **Open** — profiles should offer both with the rule stated |
 | `other` category has no ICSH counterpart and may capture cells ICSH excludes | [S1] §2.6 | **Partially addressed** — guidance added; see RA-001 HA-090 |
 | Generic `blasts` category cannot distinguish myeloblasts for M:E purposes | [S1] §2.6 | **Documented limitation** — RA-001 HA-091 |
-| No confidence interval on reported percentages | [S4] | **Closed** — module M4, DCR-007 |
-| No interval on the M:E **ratio**, which is what [S4] actually warns about | [S4] | **Open** — needs Fieller or bootstrap; advisory shown meanwhile (HA-093) |
+| No confidence interval on reported percentages | [S7]; [S8] | **Closed** — module M4, DCR-007 |
+| No interval on the M:E **ratio**, the least precise figure reported | Derivation, §3.8; [S7] | **Closed** — DCR-026: the odds transform of the Wilson interval on the conditional binomial. Fieller rejected (degenerates with no erythroid cells); bootstrap rejected (stochastic in a reported figure). RA-001 HA-093 closed. |
 | No comparison against published normal ranges for the NDC | [S1] §2.6 | Out of scope — requires age-stratified reference data |
 | Reference method is two observers × 200 cells | [S2] | Out of scope (URS §6, Phase 2) |
 

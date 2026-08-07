@@ -233,6 +233,227 @@ describe('The sign-off register describes the file as it stands (URS-092)', () =
 });
 
 // ================================================================
+describe('One measured fact, stated the same everywhere (URS-092)', () => {
+
+    /**
+     * Four live documents each carried their own copy of the test totals, and
+     * three of them disagreed. README and RTM-001 said 1039 tests with 3
+     * documented skips; the clinical brief said 1039; TR-001 — whose entire
+     * subject is the test results — said 939 with 7 skips.
+     *
+     * Every one of those had been true when it was written. The defect was
+     * structural: `qms-counts.js --write` refreshed some of them but only when
+     * someone ran it, TR-001 was written by a different tool at a different
+     * moment, and QC-001 checked the document counts while leaving the test
+     * totals unchecked, because measuring them means spawning the runners and
+     * this suite runs inside one.
+     *
+     * The totals are now written once, by the evidence run that measured them,
+     * into `qms:fact` markers. These two tests are the halves that suite can
+     * do without spawning anything: documents must agree with each other, and
+     * with the run they came from.
+     */
+    const qmsFacts = require(path.join(__dirname, '..', 'scripts', 'qms-facts.js'));
+
+    it('QC-021: No two documents state a different value for the same fact', () => {
+        const bad = qmsFacts.disagreements();
+        assert.deepEqual(bad, [],
+            'live documents disagree about a measured fact:\n  ' + bad.join('\n  '));
+    });
+
+    it('QC-022: The stated facts are the ones the newest admissible run measured', () => {
+        // Agreement is not enough on its own — four documents can agree on a
+        // number that is a year old. This ties them to a bundle whose
+        // environment.txt says the tree was clean, which is the only kind of
+        // run whose figures describe a released state.
+        const run = qmsFacts.newestCleanRun();
+        if (!run) {
+            // Before the first clean-tree evidence run there is nothing to
+            // compare against. Said out loud rather than passing silently.
+            console.log('    (skipped: no clean-tree evidence bundle with facts.json yet)');
+            return;
+        }
+        const wrong = [];
+        for (const mk of qmsFacts.readAll()) {
+            const expected = run.facts[mk.key];
+            if (expected === undefined) continue;
+            if (String(expected) !== mk.value) {
+                wrong.push(`${mk.file}:${mk.line} ${mk.key}="${mk.value}", ` +
+                    `but ${run.id} measured "${expected}"`);
+            }
+        }
+        assert.deepEqual(wrong, [],
+            'documents state figures the evidence does not support — ' +
+            'run `npm run test:qms` on a clean tree:\n  ' + wrong.join('\n  '));
+    });
+
+    it('QC-023: Every marker names a fact something actually writes', () => {
+        // A marker with a misspelled key renders invisibly, is written by
+        // nothing, and freezes whatever value it was born with — a stale
+        // number wearing the costume of a generated one.
+        const unknown = qmsFacts.readAll().filter(m => !qmsFacts.KEYS.includes(m.key));
+        assert.deepEqual(unknown.map(m => `${m.file}:${m.line} ${m.key}`), [],
+            'these markers name facts no writer produces');
+
+        // And every fact the runner measures must be visible somewhere, or the
+        // machinery is measuring something no reader ever sees.
+        const used = new Set(qmsFacts.readAll().map(m => m.key));
+        for (const key of qmsFacts.KEYS) {
+            assert.ok(used.has(key), `no document states ${key}`);
+        }
+    });
+});
+
+// ================================================================
+describe('A closure closes everywhere (URS-092)', () => {
+
+    /**
+     * HA-093 was closed in RA-001 on 2026-08-06, the day the M:E interval
+     * shipped. It stayed open in two other places: DHF-001 §7.4 listed "no
+     * interval is computed for the M:E ratio" as outstanding work, and REF-001
+     * §5 carried a gap-table row reading "Open — needs Fieller or bootstrap"
+     * ten lines below §3.8's own sentence saying the hazard was closed.
+     *
+     * That is the shape of nearly every drift incident in this repository: a
+     * session closes something and updates the one document it was looking at.
+     * The closure is real; the file goes on saying otherwise. These tests make
+     * the *class* fail, not the instance.
+     */
+    const DHF = path.join(__dirname, '..', 'QMS', 'DHF');
+    const read = f => fs.readFileSync(path.join(DHF, f), 'utf-8');
+
+    /** Hazard IDs whose RA-001 row says Closed. */
+    function closedHazards() {
+        const closed = new Set();
+        for (const line of read('RA-001-RiskAnalysis-FMEA.md').split('\n')) {
+            const m = /^\| (HA-\d+) \|/.exec(line);
+            if (m && /\bClosed\b/.test(line)) closed.add(m[1]);
+        }
+        return closed;
+    }
+
+    it('QC-024: A hazard closed in RA-001 is not still open elsewhere', () => {
+        const closed = closedHazards();
+        assert.ok(closed.size >= 1, 'no closed hazard rows found — the row parser is broken');
+
+        const offenders = [];
+
+        // DHF-001 §7.4 — the outstanding-items list.
+        const dhf = read('DHF-001-DesignHistoryFile-Index.md');
+        const openItems = /### 7\.4[^\n]*\n([\s\S]*?)\n---/.exec(dhf);
+        if (openItems) {
+            openItems[1].split('\n').forEach(line => {
+                for (const id of closed) {
+                    // A struck-through line that says "Closed" is the record of
+                    // the closure, not a claim that it is open.
+                    if (!line.includes(id)) continue;
+                    if (/~~|\bClosed\b/.test(line)) continue;
+                    offenders.push(`DHF-001 §7.4 lists ${id} as outstanding; RA-001 closed it`);
+                }
+            });
+        }
+
+        // REF-001 §5 — the gap table.
+        const ref = read('REF-001-StandardsAndLiterature.md');
+        ref.split('\n').forEach((line, i) => {
+            if (!/^\|/.test(line) || !/\*\*Open\*\*/.test(line)) return;
+            for (const id of closed) {
+                if (line.includes(id)) {
+                    offenders.push(`REF-001:${i + 1} marks ${id} Open; RA-001 closed it`);
+                }
+            }
+        });
+
+        assert.deepEqual(offenders, [],
+            'a closed hazard is still described as open:\n  ' + offenders.join('\n  '));
+    });
+
+    it('QC-025: A shipped capability is not described as absent', () => {
+        /**
+         * Table-driven, so closing the next capability is one added row.
+         *
+         * `ratioInterval` had existed since DCR-026 and three live places still
+         * gave "no interval is computed for a ratio" as their reason for
+         * something — a source comment, an operator-facing validation message,
+         * and the SYS-205 requirement rationale. The rule those three state is
+         * correct; the reason had become false.
+         *
+         * `QMS/DHF/DCR/` is out of scope by design: a change record describes
+         * what was true when it was written.
+         */
+        const Core = require(path.join(__dirname, '..', 'web', 'scripts', 'wbc-core.js'));
+        const CLAIMS = [
+            {
+                export: 'ratioInterval',
+                forbid: /no (confidence )?interval is computed for (a|the) ratio|ratio carries no confidence interval/i,
+                scope: ['web/scripts', 'web', 'QMS/DHF']
+            }
+        ];
+
+        const ROOT = path.join(__dirname, '..');
+        const files = dir => {
+            const full = path.join(ROOT, dir);
+            if (!fs.existsSync(full)) return [];
+            return fs.readdirSync(full)
+                .filter(n => /\.(js|html|md)$/.test(n))
+                .map(n => path.join(full, n));
+        };
+
+        const offenders = [];
+        for (const claim of CLAIMS) {
+            assert.equal(typeof Core[claim.export], 'function',
+                `${claim.export} is not exported — either the capability went, ` +
+                'or this table is describing something that no longer exists');
+            for (const dir of claim.scope) {
+                for (const file of files(dir)) {
+                    fs.readFileSync(file, 'utf-8').split('\n').forEach((line, i) => {
+                        // A revision-history row is a dated record of what was
+                        // changed, and quoting the wording it replaced is how
+                        // such a row explains itself. Same exemption the change
+                        // records get, and for the same reason.
+                        if (/^\|\s*[A-Z]{1,2}\s*\|\s*\d{4}-\d{2}-\d{2}\s*\|/.test(line)) return;
+                        // And the drift log, whose every row IS a quotation of
+                        // a claim that stopped being true. A log of false
+                        // claims must be able to state one.
+                        if (/DRIFT-LOG/.test(file)) return;
+                        if (claim.forbid.test(line)) {
+                            offenders.push(`${path.relative(ROOT, file)}:${i + 1} — ` +
+                                `${claim.export} exists, but this says it does not`);
+                        }
+                    });
+                }
+            }
+        }
+        assert.deepEqual(offenders, [],
+            'live text describes a shipped capability as absent:\n  ' + offenders.join('\n  '));
+    });
+
+    it('QC-026: TR-001 reports a run that is admissible as release evidence', () => {
+        // A bundle captured from a dirty tree measures code that exists in no
+        // commit. One such bundle was marked Approved. TR-001 must cite a run
+        // whose environment.txt says the tree was clean, or say it has none.
+        const qmsFacts = require(path.join(__dirname, '..', 'scripts', 'qms-facts.js'));
+        const marker = qmsFacts.readMarkers('QMS/DHF/TR-001-TestResults.md')
+            .find(m => m.key === 'evidence_run_id');
+        assert.ok(marker, 'TR-001 does not name the evidence run it reports');
+
+        if (marker.value === '(none yet)') {
+            console.log('    (skipped: TR-001 names no run yet — the first clean run sets it)');
+            return;
+        }
+        const dir = path.join(DHF, 'TestEvidence', marker.value);
+        assert.ok(fs.existsSync(dir), `TR-001 cites ${marker.value}, which does not exist`);
+        assert.equal(qmsFacts.environment(dir).tree_state, 'clean',
+            `TR-001 reports ${marker.value}, captured from a tree that was not clean — ` +
+            'it measures code that exists in no commit');
+
+        // And the command it states must be the command that bundle ran.
+        const cmd = path.join(dir, 'command.txt');
+        assert.ok(fs.existsSync(cmd), `${marker.value} records no command.txt`);
+    });
+});
+
+// ================================================================
 describe('The licence and the reserved marks stay stated (URS-092)', () => {
 
     /**

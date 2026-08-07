@@ -97,11 +97,11 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**718 verification cases** across 26 series and 4 layers, run as 775 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**724 verification cases** across 26 series and 4 layers, run as 781 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
-| `QC-*` | 17 (001–020) | Static | QMS counted quantities |
+| `QC-*` | 23 (001–026) | Static | QMS counted quantities |
 | `SC-*` | 28 (001–057) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 50 (001–094) | Static | User-facing documentation |
@@ -149,6 +149,12 @@ auditing how the plan changed.
 | QC-018 | A NOTICE travels with redistributions and reserves the marks | Static | `tests/14-qms-counts.test.js` |
 | QC-019 | README points at both grants, and at the files that carry them | Static | `tests/14-qms-counts.test.js` |
 | QC-020 | Every inlined logo carries its own reservation | Static | `tests/14-qms-counts.test.js` |
+| QC-021 | No two documents state a different value for the same fact | Static | `tests/14-qms-counts.test.js` |
+| QC-022 | The stated facts are the ones the newest admissible run measured | Static | `tests/14-qms-counts.test.js` |
+| QC-023 | Every marker names a fact something actually writes | Static | `tests/14-qms-counts.test.js` |
+| QC-024 | A hazard closed in RA-001 is not still open elsewhere | Static | `tests/14-qms-counts.test.js` |
+| QC-025 | A shipped capability is not described as absent | Static | `tests/14-qms-counts.test.js` |
+| QC-026 | TR-001 reports a run that is admissible as release evidence | Static | `tests/14-qms-counts.test.js` |
 
 #### SC-* — Standards conformance (ICSH)
 

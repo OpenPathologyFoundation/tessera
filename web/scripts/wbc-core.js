@@ -668,8 +668,13 @@
      *
      * A threshold may target a cell type — measured against the differential
      * denominator — or a percentage formula, measured against that formula's
-     * own denominator. Ratios are not eligible: no interval is computed for
-     * them (REF-001 §3.8, HA-093).
+     * own denominator. Ratios are not eligible, because a threshold is a value
+     * on the 0-100 percentage scale (validateConfig bounds t.value to that
+     * range) and a ratio does not live on it: 2.3:1 is not 2.3 per cent. To
+     * threshold a subset, express it as a `percentage` formula.
+     *
+     * Not for want of an interval — ratioInterval has computed one since
+     * DCR-026.
      *
      * @returns {Array} one entry per evaluable threshold, each carrying its
      *          interval and whether it straddles the threshold
@@ -1396,8 +1401,8 @@
                             var tf = formulaNames[t.target];
                             if ((tf.type || 'ratio') !== 'percentage') {
                                 errors.push(where + ': target "' + t.target + '" is a ratio formula. ' +
-                                    'A ratio carries no confidence interval, so it cannot be tested ' +
-                                    'against a threshold');
+                                    'A threshold is a percentage (0-100) and a ratio is not on that ' +
+                                    'scale; use a percentage formula to threshold a subset');
                             }
                         } else if (!displayedSet[t.target]) {
                             errors.push(where + ': target "' + t.target +

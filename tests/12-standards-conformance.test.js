@@ -434,7 +434,10 @@ describe('A withdrawn citation stays withdrawn (REF-001 §3.8)', () => {
         // change records and revision histories that describe the withdrawal
         // are exempt — they are the design history of this decision.
         const DHF = path.join(ROOT, 'QMS', 'DHF');
-        const exempt = /REF-001|SIGNOFF-REGISTER|CLINICAL-REVIEW-BRIEF/;
+        // DRIFT-LOG is exempt for the same reason the change records are:
+        // its entire content is quotations of claims that stopped being
+        // true. A log of withdrawn citations must be able to name one.
+        const exempt = /REF-001|SIGNOFF-REGISTER|CLINICAL-REVIEW-BRIEF|DRIFT-LOG/;
         const offenders = [];
         for (const dir of [DHF, path.join(DHF, 'DCR')]) {
             for (const name of fs.readdirSync(dir).filter(n => n.endsWith('.md'))) {

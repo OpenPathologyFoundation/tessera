@@ -63,3 +63,8 @@ playwright/.cache/
 # repository. REF-001 cites them by author, title, journal and DOI, which is how
 # a Design History File should reference literature. See DCR-009.
 sources/
+# Private local notes — never committed
+.dev-notes/
+
+# Claude Code session settings — local to a machine, not part of the DHF
+.claude/

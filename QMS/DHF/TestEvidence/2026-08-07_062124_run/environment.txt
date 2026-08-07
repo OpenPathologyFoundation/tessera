@@ -1,0 +1,32 @@
+date_utc=2026-08-07T10:21:24.423Z
+node=v26.5.0
+platform=darwin
+arch=arm64
+cwd=/Users/pg/IdeaProjects/tessera
+npm=11.17.0
+git_commit=a55c5618228ca7cb40e0e7942de26533d7e54b37
+git_branch=main
+tree_state=DIRTY
+dirty_files=
+  M .gitignore
+   M QMS/DHF/CLINICAL-REVIEW-BRIEF.md
+   M QMS/DHF/DHF-001-DesignHistoryFile-Index.md
+   M QMS/DHF/REF-001-StandardsAndLiterature.md
+   M QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md
+   M QMS/DHF/SIGNOFF-REGISTER.md
+   M QMS/DHF/SRS-001-SystemRequirementsSpecification.md
+   M QMS/DHF/TR-001-TestResults.md
+   M README.md
+   M package.json
+   M scripts/qms-counts.js
+   M scripts/qms-run-tests.js
+   M tests/01-calculation-engine.test.js
+   M tests/12-standards-conformance.test.js
+   M tests/14-qms-counts.test.js
+   M web/scripts/wbc-core.js
+   M web/sw.js
+  ?? CLAUDE-CODE-DRIFT-REMEDIATION.md
+  ?? CLAUDE.md
+  ?? QMS/DHF/DCR/DCR-029-Drift-Consistency.md
+  ?? QMS/DHF/DRIFT-LOG.md
+  ?? scripts/qms-facts.js

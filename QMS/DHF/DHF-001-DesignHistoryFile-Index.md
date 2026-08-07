@@ -6,7 +6,7 @@
 |-------|-------------------------------------------------------------------------------------------------------------------------|
 | **Document ID** | DHF-001                                                                                                                 |
 | **Product Name** | WBC ΔΣ                                                                                                                 |
-| **Product Version** | 2.15.0                                                                                                                     |
+| **Product Version** | 2.16.0                                                                                                                     |
 | **Classification** | Clinical Laboratory Aid - Software                                                                                      |
 | **Intended Use** | Keyboard-driven manual differential white blood cell counting tool for hematology laboratory personnel                  |
 | **Software Safety Class** | **Class A** (IEC 62304 §4.3) — confirmed 2026-08-05, see §3.1 |
@@ -305,6 +305,8 @@ requires the classification to be reassessed before release.
 | MAL-001 | Methods and Limitations, operator-facing (`web/methods.html`) | Instructions for Use | Draft |
 | CAL-001 | Calculation Reference (`web/calculation-reference.html`; control record `CALCULATION-REFERENCE.md`) — every calculation explained, with alternatives, controversies and what is configurable | Instructions for Use | In Review |
 | CRB-001 | Clinical Review Brief (`CLINICAL-REVIEW-BRIEF.md`) — the request put to reviewing haematopathologists | Review Record | Issued |
+| SGR-001 | Sign-off Register (`SIGNOFF-REGISTER.md`) — which approvals are outstanding, generated from the signature tables themselves | Review Record | Generated |
+| DRL-001 | Drift Log (`DRIFT-LOG.md`) — every claim this file made that had stopped being true, with the guard that now prevents it | Quality Record | Append-only |
 | TR-001 | Test Execution Results v3.1 | Evidence | Draft |
 | SOP-001 | Standard Operating Procedure | Procedure | Draft |
 | SOP-002 | Deployment Procedure | Procedure | Draft |
@@ -338,6 +340,7 @@ requires the classification to be reassessed before release.
 | DCR-026 | Design Change Record — Confidence Interval for a Derived Ratio | Change Control | Draft |
 | DCR-027 | Design Change Record — Citation Withdrawal and Sign-off Register | Change Control | Draft |
 | DCR-028 | Design Change Record — Licence Statement and Reservation of the Name and Mark | Change Control | Draft |
+| DCR-029 | Design Change Record — Drift Consistency | Change Control | Draft |
 
 **Document control note (DCR-004)**: two files previously carried Document ID
 URS-001 with neither marked as superseded, and RTM-001 v2.0 was keyed to the
@@ -353,6 +356,7 @@ superseded banner and RTM-001 v3.0 is re-keyed to v2.0.
 | C | 2026-02-20 | QMS | Added design change record entry |
 | D | 2026-02-24 | QMS | Updated to v2.0: 14-cell unified layout, advisory targets, M:E ratio, Continue Counting |
 | M | 2026-08-05 | QMS | v2.7.1: CAL-001 moved from a Markdown file in this directory to `web/calculation-reference.html`, so that it ships with the product, is reachable from the case-entry screen, the Methods page and the results screen, and is available offline. The Markdown file is retained as the document control record. Held in one place to avoid the drift recorded as HA-097. |
+| AE | 2026-08-07 | QMS | v2.16.0 (DCR-029): seven live claims had stopped being true, and none was introduced carelessly — each was written when it was accurate, by a session doing correct work on the document in front of it. Four documents held four copies of the test totals and three disagreed; TR-001, whose subject is the test results, was the furthest out. HA-093 was closed in RA-001 and open in DHF-001 §7.4 and REF-001 §5, the latter ten lines below §3.8's own statement that it was closed. Thresholds still refused ratios "because no confidence interval is computed" — false since DCR-026; the rule stands, its reason is now the percentage scale. DHF-001 restated the sign-off register DCR-027 had made authoritative. README described Tailwind as CDN-delivered after it was vendored. Test totals are now written once by the evidence run into `qms:fact` markers and `qms-counts.js` no longer competes for them; a dirty or failing run refuses to write documents at all. QC-021–026 make six classes of drift fail the build. `DRIFT-LOG.md` records all 21 incidents to date — sixteen introduced by capable sessions — and `CLAUDE.md` states the closure sweep they each missed. |
 | AD | 2026-08-06 | QMS | v2.15.0 (DCR-028): the repository makes two offers and they must not blur. The code is Apache-2.0 — commercial use included, unqualified. The name and the logo are reserved under Apache-2.0 §6, which grants no trademark rights. `LICENSE` and `TRADEMARKS.md` were both already correct; what was missing was the machinery that makes the reservation travel and be found. `NOTICE` added as the §4(d) carrier a redistributor must keep; README §License rewritten to state both grants and link all three files; the logo annotated at all ten places it is inlined as SVG, because a notice in the repository root does not travel with a copied page. QC-017–020. |
 | AC | 2026-08-06 | QMS | v2.14.0 (DCR-027): two statements a reader had to take on trust. **REF-001 [S4] (Rümke 1985) is withdrawn** — open as "primary text not held" since DCR-005, it could not be obtained from any library available to this project, including Yale's. A design file should not rest on a citation nobody involved has read. Nothing is lost: §3.8 now derives the imprecision of a ratio from the binomial model the software implements, supported by [S7] and [S8], both held. URS-037 is recited to [S8] — it had cited [S4] for the imprecision of a single percentage, which is not what that paper concerns. The design history still names it, because rewriting the record of a decision falsifies it. **`SIGNOFF-REGISTER.md` added**, generated from the signature tables themselves: the clinical brief named eleven documents needing a signature against a true thirty-one, and listed the M:E interval as outstanding a week after DCR-026 closed it. A reviewer handed a stale checklist cannot tell. SC-054–057, QC-012–015. |
 | AB | 2026-08-06 | QMS | v2.13.0 (DCR-026): the M:E ratio carries a confidence interval, closing HA-093 and the REF-001 §3.8 gap — the imprecision Rümke's 1985 paper actually concerns, and the one figure on the results screen that lacked one. Exact rather than approximate: conditioning on the cells in the ratio leaves a single binomial, so M:E is an odds and the interval is the odds transform of the Wilson interval already adopted. Fieller was rejected for degenerating with no erythroid cells; a bootstrap for being stochastic in a figure that enters a patient record. Clinical review invited on the choice of model. |
@@ -399,7 +403,7 @@ correctly.
 | State | Documents | Meaning |
 |-------|-----------|---------|
 | **Approved** | RTM-001, SAD-001, SDD-001, SRS-001, TP-001, TR-001, DCR-001, DCR-002, DCR-003 | Every required signatory has signed. These are engineering and verification artefacts with no clinical signatory. |
-| **In Review** | DHF-001 (this document), URS-001 v2.0, RA-001, REF-001, VV-001, DCR-004 to DCR-009 | Engineering approvals complete. **A clinical signature is outstanding** and these are not a released baseline until it is obtained. |
+| **In Review** | Enumerated in `SIGNOFF-REGISTER.md`, which is generated from the signature tables themselves | Engineering approvals complete. **A clinical signature is outstanding** and these are not a released baseline until it is obtained. The list is not repeated here: this row named six change records when there were twenty-eight. |
 | **Issued for local adoption** | SOP-001 | Signatories are the adopting laboratory's Laboratory Director, Quality Manager and Clinical User Representative, not the manufacturer's. |
 | **Superseded** | URS-001 v1.0 | Retained for design history only. Not to be signed. |
 
@@ -426,11 +430,15 @@ numbers.
 
 ### 7.4 Outstanding items for a released baseline
 
-1. Clinical signatures on the eleven documents listed as In Review.
+1. Clinical signatures on the documents listed in `SIGNOFF-REGISTER.md`. The
+   count is not stated here — the register measures it, and this line said
+   eleven when the true figure was twenty-nine.
 2. The NRBC reporting convention (DCR-006) is not stated in a held primary
    source — see REF-001 §2.1.
 3. CLSI H56-A is not held; affects the `body-fluid` preset only.
-4. No interval is computed for the M:E ratio (HA-093).
+4. ~~No interval is computed for the M:E ratio (HA-093).~~ **Closed
+   2026-08-06 (DCR-026)** — the ratio carries a confidence interval, computed as
+   the odds transform of a Wilson interval on the conditional binomial.
 
 ---
 

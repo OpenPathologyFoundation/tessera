@@ -15,7 +15,10 @@ function parseArgs(argv) {
         labelParts: [],
         dcr: null,
         updateTr: true,
-        updateDcr: true
+        updateDcr: true,
+        // Write the documents from a run that is not release evidence.
+        // Explicit, because the whole point is that it should be hard.
+        provisional: false
     };
     for (let i = 0; i < argv.length; i++) {
         const arg = argv[i];
@@ -34,6 +37,10 @@ function parseArgs(argv) {
         }
         if (arg === '--no-dcr') {
             parsed.updateDcr = false;
+            continue;
+        }
+        if (arg === '--provisional') {
+            parsed.provisional = true;
             continue;
         }
         parsed.labelParts.push(arg);
@@ -515,7 +522,89 @@ function appendTrRunLog(relativeEvidencePath, statusText, exitCode, cmdText) {
     return false;
 }
 
+/**
+ * The totals this run measured, read from the runners' own output.
+ *
+ * Four live documents each held their own copy of these numbers and three of
+ * them disagreed, because each was written at a different moment by a
+ * different hand or tool. They are measured here, at the one moment both
+ * layers have just finished, and written from here.
+ */
+function measureFacts() {
+    const node = {
+        tests: /^ℹ tests (\d+)$/m.exec(output),
+        skipped: /^ℹ skipped (\d+)$/m.exec(output)
+    };
+    if (!node.tests) return null;
+
+    const e2eText = e2eResult ? [e2eResult.stdout || '', e2eResult.stderr || ''].join('') : '';
+    const num = re => { const m = re.exec(e2eText); return m ? Number(m[1]) : 0; };
+    const e2ePassed = num(/^\s*(\d+) passed/m);
+    const e2eSkipped = num(/^\s*(\d+) skipped/m);
+    const e2eFailed = num(/^\s*(\d+) failed/m);
+    const e2eTotal = e2ePassed + e2eSkipped + e2eFailed;
+
+    const nodeTests = Number(node.tests[1]);
+    const nodeSkipped = node.skipped ? Number(node.skipped[1]) : 0;
+
+    return {
+        tests_total: nodeTests + e2eTotal,
+        tests_node: nodeTests,
+        tests_browser: e2eTotal,
+        tests_skipped: nodeSkipped + e2eSkipped,
+        evidence_run_id: runDirName,
+        // Not written into any document; recorded so a bundle can be audited.
+        measured_at: now.toISOString(),
+        git_commit: gitCommit || 'unknown',
+        tree_state: treeState,
+        layers: skipE2e ? 'node' : 'node+playwright',
+        status: status
+    };
+}
+
+/**
+ * Release evidence, or a record of a run — the bundle must say which.
+ *
+ * A dirty tree measures code that exists in no commit. Such a run is worth
+ * keeping, but it must not be the source of a figure a reader will take as
+ * describing the released product. Pass --provisional to write the documents
+ * from one anyway; the bundle still records tree_state=DIRTY, so the claim and
+ * its qualification travel together.
+ */
+const facts = measureFacts();
+if (facts) {
+    fs.writeFileSync(path.join(runDir, 'facts.json'),
+        JSON.stringify(facts, null, 2) + '\n', 'utf8');
+}
+
+const admissible = treeState === 'clean' && status === 'PASS';
+const factsAllowed = facts && (admissible || cliArgs.provisional);
+
 const relativeEvidencePath = path.relative(repoRoot, runDir);
+
+if (facts && !factsAllowed) {
+    const why = treeState !== 'clean'
+        ? `the tree is ${treeState.toUpperCase()}`
+        : `the run result is ${status}`;
+    console.error(
+        `\nDocuments NOT updated: ${why}. The bundle is written and marked ` +
+        'PROVISIONAL.\nCommit the tree and re-run, or pass --provisional to ' +
+        'write the documents anyway.');
+} else if (factsAllowed) {
+    const qmsFacts = require(path.join(__dirname, 'qms-facts.js'));
+    // `evidence_run_id` is TR-001's claim about which run it reports, and only
+    // an admissible run may make it. A provisional run may refresh the totals
+    // during development; it may not nominate itself as the release evidence.
+    const toWrite = Object.assign({}, facts);
+    if (!admissible) delete toWrite.evidence_run_id;
+    const touched = qmsFacts.write(toWrite);
+    if (touched.length) {
+        console.log(`\nFact markers updated in:\n  ${touched.join('\n  ')}`);
+    } else {
+        console.log('\nFact markers already current.');
+    }
+}
+
 if (cliArgs.updateDcr) {
     const resolvedDcr = normalizeDcrPath(cliArgs.dcr) || findSingleDraftDcr();
     if (resolvedDcr && !fs.existsSync(resolvedDcr) && cliArgs.dcr) {

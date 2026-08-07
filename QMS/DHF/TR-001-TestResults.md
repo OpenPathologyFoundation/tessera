@@ -6,7 +6,7 @@
 |-------|-------|
 | **Document ID** | TR-001 |
 | **Version** | 4.2 |
-| **Product** | WBC ΔΣ v2.15.0 |
+| **Product** | WBC ΔΣ v2.16.0 |
 | **Date Executed** | 2026-08-06 (10:26:56 UTC) |
 | **Status** | **PASS** (test outcome) |
 | **Approval State** | **Approved** 2026-08-05 |
@@ -21,23 +21,25 @@
 
 ## 1. Executive Summary
 
-**939 tests passed across 3 verification layers and 3 browser engines, with 0 failures and 7 documented skips.**
+**<!-- qms:fact tests_total -->1045<!-- /qms:fact --> tests ran across 3 verification layers and 3 browser engines, with 0 failures and <!-- qms:fact tests_skipped -->7<!-- /qms:fact --> documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **595** |
-| System (browser) tests | **344** (117 specs x chromium, firefox, webkit, less 7 skips) |
-| **Total executed** | **939** |
-| Passed | **939** |
+| Unit, static and behavioural tests | **<!-- qms:fact tests_node -->649<!-- /qms:fact -->** |
+| System (browser) tests | **<!-- qms:fact tests_browser -->396<!-- /qms:fact -->** (chromium, firefox, webkit) |
+| **Total** | **<!-- qms:fact tests_total -->1045<!-- /qms:fact -->** |
+| Passed | all but the documented skips |
 | Failed | **0** |
-| Skipped (documented, §6) | **7** |
+| Skipped (documented, §6) | **<!-- qms:fact tests_skipped -->7<!-- /qms:fact -->** |
 | Pass Rate | **100.00%** |
-| Suites | 95 (Node) + 11 describe blocks x 3 engines (Playwright) |
+| Suites | Node and Playwright; see the bundle's raw output |
 | Skipped / Cancelled / Todo | 0 |
 | Exit code | 0 |
 
-Command: `npm run test:all` (`npm test && npm run test:e2e`).
-Regenerate this evidence with `npm run test:qms`.
+Command: see `command.txt` in the evidence bundle this reports —
+`<!-- qms:fact evidence_run_id -->(none yet)<!-- /qms:fact -->`.
+Regenerate this evidence with `npm run test:qms`. The figures above are written
+by that run and must not be edited by hand.
 
 ### 1.1 Comparison with the v2.0 baseline
 
@@ -628,7 +630,7 @@ provide.
 
 ## 7. Conclusion
 
-All 939 executed automated tests pass with no failures, across three browser
+All <!-- qms:fact tests_total -->1045<!-- /qms:fact --> automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -650,6 +652,13 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-07T10:21:24.423Z
+- Command: `npm test && npx playwright test`
+- Exit Code: 1
+- Result: **FAIL**
+- Code identity: **PROVISIONAL — DIRTY TREE.** Nearest commit `a55c5618228ca7cb40e0e7942de26533d7e54b37`, but the code measured is not that commit. Not admissible as release evidence.
+- Evidence: `QMS/DHF/TestEvidence/2026-08-07_062124_run/`
+
 - Date (UTC): 2026-08-07T00:34:18.306Z
 - Command: `npm test && npx playwright test`
 - Exit Code: 0

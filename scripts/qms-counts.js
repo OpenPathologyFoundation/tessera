@@ -107,7 +107,16 @@ function measure() {
 
 // ---------------------------------------------------------------- rewrite
 
-/** Each edit is a regex whose first capture group is the number to replace. */
+/**
+ * Each edit is a regex whose first capture group is the number to replace.
+ *
+ * Run OUTCOMES — how many tests ran, how many were skipped — are deliberately
+ * absent. They belong to the evidence run that measured them and are written
+ * by `qms-facts.js` into `qms:fact` markers. Two writers for one fact is the
+ * defect this script exists to prevent, and for a while this script was one of
+ * the two. What remains here is measured from the tree: requirement and hazard
+ * rows, the register size, and the spec inventory per layer.
+ */
 function edits(c) {
     return [
         ['README.md', /(\*\*URS-001\*\* \| )\d+( user requirements)/, `$1${c.urs}$2`],
@@ -118,22 +127,12 @@ function edits(c) {
             `$1${c.scenarios}$2`],
         ['README.md', /(jsdom &mdash; |jsdom — )\d+( tests)/, `$1${c.suite11}$2`],
         ['README.md', /(WebKit — )\d+( specs x 3 engines)/, `$1${c.e2eSpecs}$2`],
-        ['README.md', /(\*\*)\d+( executed\*\* \()\d+( Node \+ )\d+( browser)/,
-            `$1${c.nodeTests + c.e2eTotal}$2${c.nodeTests}$3${c.e2eTotal}$4`],
-        // The brief goes to a clinician who has no way to check it.
-        ['QMS/DHF/CLINICAL-REVIEW-BRIEF.md',
-            /(The software carries )\d+( automated tests)/, `$1${c.nodeTests + c.e2eTotal}$2`],
         ['QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md',
             /(\| URS v2\.0 → SRS \| )\d+( active requirements)/, `$1${c.urs}$2`],
         ['QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md',
             /(\| SRS → Verification \| )\d+( requirements)/, `$1${c.srs}$2`],
         ['QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md',
-            /(\| FMEA → Verification \| )\d+( hazards)/, `$1${c.hazards}$2`],
-        ['QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md',
-            /(\*\*Automated test totals\*\*: )\d+( unit \+ behavioural, )\d+( system \()\d+( x 3 browser)/,
-            `$1${c.nodeTests}$2${c.e2eTotal}$3${c.e2eSpecs}$4`],
-        ['QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md',
-            /(engines\), \*\*)\d+( executed)/, `$1${c.nodeTests + c.e2eTotal}$2`]
+            /(\| FMEA → Verification \| )\d+( hazards)/, `$1${c.hazards}$2`]
     ];
 }
 

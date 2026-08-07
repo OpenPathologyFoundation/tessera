@@ -662,7 +662,7 @@ describe('Diagnostic thresholds (URS-038, ICSH 2008 §2.6)', () => {
             formulas: { me: { numerator: ['poly'], denominator: ['nrbc'] } },
             thresholds: [{ target: 'me', value: 2 }]
         }]);
-        assert.ok(errs.some(e => /ratio carries no confidence interval/.test(e)), errs.join('; '));
+        assert.ok(errs.some(e => /a threshold is a percentage \(0-100\) and a ratio is not on that scale/i.test(e)), errs.join('; '));
     });
 
     it('VV-THR-006: Validation rejects an unresolvable or out-of-range threshold', () => {

@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 3.2 |
+| **Version** | 3.3 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -232,7 +232,7 @@ Added in v2.4 under DCR-008.
 | SYS-202 | Validation SHALL reject a percentage formula whose numerator is not contained in its denominator, since the result could exceed 100%. | URS-039, URS-100 |
 | SYS-203 | The interface SHALL render every formula the profile defines, not a fixed set. | URS-039, URS-107 |
 | SYS-204 | A profile SHALL be able to define diagnostic thresholds, each naming a target, a percentage value, a label and a citable basis. A target SHALL be either a displayed category or a percentage formula. | URS-038 |
-| SYS-205 | A threshold SHALL NOT target a ratio formula, because no confidence interval is computed for a ratio (REF-001 §3.8, HA-093). Validation SHALL reject such a configuration. | URS-038 |
+| SYS-205 | A threshold SHALL NOT target a ratio formula, because a threshold is a value on the 0-100 percentage scale and a ratio is not on that scale. Validation SHALL reject such a configuration and SHALL say to express the subset as a percentage formula. | URS-038 |
 | SYS-206 | Where a confidence interval spans a configured threshold, the system SHALL state which quantity, its interval, the threshold, and the basis; and SHALL direct the operator to the Continue Counting control. | URS-038, URS-042 |
 | SYS-207 | The near-threshold indication SHALL be informational and SHALL NOT prevent count completion. | URS-038, URS-041 |
 | SYS-208 | Threshold evaluations and all formula results SHALL be carried in the session record. | URS-052 |
@@ -476,6 +476,7 @@ Phase 2 item.
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
 | B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
 | C | 2026-02-20 | QMS | Added theme toggle requirements |
+| L | 2026-08-07 | QMS | v3.3 (DCR-029): SYS-205 restated. It forbade thresholding a ratio "because no confidence interval is computed for a ratio" — false since DCR-026, which computes one. The requirement stands; its reason does not. A threshold is a value on the 0-100 percentage scale (validateConfig bounds it there) and a ratio is not on that scale. The validation message now says so and tells the operator to express the subset as a percentage formula. |
 | K | 2026-08-05 | QMS | v2.7 (DCR-010): added SYS-230–SYS-235, reporting policy. Rounding method, decimal precision and the M:E convention are now selections rather than fixed behaviour. |
 | J | 2026-08-05 | QMS | v2.6: added SYS-220–SYS-224, operator documentation, verified against the shipped configuration and engine (suite 13). |
 | I | 2026-08-05 | QMS | v2.5 (DCR-009): added SYS-210–SYS-214, method provenance. SYS-214 closes a URS-052 gap: the clipboard path carried no profile attribution. |

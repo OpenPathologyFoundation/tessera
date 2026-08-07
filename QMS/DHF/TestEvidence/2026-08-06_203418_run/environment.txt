@@ -1,0 +1,27 @@
+date_utc=2026-08-07T00:34:18.306Z
+node=v26.5.0
+platform=darwin
+arch=arm64
+cwd=/Users/pg/IdeaProjects/tessera
+npm=11.17.0
+git_commit=8296abecaaf9b0384475105ed8cad5f842305102
+git_branch=main
+tree_state=DIRTY
+dirty_files=
+  M QMS/DHF/CLINICAL-REVIEW-BRIEF.md
+   M QMS/DHF/DHF-001-DesignHistoryFile-Index.md
+   M QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md
+   M QMS/DHF/SIGNOFF-REGISTER.md
+   M QMS/DHF/TP-001-TestPlan.md
+   M QMS/DHF/TR-001-TestResults.md
+   M QMS/DHF/VV-001-VerificationValidationProtocol.md
+   M README.md
+   M logo-showcase.html
+   M package.json
+   M tests/14-qms-counts.test.js
+   M web/counter.html
+   M web/editor.html
+   M web/help.html
+   M web/sw.js
+  ?? NOTICE
+  ?? QMS/DHF/DCR/DCR-028-License-And-Mark-Reservation.md

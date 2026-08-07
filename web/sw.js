@@ -25,7 +25,7 @@
 // bump the editor would load a cached page that still calls prompt().
 //
 // v2.2.0 — shared theme stylesheet and the move of data-theme onto <html>.
-const CACHE_VERSION = 'wbcds-v2.14.0';
+const CACHE_VERSION = 'wbcds-v2.15.0';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const DATA_CACHE = CACHE_VERSION + '-data';
 

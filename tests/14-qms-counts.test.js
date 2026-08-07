@@ -233,6 +233,91 @@ describe('The sign-off register describes the file as it stands (URS-092)', () =
 });
 
 // ================================================================
+describe('The licence and the reserved marks stay stated (URS-092)', () => {
+
+    /**
+     * Two different grants live in this repository and they must not blur into
+     * one. The code is Apache-2.0 — anyone may build a commercial product on
+     * it, which is the point of choosing that licence. The name "WBC ΔΣ" and
+     * the logo are reserved: Apache-2.0 §6 grants no trademark rights, and the
+     * reservation only travels if the NOTICE travels with it.
+     *
+     * The logo is not a file. It is SVG inlined directly into the shipped
+     * pages, so someone copying a page copies the mark with it — which is why
+     * each occurrence carries its own reservation rather than relying on a
+     * notice three directories away.
+     */
+    const ROOT = path.join(__dirname, '..');
+    const root = f => fs.readFileSync(path.join(ROOT, f), 'utf-8');
+
+    it('QC-017: The licence is stated, and stated the same way in each place', () => {
+        const license = root('LICENSE');
+        assert.match(license, /Apache License, Version 2\.0/, 'LICENSE is not Apache-2.0');
+        assert.match(license, /TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION/,
+            'LICENSE carries a header but not the licence body');
+        assert.match(license, /6\. Trademarks/,
+            'the Apache §6 trademark clause is missing — it is what reserves the marks');
+
+        const pkg = JSON.parse(root('package.json'));
+        assert.equal(pkg.license, 'Apache-2.0', 'package.json disagrees with LICENSE');
+        assert.match(root('README.md'), /Apache License 2\.0/, 'README does not state the licence');
+    });
+
+    it('QC-018: A NOTICE travels with redistributions and reserves the marks', () => {
+        // Apache-2.0 §4(d): a redistributor must carry the NOTICE. It is the
+        // only clause that makes the reservation follow the code downstream.
+        const notice = root('NOTICE');
+        assert.match(notice, /Apache License, Version 2\.0/);
+        assert.match(notice, /WBC ΔΣ/, 'NOTICE does not name the reserved mark');
+        assert.match(notice, /logo/i, 'NOTICE does not reserve the logo');
+        assert.match(notice, /TRADEMARKS\.md/, 'NOTICE does not point at the full policy');
+
+        // The distinction that matters: the CODE may be used commercially; the
+        // NAME and LOGO may not. A NOTICE that blurred these would misdescribe
+        // the licence the project actually chose.
+        assert.match(notice, /including in a commercial product/i,
+            'NOTICE must not imply Apache-2.0 restricts commercial use of the code');
+        assert.match(notice, /NOT use the NAME or the LOGO/,
+            'NOTICE must state what is actually reserved');
+    });
+
+    it('QC-019: README points at both grants, and at the files that carry them', () => {
+        const readme = root('README.md');
+        for (const f of ['LICENSE', 'TRADEMARKS.md', 'NOTICE']) {
+            assert.ok(readme.includes(f), `README does not point at ${f}`);
+        }
+        assert.match(readme, /§6|section 6/i,
+            'README should say WHY the marks are reserved, not merely that they are');
+    });
+
+    it('QC-020: Every inlined logo carries its own reservation', () => {
+        // The mark ships as markup inside the pages. A notice in the repository
+        // root does not travel with a copied page; a comment beside the mark
+        // does.
+        const pages = [];
+        for (const dir of [path.join(ROOT, 'web'), ROOT]) {
+            for (const name of fs.readdirSync(dir)) {
+                if (name.endsWith('.html')) pages.push(path.join(dir, name));
+            }
+        }
+        const unmarked = [];
+        for (const page of pages) {
+            const lines = fs.readFileSync(page, 'utf-8').split('\n');
+            lines.forEach((line, i) => {
+                // The lockup is the only 40x40 viewBox in this codebase.
+                if (!line.includes('viewBox="0 0 40 40"')) return;
+                const above = lines.slice(Math.max(0, i - 2), i).join(' ');
+                if (!/RESERVED\. Not licensed under Apache-2\.0/.test(above)) {
+                    unmarked.push(`${path.relative(ROOT, page)}:${i + 1}`);
+                }
+            });
+        }
+        assert.deepEqual(unmarked, [],
+            'these copies of the logo carry no reservation:\n  ' + unmarked.join('\n  '));
+    });
+});
+
+// ================================================================
 describe('Shipped assets are all reachable (URS-094)', () => {
 
     /**

@@ -6,7 +6,7 @@
 |-------|-------|
 | **Document ID** | TR-001 |
 | **Version** | 4.2 |
-| **Product** | WBC ΔΣ v2.14.0 |
+| **Product** | WBC ΔΣ v2.15.0 |
 | **Date Executed** | 2026-08-06 (10:26:56 UTC) |
 | **Status** | **PASS** (test outcome) |
 | **Approval State** | **Approved** 2026-08-05 |
@@ -650,6 +650,13 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-07T00:34:18.306Z
+- Command: `npm test && npx playwright test`
+- Exit Code: 0
+- Result: **PASS**
+- Code identity: **PROVISIONAL — DIRTY TREE.** Nearest commit `8296abecaaf9b0384475105ed8cad5f842305102`, but the code measured is not that commit. Not admissible as release evidence.
+- Evidence: `QMS/DHF/TestEvidence/2026-08-06_203418_run/`
+
 - Date (UTC): 2026-08-07T00:17:41.625Z
 - Command: `npm test && npx playwright test`
 - Exit Code: 0

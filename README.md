@@ -324,7 +324,7 @@ CI can run `npm test` for quick feedback, but **QMS evidence requires `npm run t
 | 10 | `tests/10-config-editor.test.js` | Static | Editor structure, JS integrity, key assignment controls |
 | 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 91 tests |
 | E2E | `tests-e2e/*.spec.js` | **System** | The deployed application in Chromium, Firefox and WebKit — 132 specs x 3 engines |
-| **Total** | | | **1035 executed** (639 Node + 396 browser, 3 documented skips) |
+| **Total** | | | **1039 executed** (643 Node + 396 browser, 3 documented skips) |
 
 See `QMS/DHF/DCR/DCR-004-Verification-Integrity-Remediation.md` for why the
 suite was restructured: prior to it, no test executed the application at all.
@@ -356,7 +356,7 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
 | **RA-001** | FMEA risk analysis: 51 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan; register of 714 implemented verification cases, generated from the runners |
+| **TP-001** | Test plan; register of 718 implemented verification cases, generated from the runners |
 | **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |
@@ -426,5 +426,20 @@ The application works offline after initial page load (all assets served locally
 
 ## License
 
-- **Source code**: Apache License 2.0 — see `LICENSE`.
-- **Branding / logo assets**: Not licensed under Apache-2.0. The WBC ΔΣ logo and branding assets are reserved for project-identifying use and may not be reused to brand derivative products/services or to imply endorsement.
+**The code is open. The name and the logo are not.**
+
+- **Source code** — Apache License 2.0. See [`LICENSE`](LICENSE). Use it, modify
+  it, distribute it, sell it, build a commercial product on it. That is what the
+  licence is for.
+- **The name "WBC ΔΣ" and the logo** — reserved, and **not** granted by
+  Apache-2.0, which withholds trademark rights at §6. See
+  [`TRADEMARKS.md`](TRADEMARKS.md) for the full policy and
+  [`NOTICE`](NOTICE), which redistributions must carry.
+
+In practice: a commercial product may be built on this software, but it must not
+be *called* WBC ΔΣ or carry its logo, and must not imply endorsement. A fork
+meant for distribution should give itself its own name and mark. Saying
+truthfully that your product is derived from WBC ΔΣ is fine and needs no
+permission.
+
+Requests to use the name or mark beyond that: `info@openpathology.tech`.

@@ -1,0 +1,45 @@
+WBC ΔΣ — Manual Differential Counter
+Copyright (c) 2026 Peter Gershkovich.
+
+This product includes software developed by Peter Gershkovich
+(https://github.com/OpenPathologyFoundation/tessera).
+
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use
+this file except in compliance with the License. You may obtain a copy of the
+License at http://www.apache.org/licenses/LICENSE-2.0
+
+--------------------------------------------------------------------------------
+TRADEMARKS — NOT LICENSED UNDER APACHE-2.0
+--------------------------------------------------------------------------------
+
+Section 6 of the Apache License, Version 2.0 grants no rights to use the trade
+names, trademarks, service marks, or product names of the Licensor. The
+following are expressly reserved and are NOT covered by the grant in the
+License:
+
+  - The name "WBC ΔΣ", and confusingly similar variants.
+  - The WBC ΔΣ logo — the three-key lockup with the open-stroke sigma — in
+    every form and size in which it appears in this repository, including where
+    it is inlined as SVG markup inside HTML pages.
+
+You may use, modify, distribute and sell the SOFTWARE under Apache-2.0,
+including in a commercial product. You may NOT use the NAME or the LOGO to
+brand, market or identify that product, or in any way that suggests it is the
+official project or is endorsed by or affiliated with it.
+
+Nominative use is permitted: you may state truthfully that your product is
+based on or derived from WBC ΔΣ.
+
+A fork intended for distribution should replace the name and the logo with its
+own, and should keep this NOTICE.
+
+Full policy, including what needs no permission and what does: TRADEMARKS.md
+Permission requests: info@openpathology.tech
+
+--------------------------------------------------------------------------------
+
+WBC ΔΣ is a counting and calculation aid for trained laboratory personnel. It
+performs no cell identification and makes no diagnostic decision. It is provided
+on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND. Any
+laboratory deploying it is responsible for validating it locally under its own
+quality management system.

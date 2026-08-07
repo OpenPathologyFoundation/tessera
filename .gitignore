@@ -68,3 +68,5 @@ sources/
 
 # Claude Code session settings — local to a machine, not part of the DHF
 .claude/
+# exclude manuscript work for now.
+manuscript/

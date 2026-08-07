@@ -14,12 +14,14 @@
  *   JetBrains Mono  400-700   counts, tabular figures, exported text
  *   Libre Franklin  400-700   the WBC ΔΣ wordmark
  *
- * Subsets are latin and latin-ext. Cyrillic, Greek and Vietnamese are NOT
- * bundled: they would roughly double the payload, and a glyph outside these
- * ranges falls back to a system font rather than failing to render. Free-text
- * morphology comments in those scripts will therefore look different from the
- * surrounding interface — a cosmetic difference, recorded here so it is a
- * decision rather than a surprise.
+ * Subsets are latin and latin-ext throughout, plus greek for Inter alone —
+ * see the note above the Inter faces; the product name needs it. Cyrillic and
+ * Vietnamese are NOT bundled: they would add weight for ranges this interface
+ * does not use, and a glyph outside the bundled ranges falls back to a system
+ * font rather than failing to render. Free-text morphology comments in those
+ * scripts will therefore look different from the surrounding interface — a
+ * cosmetic difference, recorded here so it is a decision rather than a
+ * surprise.
  *
  * LICENSING. These fonts are NOT covered by this project's Apache-2.0 licence.
  * All three are under the SIL Open Font License 1.1; the full text and the
@@ -37,6 +39,28 @@
  */
 
 /* ---------------------------------------------------------------- Inter */
+/*
+ * Greek, for the product name itself.
+ *
+ * "WBC ΔΣ" contains U+0394 and U+03A3, which are Greek — so the mark cannot be
+ * set in the wordmark face at all: Google serves no Greek subset for Libre
+ * Franklin, and none exists upstream. Inter does have one, so it is bundled
+ * here and the wordmark's font stack falls back to it. That way the two
+ * characters in the product's own name come from a font that ships with the
+ * application rather than from whatever the workstation happens to have.
+ *
+ * greek-ext (U+1F00-1FFF) is polytonic and ancient Greek. Not bundled: it
+ * would add weight for glyph ranges nothing here uses.
+ */
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 300 700;
+    font-display: swap;
+    src: url('inter-greek.woff2') format('woff2');
+    unicode-range: U+0370-0377, U+037A-037F, U+0384-038A, U+038C, U+038E-03A1,
+        U+03A3-03FF;
+}
 @font-face {
     font-family: 'Inter';
     font-style: normal;

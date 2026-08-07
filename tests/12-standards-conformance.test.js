@@ -436,14 +436,73 @@ describe('The application makes no external request (URS-094)', () => {
             'the font stylesheet itself is not precached');
     });
 
+    it('SC-064: The product name can be set in a bundled font', () => {
+        /**
+         * "WBC ΔΣ" contains U+0394 and U+03A3, which are Greek. The wordmark
+         * face cannot render them: Google serves no Greek subset for Libre
+         * Franklin and none exists upstream. So a wordmark stack ending in a
+         * bare `sans-serif` would take the two characters of the product's own
+         * name from whatever the workstation happens to have installed —
+         * different on every machine, and not something the offline guarantee
+         * covers.
+         *
+         * The stack therefore names Inter, which is bundled and does carry
+         * Greek. This test holds both halves of that: the Greek face exists,
+         * and every wordmark stack routes to it before reaching the system.
+         */
+        const css = fs.readFileSync(path.join(WEB, 'vendor', 'fonts', 'fonts.css'), 'utf-8');
+        const greek = /@font-face\s*\{[^}]*?font-family:\s*'([^']+)'[^}]*?url\('([^']*greek[^']*\.woff2)'\)[^}]*?\}/s.exec(css);
+        assert.ok(greek, 'no bundled face covers Greek — Δ and Σ would fall back to the system');
+        const greekFamily = greek[1];
+
+        // U+0394 and U+03A3 must be inside that face's declared range.
+        const face = css.slice(css.indexOf(greek[0]), css.indexOf(greek[0]) + greek[0].length);
+        const range = /unicode-range:\s*([^;]+);/.exec(face);
+        assert.ok(range, 'the Greek face declares no unicode-range');
+        assert.match(range[1], /U\+038E-03A1/, 'the range must cover U+0394 (Δ)');
+        assert.match(range[1], /U\+03A3-03FF/, 'the range must cover U+03A3 (Σ)');
+
+        const stacks = [];
+        for (const name of pages()) {
+            const src = fs.readFileSync(path.join(WEB, name), 'utf-8');
+            // Stop at the `;` or the closing attribute quote — NOT at a
+            // single quote, which is what delimits the next family in the
+            // stack. Excluding it read `'Libre Franklin',` and reported a
+            // fall-through that was not there.
+            for (const m of src.matchAll(/font-family:\s*('Libre Franklin'[^;"]*)/g)) {
+                stacks.push({ page: name, stack: m[1] });
+            }
+        }
+        assert.ok(stacks.length, 'no wordmark font stack found');
+        for (const { page, stack } of stacks) {
+            assert.ok(stack.includes(greekFamily),
+                `${page}: the wordmark stack ${stack} falls through to the system for ` +
+                `Δ and Σ — name '${greekFamily}' before sans-serif`);
+        }
+    });
+
     it('SC-063: Each bundled font ships its OFL licence and copyright', () => {
         // The SIL Open Font License requires the licence and copyright to
         // travel with the font files. This repository is public, and the
         // fonts are not covered by its Apache-2.0 grant.
         const dir = path.join(WEB, 'vendor', 'fonts');
-        const families = new Set(fs.readdirSync(dir)
-            .filter(n => n.endsWith('.woff2'))
-            .map(n => n.replace(/-latin(-ext)?\.woff2$/, '')));
+
+        // The family is the filename minus its subset suffix. The suffixes are
+        // listed rather than pattern-matched: the first version stripped only
+        // `-latin(-ext)`, so adding `inter-greek.woff2` invented a family
+        // called "inter-greek" and demanded a licence file for it. A name that
+        // does not end in a known subset now fails here, loudly, instead of
+        // becoming a phantom family or being silently skipped.
+        const SUBSETS = ['latin-ext', 'latin', 'greek-ext', 'greek',
+            'cyrillic-ext', 'cyrillic', 'vietnamese'];
+        const families = new Set();
+        for (const name of fs.readdirSync(dir).filter(n => n.endsWith('.woff2'))) {
+            const stem = name.replace(/\.woff2$/, '');
+            const subset = SUBSETS.find(sub => stem.endsWith('-' + sub));
+            assert.ok(subset,
+                `${name} does not end in a known subset — name it <family>-<subset>.woff2`);
+            families.add(stem.slice(0, -(subset.length + 1)));
+        }
         assert.ok(families.size >= 3, `only ${families.size} font families found`);
 
         const notice = fs.readFileSync(path.join(ROOT, 'NOTICE'), 'utf-8');

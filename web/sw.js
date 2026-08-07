@@ -27,10 +27,12 @@
 // bump the editor would load a cached page that still calls prompt().
 //
 // v2.2.0 — shared theme stylesheet and the move of data-theme onto <html>.
+// v2.18.0 — Inter's greek subset, for the Δ and Σ in the product's own name.
+//
 // v2.17.0 — webfonts self-hosted. The cache key MUST change: an installed
 // browser would otherwise keep serving pages that still <link> to Google's
 // CDN, so the very workstation the change is for would not receive it.
-const CACHE_VERSION = 'wbcds-v2.17.0';
+const CACHE_VERSION = 'wbcds-v2.18.0';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const DATA_CACHE = CACHE_VERSION + '-data';
 
@@ -47,6 +49,7 @@ const SHELL_ASSETS = [
     // exists for, and it must get the real typeface on first load.
     './vendor/fonts/fonts.css',
     './vendor/fonts/inter-latin.woff2',
+    './vendor/fonts/inter-greek.woff2',
     './vendor/fonts/inter-latin-ext.woff2',
     './vendor/fonts/jetbrains-mono-latin.woff2',
     './vendor/fonts/jetbrains-mono-latin-ext.woff2',

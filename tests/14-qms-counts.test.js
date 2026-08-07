@@ -368,6 +368,72 @@ describe('A closure closes everywhere (URS-092)', () => {
             'a closed hazard is still described as open:\n  ' + offenders.join('\n  '));
     });
 
+    it('QC-027: The drift log counts its own rows, and nothing else counts them', () => {
+        /**
+         * Incident 24, and the sharpest one in the file: `CLAUDE.md` — the
+         * document whose principle 2 says no live document may state a
+         * measured fact from memory — opened by stating two of them. "It
+         * records 21 occasions … Sixteen were introduced by sessions doing
+         * correct work." DCR-030 appended rows 22 and 23 and did not sweep it,
+         * so both figures were stale one change record after being written.
+         *
+         * It was found during preparation of a manuscript about this
+         * machinery, which would have described a drift-control system from a
+         * summary that had drifted.
+         *
+         * Two halves. The log may state its own totals, because they are
+         * checked here against its rows. No other document may state them at
+         * all — the fix for a number that drifted once is to remove it, not to
+         * correct it.
+         */
+        const log = read('DRIFT-LOG.md');
+
+        const rows = log.split('\n').filter(l => /^\| \d+ \| \d{4}-\d{2}-\d{2} \|/.test(l));
+        assert.ok(rows.length >= 20, `only ${rows.length} incident rows parsed — the row pattern is broken`);
+
+        // Identifiers are sequential: a duplicated or skipped number means an
+        // append went wrong, and the totals below would be counting the wrong
+        // thing.
+        const ids = rows.map(l => Number(l.split('|')[1].trim()));
+        assert.deepEqual(ids, ids.slice().sort((a, b) => a - b), 'incident rows are out of order');
+        assert.equal(new Set(ids).size, ids.length, 'an incident number is duplicated');
+        assert.deepEqual(ids, Array.from({ length: ids.length }, (_, i) => i + 1),
+            'incident numbering has a gap');
+
+        // A row is guarded when its last column names something, rather than
+        // an em dash pointing at §3.
+        const guarded = rows.filter(l => {
+            const cells = l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+            const last = cells[cells.length - 1];
+            return last && !last.startsWith('—');
+        }).length;
+
+        const claim = /\*\*Counted here rather than described:\*\* (\d+) incidents, of which (\d+) are now/.exec(log);
+        assert.ok(claim, 'the drift log no longer states its own totals');
+        assert.equal(Number(claim[1]), rows.length,
+            `the drift log says ${claim[1]} incidents and carries ${rows.length} rows`);
+        assert.equal(Number(claim[2]), guarded,
+            `the drift log says ${claim[2]} are guarded; ${guarded} rows name a guard`);
+
+        // Nowhere else may state a count of them.
+        const ROOT = path.join(__dirname, '..');
+        const COUNT = /\b(?:records|logs|lists)\s+\d+\s+(?:occasions|incidents)|\b\d+\s+(?:occasions|incidents)\s+(?:on which|of which|are|were)/i;
+        const offenders = [];
+        for (const file of ['CLAUDE.md', 'README.md',
+            'QMS/DHF/DHF-001-DesignHistoryFile-Index.md',
+            'QMS/DHF/CLINICAL-REVIEW-BRIEF.md']) {
+            const full = path.join(ROOT, file);
+            if (!fs.existsSync(full)) continue;
+            fs.readFileSync(full, 'utf-8').split('\n').forEach((line, i) => {
+                if (/^\|\s*[A-Z]{1,2}\s*\|\s*\d{4}-\d{2}-\d{2}\s*\|/.test(line)) return;  // revision history
+                if (COUNT.test(line)) offenders.push(`${file}:${i + 1} — ${line.trim().slice(0, 70)}`);
+            });
+        }
+        assert.deepEqual(offenders, [],
+            'these state a drift-incident count that only DRIFT-LOG.md may state:\n  ' +
+            offenders.join('\n  '));
+    });
+
     it('QC-025: A shipped capability is not described as absent', () => {
         /**
          * Table-driven, so closing the next capability is one added row.

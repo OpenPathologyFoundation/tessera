@@ -356,7 +356,7 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
 | **RA-001** | FMEA risk analysis: 51 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan; register of 728 implemented verification cases, generated from the runners |
+| **TP-001** | Test plan; register of 730 implemented verification cases, generated from the runners |
 | **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |

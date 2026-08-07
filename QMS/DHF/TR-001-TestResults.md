@@ -6,7 +6,7 @@
 |-------|-------|
 | **Document ID** | TR-001 |
 | **Version** | 4.2 |
-| **Product** | WBC ΔΣ v2.17.0 |
+| **Product** | WBC ΔΣ v2.18.0 |
 | **Date Executed** | 2026-08-06 (10:26:56 UTC) |
 | **Status** | **PASS** (test outcome) |
 | **Approval State** | **Approved** 2026-08-05 |

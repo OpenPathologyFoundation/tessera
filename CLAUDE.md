@@ -5,11 +5,19 @@ WBC ΔΣ is a keyboard-driven manual differential counter for haematology. It is
 62304 Class A, and every change set gets a change record from
 `QMS/DHF/DCR/DCR-TEMPLATE.md`.
 
-Read `QMS/DHF/DRIFT-LOG.md` before your first substantive change. It records 21
-occasions on which this file claimed something that had stopped being true.
-Sixteen were introduced by sessions doing correct work. That is the failure mode
-this document exists to prevent, and it is not a failure of care — it is what
-happens when a capable session updates the one document in front of it.
+Read `QMS/DHF/DRIFT-LOG.md` before your first substantive change. It records
+every occasion on which this file claimed something that had stopped being true.
+**All but three were introduced by sessions doing correct work** — the log's §4
+names the three exceptions, which is how it states the proportion without
+carrying a number that goes stale. That is the failure
+mode this document exists to prevent, and it is not a failure of care: it is
+what happens when a capable session updates the one document in front of it.
+
+*No count appears in this paragraph on purpose.* It used to say "21 occasions …
+Sixteen", and both figures went stale one change record later — in the file that
+tells you not to state a measured fact from memory. That is incident 24 in the
+log, and the remedy is the one principle 2 gives: point at the source instead of
+copying from it.
 
 ## Governing principles
 
@@ -50,6 +58,11 @@ sweeps all of these before it finishes:
 6. `web/methods.html`, `web/calculation-reference.html`
 7. The QC-025 claims table in suite 14 — add a row for the new capability
 8. `QMS/DHF/DRIFT-LOG.md` — if the closure revealed a stale claim, log it
+9. **This file.** The sweep used to end at step 8, and that omission is
+   incident 24: DCR-030 appended two rows to the log and left `CLAUDE.md`'s
+   opening paragraph describing a smaller one. The document that tells you to
+   sweep is itself swept last, and it is the step easiest to skip because you
+   have stopped thinking of it as a document by then.
 
 Closing without sweeping is how nearly every incident in the drift log happened.
 The tests that catch the *class* are QC-024 (a hazard closed in one document is

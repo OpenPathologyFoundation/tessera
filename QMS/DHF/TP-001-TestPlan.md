@@ -97,12 +97,12 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**728 verification cases** across 26 series and 4 layers, run as 785 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**730 verification cases** across 26 series and 4 layers, run as 787 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
-| `QC-*` | 23 (001–026) | Static | QMS counted quantities |
-| `SC-*` | 32 (001–063) | Unit | Standards conformance (ICSH) |
+| `QC-*` | 24 (001–027) | Static | QMS counted quantities |
+| `SC-*` | 33 (001–064) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 50 (001–094) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
@@ -155,6 +155,7 @@ auditing how the plan changed.
 | QC-024 | A hazard closed in RA-001 is not still open elsewhere | Static | `tests/14-qms-counts.test.js` |
 | QC-025 | A shipped capability is not described as absent | Static | `tests/14-qms-counts.test.js` |
 | QC-026 | TR-001 reports a run that is admissible as release evidence | Static | `tests/14-qms-counts.test.js` |
+| QC-027 | The drift log counts its own rows, and nothing else counts them | Static | `tests/14-qms-counts.test.js` |
 
 #### SC-* — Standards conformance (ICSH)
 
@@ -192,6 +193,7 @@ auditing how the plan changed.
 | SC-061 | Every page loads the self-hosted font stylesheet | Unit | `tests/12-standards-conformance.test.js` |
 | SC-062 | The fonts exist, are real WOFF2, and are precached | Unit | `tests/12-standards-conformance.test.js` |
 | SC-063 | Each bundled font ships its OFL licence and copyright | Unit | `tests/12-standards-conformance.test.js` |
+| SC-064 | The product name can be set in a bundled font | Unit | `tests/12-standards-conformance.test.js` |
 
 #### TC-B-* — Application behaviour in a DOM
 

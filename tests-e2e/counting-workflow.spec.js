@@ -571,3 +571,86 @@ test.describe('Legibility of clinical advisories (URS-095)', () => {
         expect(bad, 'counting grid text below WCAG AA: ' + JSON.stringify(bad, null, 1)).toEqual([]);
     });
 });
+
+// ================================================================
+test.describe('The totals column is one column (URS-055)', () => {
+
+    /**
+     * Each category row is its own table sized `w-full`, so it divided its
+     * width by its OWN column count: a four-category row and a five-category
+     * row put their Sub column in different places, and the grand total,
+     * pinned to the container edge, landed in a third. Three columns of
+     * totals, none above another, and the misalignment grew with how uneven
+     * the two rows were.
+     *
+     * Rows are uneven in most shipped profiles, so this is the normal case
+     * rather than an edge one. Measured rather than eyeballed: the centres of
+     * the two subtotals and the grand total must coincide.
+     */
+    async function countAcross(page) {
+        await page.click('text=Start Count');
+        for (const k of ['a', 's', 'd', 'f', 'g', 'h', 'z', 'x', 'c', 'v', 'b', 'n']) {
+            for (let i = 0; i < 3; i++) await page.keyboard.press(k);
+        }
+    }
+
+    const centre = async (page, sel) => {
+        const box = await page.locator(sel).first().boundingBox();
+        return box ? box.x + box.width / 2 : null;
+    };
+
+    for (const width of [1440, 1024, 820]) {
+        test(`VV-SYS-213: Subtotals and the grand total share one axis at ${width}px`, async ({ page }) => {
+            await page.setViewportSize({ width, height: 900 });
+            await page.goto('/counter.html');
+            await countAcross(page);
+
+            // The shipped default splits 7/7, but the assertion must hold for
+            // any split — an uneven one is what exposed the defect.
+            const upper = await centre(page, '#val-sub-upper');
+            const lower = await centre(page, '#val-sub-lower');
+            const grand = await centre(page, '#val-grand-total');
+            expect(upper).not.toBeNull();
+            expect(lower).not.toBeNull();
+            expect(grand).not.toBeNull();
+
+            // One pixel of tolerance for sub-pixel layout rounding; the defect
+            // this catches was tens of pixels.
+            expect(Math.abs(upper - lower)).toBeLessThanOrEqual(1);
+            expect(Math.abs(upper - grand)).toBeLessThanOrEqual(1);
+        });
+    }
+
+    test('VV-SYS-214: An uneven split still shares the axis', async ({ page }) => {
+        // Legacy MDC is 4 above and 5 below — the shape that made the
+        // misalignment visible in the first place.
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await page.goto('/counter.html');
+        await page.click('text=Preset Profiles');
+        const clicked = await page.evaluate(() => {
+            for (const btn of document.querySelectorAll('button')) {
+                if (btn.textContent.trim() !== 'Load') continue;
+                let row = btn.parentElement;
+                while (row && !row.textContent.includes('Legacy MDC (2015)')) row = row.parentElement;
+                if (row && row.querySelectorAll('button').length <= 2) { btn.click(); return true; }
+            }
+            return false;
+        });
+        expect(clicked).toBe(true);
+        const overlay = page.locator('#modal-overlay');
+        await expect(overlay).toContainText('Legacy MDC (2015)');
+        await overlay.getByRole('button', { name: 'OK' }).click();
+        await expect(overlay).toBeHidden();
+
+        await countAcross(page);
+        const upper = await centre(page, '#val-sub-upper');
+        const lower = await centre(page, '#val-sub-lower');
+        const grand = await centre(page, '#val-grand-total');
+        expect(Math.abs(upper - lower)).toBeLessThanOrEqual(1);
+        expect(Math.abs(upper - grand)).toBeLessThanOrEqual(1);
+
+        // And the derived formula reports in the same column.
+        const me = await centre(page, '[id^="formula-"]');
+        if (me !== null) expect(Math.abs(upper - me)).toBeLessThanOrEqual(1);
+    });
+});

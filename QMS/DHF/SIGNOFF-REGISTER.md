@@ -93,7 +93,7 @@ should be quoted until someone holds the paper.
 > `node scripts/qms-signoffs.js --write` rebuilds this from the signature
 > tables in every document. Suite 14 fails the build if it goes stale.
 
-**33 signature(s) outstanding across 3 role(s).** 13 document(s) are fully signed.
+**33 signature(s) outstanding across 3 role(s).** 14 document(s) are fully signed.
 
 ### Clinical Reviewer — 30 outstanding
 

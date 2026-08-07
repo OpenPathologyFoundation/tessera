@@ -68,7 +68,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**741 verification cases** across 26 series and 4 layers, run as 807 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**743 verification cases** across 26 series and 4 layers, run as 811 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
@@ -95,7 +95,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | `VV-SCH-*` | 23 (001–023) | Unit | v2 configuration schema |
 | `VV-SRC-*` | 76 (001–076) | Static | Application source integrity (static) |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 120 (001–212) | System | System verification in a real browser |
+| `VV-SYS-*` | 122 (001–214) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
 
@@ -946,6 +946,8 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-SYS-210 | The preset loads from the catalogue | System | `tests-e2e/config-and-offline.spec.js` |
 | VV-SYS-211 | The predecessor keys count the predecessor cells | System | `tests-e2e/config-and-offline.spec.js` |
 | VV-SYS-212 | The report keeps a counted cell, and fills the M:E field | System | `tests-e2e/config-and-offline.spec.js` |
+| VV-SYS-213 | Subtotals and the grand total share one axis at 1440px | System | `tests-e2e/counting-workflow.spec.js` |
+| VV-SYS-214 | An uneven split still shares the axis | System | `tests-e2e/counting-workflow.spec.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 

@@ -1102,6 +1102,24 @@
     //
     // The attribution to Rümke 1985 was removed when that source was withdrawn
     // as unobtainable. The claim is derived, not borrowed.
+    /**
+     * Width of the totals column, shared by everything that reports a total.
+     *
+     * The two category rows are separate tables, and a table sized `w-full`
+     * divides its width by its own column count — so a four-cell row and a
+     * five-cell row put their Sub column in different places, and the grand
+     * total, pinned to the container edge, landed in a third. Three columns of
+     * totals, none of them above another.
+     *
+     * Fixing the last column at one width and letting the category columns
+     * share what is left puts all three in the same vertical strip, whatever
+     * the profile's row lengths are. `min-width` on the table keeps the
+     * horizontal scroll on a narrow viewport, which `table-layout: fixed`
+     * would otherwise remove by clipping instead.
+     */
+    var TOTALS_COL = '8rem';
+    var ROW_TABLE_STYLE = 'table-layout:fixed;min-width:32rem';
+
     var RATIO_IMPRECISION_NOTE = 'A ratio of two counted proportions carries the ' +
         'sampling error of both, and is therefore substantially less precise than ' +
         'either percentage alone. Interpret alongside cellularity and the trephine ' +
@@ -1231,9 +1249,10 @@
         html += '</div>';
 
         // --- GRAND TOTAL ---
-        html += '<div class="mt-4 flex items-center justify-between px-2">';
-        html += '<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Grand Total</span>';
-        html += '<span class="text-2xl font-mono font-bold text-accent" id="val-grand-total">0</span>';
+        html += '<div class="mt-4 flex items-center">';
+        html += '<span class="flex-1 px-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">Grand Total</span>';
+        html += '<span class="text-2xl font-mono font-bold text-accent text-center shrink-0" ' +
+            'style="width:' + TOTALS_COL + '" id="val-grand-total">0</span>';
         html += '</div>';
 
         // --- DERIVED FORMULAS ---
@@ -1245,13 +1264,13 @@
             var f = formulas[fname];
             var isRatio = (f.type || 'ratio') === 'ratio';
             var tip = isRatio ? RATIO_IMPRECISION_NOTE : (f.basis || '');
-            html += '<div class="mt-2 flex items-center justify-between px-2">';
-            html += '<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider"' +
+            html += '<div class="mt-2 flex items-center">';
+            html += '<span class="flex-1 px-2 text-xs font-semibold text-slate-400 uppercase tracking-wider"' +
                 (tip ? ' title="' + Core.escapeAttr(tip) + '"' : '') + '>' +
                 Core.escapeHtml(f.label || fname) +
                 (tip ? ' <span class="text-[9px] text-slate-500">&#9662;</span>' : '') + '</span>';
-            html += '<span class="text-lg font-mono font-semibold text-slate-300" id="' +
-                formulaElId(fname) + '">N/A</span>';
+            html += '<span class="text-lg font-mono font-semibold text-slate-300 text-center shrink-0" ' +
+                'style="width:' + TOTALS_COL + '" id="' + formulaElId(fname) + '">N/A</span>';
             html += '</div>';
         });
 
@@ -1283,7 +1302,14 @@
             html += '<div class="px-2 py-0.5 text-[10px] text-amber-400 font-medium uppercase tracking-wider">' +
                 Core.escapeHtml(abnormalLabel) + '</div>';
         }
-        html += '<table class="w-full border-collapse">';
+        html += '<table class="w-full border-collapse" style="' + ROW_TABLE_STYLE + '">';
+        // The category columns take an equal share of what is left after the
+        // totals column, which is what makes Sub land in the same place in
+        // every row regardless of how many categories precede it.
+        html += '<colgroup>';
+        cells.forEach(function () { html += '<col>'; });
+        html += '<col style="width:' + TOTALS_COL + '">';
+        html += '</colgroup>';
 
         // Row 1: Cell type names (with tooltip for aggregated constituents)
         html += '<thead><tr>';

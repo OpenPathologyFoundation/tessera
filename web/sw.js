@@ -32,7 +32,7 @@
 // v2.17.0 — webfonts self-hosted. The cache key MUST change: an installed
 // browser would otherwise keep serving pages that still <link> to Google's
 // CDN, so the very workstation the change is for would not receive it.
-const CACHE_VERSION = 'wbcds-v2.19.0';
+const CACHE_VERSION = 'wbcds-v2.19.1';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const DATA_CACHE = CACHE_VERSION + '-data';
 

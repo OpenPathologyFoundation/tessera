@@ -27,7 +27,7 @@
         isCountingActive: false,
         commentFieldFocused: false,
         config: null,              // normalized specimenTypes array
-        configMeta: null,          // { version, profileId, profileName }
+        configMeta: null,          // { version, profileId, profileName, provenance }
         counts: {},                // { cellType: number }
         morphChecked: [],          // checked morphology checklist values (URS-073)
         sessionHistory: [],        // array of completed sessions
@@ -230,7 +230,15 @@
             var errors = Core.validateConfig(norm.specimenTypes);
             return {
                 ok: errors.length === 0,
-                meta: { version: norm.version, profileId: norm.profileId, profileName: norm.profileName },
+                // `provenance` travels with the meta because the method
+                // statement reports it as "Basis" (URS-055). It was omitted,
+                // so `buildMethodStatement` emitted that entry only in unit
+                // tests that constructed the meta themselves — the shipped
+                // report never carried a basis at all. See DCR-035 §3.
+                meta: {
+                    version: norm.version, profileId: norm.profileId,
+                    profileName: norm.profileName, provenance: norm.provenance
+                },
                 specimenTypes: norm.specimenTypes,
                 errors: errors
             };

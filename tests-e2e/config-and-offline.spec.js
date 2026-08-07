@@ -1118,3 +1118,65 @@ test.describe('A renamed profile id is offered, never imposed (URS-101)', () => 
         expect(kept).toBe('ndc-14');
     });
 });
+
+// ================================================================
+test.describe('The method statement reports its basis (URS-055)', () => {
+
+    /**
+     * `buildMethodStatement` emits a "Basis" entry from `provenance.notes`,
+     * and `prepareConfig` built its meta as {version, profileId, profileName} —
+     * dropping provenance before the statement was ever built. The entry
+     * therefore appeared only in unit tests that constructed a meta by hand;
+     * no shipped report has ever carried a basis.
+     *
+     * That is why the false provenance corrected in DCR-035 never reached a
+     * patient record: two defects cancelled. Neither was safe on its own, and
+     * the one that hid the other is fixed here.
+     */
+    test('VV-SYS-220: The rendered report states the profile\'s basis', async ({ page }) => {
+        await page.goto('/counter.html');
+        await page.click('#btnStartCount');
+        for (const k of ['a', 's', 'd']) {
+            for (let i = 0; i < 10; i++) await page.keyboard.press(k);
+        }
+        await page.click('text=Count Done');
+        await page.evaluate(() => document.querySelectorAll('details').forEach(d => { d.open = true; }));
+
+        const text = await page.locator('body').innerText();
+        expect(text).toMatch(/Basis:/);
+
+        // And it is the SHIPPED profile's basis, not a leftover string.
+        const shipped = await page.evaluate(async () => {
+            const r = await fetch('settings/templates.json', { cache: 'no-cache' });
+            return (await r.json()).provenance.notes;
+        });
+        expect(shipped).toBeTruthy();
+        expect(text).toContain(shipped.slice(0, 60));
+    });
+
+    test('VV-SYS-221: A profile with no bone marrow states no bone marrow basis', async ({ page }) => {
+        // The defect this pair exists for: analyzer-5 claimed a bone marrow and
+        // M:E basis with neither. Now that the basis actually prints, a wrong
+        // note would reach the report — so the assertion is on the report, not
+        // only on the file.
+        await page.goto('/counter.html');
+        await page.click('#btnPresetCatalog');
+        await page.locator('#preset-list button[data-preset-name="5-Type — Analyzer Categories"]').click();
+        await expect(page.locator('#modal-title')).toHaveText('Preset Loaded');
+        await page.click('#modal-confirm');
+        await page.click('#btnStartCount');
+        for (const k of ['f', 'd', 's']) {
+            for (let i = 0; i < 10; i++) await page.keyboard.press(k);
+        }
+        await page.click('text=Count Done');
+        await page.evaluate(() => document.querySelectorAll('details').forEach(d => { d.open = true; }));
+
+        const basis = await page.evaluate(() => {
+            const m = document.body.innerText.match(/Basis:[^\n]*/);
+            return m ? m[0] : '';
+        });
+        expect(basis).toBeTruthy();
+        expect(basis).not.toMatch(/bone marrow/i);
+        expect(basis).not.toMatch(/M:E/);
+    });
+});

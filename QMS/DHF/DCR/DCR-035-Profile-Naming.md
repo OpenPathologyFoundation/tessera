@@ -78,13 +78,32 @@ counts rather than asserts. Drift incident 27.
 
 > "Bone marrow categories and M:E ratio follow ICSH 2008 §2.6"
 
-with **no `bm` specimen and no M:E formula between them.** This is not inert
-metadata: `provenance.notes` prints into the report's method statement under
-*Basis:*. Those reports stated a basis that did not exist, to the reader least
-able to check it. The 10-type profiles' identical note also overclaimed — their
-bone marrow categories are an aggregated subset of the ICSH list, not the list.
+with **no `bm` specimen and no M:E formula between them.** The 10-type profiles'
+identical note also overclaimed — their bone marrow categories are an aggregated
+subset of the ICSH list, not the list.
 
-Every note now claims only what its profile implements. Drift incident 28.
+**A correction to this record.** It first stated that those notes printed into
+the report's method statement under *Basis:*, and that the reports therefore
+carried a basis that did not exist. Checking the running application rather than
+the engine showed otherwise: `buildMethodStatement` does emit a `Basis` entry
+from `provenance.notes`, but `prepareConfig` built its meta as
+`{version, profileId, profileName}` and dropped provenance before the statement
+was ever constructed. **No shipped report has ever carried a basis line at all.**
+The entry appeared only in unit tests that built a meta by hand.
+
+So two defects cancelled. The false provenance was harmless because a second
+defect hid it, and neither was safe alone: correcting the notes without noticing
+the wiring would have left a designed report element permanently blank, and
+fixing the wiring without correcting the notes would have put "Bone marrow
+categories and M:E ratio follow ICSH 2008 §2.6" into the report of a profile
+with neither.
+
+Both are fixed. `provenance` now travels with the meta, the `Basis` line
+renders, and VV-SYS-220 and VV-SYS-221 assert it **from the rendered report**
+rather than from the file — because the file was never the thing at risk.
+
+Every note now claims only what its profile implements. Drift incidents 28
+and 30.
 
 A third was found while writing the guard: the catalogue said "Custom (Blank
 Template)" and the file said "Custom (Template)". Incident 29.
@@ -163,6 +182,8 @@ is append-only: removing an entry restores the silence it exists to prevent.
 | **VV-SYS-217** | A cached profile under a renamed id raises the offer, and declining leaves the configuration untouched |
 | **VV-SYS-218** | Accepting loads the renamed built-in |
 | **VV-SYS-219** | A cached profile whose id is current raises no offer |
+| **VV-SYS-220** | The rendered report states a `Basis`, and it is the shipped profile's own |
+| **VV-SYS-221** | A profile with no bone marrow specimen states no bone marrow or M:E basis **in the report** |
 
 `VV-SYS-219` asserts an absence, so removing the offer cannot fail it; the
 inverse check applies — forcing `renamedSuccessor` to return a successor for

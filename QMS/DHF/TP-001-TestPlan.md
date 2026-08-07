@@ -97,7 +97,7 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**760 verification cases** across 27 series and 4 layers, run as 828 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**762 verification cases** across 27 series and 4 layers, run as 830 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
@@ -125,7 +125,7 @@ auditing how the plan changed.
 | `VV-SCH-*` | 23 (001–023) | Unit | v2 configuration schema |
 | `VV-SRC-*` | 76 (001–076) | Static | Application source integrity (static) |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 127 (001–219) | System | System verification in a real browser |
+| `VV-SYS-*` | 129 (001–221) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
 
@@ -1000,6 +1000,8 @@ auditing how the plan changed.
 | VV-SYS-217 | The operator is told, and keeping their profile is the default | System | `tests-e2e/config-and-offline.spec.js` |
 | VV-SYS-218 | Accepting loads the renamed built-in | System | `tests-e2e/config-and-offline.spec.js` |
 | VV-SYS-219 | A current profile raises no offer | System | `tests-e2e/config-and-offline.spec.js` |
+| VV-SYS-220 | The rendered report states the profile's basis | System | `tests-e2e/config-and-offline.spec.js` |
+| VV-SYS-221 | A profile with no bone marrow states no bone marrow basis | System | `tests-e2e/config-and-offline.spec.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 

@@ -587,6 +587,24 @@ test.describe('The totals column is one column (URS-055)', () => {
      * rather than an edge one. Measured rather than eyeballed: the centres of
      * the two subtotals and the grand total must coincide.
      */
+    async function loadLegacyMdc(page) {
+        await page.click('text=Preset Profiles');
+        const ok = await page.evaluate(() => {
+            for (const b of document.querySelectorAll('button')) {
+                if (b.textContent.trim() !== 'Load') continue;
+                let row = b.parentElement;
+                while (row && !row.textContent.includes('Legacy MDC (2015)')) row = row.parentElement;
+                if (row && row.querySelectorAll('button').length <= 2) { b.click(); return true; }
+            }
+            return false;
+        });
+        expect(ok).toBe(true);
+        const overlay = page.locator('#modal-overlay');
+        await expect(overlay).toContainText('Legacy MDC (2015)');
+        await overlay.getByRole('button', { name: 'OK' }).click();
+        await expect(overlay).toBeHidden();
+    }
+
     async function countAcross(page) {
         await page.click('text=Start Count');
         for (const k of ['a', 's', 'd', 'f', 'g', 'h', 'z', 'x', 'c', 'v', 'b', 'n']) {
@@ -624,6 +642,84 @@ test.describe('The totals column is one column (URS-055)', () => {
             expect(Math.abs(upper - grand)).toBeLessThanOrEqual(1);
         });
     }
+
+    /** Centre x of every key badge, per display row. */
+    async function keyColumns(page) {
+        return page.evaluate(() => [...document.querySelectorAll('#phase-counting table')]
+            .map(t => [...t.querySelectorAll('kbd')].map(k => {
+                const r = k.getBoundingClientRect();
+                return { key: k.textContent.trim(), x: Math.round(r.x + r.width / 2) };
+            })));
+    }
+
+    test('VV-SYS-215: A keyboard-row profile puts each cell above its own key', async ({ page }) => {
+        // legacy-mdc assigns A S D F over Z X C V B, so column N of each row is
+        // the same finger and the screen mirrors the hand. Core.keyboardGrid
+        // decides this; here it is confirmed to reach the rendered page.
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await page.goto('/counter.html');
+        await loadLegacyMdc(page);
+        await countAcross(page);
+
+        const [upper, lower] = await keyColumns(page);
+        expect(upper.map(k => k.key)).toEqual(['A', 'S', 'D', 'F']);
+        expect(lower.map(k => k.key)).toEqual(['Z', 'X', 'C', 'V', 'B']);
+        // A over Z, S over X, D over C, F over V.
+        for (let i = 0; i < upper.length; i++) {
+            expect(Math.abs(upper[i].x - lower[i].x),
+                `${upper[i].key} should sit above ${lower[i].key}`).toBeLessThanOrEqual(1);
+        }
+        // B has no key above it, and the row does not stretch to close the gap.
+        expect(lower[4].x).toBeGreaterThan(upper[3].x + 40);
+    });
+
+    test('VV-SYS-216: A frequency-assigned profile is not forced onto that grid', async ({ page }) => {
+        /**
+         * Legacy 10-Part assigns keys by frequency, not by keyboard row, and
+         * splits 4 above / 6 below — the case where forcing a shared grid
+         * empties a third of the upper row and stops its rule mid-table.
+         *
+         * This profile, not the shipped default: the default splits 7/7, so a
+         * "the rows differ" assertion is vacuous there. The first version of
+         * this test used it and passed even with every profile forced onto the
+         * grid, which is no test at all.
+         */
+        await page.setViewportSize({ width: 1440, height: 900 });
+        await page.goto('/counter.html');
+        await page.click('text=Preset Profiles');
+        const ok = await page.evaluate(() => {
+            for (const b of document.querySelectorAll('button')) {
+                if (b.textContent.trim() !== 'Load') continue;
+                let row = b.parentElement;
+                while (row && !row.textContent.includes('Legacy 10-Part')) row = row.parentElement;
+                if (row && row.querySelectorAll('button').length <= 2) { b.click(); return true; }
+            }
+            return false;
+        });
+        expect(ok).toBe(true);
+        const overlay = page.locator('#modal-overlay');
+        await expect(overlay).toContainText('Legacy 10-Part');
+        await overlay.getByRole('button', { name: 'OK' }).click();
+        await expect(overlay).toBeHidden();
+        await countAcross(page);
+
+        const [upper, lower] = await keyColumns(page);
+        expect(upper.length).toBe(4);
+        expect(lower.length).toBe(6);
+        // Each row fills the width on its own, so no key sits above another.
+        for (const u of upper) {
+            for (const l of lower) {
+                expect(Math.abs(u.x - l.x),
+                    `${u.key} and ${l.key} share a column, but this profile's keys ` +
+                    'follow no keyboard row — the alignment would mean nothing').toBeGreaterThan(1);
+            }
+        }
+        // The totals column stays aligned regardless — that is the column
+        // whose alignment carries meaning.
+        const su = await centre(page, '#val-sub-upper');
+        const sl = await centre(page, '#val-sub-lower');
+        expect(Math.abs(su - sl)).toBeLessThanOrEqual(1);
+    });
 
     test('VV-SYS-214: An uneven split still shares the axis', async ({ page }) => {
         // Legacy MDC is 4 above and 5 below — the shape that made the

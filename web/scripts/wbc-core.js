@@ -1447,7 +1447,111 @@
         return 0;
     }
 
+    // ---------------------------------------------------------------- layout
+
+    var KEYBOARD_ROWS = [
+        '1234567890',
+        'QWERTYUIOP',
+        'ASDFGHJKL;',
+        'ZXCVBNM,./'
+    ];
+
+    /**
+     * A column grid that mirrors the keyboard, when the profile earns one.
+     *
+     * The two category rows are separate tables, each filling the width, so
+     * their cells do not line up. Usually that is right: they hold different
+     * category sets, and putting BLASTS above BASO asserts a relationship that
+     * does not exist. Forcing a shared grid also looks broken on a lopsided
+     * split — at four categories above and six below, a third of the upper row
+     * is empty and its rule stops dead in the middle of the table.
+     *
+     * There is one case where alignment is not decoration. If a profile
+     * assigns its keys along two ADJACENT physical keyboard rows, in
+     * left-to-right order, then column N of each display row is the same
+     * finger: A above Z, S above X, D above C, F above V. The screen then
+     * mirrors the operator's hand, which is worth having in a tool driven
+     * entirely by touch-typing.
+     *
+     * Of the shipped profiles only `legacy-mdc` qualifies — it inherited
+     * A S D F / Z X C V B from the 2015 predecessor. The others assign keys by
+     * frequency, so their columns would line up with nothing.
+     *
+     * Returns null when the profile does not qualify, so the caller falls back
+     * to filling the width. Otherwise returns slot arrays holding a cell type
+     * or null per physical key position.
+     */
+    function keyboardGrid(spec) {
+        if (!spec || !spec.categories || !spec.outCodes) return null;
+        var upper = spec.categories.upper || [];
+        var lower = spec.categories.lower || [];
+        if (!upper.length || !lower.length) return null;
+
+        var keyOf = {};
+        Object.keys(spec.outCodes).forEach(function (k) { keyOf[spec.outCodes[k]] = k; });
+
+        function place(list) {
+            var out = [];
+            for (var i = 0; i < list.length; i++) {
+                var key = keyOf[list[i]];
+                if (!key || key.length !== 1) return null;
+                var found = null;
+                for (var r = 0; r < KEYBOARD_ROWS.length; r++) {
+                    var c = KEYBOARD_ROWS[r].indexOf(key.toUpperCase());
+                    if (c !== -1) { found = { row: r, col: c }; break; }
+                }
+                if (!found) return null;
+                out.push(found);
+            }
+            return out;
+        }
+
+        var up = place(upper);
+        var lo = place(lower);
+        if (!up || !lo) return null;
+
+        // Each display row must sit on ONE physical row...
+        function sameRow(a) {
+            for (var i = 1; i < a.length; i++) if (a[i].row !== a[0].row) return false;
+            return true;
+        }
+        if (!sameRow(up) || !sameRow(lo)) return null;
+
+        // ...the lower one directly beneath the upper...
+        if (lo[0].row !== up[0].row + 1) return null;
+
+        // ...and the keys in physical left-to-right order, or the columns
+        // would align cells to the wrong fingers.
+        function ascending(a) {
+            for (var i = 1; i < a.length; i++) if (a[i].col <= a[i - 1].col) return false;
+            return true;
+        }
+        if (!ascending(up) || !ascending(lo)) return null;
+
+        var maxCol = 0;
+        up.concat(lo).forEach(function (p) { if (p.col > maxCol) maxCol = p.col; });
+
+        function slots(list, placed) {
+            var out = [];
+            for (var c = 0; c <= maxCol; c++) {
+                var hit = null;
+                for (var i = 0; i < placed.length; i++) {
+                    if (placed[i].col === c) { hit = list[i]; break; }
+                }
+                out.push(hit);
+            }
+            return out;
+        }
+
+        return {
+            columns: maxCol + 1,
+            upper: slots(upper, up),
+            lower: slots(lower, lo)
+        };
+    }
+
     return {
+        keyboardGrid: keyboardGrid,
         DEFAULT_TARGET: DEFAULT_TARGET,
         RESERVED_PLACEHOLDERS: RESERVED_PLACEHOLDERS,
         escapeHtml: escapeHtml,

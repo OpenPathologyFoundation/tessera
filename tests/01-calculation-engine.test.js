@@ -1024,3 +1024,91 @@ describe('Confidence interval for a derived ratio (HA-093, REF-001 §3.8)', () =
         }
     });
 });
+
+// ================================================================
+describe('Keyboard-mirroring column grid (URS-055)', () => {
+
+    /**
+     * The two category rows are separate tables that each fill the width, so
+     * their cells do not line up. That is usually correct — they hold
+     * different category sets, and putting BLASTS above BASO asserts a
+     * relationship that does not exist — and forcing a shared grid looks
+     * broken on a lopsided split: at four categories above and six below, a
+     * third of the upper row is empty and its rule stops mid-table.
+     *
+     * The exception is a profile whose keys run along two ADJACENT physical
+     * keyboard rows in left-to-right order. Then column N of each display row
+     * is the same finger, and the screen mirrors the operator's hand. These
+     * tests pin the conditions under which that is true, because each one
+     * exists to exclude a layout that would align cells to the wrong finger.
+     */
+    const spec = (upper, lower, keys) => ({
+        categories: { upper: upper, lower: lower },
+        outCodes: keys
+    });
+
+    it('VV-KBD-001: Two adjacent rows, in order, share a grid', () => {
+        // A S D F over Z X C V B — the predecessor's layout.
+        const g = Core.keyboardGrid(spec(
+            ['blasts', 'pro', 'gran', 'nrbc'],
+            ['baso', 'eos', 'plasma', 'lymph', 'mono'],
+            { A: 'blasts', S: 'pro', D: 'gran', F: 'nrbc',
+              Z: 'baso', X: 'eos', C: 'plasma', V: 'lymph', B: 'mono' }));
+        assert.ok(g, 'a home-row over bottom-row layout must qualify');
+        assert.equal(g.columns, 5);
+        // The trailing slot is empty: nothing is counted on the key above B.
+        assert.deepEqual(g.upper, ['blasts', 'pro', 'gran', 'nrbc', null]);
+        assert.deepEqual(g.lower, ['baso', 'eos', 'plasma', 'lymph', 'mono']);
+    });
+
+    it('VV-KBD-002: Keys scattered across rows do not', () => {
+        // consensus-14's shape: assigned by frequency, not by row.
+        assert.equal(Core.keyboardGrid(spec(
+            ['a1', 'a2'], ['b1', 'b2'],
+            { B: 'a1', R: 'a2', D: 'b1', Q: 'b2' })), null,
+            'a display row spanning two physical rows must not align');
+    });
+
+    it('VV-KBD-003: The lower row must sit directly beneath the upper', () => {
+        // Home row over home row — same row, nothing to mirror.
+        assert.equal(Core.keyboardGrid(spec(
+            ['a1', 'a2'], ['b1', 'b2'],
+            { A: 'a1', S: 'a2', D: 'b1', F: 'b2' })), null);
+        // Bottom row displayed ABOVE the home row inverts the mapping.
+        assert.equal(Core.keyboardGrid(spec(
+            ['a1', 'a2'], ['b1', 'b2'],
+            { Z: 'a1', X: 'a2', A: 'b1', S: 'b2' })), null);
+        // Two rows apart is not adjacent.
+        assert.equal(Core.keyboardGrid(spec(
+            ['a1'], ['b1'], { Q: 'a1', Z: 'b1' })), null);
+    });
+
+    it('VV-KBD-004: Out-of-order keys do not, because the fingers would not match', () => {
+        // D F over Z X would put D above Z — middle finger above little.
+        assert.ok(Core.keyboardGrid(spec(
+            ['a1', 'a2'], ['b1', 'b2'],
+            { A: 'a1', S: 'a2', Z: 'b1', X: 'b2' })), 'the in-order case must qualify');
+        assert.equal(Core.keyboardGrid(spec(
+            ['a1', 'a2'], ['b1', 'b2'],
+            { S: 'a1', A: 'a2', Z: 'b1', X: 'b2' })), null,
+            'a row whose keys run right-to-left must not align');
+    });
+
+    it('VV-KBD-005: A gap in the middle is preserved, not closed up', () => {
+        // A and F used, S and D not: the empty slots are where those keys are.
+        const g = Core.keyboardGrid(spec(
+            ['a1', 'a2'], ['b1', 'b2', 'b3', 'b4'],
+            { A: 'a1', F: 'a2', Z: 'b1', X: 'b2', C: 'b3', V: 'b4' }));
+        assert.ok(g);
+        assert.deepEqual(g.upper, ['a1', null, null, 'a2']);
+        assert.deepEqual(g.lower, ['b1', 'b2', 'b3', 'b4']);
+    });
+
+    it('VV-KBD-006: A missing or multi-character key disqualifies', () => {
+        assert.equal(Core.keyboardGrid(spec(['a1'], ['b1'], { A: 'a1' })), null,
+            'a category with no key cannot be placed');
+        assert.equal(Core.keyboardGrid(spec(['a1'], ['b1'], { A: 'a1', F1: 'b1' })), null);
+        assert.equal(Core.keyboardGrid(null), null);
+        assert.equal(Core.keyboardGrid({ categories: { upper: [], lower: [] }, outCodes: {} }), null);
+    });
+});

@@ -68,7 +68,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**744 verification cases** across 26 series and 4 layers, run as 812 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**752 verification cases** across 27 series and 4 layers, run as 820 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
@@ -86,6 +86,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | `VV-E2E-*` | 23 (001–050) | Unit | End-to-end data integrity |
 | `VV-EDT-*` | 40 (001–040) | Static | Configuration editor structure |
 | `VV-INC-*` | 3 (001–006) | Unit | Increment and decrement |
+| `VV-KBD-*` | 6 (001–006) | Unit | — |
 | `VV-LOW-*` | 6 (001–006) | Unit | Sub-target advisory |
 | `VV-ME-*` | 13 (001–016) | Unit | Myeloid-to-erythroid ratio |
 | `VV-PRE-*` | 26 (001–026) | Unit | Preset catalogue integrity |
@@ -95,7 +96,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | `VV-SCH-*` | 23 (001–023) | Unit | v2 configuration schema |
 | `VV-SRC-*` | 76 (001–076) | Static | Application source integrity (static) |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 122 (001–214) | System | System verification in a real browser |
+| `VV-SYS-*` | 124 (001–216) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
 
@@ -594,6 +595,17 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-INC-005 | Decrement never goes below zero (HA-013) | Unit | `tests/01-calculation-engine.test.js` |
 | VV-INC-006 | Sequence of increments and undos yields the arithmetic result | Unit | `tests/01-calculation-engine.test.js` |
 
+#### VV-KBD-* — verification cases
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-KBD-001 | Two adjacent rows, in order, share a grid | Unit | `tests/01-calculation-engine.test.js` |
+| VV-KBD-002 | Keys scattered across rows do not | Unit | `tests/01-calculation-engine.test.js` |
+| VV-KBD-003 | The lower row must sit directly beneath the upper | Unit | `tests/01-calculation-engine.test.js` |
+| VV-KBD-004 | Out-of-order keys do not, because the fingers would not match | Unit | `tests/01-calculation-engine.test.js` |
+| VV-KBD-005 | A gap in the middle is preserved, not closed up | Unit | `tests/01-calculation-engine.test.js` |
+| VV-KBD-006 | A missing or multi-character key disqualifies | Unit | `tests/01-calculation-engine.test.js` |
+
 #### VV-LOW-* — Sub-target advisory
 
 | ID | Verifies | Layer | File |
@@ -949,6 +961,8 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-SYS-212 | The report keeps a counted cell, and fills the M:E field | System | `tests-e2e/config-and-offline.spec.js` |
 | VV-SYS-213 | Subtotals and the grand total share one axis at 1440px | System | `tests-e2e/counting-workflow.spec.js` |
 | VV-SYS-214 | An uneven split still shares the axis | System | `tests-e2e/counting-workflow.spec.js` |
+| VV-SYS-215 | A keyboard-row profile puts each cell above its own key | System | `tests-e2e/counting-workflow.spec.js` |
+| VV-SYS-216 | A frequency-assigned profile is not forced onto that grid | System | `tests-e2e/counting-workflow.spec.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 

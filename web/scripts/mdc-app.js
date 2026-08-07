@@ -1241,11 +1241,18 @@
         var html = '';
         html += '<div class="max-w-4xl mx-auto">';
 
-        html += renderRowGroup('upper', upperLabel, categories.upper, cellToKey,
-            specConfig.upperRowAbnormal, specConfig);
+        // When the profile's keys run along two adjacent keyboard rows, both
+        // display rows share one column grid so each cell sits above the key
+        // that counts it. Otherwise each row fills the width — see
+        // Core.keyboardGrid for why that is usually the right default.
+        var grid = Core.keyboardGrid(specConfig);
+
+        html += renderRowGroup('upper', upperLabel, grid ? grid.upper : categories.upper,
+            cellToKey, specConfig.upperRowAbnormal, specConfig);
 
         html += '<div class="mt-4">';
-        html += renderRowGroup('lower', lowerLabel, categories.lower, cellToKey, false, specConfig);
+        html += renderRowGroup('lower', lowerLabel, grid ? grid.lower : categories.lower,
+            cellToKey, false, specConfig);
         html += '</div>';
 
         // --- GRAND TOTAL ---
@@ -1314,6 +1321,11 @@
         // Row 1: Cell type names (with tooltip for aggregated constituents)
         html += '<thead><tr>';
         cells.forEach(function (ct) {
+            // A null slot is a key position this row does not use. It renders
+            // as absence — no rule, no label, nothing to read — rather than as
+            // an empty cell, which would look like a category that failed to
+            // load.
+            if (!ct) { html += '<th class="px-2 py-2"></th>'; return; }
             var titleAttr = '';
             var indicator = '';
             var tips = [];
@@ -1342,6 +1354,7 @@
         html += '<tbody>';
         html += '<tr>';
         cells.forEach(function (ct) {
+            if (!ct) { html += '<td></td>'; return; }
             html += '<td class="text-center border-b border-slate-800" id="cell-' + Core.escapeAttr(ct) + '">' +
                 '<div class="py-3 mx-1 rounded-md transition-colors">' +
                 '<span class="text-2xl font-mono font-bold text-slate-100" id="val-' + Core.escapeAttr(ct) + '">0</span>' +
@@ -1356,6 +1369,7 @@
         // Row 3: Percentages
         html += '<tr>';
         cells.forEach(function (ct) {
+            if (!ct) { html += '<td></td>'; return; }
             html += '<td class="text-center border-b border-slate-800/50">' +
                 '<span class="text-xs font-mono text-slate-500" id="pct-' + Core.escapeAttr(ct) + '">0.00%</span>' +
                 '</td>';
@@ -1368,6 +1382,7 @@
         // Row 4: Key labels
         html += '<tr>';
         cells.forEach(function (ct) {
+            if (!ct) { html += '<td></td>'; return; }
             var k = cellToKey[ct] || '?';
             html += '<td class="text-center py-1.5">' +
                 '<kbd class="inline-block px-2 py-0.5 bg-slate-800 border border-slate-600 rounded text-xs font-mono font-semibold text-slate-400">' +

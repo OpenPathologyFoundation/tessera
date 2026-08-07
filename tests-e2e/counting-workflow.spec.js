@@ -594,7 +594,11 @@ test.describe('The totals column is one column (URS-055)', () => {
         }
     }
 
+    // Absence is checked before measuring. `boundingBox()` on a locator that
+    // matches nothing waits for it to appear and then times out the whole
+    // test, which reads as a layout failure and is not one.
     const centre = async (page, sel) => {
+        if (await page.locator(sel).count() === 0) return null;
         const box = await page.locator(sel).first().boundingBox();
         return box ? box.x + box.width / 2 : null;
     };
@@ -649,8 +653,11 @@ test.describe('The totals column is one column (URS-055)', () => {
         expect(Math.abs(upper - lower)).toBeLessThanOrEqual(1);
         expect(Math.abs(upper - grand)).toBeLessThanOrEqual(1);
 
-        // And the derived formula reports in the same column.
-        const me = await centre(page, '[id^="formula-"]');
-        if (me !== null) expect(Math.abs(upper - me)).toBeLessThanOrEqual(1);
+        // And the derived formula reports in the same column. The element is
+        // `val-formula-<name>`; `[id^="formula-"]` matched nothing and the
+        // measurement blocked until the test timed out.
+        const me = await centre(page, '[id^="val-formula-"]');
+        expect(me, 'Legacy MDC defines an M:E ratio, so it must be measurable').not.toBeNull();
+        expect(Math.abs(upper - me)).toBeLessThanOrEqual(1);
     });
 });

@@ -287,6 +287,36 @@ describe('One measured fact, stated the same everywhere (URS-092)', () => {
             'run `npm run test:qms` on a clean tree:\n  ' + wrong.join('\n  '));
     });
 
+    it('QC-028: A failing run is not admissible evidence, however clean the tree', () => {
+        // The runner refuses to write documents unless the tree is clean AND
+        // the run passed. The reader only checked the tree, so a FAILING run
+        // on a clean tree became the reference QC-022 measured against —
+        // documents held to the figures of a run whose point was that it
+        // failed. One definition, used by writer and reader alike.
+        const qmsFacts = require(path.join(__dirname, '..', 'scripts', 'qms-facts.js'));
+        const root = path.join(__dirname, '..', 'QMS', 'DHF', 'TestEvidence');
+        if (!fs.existsSync(root)) return;
+
+        for (const name of fs.readdirSync(root)) {
+            const dir = path.join(root, name);
+            if (!fs.statSync(dir).isDirectory()) continue;
+            const factsFile = path.join(dir, 'facts.json');
+            if (!fs.existsSync(factsFile)) continue;
+            const facts = JSON.parse(fs.readFileSync(factsFile, 'utf-8'));
+            const ok = qmsFacts.admissible(dir);
+            if (facts.status !== 'PASS' || facts.tree_state !== 'clean') {
+                assert.equal(ok, false,
+                    `${name} is treated as admissible but recorded ` +
+                    `status=${facts.status} tree_state=${facts.tree_state}`);
+            }
+        }
+        const run = qmsFacts.newestCleanRun();
+        if (run) {
+            assert.equal(run.facts.status, 'PASS');
+            assert.equal(run.facts.tree_state, 'clean');
+        }
+    });
+
     it('QC-023: Every marker names a fact something actually writes', () => {
         // A marker with a misspelled key renders invisibly, is written by
         // nothing, and freezes whatever value it was born with — a stale

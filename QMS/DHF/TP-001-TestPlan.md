@@ -97,11 +97,11 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**743 verification cases** across 26 series and 4 layers, run as 811 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**744 verification cases** across 26 series and 4 layers, run as 812 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
-| `QC-*` | 24 (001–027) | Static | QMS counted quantities |
+| `QC-*` | 25 (001–028) | Static | QMS counted quantities |
 | `SC-*` | 33 (001–064) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 52 (001–096) | Static | User-facing documentation |
@@ -156,6 +156,7 @@ auditing how the plan changed.
 | QC-025 | A shipped capability is not described as absent | Static | `tests/14-qms-counts.test.js` |
 | QC-026 | TR-001 reports a run that is admissible as release evidence | Static | `tests/14-qms-counts.test.js` |
 | QC-027 | The drift log counts its own rows, and nothing else counts them | Static | `tests/14-qms-counts.test.js` |
+| QC-028 | A failing run is not admissible evidence, however clean the tree | Static | `tests/14-qms-counts.test.js` |
 
 #### SC-* — Standards conformance (ICSH)
 

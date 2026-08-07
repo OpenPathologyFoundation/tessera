@@ -74,6 +74,23 @@ viewport widths, on Chromium, Firefox and WebKit.
 Revert-checked: with the `colgroup` and the fixed-width spans removed, all four
 Chromium cases fail.
 
+**The release gate caught a defect in itself.** After the fix, the clean-tree
+evidence run came back FAIL: `VV-SYS-214` had been failing all along, and its
+result was misread as passing because the run reported "9 passed" where twelve
+cases were expected. The cause was a selector — the derived formula's element is
+`val-formula-<name>`, and the test asked for `[id^="formula-"]`, which matches
+nothing; `boundingBox()` then waited for it and timed out, which reads as a
+layout failure and was not one. The helper now checks for absence before
+measuring.
+
+That failure then exposed a second, deeper one. `qms-run-tests.js` refuses to
+write documents unless the tree is clean **and** the run passed; `qms-facts.js`,
+which reads the bundles back, checked only the tree. So a failing run on a clean
+tree became the reference QC-022 measured the documents against — the documents
+held to the figures of a run whose whole point was that it failed. Two
+definitions of "admissible", written a few hours apart, that had already drifted.
+There is one now, used by writer and reader alike, guarded by **QC-028**.
+
 **A measurement error of my own, worth recording.** The first sweep across
 profiles reported perfect alignment for all three — but its row selector was
 `page.locator('div', { hasText: name }).locator('button:has-text("Load")').last()`,

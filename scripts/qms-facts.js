@@ -143,10 +143,28 @@ function environment(dir) {
 /**
  * The newest evidence bundle admissible as release evidence.
  *
- * A bundle captured from a dirty tree records a result but not what produced
- * it, so it cannot be the source of a published figure. The runner already
- * marks those PROVISIONAL; this is the other half — nothing reads them.
+ * Admissible means BOTH: captured from a clean tree, and passing. A bundle
+ * from a dirty tree records a result but not what produced it; a bundle from a
+ * failing run records what the software does not do.
+ *
+ * Both conditions matter, and for a while only the first was checked here
+ * while `qms-run-tests.js` checked both before writing. A failing run on a
+ * clean tree therefore became the reference that QC-022 measured the documents
+ * against — the run's own figures, from a run whose whole point was that it
+ * failed. One definition of "admissible", used by the writer and the reader
+ * alike, is the fix; DCR-033 §3 records how it surfaced.
  */
+function admissible(dir) {
+    if (environment(dir).tree_state !== 'clean') return false;
+    const facts = path.join(dir, 'facts.json');
+    if (!fs.existsSync(facts)) return false;
+    try {
+        return JSON.parse(fs.readFileSync(facts, 'utf-8')).status === 'PASS';
+    } catch (e) {
+        return false;
+    }
+}
+
 function newestCleanRun() {
     if (!fs.existsSync(EVIDENCE)) return null;
     const runs = fs.readdirSync(EVIDENCE)
@@ -155,9 +173,8 @@ function newestCleanRun() {
         .reverse();
     for (const name of runs) {
         const dir = path.join(EVIDENCE, name);
-        if (environment(dir).tree_state !== 'clean') continue;
+        if (!admissible(dir)) continue;
         const facts = path.join(dir, 'facts.json');
-        if (!fs.existsSync(facts)) continue;
         return { id: name, dir, facts: JSON.parse(fs.readFileSync(facts, 'utf-8')) };
     }
     return null;
@@ -165,7 +182,7 @@ function newestCleanRun() {
 
 module.exports = {
     LIVE_DOCUMENTS, KEYS, readMarkers, readAll, disagreements, write,
-    environment, newestCleanRun
+    environment, admissible, newestCleanRun
 };
 
 if (require.main === module) {

@@ -7,7 +7,7 @@
     "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
     "notes": "M:E ratio composition follows ICSH 2008 §2.6. Categories are an aggregated subset of the ICSH nucleated differential count, not the full list."
   },
-  "description": "Ten tallied categories. Band and segmented neutrophils are counted as one granulocyte category: the band/seg split is the least reproducible distinction between observers (REF-001 [S8]). Promyelocytes counted separately. In blood, NRBC are reported per 100 WBC, leaving a 9-category leukocyte differential. The bone marrow panel has no plasma-cell or mast-cell category — plasma cells and mast cells cannot be tallied. See the guidance on the lymphocyte and basophil categories before using this profile for a marrow.",
+  "description": "Ten tallied categories. Band and segmented neutrophils are counted as one granulocyte category: [S8] records \"high variation between morphologists in differentiating band and segmented neutrophils\", so a laboratory that does not trust the split can count what it can reliably distinguish (REF-001 §3.9). Promyelocytes counted separately. In blood, NRBC are reported per 100 WBC, leaving a 9-category leukocyte differential. The bone marrow panel has no plasma-cell or mast-cell category — plasma cells and mast cells cannot be tallied. See the guidance on the lymphocyte and basophil categories before using this profile for a marrow.",
   "specimenTypes": [
     {
       "specimenType": "bm",

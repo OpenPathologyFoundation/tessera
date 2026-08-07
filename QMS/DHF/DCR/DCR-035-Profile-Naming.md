@@ -108,6 +108,39 @@ and 30.
 A third was found while writing the guard: the catalogue said "Custom (Blank
 Template)" and the file said "Custom (Template)". Incident 29.
 
+### 3.1 Two descriptions that overclaimed
+
+Softening one claim exposed its mirror.
+
+`bands-segs-10` said it matched "mechanical bench-counter layouts **in current
+use**" — an assertion about what laboratories do today, which nothing in this
+file establishes. The naming rule bans value words from *names* for exactly this
+reason; a description is free to state facts, but this was not one. It now
+describes the profile by what distinguishes it from its sibling — bands and segs
+separate rather than combined — which is verifiable from the two files.
+
+Checking that led to `gran-combined-10`, which cited REF-001 [S8] for "the
+band/seg split is the **least reproducible** distinction between observers".
+[S8] supports no such ranking. What §3.9 records is "high variation between
+morphologists in differentiating band and segmented neutrophils" — and the
+*largest* coefficient of variation in that paper belongs to blast cells, at just
+over 15%. A superlative had been attached to a source that reports a
+comparative. The description now quotes what the paper says.
+
+Both are the same failure in opposite directions: a description reaching past
+its evidence, in one case toward practice nobody surveyed and in the other
+toward a ranking the citation does not contain. Neither reached a report — a
+`description` is catalogue text, unlike `provenance.notes` — but the catalogue
+is what an operator reads when choosing a profile.
+
+Phrasing cannot be tested without testing prose. The **citation** can:
+`VV-PRE-035` requires every `[Sn]` tag in a profile's description, summary,
+provenance or citation to exist in REF-001 and not be withdrawn. It would not
+have caught either sentence above — both cited a real, held source and
+overstated what it says — but it catches the failure mode one step coarser than
+those, which is citing something the file does not hold at all. That is the
+honest limit of what a guard can do here, and it is stated rather than implied.
+
 ---
 
 ## 4. The Plasma-Cell Question (proposal §5)
@@ -179,6 +212,7 @@ is append-only: removing an entry restores the silence it exists to prevent.
 | **VV-PRE-032** | A `provenance.notes` mentioning bone marrow requires a `bm` specimen; mentioning M:E requires an `ME_ratio` formula |
 | **VV-PRE-033** | No name in a file or the catalogue contains a value or status word |
 | **VV-PRE-034** | A bone marrow panel without a plasma-cell or mast-cell category carries guidance naming it on the row where it would be miscounted |
+| **VV-PRE-035** | Every source a profile's text cites exists in REF-001 and is not withdrawn |
 | **VV-SYS-217** | A cached profile under a renamed id raises the offer, and declining leaves the configuration untouched |
 | **VV-SYS-218** | Accepting loads the renamed built-in |
 | **VV-SYS-219** | A cached profile whose id is current raises no offer |
@@ -218,9 +252,10 @@ Two points, neither blocking:
 1. **The disposition in §4.** Plasma cells and mast cells recorded in the
    morphology comment rather than tallied, when an aggregated profile is in
    use — is that the right instruction, and is the guidance in the right place?
-2. **`bands-segs-10`'s description** states it matches "mechanical bench-counter
-   layouts in current use". That is an empirical claim about practice, and it
-   is the one sentence in this record that rests on nothing held.
+2. ~~**`bands-segs-10`'s description** states it matches "mechanical bench-counter
+   layouts in current use".~~ **Withdrawn 2026-08-07 — see §3.1.** The claim was
+   removed rather than referred; nothing in this record now rests on unheld
+   evidence.
 
 ---
 
@@ -245,6 +280,8 @@ old and new ids will both appear in records from this period.
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| C | 2026-08-07 | QMS | VV-PRE-035 added: a profile may cite only sources REF-001 defines and has not withdrawn. §3.1 states what it does not catch. |
+| B | 2026-08-07 | QMS | §3.1 added: the `bands-segs-10` "in current use" claim withdrawn, and the `gran-combined-10` "least reproducible" superlative corrected to what [S8] actually reports — the largest CV in that paper is blasts, not bands. §7 item 2 closed. |
 | A | 2026-08-07 | QMS | Initial issue. Five profiles renamed in id, file and display name; descriptions and provenance rewritten to claim only what each implements; HA-107 added with guidance on the rows where a missing category would be miscounted; `RENAMED_PROFILES` and a decline-by-default offer for cached configurations. VV-PRE-030..034. Drift incidents 27–29. |
 
 ---

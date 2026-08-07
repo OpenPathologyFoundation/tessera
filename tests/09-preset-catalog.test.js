@@ -617,3 +617,60 @@ describe('Profile names state contents, not assertions (URS-101)', () => {
         }
     });
 });
+
+// ================================================================
+describe('Profile text cites only sources the file holds (URS-101)', () => {
+
+    /**
+     * A description is catalogue text — it does not reach a report, unlike
+     * `provenance.notes` — but it is what an operator reads when choosing a
+     * profile, and two of them reached past their evidence.
+     *
+     * `bands-segs-10` claimed to match "mechanical bench-counter layouts in
+     * current use": an assertion about practice that nothing in this file
+     * establishes. `gran-combined-10` cited REF-001 [S8] for "the least
+     * reproducible distinction between observers" — a superlative attached to
+     * a source that reports a comparative, and in that paper the largest
+     * coefficient of variation belongs to blast cells, not to bands.
+     *
+     * The phrasing itself cannot be tested without testing prose. What can be
+     * tested is the citation: a source tag in profile text must exist in the
+     * literature register, and a withdrawn source must not be cited at all.
+     */
+    const REF = fs.readFileSync(path.join(__dirname, '..', 'QMS', 'DHF',
+        'REF-001-StandardsAndLiterature.md'), 'utf-8');
+    const cat = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'index.json'), 'utf-8'));
+
+    /** Source tags REF-001 defines, and those it has withdrawn. */
+    function registered() {
+        const live = new Set(), withdrawn = new Set();
+        for (const line of REF.split('\n')) {
+            const m = /^\| \*\*\[(S\d+)\]\*\*/.exec(line);
+            if (!m) continue;
+            (/WITHDRAWN/i.test(line) ? withdrawn : live).add(m[1]);
+        }
+        return { live, withdrawn };
+    }
+
+    it('VV-PRE-035: Every source a profile cites is in the register and not withdrawn', () => {
+        const { live, withdrawn } = registered();
+        assert.ok(live.size >= 5, `only ${live.size} sources parsed from REF-001`);
+
+        for (const entry of cat.presets) {
+            const raw = fs.readFileSync(path.join(PRESETS_DIR, entry.file), 'utf-8');
+            const cfg = JSON.parse(raw);
+            const text = [cfg.description || '',
+                (cfg.provenance && cfg.provenance.notes) || '',
+                (cfg.provenance && cfg.provenance.citation) || '',
+                entry.summary || ''].join(' ');
+
+            for (const m of text.matchAll(/\[(S\d+)\]/g)) {
+                const tag = m[1];
+                assert.ok(!withdrawn.has(tag),
+                    `${entry.profileId} cites [${tag}], which REF-001 has withdrawn`);
+                assert.ok(live.has(tag),
+                    `${entry.profileId} cites [${tag}], which REF-001 does not define`);
+            }
+        }
+    });
+});

@@ -7,7 +7,7 @@
     "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
     "notes": "M:E ratio composition follows ICSH 2008 §2.6. Categories are an aggregated subset of the ICSH nucleated differential count, not the full list."
   },
-  "description": "Ten tallied categories matching mechanical bench-counter layouts: bands and segmented neutrophils counted separately. No separate promyelocyte, plasma-cell or mast-cell rows — see category guidance for where those cells are recorded. Includes the blasts-of-non-erythroid-cells formula for comparison against pre-2016 reports (withdrawn by WHO 2016; see the calculation reference).",
+  "description": "Ten tallied categories, with band and segmented neutrophils counted separately — the distinction that 10-Type — Bands+Segs Combined merges. Choose it when your report requires a band percentage; note that REF-001 §3.9 records observer-dependent variability in that distinction ([S8]). No separate promyelocyte, plasma-cell or mast-cell rows — see category guidance for where those cells are recorded. Includes the blasts-of-non-erythroid-cells formula for comparison against pre-2016 reports (withdrawn by WHO 2016; see the calculation reference).",
   "specimenTypes": [
     {
       "specimenType": "bm",

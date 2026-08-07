@@ -68,7 +68,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**762 verification cases** across 27 series and 4 layers, run as 830 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**763 verification cases** across 27 series and 4 layers, run as 831 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
@@ -89,7 +89,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | `VV-KBD-*` | 6 (001–006) | Unit | — |
 | `VV-LOW-*` | 6 (001–006) | Unit | Sub-target advisory |
 | `VV-ME-*` | 13 (001–016) | Unit | Myeloid-to-erythroid ratio |
-| `VV-PRE-*` | 31 (001–034) | Unit | Preset catalogue integrity |
+| `VV-PRE-*` | 32 (001–035) | Unit | Preset catalogue integrity |
 | `VV-PROV-*` | 8 (001–008) | Unit | Method provenance |
 | `VV-RND-*` | 7 (001–007) | Unit | Rounding policy |
 | `VV-SAV-*` | 18 (001–018) | Static | Autosave and crash recovery (static) |
@@ -670,6 +670,7 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | VV-PRE-032 | Provenance claims only what the profile implements | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-033 | No name asserts value or status | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-034 | A profile omitting an ICSH category says so where it matters | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-035 | Every source a profile cites is in the register and not withdrawn | Unit | `tests/09-preset-catalog.test.js` |
 
 #### VV-PROV-* — Method provenance
 

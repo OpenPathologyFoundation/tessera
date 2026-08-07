@@ -21,7 +21,7 @@
       "profileId": "bands-segs-10",
       "file": "bands-segs-10.json",
       "name": "10-Type — Bands & Segs Separate",
-      "summary": "Ten tallied categories matching mechanical bench-counter layouts: bands and segmented neutrophils counted separately.",
+      "summary": "Ten tallied categories, with bands and segmented neutrophils counted separately rather than combined.",
       "specimens": "BM (500) - PB (200)"
     },
     {

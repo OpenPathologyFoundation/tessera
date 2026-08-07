@@ -97,7 +97,7 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**752 verification cases** across 27 series and 4 layers, run as 820 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**760 verification cases** across 27 series and 4 layers, run as 828 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
@@ -118,14 +118,14 @@ auditing how the plan changed.
 | `VV-KBD-*` | 6 (001–006) | Unit | — |
 | `VV-LOW-*` | 6 (001–006) | Unit | Sub-target advisory |
 | `VV-ME-*` | 13 (001–016) | Unit | Myeloid-to-erythroid ratio |
-| `VV-PRE-*` | 26 (001–026) | Unit | Preset catalogue integrity |
+| `VV-PRE-*` | 31 (001–034) | Unit | Preset catalogue integrity |
 | `VV-PROV-*` | 8 (001–008) | Unit | Method provenance |
 | `VV-RND-*` | 7 (001–007) | Unit | Rounding policy |
 | `VV-SAV-*` | 18 (001–018) | Static | Autosave and crash recovery (static) |
 | `VV-SCH-*` | 23 (001–023) | Unit | v2 configuration schema |
 | `VV-SRC-*` | 76 (001–076) | Static | Application source integrity (static) |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 124 (001–216) | System | System verification in a real browser |
+| `VV-SYS-*` | 127 (001–219) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
 
@@ -669,22 +669,22 @@ auditing how the plan changed.
 | ID | Verifies | Layer | File |
 |----|----------|-------|------|
 | VV-PRE-001 | Presets directory exists | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-002 | Preset file exists: consensus-14.json | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-003 | consensus-14.json is valid JSON | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-004 | consensus-14.json has required v2 wrapper fields | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-005 | consensus-14.json specimen types have required fields | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-006 | consensus-14.json outCodes values match category cell types (except custom) | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-007 | consensus-14.json has no duplicate outCode keys per specimen | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-008 | consensus-14.json left-hand preset keys are within left ergonomic zone | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-002 | Preset file exists: ndc-14.json | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-003 | ndc-14.json is valid JSON | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-004 | ndc-14.json has required v2 wrapper fields | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-005 | ndc-14.json specimen types have required fields | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-006 | ndc-14.json outCodes values match category cell types (except custom) | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-007 | ndc-14.json has no duplicate outCode keys per specimen | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-008 | ndc-14.json left-hand preset keys are within left ergonomic zone | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-009 | The right-hand key layout is still reachable, as an editor action | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-010 | consensus-14 has 14 cell types per specimen | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-011 | minimal-5 has 5 cell types | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-010 | ndc-14 has 14 cell types per specimen | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-011 | analyzer-5 has 5 cell types | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-012 | Handedness remains a per-profile field | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-013 | body-fluid has bf specimen type | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-014 | body-fluid has morphology checklist items | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-015 | harmonized-9 has constituents defined | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-015 | gran-combined-10 has constituents defined | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-016 | custom preset has empty categories | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-017 | consensus-14.json excludes NRBC from any non-marrow differential | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-017 | ndc-14.json excludes NRBC from any non-marrow differential | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-018 | A preset sharing the built-in profileId is the built-in profile | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-019 | No two presets are the same layout with the same keys | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-020 | Every selectable preset configures confidence intervals (P0-9) | Unit | `tests/09-preset-catalog.test.js` |
@@ -694,6 +694,11 @@ auditing how the plan changed.
 | VV-PRE-024 | A counted cell is never reported as absent | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-025 | The M:E field the predecessor left blank is computed | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-026 | The profile declares that it is coarser than ICSH | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-030 | Every number in a name is that profile's tallied category count | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-031 | The catalogue, the file and its contents agree | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-032 | Provenance claims only what the profile implements | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-033 | No name asserts value or status | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-034 | A profile omitting an ICSH category says so where it matters | Unit | `tests/09-preset-catalog.test.js` |
 
 #### VV-PROV-* — Method provenance
 
@@ -929,7 +934,7 @@ auditing how the plan changed.
 | VV-SYS-121 | The advisory is informational and never blocks | System | `tests-e2e/counting-workflow.spec.js` |
 | VV-SYS-122 | Extending the count re-evaluates the advisory | System | `tests-e2e/counting-workflow.spec.js` |
 | VV-SYS-123 | A clean count shows no advisory | System | `tests-e2e/counting-workflow.spec.js` |
-| VV-SYS-125 | The legacy preset reports blasts against both denominators | System | `tests-e2e/config-and-offline.spec.js` |
+| VV-SYS-125 | The bands-and-segs preset reports blasts against both denominators | System | `tests-e2e/config-and-offline.spec.js` |
 | VV-SYS-130 | The pasted report carries profile attribution | System | `tests-e2e/counting-workflow.spec.js` |
 | VV-SYS-131 | The results screen states the conventions used | System | `tests-e2e/counting-workflow.spec.js` |
 | VV-SYS-140 | The methods page is reachable and renders | System | `tests-e2e/config-and-offline.spec.js` |
@@ -992,6 +997,9 @@ auditing how the plan changed.
 | VV-SYS-214 | An uneven split still shares the axis | System | `tests-e2e/counting-workflow.spec.js` |
 | VV-SYS-215 | A keyboard-row profile puts each cell above its own key | System | `tests-e2e/counting-workflow.spec.js` |
 | VV-SYS-216 | A frequency-assigned profile is not forced onto that grid | System | `tests-e2e/counting-workflow.spec.js` |
+| VV-SYS-217 | The operator is told, and keeping their profile is the default | System | `tests-e2e/config-and-offline.spec.js` |
+| VV-SYS-218 | Accepting loads the renamed built-in | System | `tests-e2e/config-and-offline.spec.js` |
+| VV-SYS-219 | A current profile raises no offer | System | `tests-e2e/config-and-offline.spec.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 

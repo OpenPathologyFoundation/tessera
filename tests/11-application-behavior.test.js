@@ -33,7 +33,7 @@ describe('Behaviour — Boot and Phase Machine (SYS-001, SYS-130)', () => {
     it('TC-B001: Boots into case-entry with the shipped profile applied', async () => {
         const h = await boot();
         assert.equal(h.hooks.state.phase, 'case-entry');
-        assert.equal(h.hooks.state.configMeta.profileId, 'consensus-14');
+        assert.equal(h.hooks.state.configMeta.profileId, 'ndc-14');
         assert.equal(h.hooks.state.configMeta.version, DEFAULT_CONFIG.version);
         assert.ok(h.visible('phase-case-entry'));
         assert.ok(!h.visible('phase-counting'));
@@ -495,7 +495,7 @@ describe('Behaviour — Configuration Controls (URS-103, HA-060, HA-061)', () =>
         h.click('btnExportConfig');
         assert.equal(h.downloads.length, 1, 'Export Config must actually produce a file');
         const text = await h.downloadText(0);
-        assert.match(text, /"profileId": "consensus-14"/);
+        assert.match(text, /"profileId": "ndc-14"/);
         h.close();
     });
 
@@ -538,7 +538,7 @@ describe('Behaviour — Configuration Controls (URS-103, HA-060, HA-061)', () =>
         h.hooks.importConfig(file);
         await tick(60);
 
-        assert.equal(h.hooks.state.configMeta.profileId, 'consensus-14', 'bad profile must not be applied');
+        assert.equal(h.hooks.state.configMeta.profileId, 'ndc-14', 'bad profile must not be applied');
         assert.match(h.modal().title, /Import Error/);
         assert.match(h.modal().message, /ghost/);
         h.close();
@@ -598,7 +598,7 @@ describe('Behaviour — Config Resolution and Offline (URS-094, URS-106)', () =>
         delete broken.specimenTypes[0].outCodes;
         const h = await boot({ config: clone(DEFAULT_CONFIG), localStorage: { wbcds_config: broken } });
         assert.ok(h.hooks.state.config, 'must not be bricked by a bad saved profile');
-        assert.equal(h.hooks.state.configMeta.profileId, 'consensus-14');
+        assert.equal(h.hooks.state.configMeta.profileId, 'ndc-14');
         h.close();
     });
 
@@ -667,7 +667,7 @@ describe('Behaviour — Results, Export and Absolute Counts', () => {
         h.press('X', 10);
         h.click('btnCountDone');
         const summary = h.el('results-summary').textContent;
-        assert.match(summary, /consensus-14/);
+        assert.match(summary, /ndc-14/);
         assert.ok(summary.includes('v' + DEFAULT_CONFIG.version),
             'results footer must state the profile version in force');
         assert.match(summary, /Counted:/);
@@ -702,7 +702,7 @@ describe('Behaviour — Results, Export and Absolute Counts', () => {
         const csv = await h.downloadText(0);
         assert.match(csv.split('\n')[0], /configProfileId/);
         assert.match(csv, /S25-1234/);
-        assert.match(csv, /consensus-14/);
+        assert.match(csv, /ndc-14/);
         h.close();
     });
 
@@ -714,7 +714,7 @@ describe('Behaviour — Results, Export and Absolute Counts', () => {
         const parsed = JSON.parse(await h.downloadText(0));
         assert.equal(parsed.length, 1);
         assert.equal(parsed[0].counts.blasts, 10);
-        assert.equal(parsed[0].configProfileId, 'consensus-14');
+        assert.equal(parsed[0].configProfileId, 'ndc-14');
         h.close();
     });
 
@@ -761,7 +761,7 @@ describe('Behaviour — Results, Export and Absolute Counts', () => {
         h.document.querySelector('.history-entry').dispatchEvent(
             new h.window.MouseEvent('click', { bubbles: true }));
         assert.ok(!h.el('history-modal').classList.contains('hidden'));
-        assert.match(h.el('history-modal-content').textContent, /consensus-14/);
+        assert.match(h.el('history-modal-content').textContent, /ndc-14/);
         h.close();
     });
 });
@@ -1174,7 +1174,7 @@ describe('Behaviour — Method provenance (URS-052, URS-055)', () => {
         h.press('X', 50);
         h.click('btnCountDone');
         const panel = h.document.querySelector('.tab-panel').textContent;
-        assert.match(panel, /consensus-14/);
+        assert.match(panel, /ndc-14/);
         assert.ok(panel.includes('v' + DEFAULT_CONFIG.version),
             'the version in force must travel with the copied report');
         h.close();
@@ -1205,7 +1205,7 @@ describe('Behaviour — Method provenance (URS-052, URS-055)', () => {
         h.press('X', 50);
         h.click('btnCountDone');
         const panel = h.document.querySelector('.tab-panel').textContent;
-        assert.match(panel, /Method: Profile: Full 14-Part Consensus/);
+        assert.match(panel, /Method: Profile: 14-Type Nucleated Differential/);
         assert.doesNotMatch(panel, /\{\{/);
         h.close();
     });

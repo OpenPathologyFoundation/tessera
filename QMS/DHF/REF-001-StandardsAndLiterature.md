@@ -102,7 +102,7 @@ myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils,
 basophils, mast cells, promonocytes and monocytes, lymphocytes, plasma cells
 and erythroblasts."
 
-The shipped `consensus-14` profile implements this list exactly:
+The shipped `ndc-14 (formerly consensus-14)` profile implements this list exactly:
 
 | ICSH category | Profile cell type |
 |---------------|-------------------|

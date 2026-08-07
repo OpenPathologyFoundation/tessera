@@ -13,12 +13,12 @@ const path = require('node:path');
 const PRESETS_DIR = path.join(__dirname, '..', 'web', 'settings', 'presets');
 
 const expectedPresets = [
-    'consensus-14.json',
-    'harmonized-9.json',
-    'legacy-9.json',
-    'minimal-5.json',
+    'ndc-14.json',
+    'gran-combined-10.json',
+    'bands-segs-10.json',
+    'analyzer-5.json',
     'body-fluid.json',
-    'legacy-mdc.json',
+    'mdc-2015-9.json',
     'custom.json'
 ];
 
@@ -120,8 +120,8 @@ const ERGO_ZONES = {
 
 describe('Preset Catalog — Ergonomic Zone Validation', () => {
 
-    const leftPresets = ['consensus-14.json', 'harmonized-9.json', 'legacy-9.json', 'minimal-5.json',
-        'body-fluid.json', 'legacy-mdc.json'];
+    const leftPresets = ['ndc-14.json', 'gran-combined-10.json', 'bands-segs-10.json', 'analyzer-5.json',
+        'body-fluid.json', 'mdc-2015-9.json'];
 
     leftPresets.forEach(function (filename) {
         it('VV-PRE-008: ' + filename + ' left-hand preset keys are within left ergonomic zone', () => {
@@ -138,7 +138,7 @@ describe('Preset Catalog — Ergonomic Zone Validation', () => {
     });
 
     it('VV-PRE-009: The right-hand key layout is still reachable, as an editor action', () => {
-        // The `right-hand` preset was a fork of consensus-14 differing only in
+        // The `right-hand` preset was a fork of ndc-14 differing only in
         // key assignment — and it shipped with four categories that could not
         // be un-counted (HA-104), because a forked file is a place for a defect
         // to hide from the profile it was copied from. The layout is not lost:
@@ -154,16 +154,16 @@ describe('Preset Catalog — Ergonomic Zone Validation', () => {
 
 describe('Preset Catalog — Specific Presets', () => {
 
-    it('VV-PRE-010: consensus-14 has 14 cell types per specimen', () => {
-        const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'consensus-14.json'), 'utf-8'));
+    it('VV-PRE-010: ndc-14 has 14 cell types per specimen', () => {
+        const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'ndc-14.json'), 'utf-8'));
         for (const spec of config.specimenTypes) {
             assert.equal(Object.keys(spec.outCodes).length, 14,
                 spec.specimenType + ': must have 14 key mappings');
         }
     });
 
-    it('VV-PRE-011: minimal-5 has 5 cell types', () => {
-        const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'minimal-5.json'), 'utf-8'));
+    it('VV-PRE-011: analyzer-5 has 5 cell types', () => {
+        const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'analyzer-5.json'), 'utf-8'));
         const spec = config.specimenTypes[0];
         assert.equal(Object.keys(spec.outCodes).length, 5, 'Must have 5 key mappings');
     });
@@ -188,8 +188,8 @@ describe('Preset Catalog — Specific Presets', () => {
         assert.ok(bf.morphologyChecklist.length > 0, 'Body fluid must have morph checklist items');
     });
 
-    it('VV-PRE-015: harmonized-9 has constituents defined', () => {
-        const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'harmonized-9.json'), 'utf-8'));
+    it('VV-PRE-015: gran-combined-10 has constituents defined', () => {
+        const config = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'gran-combined-10.json'), 'utf-8'));
         const bm = config.specimenTypes.find(s => s.specimenType === 'bm');
         assert.ok(bm.constituents && bm.constituents.gran, 'Harmonized-9 BM must have gran constituent');
         assert.ok(Array.isArray(bm.constituents.gran.members), 'Gran constituent must have members array');
@@ -215,7 +215,7 @@ describe('Preset Catalog — Denominator Policy (URS-030, HA-092)', () => {
      * omitted `denominatorExcludes`. Loading one therefore counted NRBC into
      * the leucocyte differential — the exact hazard DCR-006 exists to prevent.
      * Measured on 180 granulocytes + 20 NRBC: 100.0% granulocytes with the
-     * built-in profile, 90.0% after choosing the harmonized-9 preset.
+     * built-in profile, 90.0% after choosing the gran-combined-10 preset.
      *
      * The catalogue is a set of starting points, so the safe convention has to
      * be the one they start from.
@@ -249,7 +249,7 @@ describe('Preset Catalog — Denominator Policy (URS-030, HA-092)', () => {
 
     it('VV-PRE-018: A preset sharing the built-in profileId is the built-in profile', () => {
         // isCacheSuperseded discards a cached profile when a built-in one with
-        // the SAME profileId carries a higher version. consensus-14.json was
+        // the SAME profileId carries a higher version. ndc-14.json was
         // v2.0 against the built-in v2.5, so choosing it from the catalogue
         // was undone on the next load. It was also missing thresholds,
         // confidenceIntervals, categoryNotes and the denominator policy.
@@ -343,7 +343,7 @@ describe('Preset Catalog — No Redundant Forks', () => {
 describe('The predecessor profile reproduces the predecessor (URS-101)', () => {
 
     /**
-     * `legacy-mdc` exists so an operator who used the 2015 Backbone/JSP counter
+     * `mdc-2015-9` exists so an operator who used the 2015 Backbone/JSP counter
      * — retained at `legacy/`, described in DCR-004 — can switch without
      * relearning the keyboard.
      *
@@ -360,7 +360,7 @@ describe('The predecessor profile reproduces the predecessor (URS-101)', () => {
      * where it changes a reported value.
      */
     const Core = require(path.join(__dirname, '..', 'web', 'scripts', 'wbc-core.js'));
-    const raw = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'legacy-mdc.json'), 'utf-8'));
+    const raw = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'mdc-2015-9.json'), 'utf-8'));
     const cfg = Core.normalizeConfig(raw);
     const spec = t => cfg.specimenTypes.find(s => s.specimenType === t);
 
@@ -474,7 +474,7 @@ describe('The predecessor profile reproduces the predecessor (URS-101)', () => {
         // profile for its familiarity must be told so.
         assert.match(raw.provenance.notes, /COARSER|coarser/,
             'the provenance does not warn that the categories are aggregated');
-        assert.match(raw.provenance.notes, /consensus-14/,
+        assert.match(raw.provenance.notes, /ndc-14/,
             'the provenance does not name the profile to prefer for new work');
         const bm = spec('bm');
         assert.ok(bm.categoryNotes && bm.categoryNotes.gran,
@@ -485,5 +485,135 @@ describe('The predecessor profile reproduces the predecessor (URS-101)', () => {
         assert.ok(!Object.values(spec('pb').outCodes).includes('nrbc'));
         assert.match(spec('pb').categoryNotes.other, /NRBC|nucleated red/i,
             'nothing tells the operator this profile cannot report NRBC per 100 WBC');
+    });
+});
+
+// ================================================================
+describe('Profile names state contents, not assertions (URS-101)', () => {
+
+    /**
+     * A profile name used to make a claim. `consensus-14` asserted a consensus
+     * no body ratified; `harmonized-9` asserted harmonisation and contradicted
+     * itself three ways — the id said 9, the name said "10-Part", the
+     * description said "9-part differential", and the profile tallied ten;
+     * `legacy-9` said only that it was old.
+     *
+     * A name now states what the profile IS: the tallied category count and
+     * the defining trait. Provenance, endorsement and rationale live in
+     * `description` and `provenance.notes`, as facts with citations.
+     *
+     * These four guards are the rule made permanent, and each exists because
+     * of a specific defect found while applying it.
+     */
+    const Core = require(path.join(__dirname, '..', 'web', 'scripts', 'wbc-core.js'));
+    const catalogue = JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, 'index.json'), 'utf-8'));
+    const entries = catalogue.presets.filter(p => !p.editorOnly);
+    const read = file => JSON.parse(fs.readFileSync(path.join(PRESETS_DIR, file), 'utf-8'));
+
+    /** Categories the operator sees as rows and counts on keys. */
+    function tallied(spec) {
+        return (spec.categories.upper || []).length + (spec.categories.lower || []).length;
+    }
+
+    it('VV-PRE-030: Every number in a name is that profile\'s tallied category count', () => {
+        // harmonized-9 tallied ten. The id, the name and the description were
+        // three writers for one fact, and two of them were wrong.
+        for (const entry of entries) {
+            const cfg = Core.normalizeConfig(read(entry.file));
+            const counts = cfg.specimenTypes.map(tallied);
+            for (const [where, text] of [['profileName', cfg.profileName], ['index name', entry.name]]) {
+                for (const n of (String(text).match(/\d+/g) || [])) {
+                    // A year is a date, not a count — "2015 Counter Layout".
+                    if (Number(n) > 1900) continue;
+                    assert.ok(counts.every(c => c === Number(n)),
+                        `${entry.profileId} ${where} "${text}" says ${n}, but its specimens ` +
+                        `tally ${counts.join('/')}`);
+                }
+            }
+        }
+    });
+
+    it('VV-PRE-031: The catalogue, the file and its contents agree', () => {
+        // The catalogue said "Custom (Blank Template)" while the file said
+        // "Custom (Template)" — a second writer for the same fact.
+        for (const entry of catalogue.presets) {
+            const cfg = read(entry.file);
+            assert.equal(entry.name, cfg.profileName,
+                `${entry.profileId}: the catalogue name and the file's profileName differ`);
+            assert.equal(entry.profileId, cfg.profileId,
+                `${entry.file}: the catalogue id and the file's profileId differ`);
+            assert.equal(entry.file, entry.profileId + '.json',
+                `${entry.profileId}: the filename does not match the id`);
+        }
+    });
+
+    it('VV-PRE-032: Provenance claims only what the profile implements', () => {
+        /**
+         * `provenance.notes` prints into the report's method statement under
+         * "Basis:". Two profiles carried a copy-pasted note claiming their
+         * bone marrow categories and M:E ratio followed ICSH 2008 §2.6 — with
+         * no bm specimen and no M:E formula between them. Those reports stated
+         * a basis that did not exist, to a reader who cannot check it.
+         */
+        for (const entry of entries) {
+            const cfg = Core.normalizeConfig(read(entry.file));
+            const notes = (cfg.provenance && cfg.provenance.notes) || '';
+            if (!notes) continue;
+            const types = cfg.specimenTypes.map(s => s.specimenType);
+
+            if (/bone marrow/i.test(notes)) {
+                assert.ok(types.includes('bm'),
+                    `${entry.profileId}: provenance claims a bone marrow basis, but the ` +
+                    `profile has no bm specimen (${types.join(', ')})`);
+            }
+            if (/M:E/.test(notes)) {
+                const hasME = cfg.specimenTypes.some(s =>
+                    s.formulas && Object.keys(s.formulas).some(k => /ME_ratio/i.test(k)));
+                assert.ok(hasME,
+                    `${entry.profileId}: provenance claims an M:E basis, but no specimen ` +
+                    'defines an ME_ratio formula');
+            }
+        }
+    });
+
+    it('VV-PRE-033: No name asserts value or status', () => {
+        // A name that says "full", "minimal" or "consensus" is arguing, not
+        // describing — and the argument is the one part nobody can check.
+        const BANNED = ['legacy', 'consensus', 'harmonized', 'harmonised',
+            'modern', 'classic', 'full', 'minimal', 'standard'];
+        for (const entry of catalogue.presets) {
+            const cfg = read(entry.file);
+            for (const [where, text] of [['profileName', cfg.profileName], ['index name', entry.name]]) {
+                for (const word of BANNED) {
+                    assert.ok(!new RegExp('\\b' + word + '\\b', 'i').test(String(text)),
+                        `${entry.profileId} ${where} "${text}" contains the value word "${word}" — ` +
+                        'a name states what the profile contains; the claim belongs in description');
+                }
+            }
+        }
+    });
+
+    it('VV-PRE-034: A profile omitting an ICSH category says so where it matters', () => {
+        // RA-001 HA-107. An aggregated panel gives the operator no key for a
+        // cell that is a legitimate member of the differential, and the
+        // likeliest substitutions are plasma cells as lymphocytes and mast
+        // cells as basophils. The guidance belongs on those rows, not in a
+        // general note the operator reads once.
+        for (const entry of entries) {
+            const cfg = Core.normalizeConfig(read(entry.file));
+            for (const spec of cfg.specimenTypes) {
+                if (spec.specimenType !== 'bm') continue;
+                const have = new Set(spec.categories.upper.concat(spec.categories.lower));
+                const notes = spec.categoryNotes || {};
+                for (const [missing, host] of [['plasma', 'lymph'], ['mast', 'baso']]) {
+                    if (have.has(missing) || !have.has(host)) continue;
+                    assert.ok(notes[host],
+                        `${entry.profileId}/bm has no "${missing}" category and no guidance on ` +
+                        `"${host}", which is where it would be miscounted`);
+                    assert.match(notes[host], new RegExp(missing, 'i'),
+                        `${entry.profileId}/bm: the guidance on "${host}" does not mention ${missing}`);
+                }
+            }
+        }
     });
 });

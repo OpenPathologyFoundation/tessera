@@ -1,13 +1,13 @@
 {
-  "version": "2.0",
-  "profileId": "minimal-5",
-  "profileName": "Minimal 5-Part",
+  "version": "2.1",
+  "profileId": "analyzer-5",
+  "profileName": "5-Type — Analyzer Categories",
   "provenance": {
     "standard": "ICSH 2008",
     "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
-    "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 \u00a72.6."
+    "notes": "Categories match the automated analyzer 5-part differential."
   },
-  "description": "Simplified 5-part differential matching automated analyzer categories: neutrophils, lymphocytes, monocytes, eosinophils, basophils. Home-row only ergonomic keys.",
+  "description": "The five categories automated analyzers report (the '5-part differential'): neutrophils, lymphocytes, monocytes, eosinophils, basophils. Peripheral blood only; target 100. Home-row ergonomic keys.",
   "specimenTypes": [
     {
       "specimenType": "pb",
@@ -57,7 +57,7 @@
         "display": 2,
         "report": 0
       },
-      "targetCountBasis": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does \u2014 a documented default, not a claim to perform the reference method.",
+      "targetCountBasis": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does — a documented default, not a claim to perform the reference method.",
       "confidenceIntervals": {
         "enabled": true,
         "level": 0.95

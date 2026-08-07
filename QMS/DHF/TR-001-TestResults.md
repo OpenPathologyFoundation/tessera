@@ -6,7 +6,7 @@
 |-------|-------|
 | **Document ID** | TR-001 |
 | **Version** | 4.2 |
-| **Product** | WBC ΔΣ v2.20.0 |
+| **Product** | WBC ΔΣ v2.21.0 |
 | **Date Executed** | 2026-08-06 (10:26:56 UTC) |
 | **Status** | **PASS** (test outcome) |
 | **Approval State** | **Approved** 2026-08-05 |
@@ -212,7 +212,7 @@ A 500-cell differential entered by keyboard in a real browser:
 | Progress indicator | 500 / 500 (target) | **PASS** |
 | M:E ratio (312 myeloid / 150 erythroid) | 2.1:1 | **PASS** |
 | Low-count advisory | absent at target | **PASS** |
-| Traceability footer | `consensus-14`, `v2.0` | **PASS** |
+| Traceability footer | `ndc-14 (formerly consensus-14)`, `v2.0` | **PASS** |
 | Reported percentages | sum to exactly 100 | **PASS** |
 
 ### 4.2 `config-and-offline.spec.js` (22 tests)
@@ -256,7 +256,7 @@ Capabilities verifiable only at this layer (real browser APIs):
 | 12 SC-040..043 | Both M:E conventions ship, are catalogued, give different ratios from identical counts, and each declares its basis | PASS |
 | 13 UD-030..038 | Every worked example, comparison table and interval in the Calculation Reference recomputed from the engine; every choice it calls configurable verified as configurable | PASS |
 
-**A defect was found**: the `consensus-14` preset never received the provenance
+**A defect was found**: the `ndc-14` preset never received the provenance
 fields added to `templates.json` under DCR-009. A laboratory loading that preset
 would have lost the standard citation and the M:E basis. All presets are now
 synchronised.
@@ -313,7 +313,7 @@ DCR-009 §3.
 | 01 VV-SUB-001..007 | Subset percentages: own denominator, the two blast conventions falling on opposite sides of 20%, zero-denominator guard, type dispatch and ratio default, interval eligibility, validation of numerator containment and unknown types | PASS |
 | 01 VV-THR-001..008 | Threshold evaluation: spanning detected, clear counts not flagged, larger counts narrow but need not resolve, formula targets, ratio targets rejected, unresolvable and out-of-range targets rejected | PASS |
 | 11 TC-B120..B127 | Advisory in the DOM, never blocking, cleared when the count moves clear, Continue Counting preserved, all formulas rendered, formula-target thresholds, session archival | PASS |
-| E2E VV-SYS-120..123, 125 | Advisory in three real browsers; the `legacy-9` preset reporting blasts against both denominators | PASS |
+| E2E VV-SYS-120..123, 125 | Advisory in three real browsers; the `bands-segs-10` preset reporting blasts against both denominators | PASS |
 
 **A test-suite defect was found by the layers disagreeing.** The E2E assertions
 compared `innerText` against source-case label text; a real browser applies the
@@ -423,10 +423,10 @@ defects that produced wrong clinical numbers.
 |--------|--------|
 | The editor rebuilt each profile from its own form fields | Saving the shipped profile untouched dropped `denominatorExcludes`, `per100Reporting`, `thresholds`, `confidenceIntervals`, `rounding`, `precision`, `categoryNotes`, `targetCountBasis`, `provenance`, and emptied `formulas` — **deleting the M:E ratio** — while reporting success |
 | The editor hard-coded `version: '2.0'` | The counter discarded every edit to a built-in profile as superseded. Measured: BM target changed 500 → 400, saved, counter still used 500 |
-| No shipped preset carried `denominatorExcludes` | Choosing a preset re-introduced HA-092. Measured on 180 granulocytes + 20 NRBC in peripheral blood: **100.0% granulocytes** with the built-in profile, **90.0%** after choosing `harmonized-9` |
+| No shipped preset carried `denominatorExcludes` | Choosing a preset re-introduced HA-092. Measured on 180 granulocytes + 20 NRBC in peripheral blood: **100.0% granulocytes** with the built-in profile, **90.0%** after choosing `gran-combined-10` |
 
 The first two masked one another: the version defect meant the field loss never
-reached the counter for `consensus-14`. Renaming the profile — which VV-SYS-062
+reached the counter for `ndc-14`. Renaming the profile — which VV-SYS-062
 does — removes that masking and the field loss applies in full.
 
 **Regression detection confirmed** by reverting each fix:

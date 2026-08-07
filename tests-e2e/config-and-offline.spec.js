@@ -56,10 +56,10 @@ test.describe('Configuration controls (URS-103)', () => {
             page.waitForEvent('download'),
             page.click('#btnExportConfig')
         ]);
-        expect(download.suggestedFilename()).toMatch(/^wbcds-config-consensus-14-.*\.json$/);
+        expect(download.suggestedFilename()).toMatch(/^wbcds-config-ndc-14-.*\.json$/);
 
         const profile = JSON.parse(await readDownload(download));
-        expect(profile.profileId).toBe('consensus-14');
+        expect(profile.profileId).toBe('ndc-14');
         expect(profile.version).toBe(SHIPPED.version);
         expect(Array.isArray(profile.specimenTypes)).toBe(true);
     });
@@ -150,7 +150,7 @@ test.describe('Configuration controls (URS-103)', () => {
         await waitForAppReady(page);
         await expect(page.locator('#specimenType option')).toHaveText(['Bone Marrow', 'Peripheral Blood']);
         expect(await page.evaluate(() => window.__wbcTestHooks.state.configMeta.profileId))
-            .toBe('consensus-14');
+            .toBe('ndc-14');
         expect(await page.evaluate(() => localStorage.getItem('wbcds_config'))).not.toContain('stale-lab');
     });
 
@@ -180,8 +180,8 @@ test.describe('Preset profile catalogue (URS-101)', () => {
         await expect(page.locator('#preset-modal')).toBeVisible();
 
         const names = await page.locator('#preset-list .text-sm').allTextContents();
-        expect(names.join('|')).toContain('Full 14-Part Consensus');
-        expect(names.join('|')).toContain('Minimal 5-Part');
+        expect(names.join('|')).toContain('14-Type Nucleated Differential');
+        expect(names.join('|')).toContain('5-Type — Analyzer Categories');
         expect(names.join('|')).toContain('Body Fluid');
 
         // The blank editor template is not a countable profile and must not be
@@ -195,14 +195,14 @@ test.describe('Preset profile catalogue (URS-101)', () => {
     test('VV-SYS-056: Loading a preset applies it and it is usable for counting', async ({ page }) => {
         await page.goto('/counter.html');
         await page.click('#btnPresetCatalog');
-        await page.locator('#preset-list button[data-preset-name="Minimal 5-Part"]').click();
+        await page.locator('#preset-list button[data-preset-name="5-Type — Analyzer Categories"]').click();
 
         await expect(page.locator('#modal-title')).toHaveText('Preset Loaded');
         await page.click('#modal-confirm');
 
         await waitForAppReady(page);
         expect(await page.evaluate(() => window.__wbcTestHooks.state.configMeta.profileId))
-            .toBe('minimal-5');
+            .toBe('analyzer-5');
 
         await page.click('#btnStartCount');
         await expect(page.locator('#progress-label')).toHaveText('0 / 100 (target)');
@@ -213,7 +213,7 @@ test.describe('Preset profile catalogue (URS-101)', () => {
     test('VV-SYS-057: The body fluid preset provides a non-blood specimen panel (URS-011)', async ({ page }) => {
         await page.goto('/counter.html');
         await page.click('#btnPresetCatalog');
-        await page.locator('#preset-list button[data-preset-name="Body Fluid"]').click();
+        await page.locator('#preset-list button[data-preset-name="Body Fluid — 7 Types"]').click();
         await expect(page.locator('#modal-title')).toHaveText('Preset Loaded');
         await page.click('#modal-confirm');
 
@@ -229,10 +229,10 @@ test.describe('Preset profile catalogue (URS-101)', () => {
 // ================================================================
 test.describe('Subset percentage formulas (URS-039)', () => {
 
-    test('VV-SYS-125: The legacy preset reports blasts against both denominators', async ({ page }) => {
+    test('VV-SYS-125: The bands-and-segs preset reports blasts against both denominators', async ({ page }) => {
         await page.goto('/counter.html');
         await page.click('#btnPresetCatalog');
-        await page.locator('#preset-list button[data-preset-name="Legacy 10-Part"]').click();
+        await page.locator('#preset-list button[data-preset-name="10-Type — Bands & Segs Separate"]').click();
         await expect(page.locator('#modal-title')).toHaveText('Preset Loaded');
         await page.click('#modal-confirm');
         await waitForAppReady(page);
@@ -596,7 +596,7 @@ test.describe('Output, export and printing', () => {
             expect(header).toContain(col);
         }
         expect(csv).toContain('S25-CSV');
-        expect(csv).toContain('consensus-14');
+        expect(csv).toContain('ndc-14');
     });
 
     test('VV-SYS-072: Session JSON export downloads and parses (URS-084)', async ({ page }) => {
@@ -612,7 +612,7 @@ test.describe('Output, export and printing', () => {
         expect(sessions).toHaveLength(1);
         expect(sessions[0].caseNumber).toBe('S25-JSON');
         expect(sessions[0].counts.blasts).toBe(5);
-        expect(sessions[0].configProfileId).toBe('consensus-14');
+        expect(sessions[0].configProfileId).toBe('ndc-14');
         expect(sessions[0].totalCount).toBe(5);
     });
 
@@ -641,7 +641,7 @@ test.describe('Output, export and printing', () => {
         await expect(page.locator('#history-count')).toHaveText('(1)');
         await page.locator('.history-entry').first().click();
         await expect(page.locator('#history-modal')).toBeVisible();
-        await expect(page.locator('#history-modal-content')).toContainText('consensus-14');
+        await expect(page.locator('#history-modal-content')).toContainText('ndc-14');
         await page.click('#history-modal-close');
         await expect(page.locator('#history-modal')).toBeHidden();
     });
@@ -726,7 +726,7 @@ test.describe('Offline operation (URS-094)', () => {
 
         await page.click('#btnCountDone');
         await expect(page.locator('#phase-results')).toBeVisible();
-        await expect(page.locator('#results-summary')).toContainText('consensus-14');
+        await expect(page.locator('#results-summary')).toContainText('ndc-14');
 
         await context.setOffline(false);
     });
@@ -949,7 +949,7 @@ test.describe('Removing a category cleans up after itself (P0-7)', () => {
 test.describe('The predecessor profile is reachable and countable (URS-101)', () => {
 
     /**
-     * `legacy-mdc` reproduces the 2015 Backbone/JSP counter kept at `legacy/`,
+     * `mdc-2015-9` reproduces the 2015 Backbone/JSP counter kept at `legacy/`,
      * so an operator who used it can switch without relearning the keyboard.
      * The unit layer holds the configuration to what that application was
      * measured to do (VV-PRE-021..026, DCR-032). What only a browser can show
@@ -959,7 +959,7 @@ test.describe('The predecessor profile is reachable and countable (URS-101)', ()
     async function loadLegacyMdc(page) {
         await page.goto('/counter.html');
         await page.click('text=Preset Profiles');
-        await page.locator('div', { hasText: /^Legacy MDC \(2015\)/ })
+        await page.locator('div', { hasText: /^9-Type — 2015 Counter Layout/ })
             .locator('button:has-text("Load")').last().click();
         // A "Preset Loaded" confirmation follows, in #modal-overlay. It must
         // be dismissed before anything else is clicked: while visible the
@@ -970,7 +970,7 @@ test.describe('The predecessor profile is reachable and countable (URS-101)', ()
         // earlier proved nothing.)
         const overlay = page.locator('#modal-overlay');
         await expect(overlay).toBeVisible();
-        await expect(overlay).toContainText('Legacy MDC (2015)');
+        await expect(overlay).toContainText('9-Type — 2015 Counter Layout');
         await overlay.getByRole('button', { name: 'OK' }).click();
         await expect(overlay).toBeHidden();
     }
@@ -1035,5 +1035,86 @@ test.describe('The predecessor profile is reachable and countable (URS-101)', ()
         const pdx = await page.locator('body').innerText();
         expect(pdx).toMatch(/M:E ratio \| \d+\.\d:1/);
         expect(pdx).not.toMatch(/M:E ratio \| _ \|/);
+    });
+});
+
+// ================================================================
+test.describe('A renamed profile id is offered, never imposed (URS-101)', () => {
+
+    /**
+     * DCR-035 renamed five profile ids. An id is not private — it prints in
+     * the report footer (URS-052) and travels in every export — and
+     * `isCacheSuperseded` compares ids for equality, so a browser holding a
+     * cached `consensus-14` would have reported "not superseded" and carried
+     * on silently under a name the catalogue no longer contains.
+     *
+     * The remedy must not overcorrect. An operator may have adapted their
+     * configuration since loading it, and replacing it to fix a label would
+     * discard that work. So: offered, declining by default.
+     */
+    async function seedOldProfile(page) {
+        const old = JSON.parse(fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'settings', 'presets', 'ndc-14.json'), 'utf-8'));
+        old.profileId = 'consensus-14';
+        old.profileName = 'Full 14-Part Consensus';
+        old.version = '2.5';
+        await page.addInitScript(cfg => {
+            localStorage.setItem('wbcds_config', JSON.stringify(cfg));
+        }, old);
+    }
+
+    test('VV-SYS-217: The operator is told, and keeping their profile is the default', async ({ page }) => {
+        await seedOldProfile(page);
+        await page.goto('/counter.html');
+
+        const overlay = page.locator('#modal-overlay');
+        await expect(overlay).toBeVisible();
+        await expect(overlay).toContainText('consensus-14');
+        await expect(overlay).toContainText('ndc-14');
+
+        await overlay.getByRole('button', { name: 'Keep mine' }).click();
+        await expect(overlay).toBeHidden();
+
+        // The configuration is untouched — this is the assertion that matters.
+        const kept = await page.evaluate(() =>
+            JSON.parse(localStorage.getItem('wbcds_config')).profileId);
+        expect(kept).toBe('consensus-14');
+    });
+
+    test('VV-SYS-218: Accepting loads the renamed built-in', async ({ page }) => {
+        await seedOldProfile(page);
+        await page.goto('/counter.html');
+
+        const overlay = page.locator('#modal-overlay');
+        await expect(overlay).toBeVisible();
+        await overlay.getByRole('button', { name: /^Load / }).click();
+
+        // "Preset Loaded" confirms; dismiss it, then check what is cached.
+        await expect(overlay).toContainText('14-Type Nucleated Differential');
+        await overlay.locator('#modal-confirm').click();
+        await expect(overlay).toBeHidden();
+
+        const now = await page.evaluate(() =>
+            JSON.parse(localStorage.getItem('wbcds_config')).profileId);
+        expect(now).toBe('ndc-14');
+    });
+
+    test('VV-SYS-219: A current profile raises no offer', async ({ page }) => {
+        // Seeds a CACHED profile whose id is current. A fresh browser would
+        // prove nothing: with no cache the offer cannot fire for a structural
+        // reason, so the test would pass however wrong the rename map was —
+        // which it did, until the inverse check exposed it.
+        const current = JSON.parse(fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'settings', 'presets', 'ndc-14.json'), 'utf-8'));
+        await page.addInitScript(cfg => {
+            localStorage.setItem('wbcds_config', JSON.stringify(cfg));
+        }, current);
+
+        await page.goto('/counter.html');
+        await waitForAppReady(page);
+        await expect(page.locator('#modal-overlay')).toBeHidden();
+        const kept = await page.evaluate(() =>
+            JSON.parse(localStorage.getItem('wbcds_config')).profileId);
+        expect(kept).toBe('ndc-14');
     });
 });

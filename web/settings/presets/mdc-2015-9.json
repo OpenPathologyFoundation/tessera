@@ -1,11 +1,11 @@
 {
-  "version": "2.1",
-  "profileId": "legacy-mdc",
-  "profileName": "Legacy MDC (2015)",
+  "version": "2.2",
+  "profileId": "mdc-2015-9",
+  "profileName": "9-Type — 2015 Counter Layout",
   "provenance": {
     "standard": "None — reproduces a predecessor application",
     "citation": "WBC ΔΣ predecessor: Backbone.js/JSP Manual Differential Counter, 2015, retained at legacy/ and described in DCR-004. Configuration recovered from web/settings/templates.json at commit aa88da4 and verified by executing the application under Playwright (DCR-032).",
-    "notes": "This profile exists so an operator familiar with the predecessor tool can switch without relearning the keyboard. Its nine categories are COARSER than ICSH 2008 §2.6: 'gran' aggregates myelocytes, metamyelocytes, bands and segmented neutrophils into one key; 'pro' covers promyelocytes and myelocytes together; 'baso' covers basophils and mast cells. A count taken in this profile therefore cannot be reported against the ICSH nucleated differential count without re-counting. Prefer consensus-14 for new work."
+    "notes": "This profile exists so an operator familiar with the predecessor tool can switch without relearning the keyboard. Its nine categories are COARSER than ICSH 2008 §2.6: 'gran' aggregates myelocytes, metamyelocytes, bands and segmented neutrophils into one key; 'pro' covers promyelocytes and myelocytes together; 'baso' covers basophils and mast cells. A count taken in this profile therefore cannot be reported against the ICSH nucleated differential count without re-counting. Prefer ndc-14 for new work."
   },
   "description": "The 2015 predecessor counter's layout, key-for-key: A S D F Z X C V B, with its Yale SOM, Precipio DX and MGH report templates. Categories are aggregated as that tool aggregated them. Percentages use this application's rounding rather than the predecessor's — see provenance.",
   "specimenTypes": [
@@ -42,7 +42,7 @@
         "B": "mono"
       },
       "categoryNotes": {
-        "gran": "Maturing granulocyte forms as one category — myelocytes, metamyelocytes, bands and segmented neutrophils together. The predecessor tool counted them on one key and this profile preserves that. ICSH 2008 §2.6 asks for them separately; use consensus-14 if the separation matters.",
+        "gran": "Maturing granulocyte forms as one category — myelocytes, metamyelocytes, bands and segmented neutrophils together. The predecessor tool counted them on one key and this profile preserves that. ICSH 2008 §2.6 asks for them separately; use ndc-14 if the separation matters.",
         "pro": "Promyelocytes AND myelocytes, as the predecessor's report wording states.",
         "baso": "Basophils and mast cells together, as the predecessor's report wording states. ICSH lists mast cells separately."
       },
@@ -138,7 +138,7 @@
       },
       "categoryNotes": {
         "pro": "Immature granulocytic precursors as one category, as the predecessor's report wording states.",
-        "other": "The predecessor offered no category for nucleated red cells in peripheral blood. If NRBC are seen, this profile cannot report them per 100 WBC — use consensus-14, which excludes them from the denominator and reports them by the ICSH convention (DCR-006)."
+        "other": "The predecessor offered no category for nucleated red cells in peripheral blood. If NRBC are seen, this profile cannot report them per 100 WBC — use ndc-14, which excludes them from the denominator and reports them by the ICSH convention (DCR-006)."
       },
       "templates": [
         {

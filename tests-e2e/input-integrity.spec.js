@@ -380,7 +380,7 @@ test.describe('Absolute counts in the report are optional (SYS-251)', () => {
         await expect(panel).toContainText('corrected for 20.0 NRBC per 100 WBC');
 
         // The provenance stamp survives the re-render (URS-052).
-        await expect(panel).toContainText('consensus-14');
+        await expect(panel).toContainText('ndc-14');
     });
 
     test('VV-SYS-192: When disabled, the report is unchanged by a WBC', async ({ page }) => {

@@ -1,6 +1,6 @@
 {
   "name": "wbc-delta-sigma",
-  "version": "2.20.0",
+  "version": "2.21.0",
   "description": "WBC ΔΣ — Keyboard-driven manual differential WBC counting tool for hematology",
   "main": "web/scripts/mdc-app.js",
   "scripts": {

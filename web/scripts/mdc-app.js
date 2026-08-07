@@ -307,15 +307,69 @@
         loadSessionHistory();
         init();
 
+        // A cached profile whose id was renamed (DCR-035) is still perfectly
+        // usable, so it is NOT replaced: the operator may have adapted it, and
+        // discarding that to correct a label would be the worse trade. But the
+        // id prints in the report footer and travels in every export, so
+        // carrying on silently under a name the catalogue no longer knows is
+        // not acceptable either. Offered, once, and only when nothing else is
+        // already claiming the modal.
+        var successor = (!notice && chosen === cached)
+            ? Core.renamedSuccessor(chosen.meta) : null;
+
         // Both of these raise a modal, and the modal is a single shared
         // element: showing them in parallel would replace the recovery prompt
         // with the notice and silently cost the operator an interrupted count.
         // They are therefore sequenced.
         if (notice) {
             showAlert('Configuration Updated', notice, checkAutosaveRecovery);
+        } else if (successor) {
+            offerRenamedProfile(chosen.meta, successor, checkAutosaveRecovery);
         } else {
             checkAutosaveRecovery();
         }
+    }
+
+    /**
+     * Tell the operator their profile was renamed, and offer the successor.
+     *
+     * Declining is the default: Escape and Cancel both keep the active
+     * configuration. Accepting loads the renamed built-in, which replaces the
+     * active one — the same consequence as loading any preset from the
+     * catalogue, and stated as such rather than described as an update.
+     *
+     * The successor's file and display name are read from the catalogue rather
+     * than assumed, so a later rename needs no second place to update. If the
+     * catalogue cannot be fetched — an offline workstation — the offer is
+     * skipped silently: there is nothing to load, and a dialog offering an
+     * action that cannot be performed is worse than no dialog.
+     */
+    async function offerRenamedProfile(cachedMeta, successorId, done) {
+        var entry = null;
+        try {
+            var resp = await fetch('settings/presets/index.json', { cache: 'no-cache' });
+            if (resp.ok) {
+                var catalogue = await resp.json();
+                (catalogue.presets || []).forEach(function (p) {
+                    if (p.profileId === successorId) entry = p;
+                });
+            }
+        } catch (e) { /* offline: no successor to offer */ }
+
+        if (!entry) { done(); return; }
+
+        WBCDialog.confirm(
+            'Profile renamed',
+            'Your active configuration is "' + (cachedMeta.profileName || cachedMeta.profileId) +
+            '" (' + cachedMeta.profileId + '), which has been renamed to "' + entry.name +
+            '" (' + successorId + '). Names now state what a profile contains rather than asserting ' +
+            'endorsement. Your configuration still works, and reports will keep citing the old id. ' +
+            'Load the renamed built-in profile instead? This replaces the active configuration and ' +
+            'clears any count in progress.',
+            'Load ' + entry.name,
+            function () { loadPreset(entry.file, entry.name); },
+            'Keep mine',
+            done);
     }
 
     /**

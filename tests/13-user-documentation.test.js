@@ -409,7 +409,7 @@ describe('User guide tracks the shipped configuration (URS-092)', () => {
 
     it('UD-095: The guide lists the presets the catalogue actually offers', () => {
         // It named `frequency-ergonomic` and `right-hand` for months after both
-        // were withdrawn (DCR-020, HA-104), and did not name `legacy-mdc` when
+        // were withdrawn (DCR-020, HA-104), and did not name `mdc-2015-9` when
         // that was added. A reader looking for a profile by the name the guide
         // gives it finds nothing, and concludes the tool cannot do the thing.
         const cat = JSON.parse(fs.readFileSync(path.join(
@@ -436,7 +436,7 @@ describe('User guide tracks the shipped configuration (URS-092)', () => {
         // An operator switching for familiarity must be told where the
         // familiarity stops. The profile is coarser than ICSH and its report
         // figures differ from the old tool's in three specific ways.
-        assert.match(guide, /Legacy MDC \(2015\)/, 'the guide does not name the profile');
+        assert.match(guide, /9-Type — 2015 Counter Layout/, 'the guide does not name the profile');
         assert.match(guide, /coarser/i, 'the guide does not warn that the categories are aggregated');
         assert.match(guide, /0\.5%/, 'the guide does not show the corrected figure for a rare cell');
         assert.match(guide, /sum to 100/, 'the guide does not state that the percentages now sum');
@@ -639,7 +639,7 @@ describe('Calculation reference is arithmetically true (URS-092)', () => {
         // (DCR-020).
         const presets = path.join(ROOT, 'web', 'settings', 'presets');
         const bm = Core.normalizeConfig(JSON.parse(
-            fs.readFileSync(path.join(presets, 'consensus-14.json'), 'utf-8')))
+            fs.readFileSync(path.join(presets, 'ndc-14.json'), 'utf-8')))
             .specimenTypes.find(s => s.specimenType === 'bm');
         const icsh = bm.formulas.ME_ratio;
         const alt = Object.assign({}, icsh,

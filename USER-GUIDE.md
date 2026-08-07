@@ -104,7 +104,7 @@ Everything clinical is configurable without touching the software: cell
 categories, keys, target counts, derived formulas, diagnostic thresholds and
 report wording.
 
-- **Preset Profiles** — Full 14-Part Consensus, Harmonized 10-Part, Legacy 10-Part, Minimal 5-Part, Body Fluid, Legacy MDC (2015).
+- **Preset Profiles** — 14-Type Nucleated Differential, 10-Type — Bands+Segs Combined, 10-Type — Bands & Segs Separate, 5-Type — Analyzer Categories, Body Fluid — 7 Types, 9-Type — 2015 Counter Layout.
 - **Configuration Editor** — build or adapt a profile visually.
 - **Export / Import Config** — share a profile between workstations or colleagues.
 
@@ -116,7 +116,7 @@ disagree, check that first.
 
 ### If you used the 2015 counter
 
-**Preset Profiles → Legacy MDC (2015) → Load.**
+**Preset Profiles → 9-Type — 2015 Counter Layout → Load.**
 
 Your keys are unchanged: `A S D F` across the top, `Z X C V B` below, mapped to
 the same cell types in the same order. Bone marrow still targets 200 cells and

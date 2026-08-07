@@ -1421,6 +1421,42 @@
     }
 
     /**
+     * Profiles renamed under DCR-035, old id to new.
+     *
+     * A profile id is not private: it prints in the report footer (URS-052)
+     * and travels in every export, so a rename leaves an installed browser
+     * holding a cached configuration whose id names nothing in the catalogue.
+     * `isCacheSuperseded` compares ids for equality, so it says "not
+     * superseded" and the operator carries on under the old name without
+     * being told — the one outcome a rename must not produce silently.
+     *
+     * The map is data rather than logic so a later rename is one line. It is
+     * append-only: an entry removed would restore the silence it exists to
+     * prevent.
+     */
+    var RENAMED_PROFILES = {
+        'consensus-14': 'ndc-14',
+        'harmonized-9': 'gran-combined-10',
+        'legacy-9': 'bands-segs-10',
+        'minimal-5': 'analyzer-5',
+        'legacy-mdc': 'mdc-2015-9'
+    };
+
+    /**
+     * The successor of a cached profile whose id was renamed, or null.
+     *
+     * Deliberately does NOT report the cached profile as superseded: an
+     * operator's active configuration may have been adapted since it was
+     * loaded, and replacing it because the built-in was renamed would discard
+     * work to fix a label. The caller offers; it does not act.
+     */
+    function renamedSuccessor(cachedMeta) {
+        if (!cachedMeta || !cachedMeta.profileId) return null;
+        var to = RENAMED_PROFILES[cachedMeta.profileId];
+        return to || null;
+    }
+
+    /**
      * Whether a cached config may be used in place of the shipped one.
      * A cached profile is superseded when the shipped file carries the same
      * profileId at a newer version, which is what allows a corrected default
@@ -1473,7 +1509,7 @@
      * mirrors the operator's hand, which is worth having in a tool driven
      * entirely by touch-typing.
      *
-     * Of the shipped profiles only `legacy-mdc` qualifies — it inherited
+     * Of the shipped profiles only `mdc-2015-9` qualifies — it inherited
      * A S D F / Z X C V B from the 2015 predecessor. The others assign keys by
      * frequency, so their columns would line up with nothing.
      *
@@ -1588,6 +1624,8 @@
         buildSessionJson: buildSessionJson,
         normalizeConfig: normalizeConfig,
         validateConfig: validateConfig,
+        RENAMED_PROFILES: RENAMED_PROFILES,
+        renamedSuccessor: renamedSuccessor,
         isCacheSuperseded: isCacheSuperseded,
         compareVersions: compareVersions
     };

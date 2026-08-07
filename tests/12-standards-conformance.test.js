@@ -225,7 +225,7 @@ describe('Both M:E conventions are offered (URS-035)', () => {
 
     /**
      * The alternative M:E convention used to ship as its own preset file. That
-     * file was a fork of consensus-14 differing in one field, and the forking
+     * file was a fork of ndc-14 differing in one field, and the forking
      * pattern had already cost correctness twice (HA-104; six presets missing
      * confidenceIntervals). It was removed under DCR-020.
      *
@@ -235,7 +235,7 @@ describe('Both M:E conventions are offered (URS-035)', () => {
      * editor control that composes the formula.
      */
     it('SC-040: The alternative convention is composable and valid', () => {
-        const base = load('consensus-14.json');
+        const base = load('ndc-14.json');
         const bm = base.specimenTypes.find(s => s.specimenType === 'bm');
         assert.ok(bm.formulas.ME_ratio.numerator.includes('mono'),
             'the shipped default follows ICSH 2008 §2.6 and includes monocytes');
@@ -262,7 +262,7 @@ describe('Both M:E conventions are offered (URS-035)', () => {
     });
 
     it('SC-042: The two conventions give different ratios from identical counts', () => {
-        const bm = load('consensus-14.json').specimenTypes.find(s => s.specimenType === 'bm');
+        const bm = load('ndc-14.json').specimenTypes.find(s => s.specimenType === 'bm');
         const icsh = bm.formulas.ME_ratio;
         const alt = Object.assign({}, icsh,
             { numerator: icsh.numerator.filter(ct => ct !== 'mono') });
@@ -279,7 +279,7 @@ describe('Both M:E conventions are offered (URS-035)', () => {
     });
 
     it('SC-043: The convention in force is stated, so a report is interpretable', () => {
-        const cfg = load('consensus-14.json');
+        const cfg = load('ndc-14.json');
         const bm = cfg.specimenTypes.find(s => s.specimenType === 'bm');
         assert.ok(bm.formulas.ME_ratio.basis, 'no stated basis for the M:E ratio');
         assert.match(bm.formulas.ME_ratio.basis, /monocytes/i,

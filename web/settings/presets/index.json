@@ -1,48 +1,48 @@
 {
   "schemaVersion": "1.0",
-  "description": "Catalogue of built-in configuration profiles (URS-101). Each entry is a starting point a laboratory can load and then adapt in the configuration editor. Profiles marked editorOnly cannot be counted with as-is and are offered only as editor templates. Layouts that differ only in key assignment or M:E composition are not separate profiles: both are fields, editable in the Configuration Editor.",
+  "description": "Catalogue of built-in configuration profiles (URS-101). A profile name states what the profile IS — its tallied category count and defining trait. Provenance, endorsement and rationale live in `description` and `provenance.notes`, as facts with citations. Value and status words (legacy, consensus, harmonized, modern, classic, full, minimal, standard) are not used in names; VV-PRE-030..033 enforce this. Each entry is a starting point a laboratory can load and then adapt in the configuration editor. Profiles marked editorOnly cannot be counted with as-is.",
   "presets": [
     {
-      "profileId": "consensus-14",
-      "file": "consensus-14.json",
-      "name": "Full 14-Part Consensus",
-      "summary": "Complete 14-category differential for bone marrow and peripheral blood, with M:E ratio. Key layout and M:E composition are editable in the Configuration Editor.",
+      "profileId": "ndc-14",
+      "file": "ndc-14.json",
+      "name": "14-Type Nucleated Differential",
+      "summary": "The 13 ICSH 2008 §2.6 nucleated differential categories plus an `other` category with scope guidance. BM 500, PB 200; NRBC reported per 100 WBC in blood.",
       "specimens": "BM (500) - PB (200)",
       "default": true
     },
     {
-      "profileId": "harmonized-9",
-      "file": "harmonized-9.json",
-      "name": "Harmonized 10-Part",
-      "summary": "Ten-category harmonised panel following contemporary reporting practice.",
+      "profileId": "gran-combined-10",
+      "file": "gran-combined-10.json",
+      "name": "10-Type — Bands+Segs Combined",
+      "summary": "Ten tallied categories; band and segmented neutrophils counted as one granulocyte category. Promyelocytes separate.",
       "specimens": "BM (500) - PB (200)"
     },
     {
-      "profileId": "legacy-9",
-      "file": "legacy-9.json",
-      "name": "Legacy 10-Part",
-      "summary": "Ten-category panel matching older mechanical counter layouts.",
+      "profileId": "bands-segs-10",
+      "file": "bands-segs-10.json",
+      "name": "10-Type — Bands & Segs Separate",
+      "summary": "Ten tallied categories matching mechanical bench-counter layouts: bands and segmented neutrophils counted separately.",
       "specimens": "BM (500) - PB (200)"
     },
     {
-      "profileId": "minimal-5",
-      "file": "minimal-5.json",
-      "name": "Minimal 5-Part",
-      "summary": "Five-category screening differential for routine peripheral blood.",
+      "profileId": "analyzer-5",
+      "file": "analyzer-5.json",
+      "name": "5-Type — Analyzer Categories",
+      "summary": "The five categories automated analyzers report: neutrophils, lymphocytes, monocytes, eosinophils, basophils. Peripheral blood only.",
       "specimens": "PB (100)"
     },
     {
       "profileId": "body-fluid",
       "file": "body-fluid.json",
-      "name": "Body Fluid",
-      "summary": "CSF, pleural, peritoneal and synovial categories per CLSI H56-A (URS-011).",
+      "name": "Body Fluid — 7 Types",
+      "summary": "Seven categories for CSF, serous and synovial fluid differentials, including mesothelial and malignant cells.",
       "specimens": "BF (200)"
     },
     {
-      "profileId": "legacy-mdc",
-      "file": "legacy-mdc.json",
-      "name": "Legacy MDC (2015)",
-      "summary": "The 2015 predecessor counter's layout key-for-key, with its Yale SOM, Precipio DX and MGH templates. Categories are aggregated as that tool aggregated them and are coarser than ICSH \u2014 see the profile's provenance.",
+      "profileId": "mdc-2015-9",
+      "file": "mdc-2015-9.json",
+      "name": "9-Type — 2015 Counter Layout",
+      "summary": "Nine tallied categories reproducing the 2015 predecessor counter's key layout, with its Yale SOM, Precipio DX and MGH report templates.",
       "specimens": "BM (200) - PB (100)"
     },
     {

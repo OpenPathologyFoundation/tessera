@@ -1,13 +1,13 @@
 {
-  "version": "2.0",
-  "profileId": "harmonized-9",
-  "profileName": "Harmonized 10-Part",
+  "version": "2.1",
+  "profileId": "gran-combined-10",
+  "profileName": "10-Type — Bands+Segs Combined",
   "provenance": {
     "standard": "ICSH 2008",
     "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
-    "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 \u00a72.6."
+    "notes": "M:E ratio composition follows ICSH 2008 §2.6. Categories are an aggregated subset of the ICSH nucleated differential count, not the full list."
   },
-  "description": "Modern consensus 9-part differential: blasts, promyelocytes, myelocytes, metamyelocytes, bands/segs, eosinophils, basophils, monocytes, lymphocytes. Aggregates bands and segmented neutrophils into a single granulocyte category. Left-hand ergonomic key layout.",
+  "description": "Ten tallied categories. Band and segmented neutrophils are counted as one granulocyte category: the band/seg split is the least reproducible distinction between observers (REF-001 [S8]). Promyelocytes counted separately. In blood, NRBC are reported per 100 WBC, leaving a 9-category leukocyte differential. The bone marrow panel has no plasma-cell or mast-cell category — plasma cells and mast cells cannot be tallied. See the guidance on the lymphocyte and basophil categories before using this profile for a marrow.",
   "specimenTypes": [
     {
       "specimenType": "bm",
@@ -60,7 +60,7 @@
             "nrbc"
           ],
           "precision": 1,
-          "basis": "ICSH 2008 \u00a72.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
+          "basis": "ICSH 2008 §2.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
         }
       },
       "templates": [
@@ -95,7 +95,7 @@
         "display": 2,
         "report": 0
       },
-      "targetCountBasis": "ICSH 2008 \u00a72.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it.",
+      "targetCountBasis": "ICSH 2008 §2.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it.",
       "confidenceIntervals": {
         "enabled": true,
         "level": 0.95
@@ -105,15 +105,19 @@
           "target": "blasts",
           "value": 20,
           "label": "AML blast threshold",
-          "basis": "WHO 2022 / ICC 2022 \u2014 20% blasts of all nucleated cells."
+          "basis": "WHO 2022 / ICC 2022 — 20% blasts of all nucleated cells."
         },
         {
           "target": "blasts",
           "value": 5,
           "label": "low blast threshold",
-          "basis": "ICSH 2008 \u00a72.6 cites 5% as a low threshold warranting an extended count."
+          "basis": "ICSH 2008 §2.6 cites 5% as a low threshold warranting an extended count."
         }
-      ]
+      ],
+      "categoryNotes": {
+        "lymph": "Lymphocytes only. **Plasma cells have no category in this profile.** Do not count them here — record them in the morphology comment. Counting a plasma cell as a lymphocyte overstates the lymphoid percentage and depresses every other percentage, because the denominator grows. If plasma cells need quantifying, use the 14-Type Nucleated Differential, which has a plasma-cell category (ICSH 2008 §2.6 lists one).",
+        "baso": "Basophils only. **Mast cells have no category in this profile.** Do not count them here — record them in the morphology comment. ICSH 2008 §2.6 lists mast cells separately; the 14-Type Nucleated Differential provides that category."
+      }
     },
     {
       "specimenType": "pb",
@@ -181,7 +185,7 @@
         "display": 2,
         "report": 0
       },
-      "targetCountBasis": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does \u2014 a documented default, not a claim to perform the reference method.",
+      "targetCountBasis": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does — a documented default, not a claim to perform the reference method.",
       "denominatorExcludes": [
         "nrbc"
       ],

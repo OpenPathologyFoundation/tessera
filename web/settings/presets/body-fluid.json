@@ -1,13 +1,13 @@
 {
-  "version": "2.0",
+  "version": "2.1",
   "profileId": "body-fluid",
-  "profileName": "Body Fluid",
+  "profileName": "Body Fluid — 7 Types",
   "provenance": {
     "standard": "ICSH 2008",
     "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
-    "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 \u00a72.6."
+    "notes": "Practice-based body fluid panel; see CLSI H56 (REF-001 [S3]). Not held in full text."
   },
-  "description": "Differential for body fluid specimens (CSF, pleural, peritoneal, synovial). Includes lymphocytes, monocytes/macrophages, mesothelial cells, neutrophils, eosinophils, malignant cells, and other. Left-hand ergonomic key layout.",
+  "description": "Seven categories for CSF, serous and synovial fluid differentials, including mesothelial and malignant cells. Basis: laboratory practice informed by CLSI H56; H56 is not held in full text (REF-001 [S3]).",
   "specimenTypes": [
     {
       "specimenType": "bf",
@@ -66,13 +66,13 @@
         "display": 2,
         "report": 0
       },
-      "targetCountBasis": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does \u2014 a documented default, not a claim to perform the reference method.",
+      "targetCountBasis": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does — a documented default, not a claim to perform the reference method.",
       "confidenceIntervals": {
         "enabled": true,
         "level": 0.95
       },
       "categoryNotes": {
-        "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells \u2014 ICSH 2008 \u00a72.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
+        "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells — ICSH 2008 §2.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
       }
     }
   ]

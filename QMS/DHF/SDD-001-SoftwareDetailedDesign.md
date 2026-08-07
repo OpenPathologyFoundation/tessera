@@ -595,8 +595,8 @@ has not shipped since v2.0, and omitted every field added by DCR-006 onward.
 ```jsonc
 {
   "version": "2.5",                    // supersede comparison, §3.11.3
-  "profileId": "consensus-14",         // identity; appears in every report
-  "profileName": "Full 14-Part Consensus",
+  "profileId": "ndc-14 (formerly consensus-14)",         // identity; appears in every report
+  "profileName": "14-Type Nucleated Differential",
   "provenance": { ... },               // free-form origin record
   "specimenTypes": [
     {

@@ -171,7 +171,7 @@ describe('Config Schema V2 — Backward Compatibility', () => {
 
     it('VV-SCH-018: normalizeConfig accepts the v2 envelope and preserves its metadata', () => {
         const norm = Core.normalizeConfig({
-            version: '2.0', profileId: 'consensus-14', profileName: 'Full 14-Part Consensus',
+            version: '2.0', profileId: 'ndc-14', profileName: '14-Type Nucleated Differential',
             specimenTypes: [{
                 specimenType: 'pb',
                 categories: { upper: ['blasts'], lower: ['poly'] },
@@ -179,8 +179,8 @@ describe('Config Schema V2 — Backward Compatibility', () => {
                 templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }]
             }]
         });
-        assert.equal(norm.profileId, 'consensus-14');
-        assert.equal(norm.profileName, 'Full 14-Part Consensus');
+        assert.equal(norm.profileId, 'ndc-14');
+        assert.equal(norm.profileName, '14-Type Nucleated Differential');
         assert.equal(norm.version, '2.0');
         assert.equal(norm.specimenTypes[0].specimenLabel, 'Peripheral Blood');
         assert.equal(norm.specimenTypes[0].targetCount, 200);

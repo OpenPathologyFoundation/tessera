@@ -227,7 +227,7 @@ describe('E2E — Traceability Fields in Output (URS-052)', () => {
     it('VV-E2E-020: Session carries profile id, name, version, target and timestamp', () => {
         const spec = specFor('bm');
         const session = buildSession('bm', applyKeystrokes(spec, press('X', 10)), 'S25-1234', '');
-        assert.equal(session.configProfileId, 'consensus-14');
+        assert.equal(session.configProfileId, 'ndc-14');
         assert.equal(session.configVersion, normalized.version,
             'the session must record the version of the profile actually in force');
         assert.ok(session.configProfileName);
@@ -248,7 +248,7 @@ describe('E2E — Traceability Fields in Output (URS-052)', () => {
             assert.ok(header.includes(col), `CSV header missing ${col}`);
         });
         const row = csv.split('\n')[1];
-        assert.match(row, /consensus-14/);
+        assert.match(row, /ndc-14/);
         assert.match(row, /S25-1234/);
     });
 
@@ -258,7 +258,7 @@ describe('E2E — Traceability Fields in Output (URS-052)', () => {
             buildSession('bm', applyKeystrokes(spec, press('X', 10)), 'S25-1234', '')
         ]));
         assert.equal(parsed.length, 1);
-        assert.equal(parsed[0].configProfileId, 'consensus-14');
+        assert.equal(parsed[0].configProfileId, 'ndc-14');
         assert.equal(parsed[0].counts.blasts, 10);
         // Report text is exported as plain text, not markup
         assert.doesNotMatch(parsed[0].outputs.pdx, /<br>/);

@@ -177,7 +177,7 @@ test.describe('Validation scenario V1 — complete bone marrow differential', ()
         await expect(page.locator('#low-count-note')).toBeHidden();
 
         // Traceability footer present (URS-052)
-        await expect(page.locator('#results-summary')).toContainText('consensus-14');
+        await expect(page.locator('#results-summary')).toContainText('ndc-14');
         await expect(page.locator('#results-summary')).toContainText('v' + SHIPPED.version);
 
         // The report percentages must sum to 100
@@ -449,7 +449,7 @@ test.describe('Method provenance (URS-052, URS-055)', () => {
         // What actually lands in the LIS must identify the profile that
         // produced it — the report is otherwise not interpretable later.
         const clip = await page.evaluate(() => navigator.clipboard.readText());
-        expect(clip).toContain('consensus-14');
+        expect(clip).toContain('ndc-14');
         expect(clip).toMatch(/v\d+\.\d+/);
         expect(clip).toContain('S25-PROV');
     });
@@ -593,14 +593,14 @@ test.describe('The totals column is one column (URS-055)', () => {
             for (const b of document.querySelectorAll('button')) {
                 if (b.textContent.trim() !== 'Load') continue;
                 let row = b.parentElement;
-                while (row && !row.textContent.includes('Legacy MDC (2015)')) row = row.parentElement;
+                while (row && !row.textContent.includes('9-Type — 2015 Counter Layout')) row = row.parentElement;
                 if (row && row.querySelectorAll('button').length <= 2) { b.click(); return true; }
             }
             return false;
         });
         expect(ok).toBe(true);
         const overlay = page.locator('#modal-overlay');
-        await expect(overlay).toContainText('Legacy MDC (2015)');
+        await expect(overlay).toContainText('9-Type — 2015 Counter Layout');
         await overlay.getByRole('button', { name: 'OK' }).click();
         await expect(overlay).toBeHidden();
     }
@@ -653,7 +653,7 @@ test.describe('The totals column is one column (URS-055)', () => {
     }
 
     test('VV-SYS-215: A keyboard-row profile puts each cell above its own key', async ({ page }) => {
-        // legacy-mdc assigns A S D F over Z X C V B, so column N of each row is
+        // mdc-2015-9 assigns A S D F over Z X C V B, so column N of each row is
         // the same finger and the screen mirrors the hand. Core.keyboardGrid
         // decides this; here it is confirmed to reach the rendered page.
         await page.setViewportSize({ width: 1440, height: 900 });
@@ -675,7 +675,7 @@ test.describe('The totals column is one column (URS-055)', () => {
 
     test('VV-SYS-216: A frequency-assigned profile is not forced onto that grid', async ({ page }) => {
         /**
-         * Legacy 10-Part assigns keys by frequency, not by keyboard row, and
+         * 10-Type — Bands & Segs Separate assigns keys by frequency, not by keyboard row, and
          * splits 4 above / 6 below — the case where forcing a shared grid
          * empties a third of the upper row and stops its rule mid-table.
          *
@@ -691,14 +691,14 @@ test.describe('The totals column is one column (URS-055)', () => {
             for (const b of document.querySelectorAll('button')) {
                 if (b.textContent.trim() !== 'Load') continue;
                 let row = b.parentElement;
-                while (row && !row.textContent.includes('Legacy 10-Part')) row = row.parentElement;
+                while (row && !row.textContent.includes('10-Type — Bands & Segs Separate')) row = row.parentElement;
                 if (row && row.querySelectorAll('button').length <= 2) { b.click(); return true; }
             }
             return false;
         });
         expect(ok).toBe(true);
         const overlay = page.locator('#modal-overlay');
-        await expect(overlay).toContainText('Legacy 10-Part');
+        await expect(overlay).toContainText('10-Type — Bands & Segs Separate');
         await overlay.getByRole('button', { name: 'OK' }).click();
         await expect(overlay).toBeHidden();
         await countAcross(page);
@@ -722,7 +722,7 @@ test.describe('The totals column is one column (URS-055)', () => {
     });
 
     test('VV-SYS-214: An uneven split still shares the axis', async ({ page }) => {
-        // Legacy MDC is 4 above and 5 below — the shape that made the
+        // The 2015 layout is 4 above and 5 below — the shape that made the
         // misalignment visible in the first place.
         await page.setViewportSize({ width: 1440, height: 900 });
         await page.goto('/counter.html');
@@ -731,14 +731,14 @@ test.describe('The totals column is one column (URS-055)', () => {
             for (const btn of document.querySelectorAll('button')) {
                 if (btn.textContent.trim() !== 'Load') continue;
                 let row = btn.parentElement;
-                while (row && !row.textContent.includes('Legacy MDC (2015)')) row = row.parentElement;
+                while (row && !row.textContent.includes('9-Type — 2015 Counter Layout')) row = row.parentElement;
                 if (row && row.querySelectorAll('button').length <= 2) { btn.click(); return true; }
             }
             return false;
         });
         expect(clicked).toBe(true);
         const overlay = page.locator('#modal-overlay');
-        await expect(overlay).toContainText('Legacy MDC (2015)');
+        await expect(overlay).toContainText('9-Type — 2015 Counter Layout');
         await overlay.getByRole('button', { name: 'OK' }).click();
         await expect(overlay).toBeHidden();
 
@@ -753,7 +753,7 @@ test.describe('The totals column is one column (URS-055)', () => {
         // `val-formula-<name>`; `[id^="formula-"]` matched nothing and the
         // measurement blocked until the test timed out.
         const me = await centre(page, '[id^="val-formula-"]');
-        expect(me, 'Legacy MDC defines an M:E ratio, so it must be measurable').not.toBeNull();
+        expect(me, 'The 2015 layout defines an M:E ratio, so it must be measurable').not.toBeNull();
         expect(Math.abs(upper - me)).toBeLessThanOrEqual(1);
     });
 });

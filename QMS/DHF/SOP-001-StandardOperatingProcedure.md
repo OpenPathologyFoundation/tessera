@@ -107,7 +107,7 @@ For each cell identified under the microscope, press the corresponding keyboard 
 
 #### Bone Marrow Key Mapping
 
-Generated from the shipped profile `consensus-14` v2.5. **The
+Generated from the shipped profile `ndc-14 (formerly consensus-14)` v2.5. **The
 authoritative mapping is always the key display on the counting screen** — keys
 are configurable, and a laboratory that adapts the profile changes them.
 

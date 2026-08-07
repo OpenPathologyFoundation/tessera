@@ -1,7 +1,7 @@
 {
-  "version": "2.0",
+  "version": "2.1",
   "profileId": "custom",
-  "profileName": "Custom (Template)",
+  "profileName": "Custom (Blank Template)",
   "description": "Blank starting point for building a custom differential layout. Use the visual configuration editor to add cell types, assign keys, and set targets.",
   "specimenTypes": [
     {

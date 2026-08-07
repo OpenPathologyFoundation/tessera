@@ -1,11 +1,11 @@
 {
-  "version": "2.5",
-  "profileId": "consensus-14",
-  "profileName": "Full 14-Part Consensus",
+  "version": "2.6",
+  "profileId": "ndc-14",
+  "profileName": "14-Type Nucleated Differential",
   "provenance": {
     "standard": "ICSH 2008",
     "citation": "Lee S-H, Erber WN, Porwit A, Tomonaga M, Peterson LC, for the ICSH. ICSH guidelines for the standardization of bone marrow specimens and reports. Int J Lab Hematol 2008;30(5):349-364.",
-    "notes": "Bone marrow categories and M:E ratio follow ICSH 2008 \u00a72.6."
+    "notes": "Bone marrow categories and M:E ratio composition follow ICSH 2008 §2.6. The peripheral blood NRBC convention follows DCR-006."
   },
   "specimenTypes": [
     {
@@ -68,7 +68,7 @@
             "nrbc"
           ],
           "precision": 1,
-          "basis": "ICSH 2008 \u00a72.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
+          "basis": "ICSH 2008 §2.6: all granulocytes and monocytes and their precursors (myeloblasts, promyelocytes, myelocytes, metamyelocytes, band forms, segmented neutrophils, eosinophils, basophils, promonocytes, monocytes) over erythroblasts at all stages. Note that a competing convention excludes monocytes."
         }
       },
       "templates": [
@@ -101,7 +101,7 @@
       "handedness": "left",
       "morphologyChecklist": [],
       "categoryNotes": {
-        "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells \u2014 ICSH 2008 \u00a72.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
+        "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells — ICSH 2008 §2.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
       },
       "confidenceIntervals": {
         "enabled": true,
@@ -112,13 +112,13 @@
           "target": "blasts",
           "value": 20,
           "label": "AML blast threshold",
-          "basis": "WHO 2022 / ICC 2022 \u2014 20% blasts of all nucleated cells."
+          "basis": "WHO 2022 / ICC 2022 — 20% blasts of all nucleated cells."
         },
         {
           "target": "blasts",
           "value": 5,
           "label": "low blast threshold",
-          "basis": "ICSH 2008 \u00a72.6 cites 5% as a low threshold warranting an extended count."
+          "basis": "ICSH 2008 §2.6 cites 5% as a low threshold warranting an extended count."
         },
         {
           "target": "plasma",
@@ -127,7 +127,7 @@
           "basis": "10% clonal plasma cells is a diagnostic boundary for plasma cell neoplasia."
         }
       ],
-      "targetCountBasis": "ICSH 2008 \u00a72.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it.",
+      "targetCountBasis": "ICSH 2008 §2.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it.",
       "rounding": "largest-remainder",
       "precision": {
         "display": 2,
@@ -196,7 +196,7 @@
       "handedness": "left",
       "morphologyChecklist": [],
       "categoryNotes": {
-        "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells \u2014 ICSH 2008 \u00a72.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
+        "other": "Unclassifiable haemopoietic cells only. Do NOT count into this category: megakaryocytes, macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells, or non-haemopoietic cells such as metastatic tumour cells — ICSH 2008 §2.6 excludes these from the nucleated differential count. Record such findings in the morphology comment instead."
       },
       "denominatorExcludes": [
         "nrbc"
@@ -219,7 +219,7 @@
           "basis": "WHO 2022 / ICC 2022."
         }
       ],
-      "targetCountBasis": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does \u2014 a documented default, not a claim to perform the reference method.",
+      "targetCountBasis": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does — a documented default, not a claim to perform the reference method.",
       "rounding": "largest-remainder",
       "precision": {
         "display": 2,

@@ -706,8 +706,8 @@ describe('Diagnostic thresholds (URS-038, ICSH 2008 §2.6)', () => {
 describe('Method provenance (URS-055, DCR-009)', () => {
 
     const META = {
-        profileId: 'consensus-14',
-        profileName: 'Full 14-Part Consensus',
+        profileId: 'ndc-14',
+        profileName: '14-Type Nucleated Differential',
         version: '2.4',
         provenance: { notes: 'Categories follow ICSH 2008 §2.6.' }
     };
@@ -716,8 +716,8 @@ describe('Method provenance (URS-055, DCR-009)', () => {
         const e = Core.buildMethodStatement({}, META);
         const profile = e.find(x => x.label === 'Profile');
         assert.ok(profile);
-        assert.match(profile.text, /Full 14-Part Consensus/);
-        assert.match(profile.text, /consensus-14/);
+        assert.match(profile.text, /14-Type Nucleated Differential/);
+        assert.match(profile.text, /ndc-14/);
         assert.match(profile.text, /v2\.4/);
     });
 
@@ -774,7 +774,7 @@ describe('Method provenance (URS-055, DCR-009)', () => {
     it('VV-PROV-007: The statement flattens for template substitution', () => {
         const text = Core.formatMethodStatement(
             Core.buildMethodStatement({ targetCountBasis: 'ICSH 2008 §2.6.' }, META), ' ');
-        assert.match(text, /Profile: Full 14-Part Consensus/);
+        assert.match(text, /Profile: 14-Type Nucleated Differential/);
         assert.match(text, /Target count: ICSH 2008/);
     });
 
@@ -1062,7 +1062,7 @@ describe('Keyboard-mirroring column grid (URS-055)', () => {
     });
 
     it('VV-KBD-002: Keys scattered across rows do not', () => {
-        // consensus-14's shape: assigned by frequency, not by row.
+        // ndc-14's shape: assigned by frequency, not by row.
         assert.equal(Core.keyboardGrid(spec(
             ['a1', 'a2'], ['b1', 'b2'],
             { B: 'a1', R: 'a2', D: 'b1', Q: 'b2' })), null,

@@ -8,6 +8,7 @@
 | **Purpose** | The single place that states which approvals are outstanding. Generated from the signature tables themselves, so it cannot drift from them. |
 | **Parent Document** | DHF-001 |
 | **Companion** | `CLINICAL-REVIEW-BRIEF.md` — the invitation and the questions. This is the checklist. |
+| **Version under review** | **v2.22.1** — try it at https://mdc.openpathology.org/ ; source at https://github.com/OpenPathologyFoundation/tessera/tree/v2.22.1 |
 
 ---
 
@@ -93,7 +94,7 @@ should be quoted until someone holds the paper.
 > `node scripts/qms-signoffs.js --write` rebuilds this from the signature
 > tables in every document. Suite 14 fails the build if it goes stale.
 
-**35 signature(s) outstanding across 3 role(s).** 15 document(s) are fully signed.
+**35 signature(s) outstanding across 3 role(s).** 16 document(s) are fully signed.
 
 ### Clinical Reviewer — 32 outstanding
 

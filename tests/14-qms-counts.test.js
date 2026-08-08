@@ -201,6 +201,16 @@ describe('The sign-off register describes the file as it stands (URS-092)', () =
         assert.ok(header, 'DHF-001 states no product version');
         assert.equal(header[1], v, 'DHF-001 disagrees with package.json');
 
+        // The version the application SHOWS. A reviewer on the hosted site has
+        // no other way to tell which build produced their report, so this one
+        // being wrong is worse than the others: it misinforms rather than
+        // merely disagreeing (DCR-037).
+        const app = fs.readFileSync(
+            path.join(__dirname, '..', 'web', 'scripts', 'mdc-app.js'), 'utf-8');
+        const shown = /APP_VERSION\s*=\s*'([\d.]+)'/.exec(app);
+        assert.ok(shown, 'mdc-app.js declares no APP_VERSION');
+        assert.equal(shown[1], v, 'the version the application displays disagrees with package.json');
+
         const sw = fs.readFileSync(path.join(__dirname, '..', 'web', 'sw.js'), 'utf-8');
         const cache = /CACHE_VERSION\s*=\s*'wbcds-v([\d.]+)'/.exec(sw);
         assert.ok(cache, 'the service worker states no cache version');

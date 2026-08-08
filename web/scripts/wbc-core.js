@@ -895,6 +895,14 @@
             });
         }
 
+        if (m.appVersion) {
+            // Which build produced this report. A reviewer using the hosted
+            // application has no other way to tell what they are looking at,
+            // and a signature that does not name a version attaches to
+            // nothing (DCR-037).
+            entries.push({ label: 'Application', text: 'WBC \u0394\u03a3 v' + m.appVersion });
+        }
+
         if (m.provenance && m.provenance.notes) {
             entries.push({ label: 'Basis', text: m.provenance.notes });
         }

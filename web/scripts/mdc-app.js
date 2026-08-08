@@ -40,6 +40,14 @@
 
     // Storage keys
     const THEME_KEY = 'wbcds_theme';
+    /**
+     * The shipped build. Stated in the method statement so a reader — a
+     * clinical reviewer using the hosted application above all — can tell
+     * which version produced a report. QC-016 holds it equal to
+     * package.json, DHF-001 and the service-worker cache key.
+     */
+    const APP_VERSION = '2.22.1';
+
     const AUDIO_KEY = 'wbcds_audio';
     const CONFIG_CACHE_KEY = 'wbcds_config';
     const AUTOSAVE_KEY = 'wbcds_autosave';
@@ -318,7 +326,8 @@
                 // report never carried a basis at all. See DCR-035 §3.
                 meta: {
                     version: norm.version, profileId: norm.profileId,
-                    profileName: norm.profileName, provenance: norm.provenance
+                    profileName: norm.profileName, provenance: norm.provenance,
+                    appVersion: APP_VERSION
                 },
                 specimenTypes: norm.specimenTypes,
                 errors: errors

@@ -1,7 +1,25 @@
 # WBC ΔΣ — Invitation to Clinical Review
 
 **A manual differential counter for haematology.**
-Peter Gershkovich, M.D., M.H.A. · info@openpathology.tech · 2026-08-05
+Peter Gershkovich, M.D., M.H.A. · info@openpathology.tech
+
+| | |
+|---|---|
+| **Try it** | **https://mdc.openpathology.org/** — nothing to install |
+| **Version under review** | **v2.22.1** |
+| **Source** | https://github.com/OpenPathologyFoundation/tessera/tree/v2.22.1 |
+| **Verification** | 1147 automated tests, 0 failures, 7 documented skips |
+
+**Please check the version before you sign.** Count a few cells, click **Count
+Done**, and open **METHOD** on the results card. It states two versions:
+
+> Profile: 14-Type Nucleated Differential (ndc-14 v2.6)
+> **Application: WBC ΔΣ v2.22.1**
+
+The second is the one this brief describes. If it reads anything else, the
+hosted site has moved on and your answers may not match what I have written —
+which is worth telling me, because it would mean something changed without this
+document following it.
 
 ---
 
@@ -190,9 +208,32 @@ qualified to set alone.
 
 ## 4. How to try it
 
-The application runs in a browser with no installation and works offline.
-Nothing is transmitted anywhere; counts stay in your browser and are lost when
-it closes unless exported.
+The application runs in a browser and works offline. Nothing is transmitted
+anywhere; counts stay in your browser and are lost when it closes unless
+exported. There is no account, no server and no installer.
+
+**Just open https://mdc.openpathology.org/.** There is nothing to install and
+no account. Counts stay in your browser; you can close the tab to discard one.
+
+Nothing is fetched at runtime — you can put the machine in flight mode after the
+page loads and it will behave identically, which is the point of it working on a
+restricted laboratory network.
+
+If you would rather run the exact reviewed source yourself, with Node.js
+installed:
+
+```
+git clone https://github.com/OpenPathologyFoundation/tessera.git
+cd tessera && git checkout v2.22.1 && npm run serve
+```
+
+then open http://localhost:8089/counter.html.
+
+If you would rather not run anything, tell me and I will send a copy that opens
+by double-clicking, or a recorded walkthrough. **Please do not let the setup be
+the reason the review does not happen** — the questions in §3 matter more than
+seeing the tool, and answering them from this document alone is genuinely
+useful.
 
 Suggested twenty minutes:
 

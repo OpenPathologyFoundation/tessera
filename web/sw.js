@@ -35,7 +35,7 @@
 // v2.22.0 — tonal feedback. wbc-tones.js is a new shell asset, so the key
 // must change or an installed browser serves a page that references a file
 // its cache does not hold.
-const CACHE_VERSION = 'wbcds-v2.22.2';
+const CACHE_VERSION = 'wbcds-v2.22.3';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const DATA_CACHE = CACHE_VERSION + '-data';
 

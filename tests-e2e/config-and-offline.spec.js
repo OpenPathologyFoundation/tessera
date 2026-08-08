@@ -524,8 +524,13 @@ test.describe('Configuration editor round-trip (URS-102)', () => {
         for (let i = 0; i < 90; i++) await page.keyboard.press('b');    // erythroid
         await page.click('#btnCountDone');
 
-        await expect(page.locator('#results-summary')).toContainText('1.7');
-        await expect(page.locator('#results-summary')).not.toContainText('2.3');
+        // Asserted on the M:E element, not the whole panel. A panel-wide
+        // `not.toContainText('2.3')` collided with the application version
+        // string the method statement gained in DCR-037 — "WBC ΔΣ v2.22.3"
+        // contains "2.3", so a correct 1.7:1 failed on an unrelated number.
+        const me = page.locator('[id^="val-formula-"]').first();
+        await expect(me).toContainText('1.7');
+        await expect(me).not.toContainText('2.3');
     });
 
     test('VV-SYS-069: The policy controls cannot produce a profile the counter rejects', async ({ page }) => {

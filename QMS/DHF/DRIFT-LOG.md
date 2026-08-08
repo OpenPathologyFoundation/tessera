@@ -25,7 +25,7 @@ where an individual session is capable and thorough and has no memory of the
 other five documents. And it is the evidence base for the guards: each `QC-`
 identifier in the last column exists because of a specific row above it.
 
-**Counted here rather than described:** 36 incidents, of which 33 are now
+**Counted here rather than described:** 43 incidents, of which 36 are now
 prevented by an automated check. QC-027 checks both figures against the rows
 below, so this sentence cannot be the next thing to drift.
 
@@ -71,6 +71,13 @@ below, so this sentence cannot be the next thing to drift.
 | 34 | 2026-08-08 | "No data is stored in permanent browser storage" | `SOP-001` §8 data-handling attestation | Autosave writes the accession number, counts and morphology text to localStorage | The attestation a deploying laboratory's privacy review relies on. Same false-privacy class as incident 5, on a different document | Pre-validation review | DCR-038 | — |
 | 35 | 2026-08-08 | "'Start Count' button is visible but disabled … becomes enabled once a valid case number is entered" | `SOP-001` §5.1, §5.2 | `requireCaseNumber` is false in all eight profiles; the button is enabled and the field optional | Described a software control that was never built, so the procedural control it replaced was never written down either | Pre-validation review | DCR-038 | — |
 | 36 | 2026-08-08 | In-app help listed seven profiles: "full 14-part consensus, harmonized 9-part, legacy 9-part, minimal 5-part … frequency-ergonomic, right-hand" | `web/help.html` §Profiles | Every one withdrawn by DCR-035 or never shipped | Incident 25's class recurring on a page its guard (UD-095) did not cover — and `help.html` is precached for offline use | Pre-validation review | DCR-038 | UD-097 |
+| 37 | 2026-08-08 | "Keyboard key assignment is **fixed** per specimen type … contact the laboratory director" | `SOP-001` §7 item 6 | The Configuration Editor is linked from the case-entry screen, and §4.1 four pages earlier says keys are configurable | The SOP contradicted itself. A limitations list is where a reader looks to learn what the tool cannot do, so a false limit there is believed | Pre-validation review, second pass | DCR-039 | — |
+| 38 | 2026-08-08 | "Generated from the shipped profile `ndc-14` **v2.5**" | `SOP-001` §4.1 key-table stamp | The shipped profile is v2.6 | The table content was still correct, so nothing was wrong — but a provenance stamp that nothing checks is one version bump from being a lie | Pre-validation review, second pass | DCR-039 | UD-100 |
+| 39 | 2026-08-08 | "Warning dialog when completing below threshold with explicit override" | `README.md` features table | Completion is never blocked; the report carries a quantified advisory note | Described a modal that was never built. The real behaviour is better than the claim, which is why nobody noticed | Pre-validation review, second pass | DCR-039 | — |
+| 40 | 2026-08-08 | §5.9 Method 1: "Clear the current case number … a confirmation dialog will appear" | `SOP-001` §5.9 | The case field exists only on the case-entry screen; during counting the case is a read-only badge. There is no such dialog | A procedure for a flow that never existed, in the document validators follow | Pre-validation review, second pass | DCR-039 | — |
+| 41 | 2026-08-08 | A 200-cell CLSI rationale printed on a 100-cell report | `analyzer-5` `targetCountBasis` | The profile targets 100 | `targetCountBasis` prints into the report method statement, so every analyzer-5 report stated a basis for a target it does not use | Pre-validation review, second pass | DCR-039 | UD-101 |
+| 42 | 2026-08-08 | "Do NOT count into this category: … macrophages … metastatic tumour cells" | `body-fluid` `categoryNotes.other` | This panel has `malignant` and `mono_macro` keys for exactly those cells | The bone-marrow note copied onto a panel whose purpose is counting what the marrow excludes. It instructed operators to discard the panel's own findings | Pre-validation review, second pass | DCR-039 | — |
+| 43 | 2026-08-08 | A key captured with Shift (`:` for `;`) validated cleanly | `validateConfig`, and the editor's key capture | Shift+key is the decrement, so such a cell could be un-counted but never counted | Validation checked that keys were unique and mapped, not that they were typeable. No shipped preset was affected; the editor could produce one | Pre-validation review, second pass | DCR-039 | `isCountableKey` in validateConfig; rejected at capture |
 
 ---
 
@@ -127,6 +134,7 @@ recurrence.
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| I | 2026-08-08 | QMS | Rows 37–43 added (DCR-039): the majors left standing after the blockers were cleared. Four are SOP-001 describing behaviour that was never built — a fixed key assignment, a case-number dialog, a blocking completion warning — and two are profile text that prints into a clinical report. The seventh is the first CODE defect this file has recorded since the drift work began: a key that could be decremented but never incremented. |
 | H | 2026-08-08 | QMS | Rows 31–36 added (DCR-038): the pre-validation audit of every surface a validating pathologist reads. Five of the six are in SOP-001 and VV-001 — the documents a validator rehearses and executes — and none was covered by any guard, because the guards built so far check generated figures and profile names, not procedures. |
 | G | 2026-08-07 | QMS | Row 30 added and row 28 corrected (DCR-035): the false provenance never reached a report, because a second defect dropped provenance before the method statement was built. Two defects that cancelled. |
 | F | 2026-08-07 | QMS | Rows 27–29 added (DCR-035): profile names that asserted rather than described, a copy-pasted provenance note that printed a false basis into clinical reports, and a display name the catalogue and the file disagreed about. VV-PRE-030..034. |

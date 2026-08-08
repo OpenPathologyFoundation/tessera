@@ -491,9 +491,28 @@
         var spec = getActiveSpec();
         var key = ev.key.length === 1 ? ev.key.toUpperCase() : ev.key;
 
-        // For punctuation keys, use the raw key
-        if (ev.key === ';' || ev.key === ',' || ev.key === '.' || ev.key === '/') {
+        // Punctuation is taken as typed. The list matches the physical-key map
+        // in mdc-app.js, so any key the counter can resolve can be assigned.
+        if ('`-=[]\\;\',./'.indexOf(ev.key) !== -1) {
             key = ev.key;
+        }
+
+        // A key that needs Shift cannot count. Shift+key is the DECREMENT, so
+        // a cell assigned `:` (Shift+;) or `?` (Shift+/) could be un-counted
+        // but never counted. Rejected at capture, where the operator can just
+        // press another key, rather than at save — by then they have laid out
+        // a whole profile around it.
+        // Guarded on the engine being present: if it is not, the editor is
+        // already unusable for other reasons, and blocking key assignment
+        // on a missing dependency would be the wrong failure.
+        if (window.WBCCore && !window.WBCCore.isCountableKey(key)) {
+            stopListening();
+            renderKeyAssignment();
+            WBCDialog.alert('Key needs Shift',
+                'The key "' + key + '" is typed with Shift, and Shift is how a count is ' +
+                'un-done. A cell on this key could be decremented but never incremented.' +
+                '\n\nPress the unshifted key instead — for example ";" rather than ":".');
+            return;
         }
 
         // Remove old mapping for this cell

@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SOP-001 |
-| **Version** | 2.0 |
+| **Version** | 2.1 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Status** | **Issued for local adoption** — to be reviewed and signed by the adopting laboratory. Key mappings, targets and completion behaviour corrected 2026-08-06 against the shipped profile (DCR-015); any locally printed copy of v1.0 must be withdrawn. |
@@ -112,7 +112,7 @@ For each cell identified under the microscope, press the corresponding keyboard 
 
 #### Bone Marrow Key Mapping
 
-Generated from the shipped profile `ndc-14 (formerly consensus-14)` v2.5. **The
+Generated from the shipped profile `ndc-14 (formerly consensus-14)` v2.6. **The
 authoritative mapping is always the key display on the counting screen** — keys
 are configurable, and a laboratory that adapts the profile changes them.
 
@@ -227,11 +227,17 @@ During or after counting, you may enter morphology observations:
 
 ### 5.9 Starting a New Case
 
-#### Method 1: Enter New Case Number
-1. Clear the current case number and type the new accession number.
-2. A confirmation dialog will appear: "Changing the case number will clear all current count data. Continue?"
-3. Click **OK** to clear all data and begin the new case.
-4. Click **Cancel** to keep the current data and restore the previous case number.
+#### Method 1: New Case (from the results screen)
+1. Finish the current count with **Count Done**.
+2. Click **New Case**. The application returns to the case-entry screen with an
+   empty case field, ready for the next specimen.
+3. The completed count remains in Session History for the rest of the browser
+   session (§5.10).
+
+**The case number cannot be edited mid-count.** The field exists only on the
+case-entry screen; during counting the case is shown as a read-only badge. There
+is no change-the-case-number dialog — to correct a mistyped accession number,
+finish or **Reset** the count and start again.
 
 #### Method 2: Reset Button
 1. Click the **"Reset"** button.
@@ -335,7 +341,13 @@ If the application produces unexpected results:
 3. **Session data is temporary.** Do not rely on the application for data retention. Always copy results to the LIS/EMR before closing.
 4. **The application does not replace the LIS.** The LIS is the system of record for all patient results.
 5. **Accuracy depends on operator training.** The software cannot detect miscategorization of cells — only that a key was pressed.
-6. **Keyboard key assignment is fixed per specimen type.** If institutional cell categories differ from the configured categories, contact the laboratory director to request a configuration change.
+6. **Cell categories and their keys are configurable, not fixed.** The
+   Configuration Editor (linked from the case-entry screen) changes
+   categories, keys, targets and report wording. **Treat a configuration
+   change as a change to a controlled document**: agree it with the
+   laboratory director, record it, and re-run §6.2 afterwards, because
+   every key in this procedure and every figure in §6.2 assumes the
+   shipped default profile.
 
 ---
 
@@ -370,6 +382,8 @@ I have read and understand SOP-001 for the WBC ΔΣ application. I have been tra
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | A | 2026-02-18 | QMS | Initial draft - complete SOP |
+| B | 2026-08-06 | QMS | v2.0 (DCR-015): key tables regenerated from the shipped profile after the v2.0 layout change; operator documentation aligned with the 14-category profile. |
+| C | 2026-08-08 | QMS | v2.1 (DCR-038): pre-validation corrections. §5.5 miscount example named keys that do not do what it said (A was called blasts; A is monocytes). §6.2 monthly QC entered categories the profile does not have and cited a test that does not exist; replaced with an engine-derived 100-cell vector. §8 attested that nothing is written to permanent browser storage, which autosave contradicts. §5.1/§5.2 described a Start button gated on a case number, which was never built — the identification check is procedural and is now stated as such. §5.9 Method 1 described a case-number-change dialog that does not exist. §7 item 6 said keys are fixed, contradicting §4.1 and the Configuration Editor. Profile version stamp corrected to v2.6. |
 
 ## 13. Approval Signatures
 

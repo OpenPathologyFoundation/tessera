@@ -523,6 +523,66 @@ describe('User guide tracks the shipped configuration (URS-092)', () => {
         }
     });
 
+    it('UD-100: A document citing a profile version cites the shipped one', () => {
+        // SOP-001 §4.1 stamped its key tables "Generated from the shipped
+        // profile ndc-14 v2.5" while the shipped profile was v2.6. The tables
+        // happened to still be correct, so nothing was wrong — but a stamp
+        // that nothing checks is one bump away from being a lie about
+        // provenance, which is the class this file has thirty-six rows about.
+        const ROOT = path.join(__dirname, '..');
+        const shipped = JSON.parse(fs.readFileSync(
+            path.join(ROOT, 'web', 'settings', 'templates.json'), 'utf-8'));
+        const offenders = [];
+        for (const rel of [path.join('QMS', 'DHF', 'SOP-001-StandardOperatingProcedure.md'),
+            'USER-GUIDE.md']) {
+            const full = path.join(ROOT, rel);
+            if (!fs.existsSync(full)) continue;
+            fs.readFileSync(full, 'utf-8').split('\n').forEach((line, i) => {
+                // A revision-history row records what a past revision said.
+                if (/^\|\s*[A-Z]{1,2}\s*\|\s*\d{4}-\d{2}-\d{2}\s*\|/.test(line)) return;
+                // The stamp is "shipped profile `<id>` vX.Y" — the version must
+                // follow the name immediately. A looser pattern matched any
+                // version later in the sentence, including the phrase "after
+                // the v2.0 layout change" in this document's own history.
+                const m = /shipped profile\s+`[^`]*`\s+v(\d+\.\d+)/.exec(line);
+                if (m && m[1] !== shipped.version) {
+                    offenders.push(`${rel}:${i + 1} cites profile v${m[1]}; shipped is v${shipped.version}`);
+                }
+            });
+        }
+        assert.deepEqual(offenders, [], offenders.join('\n  '));
+    });
+
+    it('UD-101: A stated target basis describes the target it belongs to', () => {
+        /**
+         * `analyzer-5` targets 100 cells and its `targetCountBasis` described
+         * the 200-cell CLSI reference method — and that text prints into the
+         * report's method statement, so a 100-cell report carried a 200-cell
+         * rationale. Any number the basis states must be reconcilable with the
+         * target: the target itself, or a figure it is explicitly derived from.
+         */
+        const ROOT = path.join(__dirname, '..');
+        const dir = path.join(ROOT, 'web', 'settings', 'presets');
+        const cat = JSON.parse(fs.readFileSync(path.join(dir, 'index.json'), 'utf-8'));
+        const offenders = [];
+
+        for (const entry of cat.presets) {
+            if (entry.editorOnly) continue;
+            const cfg = JSON.parse(fs.readFileSync(path.join(dir, entry.file), 'utf-8'));
+            for (const spec of cfg.specimenTypes || []) {
+                const basis = spec.targetCountBasis;
+                if (!basis) continue;
+                const target = String(spec.targetCount);
+                // The basis must name its own target somewhere in the text.
+                if (!new RegExp('\\b' + target + '\\b').test(basis)) {
+                    offenders.push(`${entry.profileId}/${spec.specimenType}: target ${target} ` +
+                        'is not mentioned in its own targetCountBasis, which prints in the report');
+                }
+            }
+        }
+        assert.deepEqual(offenders, [], offenders.join('\n  '));
+    });
+
     it('UD-097: No operator-facing page names a withdrawn profile', () => {
         /**
          * UD-095 checks the USER-GUIDE against the catalogue. It did not cover

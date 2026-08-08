@@ -21,7 +21,7 @@ WBC ΔΣ enables medical technologists and pathologists to perform manual differ
 | **Real-Time Percentages** | Auto-calculated with 2 decimal precision as you count |
 | **Visual Feedback** | Green flash on increment, amber flash on decrement |
 | **Progress Bar** | Tracks count toward the profile's target (default 500 BM / 200 PB). Reaching it is advisory, never blocking. |
-| **Minimum Count Enforcement** | Warning dialog when completing below threshold with explicit override |
+| **Sub-target advisory** | Completing below the target is **never blocked**. The report carries a note stating the count, the target, and the confidence interval that count supports — so the imprecision is quantified rather than merely flagged. |
 | **Morphology Comments** | Free-text field, keyboard-isolated (typing doesn't trigger counts) |
 | **Institutional Templates** | Yale SOM, Precipio DX, MGH for BM; MGH for PB |
 | **Copy to Clipboard** | One-click copy of formatted output for LIS/EMR |
@@ -359,7 +359,7 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
 | **RA-001** | FMEA risk analysis: 55 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan; register of 784 implemented verification cases, generated from the runners |
+| **TP-001** | Test plan; register of 786 implemented verification cases, generated from the runners |
 | **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |

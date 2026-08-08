@@ -97,14 +97,14 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**784 verification cases** across 28 series and 4 layers, run as 852 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**786 verification cases** across 28 series and 4 layers, run as 854 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 25 (001–028) | Static | QMS counted quantities |
 | `SC-*` | 33 (001–064) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 96 (001–135) | Behaviour | Application behaviour in a DOM |
-| `UD-*` | 55 (001–099) | Static | User-facing documentation |
+| `UD-*` | 57 (001–101) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-AUD-*` | 19 (001–019) | Static | Audio engine structure |
 | `VV-CALC-*` | 24 (001–030) | Unit | Calculation engine vectors |
@@ -358,6 +358,8 @@ auditing how the plan changed.
 | UD-097 | No operator-facing page names a withdrawn profile | Static | `tests/13-user-documentation.test.js` |
 | UD-098 | Every key a procedure names maps to the category it claims | Static | `tests/13-user-documentation.test.js` |
 | UD-099 | A procedure only enters categories the profile has | Static | `tests/13-user-documentation.test.js` |
+| UD-100 | A document citing a profile version cites the shipped one | Static | `tests/13-user-documentation.test.js` |
+| UD-101 | A stated target basis describes the target it belongs to | Static | `tests/13-user-documentation.test.js` |
 
 #### VV-ABS-* — Absolute counts and the analyser WBC
 

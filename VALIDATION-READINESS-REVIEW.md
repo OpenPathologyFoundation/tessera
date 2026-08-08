@@ -1,5 +1,41 @@
 # Validation Readiness Review — 2026-08-07
 
+> **Re-check 2026-08-08 (v2.22.2, HEAD 530eb82, suite 703/703, clean-tree
+> bundle at DCR-038):** all six blockers are fixed — SOP correction example,
+> VV-001 V6 keys (now B/F/X with correct interval expectations), monthly QC,
+> storage claim (now a model §7 disclosure), case-number gating, help.html
+> catalogue (guard extended to help.html in suite 13). V7 (Click-vs-Tones A/B)
+> is in VV-001 with the pre-specified decision rule. USER-GUIDE,
+> calculation-reference, and most of README are clean. **Verdict upgraded to
+> CONDITIONAL GO** for BM/PB validation on ndc-14. Remaining punch list, none
+> of it in the validators' critical path:
+>
+> - **README:24** still claims a blocking "warning dialog with explicit
+>   override" below threshold; completion is advisory. (MAJOR — last survivor
+>   of the README cluster.)
+> - **SOP-001 §5.9 (~line 232)** still quotes a case-number-change dialog that
+>   does not exist; **§7 item 6 (~line 338)** still says keys are fixed and
+>   only the director can change them; **revision history still ends at
+>   Rev A** while the header claims v2.0/DCR-015. (MAJOR ×3 — SOP stragglers.)
+> - **analyzer-5 `targetCountBasis`** still explains a 200-cell default on a
+>   100-cell profile, and prints in that profile's report method statement.
+>   **body-fluid `categoryNotes.other`** gained a correct first sentence but
+>   still tells operators to record metastatic tumour cells in the morphology
+>   comment — this panel has a `malignant` category for them. (MAJOR ×2 —
+>   matter only if those profiles are exercised; they are not in the BM/PB
+>   pilot.)
+> - **Editor typeability rule** (shifted-character keys that can never
+>   increment) not yet added to `validateConfig`/editor. (MAJOR — cannot
+>   affect shipped presets; affects only locally built profiles.)
+> - Minors unchanged: click/chime node disconnect, QC-025 rows for
+>   DCR-035/036 capabilities, `provenance.standard` on analyzer-5/body-fluid,
+>   README features table still silent on the three audio modes.
+>
+> Condition for the GO: validators use ndc-14 on BM/PB slides and are told to
+> ignore SOP §5.9 Method 1 (use the New Case button, which §5.9 Method 2 —
+> and the app — actually provide). Land the punch list in the next DCR; none
+> of it blocks scheduling sessions.
+
 Reviewed at HEAD `3fb1d52` (v2.22.0), Node suite executed (700 pass / 0 fail),
 newest evidence bundle clean-tree and cited by TR-001 (1147 total: 700 Node +
 447 browser, 7 skips). A concurrent session was preparing DCR-037 during this

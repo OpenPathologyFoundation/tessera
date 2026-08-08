@@ -1243,6 +1243,11 @@
             var mappedSet = {};
             Object.keys(outCodes).forEach(function (key) {
                 var ct = outCodes[key];
+                if (!isCountableKey(key)) {
+                    errors.push(name + ': key "' + key + '" cannot be typed without Shift, and ' +
+                        'Shift is the decrement. A cell on this key could be un-counted but never ' +
+                        'counted. Use a key that types unshifted.');
+                }
                 if (mappedSet[ct]) {
                     errors.push(name + ': cell type "' + ct + '" is mapped to more than one key');
                 }
@@ -1491,6 +1496,28 @@
         return 0;
     }
 
+    /**
+     * Keys that can actually count.
+     *
+     * Shift+key is the decrement, so a counting key must be reachable WITHOUT
+     * Shift. A key captured as a shifted character — `:` for `;`, `?` for `/` —
+     * validated cleanly and produced a category that could be un-counted but
+     * never counted: the unshifted press does not match it, and the shifted
+     * press is the decrement path. Nothing rejected it, because validation
+     * checked that keys were unique and mapped, not that they were typeable.
+     *
+     * The set is the unshifted US layout: letters, digits, and the punctuation
+     * that needs no Shift. Letters are compared uppercase because that is how
+     * the key handler normalises them.
+     */
+    var UNSHIFTED_PUNCTUATION = '`-=[]\\;\',./';
+
+    function isCountableKey(key) {
+        if (typeof key !== 'string' || key.length !== 1) return false;
+        if (/[A-Z0-9]/.test(key)) return true;
+        return UNSHIFTED_PUNCTUATION.indexOf(key) !== -1;
+    }
+
     // ---------------------------------------------------------------- layout
 
     var KEYBOARD_ROWS = [
@@ -1595,6 +1622,7 @@
     }
 
     return {
+        isCountableKey: isCountableKey,
         keyboardGrid: keyboardGrid,
         DEFAULT_TARGET: DEFAULT_TARGET,
         RESERVED_PLACEHOLDERS: RESERVED_PLACEHOLDERS,

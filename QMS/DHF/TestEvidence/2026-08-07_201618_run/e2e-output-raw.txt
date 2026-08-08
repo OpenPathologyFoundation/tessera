@@ -1,0 +1,821 @@
+
+Running 447 tests using 6 workers
+
+  ✓    1 [chromium] › tests-e2e/config-and-offline.spec.js:51:5 › Configuration controls (URS-103) › VV-SYS-050: Export Config downloads the active profile (1.6s)
+  ✓    5 [chromium] › tests-e2e/config-and-offline.spec.js:177:5 › Preset profile catalogue (URS-101) › VV-SYS-055: The catalogue lists the built-in profiles (1.7s)
+  ✓    6 [chromium] › tests-e2e/config-and-offline.spec.js:103:5 › Configuration controls (URS-103) › VV-SYS-052: Import rejects an invalid profile and keeps the current one (1.7s)
+  ✓    4 [chromium] › tests-e2e/config-and-offline.spec.js:67:5 › Configuration controls (URS-103) › VV-SYS-051: Import Config applies a profile and re-renders the counter (1.8s)
+  ✓    2 [chromium] › tests-e2e/config-and-offline.spec.js:157:5 › Configuration controls (URS-103) › VV-SYS-054: A newer built-in profile supersedes a cached copy of the same profile (1.9s)
+  ✓    3 [chromium] › tests-e2e/config-and-offline.spec.js:129:5 › Configuration controls (URS-103) › VV-SYS-053: Reset to Default confirms, clears the cache and restores the built-in profile (2.4s)
+  ✓   11 [chromium] › tests-e2e/config-and-offline.spec.js:284:5 › Configuration editor round-trip (URS-102) › VV-SYS-061: An unusable draft is downloaded but never made active (766ms)
+  ✓   10 [chromium] › tests-e2e/config-and-offline.spec.js:275:5 › Configuration editor round-trip (URS-102) › VV-SYS-060: The editor is reachable from the counter (933ms)
+  ✓    8 [chromium] › tests-e2e/config-and-offline.spec.js:213:5 › Preset profile catalogue (URS-101) › VV-SYS-057: The body fluid preset provides a non-blood specimen panel (URS-011) (1.1s)
+  ✓    7 [chromium] › tests-e2e/config-and-offline.spec.js:195:5 › Preset profile catalogue (URS-101) › VV-SYS-056: Loading a preset applies it and it is usable for counting (1.8s)
+  ✓   12 [chromium] › tests-e2e/config-and-offline.spec.js:303:5 › Configuration editor round-trip (URS-102) › VV-SYS-062: A complete profile saved in the editor is picked up by the counter (1.2s)
+  ✓   15 [chromium] › tests-e2e/config-and-offline.spec.js:368:5 › Configuration editor round-trip (URS-102) › VV-SYS-064: An edit saved in the editor is honoured by the counter (1.3s)
+  ✘   13 [chromium] › tests-e2e/config-and-offline.spec.js:335:5 › Configuration editor round-trip (URS-102) › VV-SYS-063: The editor preserves every field it does not itself edit (1.4s)
+  ✓   16 [chromium] › tests-e2e/config-and-offline.spec.js:461:5 › Configuration editor round-trip (URS-102) › VV-SYS-066: Rounding and precision can be set in the editor and change the figures (1.4s)
+  ✓   17 [chromium] › tests-e2e/config-and-offline.spec.js:486:5 › Configuration editor round-trip (URS-102) › VV-SYS-067: A threshold added in the editor raises the advisory (1.7s)
+  ✓   19 [chromium] › tests-e2e/config-and-offline.spec.js:562:5 › Output, export and printing › VV-SYS-070: Copy to Clipboard places the report on the system clipboard (URS-053) (1.3s)
+  ✓   20 [chromium] › tests-e2e/config-and-offline.spec.js:582:5 › Output, export and printing › VV-SYS-071: Session CSV export downloads with traceability columns (URS-084) (1.2s)
+  ✓   14 [chromium] › tests-e2e/config-and-offline.spec.js:430:5 › Configuration editor round-trip (URS-102) › VV-SYS-065: The denominator policy can be set in the editor and changes the count (4.4s)
+  ✓   22 [chromium] › tests-e2e/config-and-offline.spec.js:602:5 › Output, export and printing › VV-SYS-072: Session JSON export downloads and parses (URS-084) (1.2s)
+  ✓   23 [chromium] › tests-e2e/config-and-offline.spec.js:619:5 › Output, export and printing › VV-SYS-073: A case number containing markup is rendered as inert text (SYS-S04) (995ms)
+  ✓   21 [chromium] › tests-e2e/config-and-offline.spec.js:531:5 › Configuration editor round-trip (URS-102) › VV-SYS-069: The policy controls cannot produce a profile the counter rejects (2.0s)
+  ✓   24 [chromium] › tests-e2e/config-and-offline.spec.js:629:5 › Output, export and printing › VV-SYS-074: The print control is available on the results screen (URS-054) (1.3s)
+  ✓   25 [chromium] › tests-e2e/config-and-offline.spec.js:637:5 › Output, export and printing › VV-SYS-075: Session history opens a read-only record (URS-082) (1.3s)
+  ✓   26 [chromium] › tests-e2e/config-and-offline.spec.js:653:5 › Autosave and crash recovery (URS-085) › VV-SYS-080: An interrupted count is recovered after a browser restart (2.2s)
+  ✓   27 [chromium] › tests-e2e/config-and-offline.spec.js:676:5 › Autosave and crash recovery (URS-085) › VV-SYS-081: Discarding the recovery starts clean (1.6s)
+  ✓   28 [chromium] › tests-e2e/config-and-offline.spec.js:685:5 › Autosave and crash recovery (URS-085) › VV-SYS-082: A finalized count leaves no recovery prompt behind (1.2s)
+  ✓   30 [chromium] › tests-e2e/config-and-offline.spec.js:734:5 › Offline operation (URS-094) › VV-SYS-091: Tailwind is served from the local origin, not a CDN (548ms)
+  ✓   29 [chromium] › tests-e2e/config-and-offline.spec.js:697:5 › Offline operation (URS-094) › VV-SYS-090: The application loads and counts with the network disconnected (1.6s)
+  ✓   18 [chromium] › tests-e2e/config-and-offline.spec.js:508:5 › Configuration editor round-trip (URS-102) › VV-SYS-068: The M:E composition can be changed in the editor (6.3s)
+  ✓   31 [chromium] › tests-e2e/config-and-offline.spec.js:749:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-140: The methods page is reachable and renders (694ms)
+  ✓    9 [chromium] › tests-e2e/config-and-offline.spec.js:232:5 › Subset percentage formulas (URS-039) › VV-SYS-125: The bands-and-segs preset reports blasts against both denominators (8.8s)
+  ✓   36 [chromium] › tests-e2e/config-and-offline.spec.js:837:5 › Calculation reference (CAL-001) › VV-SYS-151: Reachable from the methods page and links back (726ms)
+  ✓   34 [chromium] › tests-e2e/config-and-offline.spec.js:798:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-143: The methods page works offline (845ms)
+  ✓   35 [chromium] › tests-e2e/config-and-offline.spec.js:819:5 › Calculation reference (CAL-001) › VV-SYS-150: Reachable from the counter and renders (858ms)
+  ✓   39 [chromium] › tests-e2e/config-and-offline.spec.js:857:5 › Calculation reference (CAL-001) › VV-SYS-153: States both what is configurable and what is fixed (412ms)
+  ✓   40 [chromium] › tests-e2e/config-and-offline.spec.js:886:5 › Calculation reference (CAL-001) › VV-SYS-155: Loads no third-party script (URS-094) (421ms)
+  ✓   33 [chromium] › tests-e2e/config-and-offline.spec.js:785:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-142: The results screen links to the methods page (1.4s)
+  ✓   38 [chromium] › tests-e2e/config-and-offline.spec.js:870:5 › Calculation reference (CAL-001) › VV-SYS-154: Available offline (743ms)
+  ✓   37 [chromium] › tests-e2e/config-and-offline.spec.js:845:5 › Calculation reference (CAL-001) › VV-SYS-152: Reachable from the results screen (1.7s)
+  ✓   41 [chromium] › tests-e2e/config-and-offline.spec.js:905:5 › Removing a category cleans up after itself (P0-7) › VV-SYS-200: Removing a category removes what depended on it (1.0s)
+  ✓   45 [chromium] › tests-e2e/config-and-offline.spec.js:1066:5 › A renamed profile id is offered, never imposed (URS-101) › VV-SYS-217: The operator is told, and keeping their profile is the default (759ms)
+  ✓   42 [chromium] › tests-e2e/config-and-offline.spec.js:978:5 › The predecessor profile is reachable and countable (URS-101) › VV-SYS-210: The preset loads from the catalogue (1.5s)
+  ✓   32 [chromium] › tests-e2e/config-and-offline.spec.js:764:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-141: The worked figures on the page match what the counter produces (3.9s)
+  ✓   47 [chromium] › tests-e2e/config-and-offline.spec.js:1102:5 › A renamed profile id is offered, never imposed (URS-101) › VV-SYS-219: A current profile raises no offer (665ms)
+  ✓   46 [chromium] › tests-e2e/config-and-offline.spec.js:1084:5 › A renamed profile id is offered, never imposed (URS-101) › VV-SYS-218: Accepting loads the renamed built-in (1.2s)
+  ✓   50 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-162 (dark): counter — case entry meets WCAG AA (510ms)
+  ✓   48 [chromium] › tests-e2e/config-and-offline.spec.js:1136:5 › The method statement reports its basis (URS-055) › VV-SYS-220: The rendered report states the profile's basis (1.4s)
+  ✓   53 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-165 (dark): methods and limitations meets WCAG AA (665ms)
+  ✓   49 [chromium] › tests-e2e/config-and-offline.spec.js:1157:5 › The method statement reports its basis (URS-055) › VV-SYS-221: A profile with no bone marrow states no bone marrow basis (2.0s)
+  ✓   54 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-166 (dark): calculation reference meets WCAG AA (556ms)
+  ✓   55 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-167 (dark): quick start guide meets WCAG AA (516ms)
+  ✓   43 [chromium] › tests-e2e/config-and-offline.spec.js:996:5 › The predecessor profile is reachable and countable (URS-101) › VV-SYS-211: The predecessor keys count the predecessor cells (4.7s)
+  ✓   56 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-168 (dark): configuration editor meets WCAG AA (530ms)
+  ✓   44 [chromium] › tests-e2e/config-and-offline.spec.js:1014:5 › The predecessor profile is reachable and countable (URS-101) › VV-SYS-212: The report keeps a counted cell, and fills the M:E field (5.0s)
+  ✓   58 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-162 (light): counter — case entry meets WCAG AA (598ms)
+  ✓   57 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-169 (dark): dialog, with validation errors shown meets WCAG AA (1.3s)
+  ✓   61 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-165 (light): methods and limitations meets WCAG AA (537ms)
+  ✓   62 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-166 (light): calculation reference meets WCAG AA (632ms)
+  ✓   63 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-167 (light): quick start guide meets WCAG AA (587ms)
+  ✓   64 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-168 (light): configuration editor meets WCAG AA (656ms)
+  ✓   66 [chromium] › tests-e2e/counting-workflow.spec.js:45:5 › Case entry and start › VV-SYS-001: Application loads and presents the case entry phase (492ms)
+  ✓   65 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-169 (light): dialog, with validation errors shown meets WCAG AA (1.3s)
+  ✓   67 [chromium] › tests-e2e/counting-workflow.spec.js:52:5 › Case entry and start › VV-SYS-002: Specimen selector is populated from the configuration profile (419ms)
+  ✓   51 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-163 (dark): counter — counting meets WCAG AA (5.8s)
+  ✓   52 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-164 (dark): counter — results meets WCAG AA (5.6s)
+  ✓   68 [chromium] › tests-e2e/counting-workflow.spec.js:58:5 › Case entry and start › VV-SYS-003: Enter in the case field starts counting (barcode workflow, URS-006) (677ms)
+  ✓   69 [chromium] › tests-e2e/counting-workflow.spec.js:68:5 › Case entry and start › VV-SYS-004: Counting may begin without a case number (URS-004) (712ms)
+  ✓   70 [chromium] › tests-e2e/counting-workflow.spec.js:73:5 › Case entry and start › VV-SYS-005: Active case number is displayed throughout counting (URS-002) (838ms)
+  ✓   71 [chromium] › tests-e2e/counting-workflow.spec.js:83:5 › Keyboard counting › VV-SYS-010: Every configured key increments its own category (URS-020, URS-021) (1.2s)
+  ✓   72 [chromium] › tests-e2e/counting-workflow.spec.js:95:5 › Keyboard counting › VV-SYS-011: Shift+key undoes and never passes zero (URS-025) (892ms)
+  ✓   73 [chromium] › tests-e2e/counting-workflow.spec.js:106:5 › Keyboard counting › VV-SYS-012: Unmapped keys are ignored (URS-026) (808ms)
+  ✓   74 [chromium] › tests-e2e/counting-workflow.spec.js:112:5 › Keyboard counting › VV-SYS-013: Key mapping is displayed for every category (URS-022) (843ms)
+  ✓   59 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-163 (light): counter — counting meets WCAG AA (5.3s)
+  ✓   76 [chromium] › tests-e2e/counting-workflow.spec.js:129:5 › Keyboard counting › VV-SYS-015: Typing in the comment field never counts (URS-070) (859ms)
+  ✓   77 [chromium] › tests-e2e/counting-workflow.spec.js:137:5 › Keyboard counting › VV-SYS-016: Progress indicator tracks the target count (URS-024) (951ms)
+  ✓   75 [chromium] › tests-e2e/counting-workflow.spec.js:120:5 › Keyboard counting › VV-SYS-014: Percentages update live and sum to 100.00 (URS-031, URS-034) (1.3s)
+  ✓   82 [chromium] › tests-e2e/counting-workflow.spec.js:218:5 › Continue Counting and reset › VV-SYS-031: Comments survive Count Done then Continue Counting (URS-073) (1.5s)
+  ✓   78 [chromium] › tests-e2e/counting-workflow.spec.js:144:5 › Keyboard counting › VV-SYS-017: M:E ratio computes live and shows N/A with a zero denominator (URS-035) (3.2s)
+  ✓   60 [chromium] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-164 (light): counter — results meets WCAG AA (7.8s)
+  ✓   83 [chromium] › tests-e2e/counting-workflow.spec.js:228:5 › Continue Counting and reset › VV-SYS-032: Reset requires confirmation and then clears the count (URS-060, URS-061) (1.8s)
+  ✓   85 [chromium] › tests-e2e/counting-workflow.spec.js:256:5 › Specimen type switching (URS-010, URS-013) › VV-SYS-040: The specimen switcher is available during counting (888ms)
+  ✓   84 [chromium] › tests-e2e/counting-workflow.spec.js:243:5 › Continue Counting and reset › VV-SYS-033: Keystrokes after completion cannot alter the count (HA-015) (1.5s)
+  ✓   80 [chromium] › tests-e2e/counting-workflow.spec.js:189:5 › Validation scenario V1 — complete bone marrow differential › VV-SYS-021: Sub-target count completes with an advisory, never a block (URS-041) (4.1s)
+  ✓   81 [chromium] › tests-e2e/counting-workflow.spec.js:202:5 › Continue Counting and reset › VV-SYS-030: Continue Counting preserves the tally and extends it (URS-042) (4.5s)
+  ✓   86 [chromium] › tests-e2e/counting-workflow.spec.js:262:5 › Specimen type switching (URS-010, URS-013) › VV-SYS-041: Switching mid-count saves the work to history first (1.6s)
+  ✓   87 [chromium] › tests-e2e/counting-workflow.spec.js:275:5 › Specimen type switching (URS-010, URS-013) › VV-SYS-042: Cancelling a switch restores both the selector and the count (1.7s)
+  ✓   88 [chromium] › tests-e2e/counting-workflow.spec.js:295:5 › Denominator policy — NRBC in peripheral blood (URS-030, DCR-006) › VV-SYS-100: NRBC counted in PB do not dilute the leucocyte percentages (3.8s)
+  ✓   92 [chromium] › tests-e2e/counting-workflow.spec.js:352:5 › Sampling precision (URS-037, HA-030) › VV-SYS-111: A sub-target count carries a quantified advisory (2.5s)
+  ✓   89 [chromium] › tests-e2e/counting-workflow.spec.js:311:5 › Denominator policy — NRBC in peripheral blood (URS-030, DCR-006) › VV-SYS-101: The report states the leucocyte differential and NRBC per 100 WBC (4.0s)
+  ✓   79 [chromium] › tests-e2e/counting-workflow.spec.js:157:5 › Validation scenario V1 — complete bone marrow differential › VV-SYS-020: 500-cell differential counts, reports and exports consistently (8.6s)
+  ✓   90 [chromium] › tests-e2e/counting-workflow.spec.js:327:5 › Denominator policy — NRBC in peripheral blood (URS-030, DCR-006) › VV-SYS-102: Bone marrow keeps erythroblasts in the differential (4.0s)
+  ✓   91 [chromium] › tests-e2e/counting-workflow.spec.js:340:5 › Sampling precision (URS-037, HA-030) › VV-SYS-110: The report states a confidence interval for each percentage (3.6s)
+  ✓   98 [chromium] › tests-e2e/counting-workflow.spec.js:439:5 › Method provenance (URS-052, URS-055) › VV-SYS-130: The pasted report carries profile attribution (2.2s)
+  ✓   94 [chromium] › tests-e2e/counting-workflow.spec.js:382:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-120: A count straddling the AML threshold raises the advisory (4.1s)
+  ✓   93 [chromium] › tests-e2e/counting-workflow.spec.js:365:5 › Sampling precision (URS-037, HA-030) › VV-SYS-112: A zero count is reported as bounded, not absent (4.1s)
+  ✓   95 [chromium] › tests-e2e/counting-workflow.spec.js:400:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-121: The advisory is informational and never blocks (4.0s)
+  ✓   99 [chromium] › tests-e2e/counting-workflow.spec.js:457:5 › Method provenance (URS-052, URS-055) › VV-SYS-131: The results screen states the conventions used (2.1s)
+  ✓  103 [chromium] › tests-e2e/counting-workflow.spec.js:625:9 › The totals column is one column (URS-055) › VV-SYS-213: Subtotals and the grand total share one axis at 1440px (1.8s)
+  ✓  102 [chromium] › tests-e2e/counting-workflow.spec.js:561:5 › Legibility of clinical advisories (URS-095) › VV-SYS-161: The counting grid stays legible in the light theme (4.6s)
+  ✓  104 [chromium] › tests-e2e/counting-workflow.spec.js:625:9 › The totals column is one column (URS-055) › VV-SYS-213: Subtotals and the grand total share one axis at 1024px (1.9s)
+  ✓   97 [chromium] › tests-e2e/counting-workflow.spec.js:428:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-123: A clean count shows no advisory (8.3s)
+  ✓   96 [chromium] › tests-e2e/counting-workflow.spec.js:412:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-122: Extending the count re-evaluates the advisory (9.0s)
+  ✓  100 [chromium] › tests-e2e/counting-workflow.spec.js:539:9 › Legibility of clinical advisories (URS-095) › VV-SYS-160 (light): advisories are legible in the light theme (6.4s)
+  ✓  101 [chromium] › tests-e2e/counting-workflow.spec.js:539:9 › Legibility of clinical advisories (URS-095) › VV-SYS-160 (dark): advisories are legible in the dark theme (6.4s)
+  ✓  105 [chromium] › tests-e2e/counting-workflow.spec.js:625:9 › The totals column is one column (URS-055) › VV-SYS-213: Subtotals and the grand total share one axis at 820px (2.0s)
+  ✓  108 [chromium] › tests-e2e/counting-workflow.spec.js:724:5 › The totals column is one column (URS-055) › VV-SYS-214: An uneven split still shares the axis (2.3s)
+  ✓  106 [chromium] › tests-e2e/counting-workflow.spec.js:655:5 › The totals column is one column (URS-055) › VV-SYS-215: A keyboard-row profile puts each cell above its own key (2.4s)
+  ✓  107 [chromium] › tests-e2e/counting-workflow.spec.js:676:5 › The totals column is one column (URS-055) › VV-SYS-216: A frequency-assigned profile is not forced onto that grid (2.4s)
+  ✓  109 [chromium] › tests-e2e/counting-workflow.spec.js:769:5 › Audio modes (URS-108) › VV-SYS-222: The control cycles three modes and the choice survives a reload (1.3s)
+  ✓  111 [chromium] › tests-e2e/dialog.spec.js:45:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-170: Adding a specimen type uses the product dialog, not a browser prompt (1.4s)
+  ✓  112 [chromium] › tests-e2e/dialog.spec.js:72:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-171: Adding a derived figure uses the product dialog (1.3s)
+  ✓  114 [chromium] › tests-e2e/dialog.spec.js:120:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-173: Enter confirms, Escape cancels, focus is placed and restored (1.2s)
+  ✓  113 [chromium] › tests-e2e/dialog.spec.js:90:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-172: Invalid input is refused with a reason, and the dialog stays open (1.4s)
+  ✓  115 [chromium] › tests-e2e/dialog.spec.js:149:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-174: Tab is trapped inside the dialog (1.3s)
+  ✓  110 [chromium] › tests-e2e/counting-workflow.spec.js:793:5 › Audio modes (URS-108) › VV-SYS-223: Counting is unaffected by the audio mode (2.9s)
+  ✓  116 [chromium] › tests-e2e/dialog.spec.js:171:5 › A dialog is modal for the keyboard too (SYS-246) › VV-SYS-175: A counting key pressed while a dialog is open does not count (1.3s)
+  ✓  122 [chromium] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (analyzer-5.json): every mapped key increments and decrements (945ms)
+  ✓  120 [chromium] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — light theme (SYS-113) › VV-SYS-177 (light): counter controls meet AA under the pointer (1.2s)
+  ✓  118 [chromium] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — dark theme (SYS-113) › VV-SYS-177 (dark): counter controls meet AA under the pointer (1.6s)
+  ✓  117 [chromium] › tests-e2e/dialog.spec.js:194:5 › A dialog is modal for the keyboard too (SYS-246) › VV-SYS-176: Escape cannot discard an interrupted count (1.8s)
+  ✓  124 [chromium] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (body-fluid.json): every mapped key increments and decrements (940ms)
+  ✓  123 [chromium] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (bands-segs-10.json): every mapped key increments and decrements (1.6s)
+  ✓  126 [chromium] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (mdc-2015-9.json): every mapped key increments and decrements (1.8s)
+  ✓  125 [chromium] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (gran-combined-10.json): every mapped key increments and decrements (2.0s)
+  ✓  128 [chromium] › tests-e2e/input-integrity.spec.js:122:5 › Auto-repeat does not inflate a count (SYS-030) › VV-SYS-181: A held key adds one cell, not one per repeat (729ms)
+  ✓  129 [chromium] › tests-e2e/input-integrity.spec.js:143:5 › Auto-repeat does not inflate a count (SYS-030) › VV-SYS-182: Keystrokes composed by an input method do not count (708ms)
+  ✓  127 [chromium] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (ndc-14.json): every mapped key increments and decrements (1.9s)
+  ✓  131 [chromium] › tests-e2e/input-integrity.spec.js:190:5 › Crash-recovery snapshot is bounded (URS-080) › VV-SYS-184: A stale autosave is discarded rather than resurrected (1.2s)
+  ✓  130 [chromium] › tests-e2e/input-integrity.spec.js:159:5 › An acknowledgement runs however it is dismissed (SYS-247) › VV-SYS-183: Escape on an alert still runs its continuation (1.7s)
+  ✓  132 [chromium] › tests-e2e/input-integrity.spec.js:219:5 › Crash-recovery snapshot is bounded (URS-080) › VV-SYS-185: A recent autosave is still offered (1.3s)
+  ✓  133 [chromium] › tests-e2e/input-integrity.spec.js:260:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-186: The entered WBC is corrected before any absolute count (2.2s)
+  ✓  134 [chromium] › tests-e2e/input-integrity.spec.js:272:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-187: The correction is shown, not applied silently (2.4s)
+  ✓  136 [chromium] › tests-e2e/input-integrity.spec.js:297:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-189: With no nucleated red cells the control is not offered (2.1s)
+  ✓  121 [chromium] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — light theme (SYS-113) › VV-SYS-178 (light): configuration editor controls meet AA under the pointer (7.2s)
+  ✓  135 [chromium] › tests-e2e/input-integrity.spec.js:283:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-188: An already-corrected value is used as entered (2.8s)
+  ✓  141 [chromium] › tests-e2e/input-integrity.spec.js:435:5 › The profile audio default is honoured (URS-097) › VV-SYS-194: A profile with audio disabled starts silent (511ms)
+  ✓  137 [chromium] › tests-e2e/input-integrity.spec.js:314:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-190: Bone marrow gets no correction — erythroblasts belong in the count (2.7s)
+  ✓  138 [chromium] › tests-e2e/input-integrity.spec.js:369:5 › Absolute counts in the report are optional (SYS-251) › VV-SYS-191: When enabled, the report carries the corrected ANC and its basis (3.1s)
+  ✓  140 [chromium] › tests-e2e/input-integrity.spec.js:398:5 › Absolute counts in the report are optional (SYS-251) › VV-SYS-193: Declaring the WBC already corrected changes the reported figure and says so (3.3s)
+  ✓  139 [chromium] › tests-e2e/input-integrity.spec.js:386:5 › Absolute counts in the report are optional (SYS-251) › VV-SYS-192: When disabled, the report is unchanged by a WBC (3.3s)
+  ✓  144 [chromium] › tests-e2e/input-integrity.spec.js:490:5 › Displayed figures reconcile with each other (P0-10) › VV-SYS-197: Each row subtotal equals the sum of the cells displayed in it (775ms)
+  ✓  145 [chromium] › tests-e2e/input-integrity.spec.js:529:5 › Displayed figures reconcile with each other (P0-10) › VV-SYS-198: The same holds at two decimal places (869ms)
+  ✓  146 [chromium] › tests-e2e/input-integrity.spec.js:540:5 › Displayed figures reconcile with each other (P0-10) › VV-SYS-199: Session history reports at the precision the count used (929ms)
+  ✓  148 [chromium] › tests-e2e/input-integrity.spec.js:589:5 › The M:E ratio carries its own interval (HA-093) › VV-SYS-202: The same ratio at a tenth of the count reads far less precisely (949ms)
+  ✓  119 [chromium] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — dark theme (SYS-113) › VV-SYS-178 (dark): configuration editor controls meet AA under the pointer (13.0s)
+  ✓  147 [chromium] › tests-e2e/input-integrity.spec.js:580:5 › The M:E ratio carries its own interval (HA-093) › VV-SYS-201: The displayed ratio is accompanied by its interval (2.2s)
+  ✓  149 [chromium] › tests-e2e/input-integrity.spec.js:596:5 › The M:E ratio carries its own interval (HA-093) › VV-SYS-203: A profile with intervals disabled shows none (1.9s)
+  ✘  142 [chromium] › tests-e2e/input-integrity.spec.js:441:5 › The profile audio default is honoured (URS-097) › VV-SYS-195: A profile with audio enabled starts with sound (5.6s)
+  ✘  143 [chromium] › tests-e2e/input-integrity.spec.js:446:5 › The profile audio default is honoured (URS-097) › VV-SYS-196: The operator overrides the profile, in both directions (5.6s)
+  ✓  150 [firefox] › tests-e2e/config-and-offline.spec.js:51:5 › Configuration controls (URS-103) › VV-SYS-050: Export Config downloads the active profile (1.5s)
+  ✓  151 [firefox] › tests-e2e/config-and-offline.spec.js:67:5 › Configuration controls (URS-103) › VV-SYS-051: Import Config applies a profile and re-renders the counter (2.2s)
+  ✓  152 [firefox] › tests-e2e/config-and-offline.spec.js:103:5 › Configuration controls (URS-103) › VV-SYS-052: Import rejects an invalid profile and keeps the current one (2.2s)
+  ✓  156 [firefox] › tests-e2e/config-and-offline.spec.js:195:5 › Preset profile catalogue (URS-101) › VV-SYS-056: Loading a preset applies it and it is usable for counting (1.8s)
+  ✓  153 [firefox] › tests-e2e/config-and-offline.spec.js:129:5 › Configuration controls (URS-103) › VV-SYS-053: Reset to Default confirms, clears the cache and restores the built-in profile (2.7s)
+  ✓  159 [firefox] › tests-e2e/config-and-offline.spec.js:275:5 › Configuration editor round-trip (URS-102) › VV-SYS-060: The editor is reachable from the counter (1.2s)
+  ✓  154 [firefox] › tests-e2e/config-and-offline.spec.js:157:5 › Configuration controls (URS-103) › VV-SYS-054: A newer built-in profile supersedes a cached copy of the same profile (2.7s)
+  ✓  157 [firefox] › tests-e2e/config-and-offline.spec.js:213:5 › Preset profile catalogue (URS-101) › VV-SYS-057: The body fluid preset provides a non-blood specimen panel (URS-011) (2.0s)
+  ✓  155 [firefox] › tests-e2e/config-and-offline.spec.js:177:5 › Preset profile catalogue (URS-101) › VV-SYS-055: The catalogue lists the built-in profiles (2.2s)
+  ✓  160 [firefox] › tests-e2e/config-and-offline.spec.js:284:5 › Configuration editor round-trip (URS-102) › VV-SYS-061: An unusable draft is downloaded but never made active (857ms)
+  ✓  161 [firefox] › tests-e2e/config-and-offline.spec.js:303:5 › Configuration editor round-trip (URS-102) › VV-SYS-062: A complete profile saved in the editor is picked up by the counter (1.6s)
+  ✓  163 [firefox] › tests-e2e/config-and-offline.spec.js:368:5 › Configuration editor round-trip (URS-102) › VV-SYS-064: An edit saved in the editor is honoured by the counter (1.4s)
+  ✘  162 [firefox] › tests-e2e/config-and-offline.spec.js:335:5 › Configuration editor round-trip (URS-102) › VV-SYS-063: The editor preserves every field it does not itself edit (1.3s)
+  ✓  165 [firefox] › tests-e2e/config-and-offline.spec.js:461:5 › Configuration editor round-trip (URS-102) › VV-SYS-066: Rounding and precision can be set in the editor and change the figures (2.0s)
+  ✓  166 [firefox] › tests-e2e/config-and-offline.spec.js:486:5 › Configuration editor round-trip (URS-102) › VV-SYS-067: A threshold added in the editor raises the advisory (1.8s)
+  -  169 [firefox] › tests-e2e/config-and-offline.spec.js:562:5 › Output, export and printing › VV-SYS-070: Copy to Clipboard places the report on the system clipboard (URS-053)
+  ✓  164 [firefox] › tests-e2e/config-and-offline.spec.js:430:5 › Configuration editor round-trip (URS-102) › VV-SYS-065: The denominator policy can be set in the editor and changes the count (4.2s)
+  ✓  170 [firefox] › tests-e2e/config-and-offline.spec.js:582:5 › Output, export and printing › VV-SYS-071: Session CSV export downloads with traceability columns (URS-084) (1.6s)
+  ✓  171 [firefox] › tests-e2e/config-and-offline.spec.js:602:5 › Output, export and printing › VV-SYS-072: Session JSON export downloads and parses (URS-084) (1.6s)
+  ✓  172 [firefox] › tests-e2e/config-and-offline.spec.js:619:5 › Output, export and printing › VV-SYS-073: A case number containing markup is rendered as inert text (SYS-S04) (1.1s)
+  ✓  168 [firefox] › tests-e2e/config-and-offline.spec.js:531:5 › Configuration editor round-trip (URS-102) › VV-SYS-069: The policy controls cannot produce a profile the counter rejects (2.9s)
+  ✓  173 [firefox] › tests-e2e/config-and-offline.spec.js:629:5 › Output, export and printing › VV-SYS-074: The print control is available on the results screen (URS-054) (1.3s)
+  ✓  158 [firefox] › tests-e2e/config-and-offline.spec.js:232:5 › Subset percentage formulas (URS-039) › VV-SYS-125: The bands-and-segs preset reports blasts against both denominators (8.2s)
+  ✓  174 [firefox] › tests-e2e/config-and-offline.spec.js:637:5 › Output, export and printing › VV-SYS-075: Session history opens a read-only record (URS-082) (1.5s)
+  ✓  176 [firefox] › tests-e2e/config-and-offline.spec.js:676:5 › Autosave and crash recovery (URS-085) › VV-SYS-081: Discarding the recovery starts clean (1.4s)
+  ✓  167 [firefox] › tests-e2e/config-and-offline.spec.js:508:5 › Configuration editor round-trip (URS-102) › VV-SYS-068: The M:E composition can be changed in the editor (6.0s)
+  ✓  177 [firefox] › tests-e2e/config-and-offline.spec.js:685:5 › Autosave and crash recovery (URS-085) › VV-SYS-082: A finalized count leaves no recovery prompt behind (1.4s)
+  ✓  179 [firefox] › tests-e2e/config-and-offline.spec.js:734:5 › Offline operation (URS-094) › VV-SYS-091: Tailwind is served from the local origin, not a CDN (596ms)
+  ✓  175 [firefox] › tests-e2e/config-and-offline.spec.js:653:5 › Autosave and crash recovery (URS-085) › VV-SYS-080: An interrupted count is recovered after a browser restart (2.2s)
+  ✓  178 [firefox] › tests-e2e/config-and-offline.spec.js:697:5 › Offline operation (URS-094) › VV-SYS-090: The application loads and counts with the network disconnected (1.5s)
+  ✓  180 [firefox] › tests-e2e/config-and-offline.spec.js:749:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-140: The methods page is reachable and renders (1.1s)
+  ✓  183 [firefox] › tests-e2e/config-and-offline.spec.js:798:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-143: The methods page works offline (931ms)
+  ✓  184 [firefox] › tests-e2e/config-and-offline.spec.js:819:5 › Calculation reference (CAL-001) › VV-SYS-150: Reachable from the counter and renders (1.1s)
+  ✓  187 [firefox] › tests-e2e/config-and-offline.spec.js:857:5 › Calculation reference (CAL-001) › VV-SYS-153: States both what is configurable and what is fixed (605ms)
+  ✓  185 [firefox] › tests-e2e/config-and-offline.spec.js:837:5 › Calculation reference (CAL-001) › VV-SYS-151: Reachable from the methods page and links back (938ms)
+  ✓  182 [firefox] › tests-e2e/config-and-offline.spec.js:785:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-142: The results screen links to the methods page (1.6s)
+  ✓  188 [firefox] › tests-e2e/config-and-offline.spec.js:870:5 › Calculation reference (CAL-001) › VV-SYS-154: Available offline (1.1s)
+  ✓  186 [firefox] › tests-e2e/config-and-offline.spec.js:845:5 › Calculation reference (CAL-001) › VV-SYS-152: Reachable from the results screen (1.6s)
+  ✓  190 [firefox] › tests-e2e/config-and-offline.spec.js:905:5 › Removing a category cleans up after itself (P0-7) › VV-SYS-200: Removing a category removes what depended on it (1.1s)
+  ✓  189 [firefox] › tests-e2e/config-and-offline.spec.js:886:5 › Calculation reference (CAL-001) › VV-SYS-155: Loads no third-party script (URS-094) (1.2s)
+  ✓  181 [firefox] › tests-e2e/config-and-offline.spec.js:764:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-141: The worked figures on the page match what the counter produces (3.3s)
+  ✓  194 [firefox] › tests-e2e/config-and-offline.spec.js:1066:5 › A renamed profile id is offered, never imposed (URS-101) › VV-SYS-217: The operator is told, and keeping their profile is the default (923ms)
+  ✓  196 [firefox] › tests-e2e/config-and-offline.spec.js:1102:5 › A renamed profile id is offered, never imposed (URS-101) › VV-SYS-219: A current profile raises no offer (607ms)
+  ✓  191 [firefox] › tests-e2e/config-and-offline.spec.js:978:5 › The predecessor profile is reachable and countable (URS-101) › VV-SYS-210: The preset loads from the catalogue (2.1s)
+  ✓  195 [firefox] › tests-e2e/config-and-offline.spec.js:1084:5 › A renamed profile id is offered, never imposed (URS-101) › VV-SYS-218: Accepting loads the renamed built-in (1.4s)
+  ✓  199 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-162 (dark): counter — case entry meets WCAG AA (819ms)
+  ✓  197 [firefox] › tests-e2e/config-and-offline.spec.js:1136:5 › The method statement reports its basis (URS-055) › VV-SYS-220: The rendered report states the profile's basis (1.3s)
+  ✓  202 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-165 (dark): methods and limitations meets WCAG AA (669ms)
+  ✓  198 [firefox] › tests-e2e/config-and-offline.spec.js:1157:5 › The method statement reports its basis (URS-055) › VV-SYS-221: A profile with no bone marrow states no bone marrow basis (2.2s)
+  ✓  192 [firefox] › tests-e2e/config-and-offline.spec.js:996:5 › The predecessor profile is reachable and countable (URS-101) › VV-SYS-211: The predecessor keys count the predecessor cells (3.8s)
+  ✓  203 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-166 (dark): calculation reference meets WCAG AA (780ms)
+  ✓  204 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-167 (dark): quick start guide meets WCAG AA (673ms)
+  ✓  193 [firefox] › tests-e2e/config-and-offline.spec.js:1014:5 › The predecessor profile is reachable and countable (URS-101) › VV-SYS-212: The report keeps a counted cell, and fills the M:E field (4.4s)
+  ✓  205 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-168 (dark): configuration editor meets WCAG AA (698ms)
+  ✓  207 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-162 (light): counter — case entry meets WCAG AA (952ms)
+  ✓  201 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-164 (dark): counter — results meets WCAG AA (4.1s)
+  ✓  206 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-169 (dark): dialog, with validation errors shown meets WCAG AA (2.3s)
+  ✓  200 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-163 (dark): counter — counting meets WCAG AA (4.6s)
+  ✓  210 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-165 (light): methods and limitations meets WCAG AA (1.5s)
+  ✓  211 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-166 (light): calculation reference meets WCAG AA (696ms)
+  ✓  212 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-167 (light): quick start guide meets WCAG AA (735ms)
+  ✓  213 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-168 (light): configuration editor meets WCAG AA (729ms)
+  ✓  215 [firefox] › tests-e2e/counting-workflow.spec.js:45:5 › Case entry and start › VV-SYS-001: Application loads and presents the case entry phase (530ms)
+  ✓  216 [firefox] › tests-e2e/counting-workflow.spec.js:52:5 › Case entry and start › VV-SYS-002: Specimen selector is populated from the configuration profile (535ms)
+  ✓  217 [firefox] › tests-e2e/counting-workflow.spec.js:58:5 › Case entry and start › VV-SYS-003: Enter in the case field starts counting (barcode workflow, URS-006) (644ms)
+  ✓  214 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-169 (light): dialog, with validation errors shown meets WCAG AA (1.4s)
+  ✓  218 [firefox] › tests-e2e/counting-workflow.spec.js:68:5 › Case entry and start › VV-SYS-004: Counting may begin without a case number (URS-004) (753ms)
+  ✓  219 [firefox] › tests-e2e/counting-workflow.spec.js:73:5 › Case entry and start › VV-SYS-005: Active case number is displayed throughout counting (URS-002) (818ms)
+  ✓  220 [firefox] › tests-e2e/counting-workflow.spec.js:83:5 › Keyboard counting › VV-SYS-010: Every configured key increments its own category (URS-020, URS-021) (1.0s)
+  ✓  208 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-163 (light): counter — counting meets WCAG AA (4.6s)
+  ✓  221 [firefox] › tests-e2e/counting-workflow.spec.js:95:5 › Keyboard counting › VV-SYS-011: Shift+key undoes and never passes zero (URS-025) (916ms)
+  ✓  222 [firefox] › tests-e2e/counting-workflow.spec.js:106:5 › Keyboard counting › VV-SYS-012: Unmapped keys are ignored (URS-026) (822ms)
+  ✓  209 [firefox] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-164 (light): counter — results meets WCAG AA (4.9s)
+  ✓  223 [firefox] › tests-e2e/counting-workflow.spec.js:112:5 › Keyboard counting › VV-SYS-013: Key mapping is displayed for every category (URS-022) (970ms)
+  ✓  225 [firefox] › tests-e2e/counting-workflow.spec.js:129:5 › Keyboard counting › VV-SYS-015: Typing in the comment field never counts (URS-070) (949ms)
+  ✓  226 [firefox] › tests-e2e/counting-workflow.spec.js:137:5 › Keyboard counting › VV-SYS-016: Progress indicator tracks the target count (URS-024) (983ms)
+  ✓  224 [firefox] › tests-e2e/counting-workflow.spec.js:120:5 › Keyboard counting › VV-SYS-014: Percentages update live and sum to 100.00 (URS-031, URS-034) (1.6s)
+  ✓  231 [firefox] › tests-e2e/counting-workflow.spec.js:218:5 › Continue Counting and reset › VV-SYS-031: Comments survive Count Done then Continue Counting (URS-073) (1.4s)
+  ✓  227 [firefox] › tests-e2e/counting-workflow.spec.js:144:5 › Keyboard counting › VV-SYS-017: M:E ratio computes live and shows N/A with a zero denominator (URS-035) (2.6s)
+  ✓  232 [firefox] › tests-e2e/counting-workflow.spec.js:228:5 › Continue Counting and reset › VV-SYS-032: Reset requires confirmation and then clears the count (URS-060, URS-061) (1.8s)
+  ✓  229 [firefox] › tests-e2e/counting-workflow.spec.js:189:5 › Validation scenario V1 — complete bone marrow differential › VV-SYS-021: Sub-target count completes with an advisory, never a block (URS-041) (3.1s)
+  ✓  234 [firefox] › tests-e2e/counting-workflow.spec.js:256:5 › Specimen type switching (URS-010, URS-013) › VV-SYS-040: The specimen switcher is available during counting (781ms)
+  ✓  233 [firefox] › tests-e2e/counting-workflow.spec.js:243:5 › Continue Counting and reset › VV-SYS-033: Keystrokes after completion cannot alter the count (HA-015) (1.4s)
+  ✓  230 [firefox] › tests-e2e/counting-workflow.spec.js:202:5 › Continue Counting and reset › VV-SYS-030: Continue Counting preserves the tally and extends it (URS-042) (3.4s)
+  ✓  235 [firefox] › tests-e2e/counting-workflow.spec.js:262:5 › Specimen type switching (URS-010, URS-013) › VV-SYS-041: Switching mid-count saves the work to history first (1.5s)
+  ✓  236 [firefox] › tests-e2e/counting-workflow.spec.js:275:5 › Specimen type switching (URS-010, URS-013) › VV-SYS-042: Cancelling a switch restores both the selector and the count (1.5s)
+  ✓  237 [firefox] › tests-e2e/counting-workflow.spec.js:295:5 › Denominator policy — NRBC in peripheral blood (URS-030, DCR-006) › VV-SYS-100: NRBC counted in PB do not dilute the leucocyte percentages (2.9s)
+  ✓  228 [firefox] › tests-e2e/counting-workflow.spec.js:157:5 › Validation scenario V1 — complete bone marrow differential › VV-SYS-020: 500-cell differential counts, reports and exports consistently (6.4s)
+  ✓  241 [firefox] › tests-e2e/counting-workflow.spec.js:352:5 › Sampling precision (URS-037, HA-030) › VV-SYS-111: A sub-target count carries a quantified advisory (1.9s)
+  ✓  238 [firefox] › tests-e2e/counting-workflow.spec.js:311:5 › Denominator policy — NRBC in peripheral blood (URS-030, DCR-006) › VV-SYS-101: The report states the leucocyte differential and NRBC per 100 WBC (3.2s)
+  ✓  239 [firefox] › tests-e2e/counting-workflow.spec.js:327:5 › Denominator policy — NRBC in peripheral blood (URS-030, DCR-006) › VV-SYS-102: Bone marrow keeps erythroblasts in the differential (2.9s)
+  ✓  240 [firefox] › tests-e2e/counting-workflow.spec.js:340:5 › Sampling precision (URS-037, HA-030) › VV-SYS-110: The report states a confidence interval for each percentage (3.3s)
+  ✓  242 [firefox] › tests-e2e/counting-workflow.spec.js:365:5 › Sampling precision (URS-037, HA-030) › VV-SYS-112: A zero count is reported as bounded, not absent (3.2s)
+  ✓  243 [firefox] › tests-e2e/counting-workflow.spec.js:382:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-120: A count straddling the AML threshold raises the advisory (3.0s)
+  ✓  244 [firefox] › tests-e2e/counting-workflow.spec.js:400:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-121: The advisory is informational and never blocks (3.0s)
+  -  247 [firefox] › tests-e2e/counting-workflow.spec.js:439:5 › Method provenance (URS-052, URS-055) › VV-SYS-130: The pasted report carries profile attribution
+  ✓  248 [firefox] › tests-e2e/counting-workflow.spec.js:457:5 › Method provenance (URS-052, URS-055) › VV-SYS-131: The results screen states the conventions used (1.8s)
+  ✓  252 [firefox] › tests-e2e/counting-workflow.spec.js:625:9 › The totals column is one column (URS-055) › VV-SYS-213: Subtotals and the grand total share one axis at 1440px (1.5s)
+  ✓  245 [firefox] › tests-e2e/counting-workflow.spec.js:412:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-122: Extending the count re-evaluates the advisory (6.3s)
+  ✓  251 [firefox] › tests-e2e/counting-workflow.spec.js:561:5 › Legibility of clinical advisories (URS-095) › VV-SYS-161: The counting grid stays legible in the light theme (3.1s)
+  ✓  246 [firefox] › tests-e2e/counting-workflow.spec.js:428:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-123: A clean count shows no advisory (6.2s)
+  ✓  249 [firefox] › tests-e2e/counting-workflow.spec.js:539:9 › Legibility of clinical advisories (URS-095) › VV-SYS-160 (light): advisories are legible in the light theme (4.2s)
+  ✓  250 [firefox] › tests-e2e/counting-workflow.spec.js:539:9 › Legibility of clinical advisories (URS-095) › VV-SYS-160 (dark): advisories are legible in the dark theme (4.5s)
+  ✓  253 [firefox] › tests-e2e/counting-workflow.spec.js:625:9 › The totals column is one column (URS-055) › VV-SYS-213: Subtotals and the grand total share one axis at 1024px (1.6s)
+  ✓  254 [firefox] › tests-e2e/counting-workflow.spec.js:625:9 › The totals column is one column (URS-055) › VV-SYS-213: Subtotals and the grand total share one axis at 820px (2.0s)
+  ✓  255 [firefox] › tests-e2e/counting-workflow.spec.js:655:5 › The totals column is one column (URS-055) › VV-SYS-215: A keyboard-row profile puts each cell above its own key (2.0s)
+  ✓  256 [firefox] › tests-e2e/counting-workflow.spec.js:676:5 › The totals column is one column (URS-055) › VV-SYS-216: A frequency-assigned profile is not forced onto that grid (2.6s)
+  ✓  258 [firefox] › tests-e2e/counting-workflow.spec.js:769:5 › Audio modes (URS-108) › VV-SYS-222: The control cycles three modes and the choice survives a reload (1.7s)
+  ✓  257 [firefox] › tests-e2e/counting-workflow.spec.js:724:5 › The totals column is one column (URS-055) › VV-SYS-214: An uneven split still shares the axis (2.2s)
+  ✓  260 [firefox] › tests-e2e/dialog.spec.js:45:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-170: Adding a specimen type uses the product dialog, not a browser prompt (1.4s)
+  ✓  261 [firefox] › tests-e2e/dialog.spec.js:72:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-171: Adding a derived figure uses the product dialog (1.4s)
+  ✓  263 [firefox] › tests-e2e/dialog.spec.js:120:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-173: Enter confirms, Escape cancels, focus is placed and restored (984ms)
+  ✓  264 [firefox] › tests-e2e/dialog.spec.js:149:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-174: Tab is trapped inside the dialog (911ms)
+  ✓  259 [firefox] › tests-e2e/counting-workflow.spec.js:793:5 › Audio modes (URS-108) › VV-SYS-223: Counting is unaffected by the audio mode (2.9s)
+  ✓  262 [firefox] › tests-e2e/dialog.spec.js:90:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-172: Invalid input is refused with a reason, and the dialog stays open (1.4s)
+  ✓  265 [firefox] › tests-e2e/dialog.spec.js:171:5 › A dialog is modal for the keyboard too (SYS-246) › VV-SYS-175: A counting key pressed while a dialog is open does not count (1.6s)
+  ✓  266 [firefox] › tests-e2e/dialog.spec.js:194:5 › A dialog is modal for the keyboard too (SYS-246) › VV-SYS-176: Escape cannot discard an interrupted count (1.9s)
+  ✓  267 [firefox] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — dark theme (SYS-113) › VV-SYS-177 (dark): counter controls meet AA under the pointer (1.7s)
+  ✓  270 [firefox] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — light theme (SYS-113) › VV-SYS-177 (light): counter controls meet AA under the pointer (1.4s)
+  ✓  271 [firefox] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (analyzer-5.json): every mapped key increments and decrements (1.1s)
+  ✓  273 [firefox] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (body-fluid.json): every mapped key increments and decrements (1.0s)
+  ✓  272 [firefox] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (bands-segs-10.json): every mapped key increments and decrements (1.7s)
+  ✓  274 [firefox] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (gran-combined-10.json): every mapped key increments and decrements (1.8s)
+  ✓  275 [firefox] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (mdc-2015-9.json): every mapped key increments and decrements (1.6s)
+  ✓  277 [firefox] › tests-e2e/input-integrity.spec.js:122:5 › Auto-repeat does not inflate a count (SYS-030) › VV-SYS-181: A held key adds one cell, not one per repeat (758ms)
+  ✓  278 [firefox] › tests-e2e/input-integrity.spec.js:143:5 › Auto-repeat does not inflate a count (SYS-030) › VV-SYS-182: Keystrokes composed by an input method do not count (752ms)
+  ✓  276 [firefox] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (ndc-14.json): every mapped key increments and decrements (1.8s)
+  ✓  280 [firefox] › tests-e2e/input-integrity.spec.js:190:5 › Crash-recovery snapshot is bounded (URS-080) › VV-SYS-184: A stale autosave is discarded rather than resurrected (1.3s)
+  ✓  281 [firefox] › tests-e2e/input-integrity.spec.js:219:5 › Crash-recovery snapshot is bounded (URS-080) › VV-SYS-185: A recent autosave is still offered (1.4s)
+  ✓  279 [firefox] › tests-e2e/input-integrity.spec.js:159:5 › An acknowledgement runs however it is dismissed (SYS-247) › VV-SYS-183: Escape on an alert still runs its continuation (1.8s)
+  ✓  282 [firefox] › tests-e2e/input-integrity.spec.js:260:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-186: The entered WBC is corrected before any absolute count (2.4s)
+  ✓  269 [firefox] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — light theme (SYS-113) › VV-SYS-178 (light): configuration editor controls meet AA under the pointer (6.6s)
+  ✓  283 [firefox] › tests-e2e/input-integrity.spec.js:272:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-187: The correction is shown, not applied silently (2.3s)
+  ✓  285 [firefox] › tests-e2e/input-integrity.spec.js:297:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-189: With no nucleated red cells the control is not offered (2.3s)
+  ✓  284 [firefox] › tests-e2e/input-integrity.spec.js:283:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-188: An already-corrected value is used as entered (3.0s)
+  ✓  286 [firefox] › tests-e2e/input-integrity.spec.js:314:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-190: Bone marrow gets no correction — erythroblasts belong in the count (2.9s)
+  ✓  290 [firefox] › tests-e2e/input-integrity.spec.js:435:5 › The profile audio default is honoured (URS-097) › VV-SYS-194: A profile with audio disabled starts silent (1.3s)
+  ✓  287 [firefox] › tests-e2e/input-integrity.spec.js:369:5 › Absolute counts in the report are optional (SYS-251) › VV-SYS-191: When enabled, the report carries the corrected ANC and its basis (3.5s)
+  ✓  288 [firefox] › tests-e2e/input-integrity.spec.js:386:5 › Absolute counts in the report are optional (SYS-251) › VV-SYS-192: When disabled, the report is unchanged by a WBC (3.7s)
+  ✓  293 [firefox] › tests-e2e/input-integrity.spec.js:490:5 › Displayed figures reconcile with each other (P0-10) › VV-SYS-197: Each row subtotal equals the sum of the cells displayed in it (953ms)
+  ✓  289 [firefox] › tests-e2e/input-integrity.spec.js:398:5 › Absolute counts in the report are optional (SYS-251) › VV-SYS-193: Declaring the WBC already corrected changes the reported figure and says so (3.6s)
+  ✓  295 [firefox] › tests-e2e/input-integrity.spec.js:540:5 › Displayed figures reconcile with each other (P0-10) › VV-SYS-199: Session history reports at the precision the count used (1.1s)
+  ✓  294 [firefox] › tests-e2e/input-integrity.spec.js:529:5 › Displayed figures reconcile with each other (P0-10) › VV-SYS-198: The same holds at two decimal places (1.3s)
+  ✓  268 [firefox] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — dark theme (SYS-113) › VV-SYS-178 (dark): configuration editor controls meet AA under the pointer (12.7s)
+  ✓  297 [firefox] › tests-e2e/input-integrity.spec.js:589:5 › The M:E ratio carries its own interval (HA-093) › VV-SYS-202: The same ratio at a tenth of the count reads far less precisely (1.1s)
+  ✓  296 [firefox] › tests-e2e/input-integrity.spec.js:580:5 › The M:E ratio carries its own interval (HA-093) › VV-SYS-201: The displayed ratio is accompanied by its interval (2.6s)
+  ✓  298 [firefox] › tests-e2e/input-integrity.spec.js:596:5 › The M:E ratio carries its own interval (HA-093) › VV-SYS-203: A profile with intervals disabled shows none (2.3s)
+  ✓  299 [webkit] › tests-e2e/config-and-offline.spec.js:51:5 › Configuration controls (URS-103) › VV-SYS-050: Export Config downloads the active profile (1.4s)
+  ✘  291 [firefox] › tests-e2e/input-integrity.spec.js:441:5 › The profile audio default is honoured (URS-097) › VV-SYS-195: A profile with audio enabled starts with sound (5.7s)
+  ✓  300 [webkit] › tests-e2e/config-and-offline.spec.js:67:5 › Configuration controls (URS-103) › VV-SYS-051: Import Config applies a profile and re-renders the counter (1.3s)
+  ✓  302 [webkit] › tests-e2e/config-and-offline.spec.js:157:5 › Configuration controls (URS-103) › VV-SYS-054: A newer built-in profile supersedes a cached copy of the same profile (1.1s)
+  ✓  301 [webkit] › tests-e2e/config-and-offline.spec.js:103:5 › Configuration controls (URS-103) › VV-SYS-052: Import rejects an invalid profile and keeps the current one (1.1s)
+  ✘  292 [firefox] › tests-e2e/input-integrity.spec.js:446:5 › The profile audio default is honoured (URS-097) › VV-SYS-196: The operator overrides the profile, in both directions (5.9s)
+  ✓  304 [webkit] › tests-e2e/config-and-offline.spec.js:195:5 › Preset profile catalogue (URS-101) › VV-SYS-056: Loading a preset applies it and it is usable for counting (1.7s)
+  ✓  303 [webkit] › tests-e2e/config-and-offline.spec.js:129:5 › Configuration controls (URS-103) › VV-SYS-053: Reset to Default confirms, clears the cache and restores the built-in profile (1.8s)
+  ✓  305 [webkit] › tests-e2e/config-and-offline.spec.js:213:5 › Preset profile catalogue (URS-101) › VV-SYS-057: The body fluid preset provides a non-blood specimen panel (URS-011) (1.7s)
+  ✓  307 [webkit] › tests-e2e/config-and-offline.spec.js:177:5 › Preset profile catalogue (URS-101) › VV-SYS-055: The catalogue lists the built-in profiles (1.1s)
+  ✓  309 [webkit] › tests-e2e/config-and-offline.spec.js:284:5 › Configuration editor round-trip (URS-102) › VV-SYS-061: An unusable draft is downloaded but never made active (702ms)
+  ✓  308 [webkit] › tests-e2e/config-and-offline.spec.js:275:5 › Configuration editor round-trip (URS-102) › VV-SYS-060: The editor is reachable from the counter (1.2s)
+  ✓  312 [webkit] › tests-e2e/config-and-offline.spec.js:368:5 › Configuration editor round-trip (URS-102) › VV-SYS-064: An edit saved in the editor is honoured by the counter (1.3s)
+  ✓  310 [webkit] › tests-e2e/config-and-offline.spec.js:303:5 › Configuration editor round-trip (URS-102) › VV-SYS-062: A complete profile saved in the editor is picked up by the counter (1.6s)
+  ✘  311 [webkit] › tests-e2e/config-and-offline.spec.js:335:5 › Configuration editor round-trip (URS-102) › VV-SYS-063: The editor preserves every field it does not itself edit (1.3s)
+  ✓  314 [webkit] › tests-e2e/config-and-offline.spec.js:461:5 › Configuration editor round-trip (URS-102) › VV-SYS-066: Rounding and precision can be set in the editor and change the figures (1.9s)
+  ✓  315 [webkit] › tests-e2e/config-and-offline.spec.js:486:5 › Configuration editor round-trip (URS-102) › VV-SYS-067: A threshold added in the editor raises the advisory (2.1s)
+  -  318 [webkit] › tests-e2e/config-and-offline.spec.js:562:5 › Output, export and printing › VV-SYS-070: Copy to Clipboard places the report on the system clipboard (URS-053)
+  ✓  317 [webkit] › tests-e2e/config-and-offline.spec.js:531:5 › Configuration editor round-trip (URS-102) › VV-SYS-069: The policy controls cannot produce a profile the counter rejects (1.7s)
+  ✓  313 [webkit] › tests-e2e/config-and-offline.spec.js:430:5 › Configuration editor round-trip (URS-102) › VV-SYS-065: The denominator policy can be set in the editor and changes the count (4.0s)
+  ✓  319 [webkit] › tests-e2e/config-and-offline.spec.js:582:5 › Output, export and printing › VV-SYS-071: Session CSV export downloads with traceability columns (URS-084) (1.4s)
+  ✓  321 [webkit] › tests-e2e/config-and-offline.spec.js:619:5 › Output, export and printing › VV-SYS-073: A case number containing markup is rendered as inert text (SYS-S04) (1.2s)
+  ✓  320 [webkit] › tests-e2e/config-and-offline.spec.js:602:5 › Output, export and printing › VV-SYS-072: Session JSON export downloads and parses (URS-084) (1.3s)
+  ✓  322 [webkit] › tests-e2e/config-and-offline.spec.js:629:5 › Output, export and printing › VV-SYS-074: The print control is available on the results screen (URS-054) (1.5s)
+  ✓  306 [webkit] › tests-e2e/config-and-offline.spec.js:232:5 › Subset percentage formulas (URS-039) › VV-SYS-125: The bands-and-segs preset reports blasts against both denominators (7.7s)
+  ✓  316 [webkit] › tests-e2e/config-and-offline.spec.js:508:5 › Configuration editor round-trip (URS-102) › VV-SYS-068: The M:E composition can be changed in the editor (4.9s)
+  -  327 [webkit] › tests-e2e/config-and-offline.spec.js:697:5 › Offline operation (URS-094) › VV-SYS-090: The application loads and counts with the network disconnected
+  ✓  323 [webkit] › tests-e2e/config-and-offline.spec.js:637:5 › Output, export and printing › VV-SYS-075: Session history opens a read-only record (URS-082) (1.6s)
+  ✓  325 [webkit] › tests-e2e/config-and-offline.spec.js:676:5 › Autosave and crash recovery (URS-085) › VV-SYS-081: Discarding the recovery starts clean (1.5s)
+  ✓  328 [webkit] › tests-e2e/config-and-offline.spec.js:734:5 › Offline operation (URS-094) › VV-SYS-091: Tailwind is served from the local origin, not a CDN (581ms)
+  -  332 [webkit] › tests-e2e/config-and-offline.spec.js:798:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-143: The methods page works offline
+  ✓  324 [webkit] › tests-e2e/config-and-offline.spec.js:653:5 › Autosave and crash recovery (URS-085) › VV-SYS-080: An interrupted count is recovered after a browser restart (2.1s)
+  ✓  326 [webkit] › tests-e2e/config-and-offline.spec.js:685:5 › Autosave and crash recovery (URS-085) › VV-SYS-082: A finalized count leaves no recovery prompt behind (1.4s)
+  ✓  329 [webkit] › tests-e2e/config-and-offline.spec.js:749:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-140: The methods page is reachable and renders (1.0s)
+  ✓  336 [webkit] › tests-e2e/config-and-offline.spec.js:857:5 › Calculation reference (CAL-001) › VV-SYS-153: States both what is configurable and what is fixed (612ms)
+  ✓  334 [webkit] › tests-e2e/config-and-offline.spec.js:837:5 › Calculation reference (CAL-001) › VV-SYS-151: Reachable from the methods page and links back (850ms)
+  ✓  333 [webkit] › tests-e2e/config-and-offline.spec.js:819:5 › Calculation reference (CAL-001) › VV-SYS-150: Reachable from the counter and renders (1.0s)
+  -  337 [webkit] › tests-e2e/config-and-offline.spec.js:870:5 › Calculation reference (CAL-001) › VV-SYS-154: Available offline
+  ✓  331 [webkit] › tests-e2e/config-and-offline.spec.js:785:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-142: The results screen links to the methods page (1.7s)
+  ✓  338 [webkit] › tests-e2e/config-and-offline.spec.js:886:5 › Calculation reference (CAL-001) › VV-SYS-155: Loads no third-party script (URS-094) (521ms)
+  ✓  335 [webkit] › tests-e2e/config-and-offline.spec.js:845:5 › Calculation reference (CAL-001) › VV-SYS-152: Reachable from the results screen (1.7s)
+  ✓  339 [webkit] › tests-e2e/config-and-offline.spec.js:905:5 › Removing a category cleans up after itself (P0-7) › VV-SYS-200: Removing a category removes what depended on it (1.0s)
+  ✓  330 [webkit] › tests-e2e/config-and-offline.spec.js:764:5 › Methods and limitations documentation (URS-092, URS-055) › VV-SYS-141: The worked figures on the page match what the counter produces (3.2s)
+  ✓  343 [webkit] › tests-e2e/config-and-offline.spec.js:1066:5 › A renamed profile id is offered, never imposed (URS-101) › VV-SYS-217: The operator is told, and keeping their profile is the default (815ms)
+  ✓  340 [webkit] › tests-e2e/config-and-offline.spec.js:978:5 › The predecessor profile is reachable and countable (URS-101) › VV-SYS-210: The preset loads from the catalogue (1.7s)
+  ✓  345 [webkit] › tests-e2e/config-and-offline.spec.js:1102:5 › A renamed profile id is offered, never imposed (URS-101) › VV-SYS-219: A current profile raises no offer (503ms)
+  ✓  344 [webkit] › tests-e2e/config-and-offline.spec.js:1084:5 › A renamed profile id is offered, never imposed (URS-101) › VV-SYS-218: Accepting loads the renamed built-in (1.3s)
+  ✓  348 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-162 (dark): counter — case entry meets WCAG AA (711ms)
+  ✓  346 [webkit] › tests-e2e/config-and-offline.spec.js:1136:5 › The method statement reports its basis (URS-055) › VV-SYS-220: The rendered report states the profile's basis (1.3s)
+  ✓  351 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-165 (dark): methods and limitations meets WCAG AA (751ms)
+  ✓  347 [webkit] › tests-e2e/config-and-offline.spec.js:1157:5 › The method statement reports its basis (URS-055) › VV-SYS-221: A profile with no bone marrow states no bone marrow basis (2.3s)
+  ✓  341 [webkit] › tests-e2e/config-and-offline.spec.js:996:5 › The predecessor profile is reachable and countable (URS-101) › VV-SYS-211: The predecessor keys count the predecessor cells (4.0s)
+  ✓  352 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-166 (dark): calculation reference meets WCAG AA (781ms)
+  ✓  353 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-167 (dark): quick start guide meets WCAG AA (769ms)
+  ✓  354 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-168 (dark): configuration editor meets WCAG AA (766ms)
+  ✓  342 [webkit] › tests-e2e/config-and-offline.spec.js:1014:5 › The predecessor profile is reachable and countable (URS-101) › VV-SYS-212: The report keeps a counted cell, and fills the M:E field (4.6s)
+  ✓  356 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-162 (light): counter — case entry meets WCAG AA (673ms)
+  ✓  355 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-169 (dark): dialog, with validation errors shown meets WCAG AA (1.3s)
+  ✓  359 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-165 (light): methods and limitations meets WCAG AA (684ms)
+  ✓  360 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-166 (light): calculation reference meets WCAG AA (738ms)
+  ✓  361 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-167 (light): quick start guide meets WCAG AA (667ms)
+  ✓  349 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-163 (dark): counter — counting meets WCAG AA (4.5s)
+  ✓  350 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — dark theme (URS-095) › VV-SYS-164 (dark): counter — results meets WCAG AA (4.6s)
+  ✓  362 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-168 (light): configuration editor meets WCAG AA (814ms)
+  ✓  364 [webkit] › tests-e2e/counting-workflow.spec.js:45:5 › Case entry and start › VV-SYS-001: Application loads and presents the case entry phase (584ms)
+  ✓  365 [webkit] › tests-e2e/counting-workflow.spec.js:52:5 › Case entry and start › VV-SYS-002: Specimen selector is populated from the configuration profile (557ms)
+  ✓  366 [webkit] › tests-e2e/counting-workflow.spec.js:58:5 › Case entry and start › VV-SYS-003: Enter in the case field starts counting (barcode workflow, URS-006) (740ms)
+  ✓  363 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-169 (light): dialog, with validation errors shown meets WCAG AA (1.4s)
+  ✓  367 [webkit] › tests-e2e/counting-workflow.spec.js:68:5 › Case entry and start › VV-SYS-004: Counting may begin without a case number (URS-004) (873ms)
+  ✓  368 [webkit] › tests-e2e/counting-workflow.spec.js:73:5 › Case entry and start › VV-SYS-005: Active case number is displayed throughout counting (URS-002) (849ms)
+  ✓  369 [webkit] › tests-e2e/counting-workflow.spec.js:83:5 › Keyboard counting › VV-SYS-010: Every configured key increments its own category (URS-020, URS-021) (1.0s)
+  ✓  357 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-163 (light): counter — counting meets WCAG AA (4.2s)
+  ✓  371 [webkit] › tests-e2e/counting-workflow.spec.js:106:5 › Keyboard counting › VV-SYS-012: Unmapped keys are ignored (URS-026) (905ms)
+  ✓  370 [webkit] › tests-e2e/counting-workflow.spec.js:95:5 › Keyboard counting › VV-SYS-011: Shift+key undoes and never passes zero (URS-025) (1.0s)
+  ✓  358 [webkit] › tests-e2e/contrast-sweep.spec.js:182:13 › Full-surface contrast — light theme (URS-095) › VV-SYS-164 (light): counter — results meets WCAG AA (4.5s)
+  ✓  372 [webkit] › tests-e2e/counting-workflow.spec.js:112:5 › Keyboard counting › VV-SYS-013: Key mapping is displayed for every category (URS-022) (902ms)
+  ✓  374 [webkit] › tests-e2e/counting-workflow.spec.js:129:5 › Keyboard counting › VV-SYS-015: Typing in the comment field never counts (URS-070) (991ms)
+  ✓  375 [webkit] › tests-e2e/counting-workflow.spec.js:137:5 › Keyboard counting › VV-SYS-016: Progress indicator tracks the target count (URS-024) (991ms)
+  ✓  373 [webkit] › tests-e2e/counting-workflow.spec.js:120:5 › Keyboard counting › VV-SYS-014: Percentages update live and sum to 100.00 (URS-031, URS-034) (1.3s)
+  ✓  376 [webkit] › tests-e2e/counting-workflow.spec.js:144:5 › Keyboard counting › VV-SYS-017: M:E ratio computes live and shows N/A with a zero denominator (URS-035) (2.2s)
+  ✓  380 [webkit] › tests-e2e/counting-workflow.spec.js:218:5 › Continue Counting and reset › VV-SYS-031: Comments survive Count Done then Continue Counting (URS-073) (1.6s)
+  ✓  381 [webkit] › tests-e2e/counting-workflow.spec.js:228:5 › Continue Counting and reset › VV-SYS-032: Reset requires confirmation and then clears the count (URS-060, URS-061) (2.0s)
+  ✓  378 [webkit] › tests-e2e/counting-workflow.spec.js:189:5 › Validation scenario V1 — complete bone marrow differential › VV-SYS-021: Sub-target count completes with an advisory, never a block (URS-041) (2.8s)
+  ✓  383 [webkit] › tests-e2e/counting-workflow.spec.js:256:5 › Specimen type switching (URS-010, URS-013) › VV-SYS-040: The specimen switcher is available during counting (885ms)
+  ✓  382 [webkit] › tests-e2e/counting-workflow.spec.js:243:5 › Continue Counting and reset › VV-SYS-033: Keystrokes after completion cannot alter the count (HA-015) (1.5s)
+  ✓  379 [webkit] › tests-e2e/counting-workflow.spec.js:202:5 › Continue Counting and reset › VV-SYS-030: Continue Counting preserves the tally and extends it (URS-042) (3.2s)
+  ✓  385 [webkit] › tests-e2e/counting-workflow.spec.js:275:5 › Specimen type switching (URS-010, URS-013) › VV-SYS-042: Cancelling a switch restores both the selector and the count (1.6s)
+  ✓  384 [webkit] › tests-e2e/counting-workflow.spec.js:262:5 › Specimen type switching (URS-010, URS-013) › VV-SYS-041: Switching mid-count saves the work to history first (1.7s)
+  ✓  377 [webkit] › tests-e2e/counting-workflow.spec.js:157:5 › Validation scenario V1 — complete bone marrow differential › VV-SYS-020: 500-cell differential counts, reports and exports consistently (5.5s)
+  ✓  386 [webkit] › tests-e2e/counting-workflow.spec.js:295:5 › Denominator policy — NRBC in peripheral blood (URS-030, DCR-006) › VV-SYS-100: NRBC counted in PB do not dilute the leucocyte percentages (2.8s)
+  ✓  390 [webkit] › tests-e2e/counting-workflow.spec.js:352:5 › Sampling precision (URS-037, HA-030) › VV-SYS-111: A sub-target count carries a quantified advisory (2.2s)
+  ✓  387 [webkit] › tests-e2e/counting-workflow.spec.js:311:5 › Denominator policy — NRBC in peripheral blood (URS-030, DCR-006) › VV-SYS-101: The report states the leucocyte differential and NRBC per 100 WBC (3.2s)
+  ✓  388 [webkit] › tests-e2e/counting-workflow.spec.js:327:5 › Denominator policy — NRBC in peripheral blood (URS-030, DCR-006) › VV-SYS-102: Bone marrow keeps erythroblasts in the differential (3.2s)
+  ✓  389 [webkit] › tests-e2e/counting-workflow.spec.js:340:5 › Sampling precision (URS-037, HA-030) › VV-SYS-110: The report states a confidence interval for each percentage (3.6s)
+  ✓  391 [webkit] › tests-e2e/counting-workflow.spec.js:365:5 › Sampling precision (URS-037, HA-030) › VV-SYS-112: A zero count is reported as bounded, not absent (3.4s)
+  ✓  392 [webkit] › tests-e2e/counting-workflow.spec.js:382:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-120: A count straddling the AML threshold raises the advisory (3.4s)
+  ✓  393 [webkit] › tests-e2e/counting-workflow.spec.js:400:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-121: The advisory is informational and never blocks (3.0s)
+  -  396 [webkit] › tests-e2e/counting-workflow.spec.js:439:5 › Method provenance (URS-052, URS-055) › VV-SYS-130: The pasted report carries profile attribution
+  ✓  397 [webkit] › tests-e2e/counting-workflow.spec.js:457:5 › Method provenance (URS-052, URS-055) › VV-SYS-131: The results screen states the conventions used (1.9s)
+  ✓  401 [webkit] › tests-e2e/counting-workflow.spec.js:625:9 › The totals column is one column (URS-055) › VV-SYS-213: Subtotals and the grand total share one axis at 1440px (1.6s)
+  ✓  395 [webkit] › tests-e2e/counting-workflow.spec.js:428:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-123: A clean count shows no advisory (5.7s)
+  ✓  400 [webkit] › tests-e2e/counting-workflow.spec.js:561:5 › Legibility of clinical advisories (URS-095) › VV-SYS-161: The counting grid stays legible in the light theme (3.0s)
+  ✓  394 [webkit] › tests-e2e/counting-workflow.spec.js:412:5 › Near-threshold advisory (URS-038, ICSH 2008 §2.6) › VV-SYS-122: Extending the count re-evaluates the advisory (6.8s)
+  ✓  398 [webkit] › tests-e2e/counting-workflow.spec.js:539:9 › Legibility of clinical advisories (URS-095) › VV-SYS-160 (light): advisories are legible in the light theme (4.2s)
+  ✓  399 [webkit] › tests-e2e/counting-workflow.spec.js:539:9 › Legibility of clinical advisories (URS-095) › VV-SYS-160 (dark): advisories are legible in the dark theme (4.1s)
+  ✓  402 [webkit] › tests-e2e/counting-workflow.spec.js:625:9 › The totals column is one column (URS-055) › VV-SYS-213: Subtotals and the grand total share one axis at 1024px (1.7s)
+  ✓  403 [webkit] › tests-e2e/counting-workflow.spec.js:625:9 › The totals column is one column (URS-055) › VV-SYS-213: Subtotals and the grand total share one axis at 820px (1.6s)
+  ✓  404 [webkit] › tests-e2e/counting-workflow.spec.js:655:5 › The totals column is one column (URS-055) › VV-SYS-215: A keyboard-row profile puts each cell above its own key (2.0s)
+  ✓  407 [webkit] › tests-e2e/counting-workflow.spec.js:769:5 › Audio modes (URS-108) › VV-SYS-222: The control cycles three modes and the choice survives a reload (1.3s)
+  ✓  409 [webkit] › tests-e2e/dialog.spec.js:45:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-170: Adding a specimen type uses the product dialog, not a browser prompt (1.3s)
+  ✓  405 [webkit] › tests-e2e/counting-workflow.spec.js:676:5 › The totals column is one column (URS-055) › VV-SYS-216: A frequency-assigned profile is not forced onto that grid (2.3s)
+  ✓  406 [webkit] › tests-e2e/counting-workflow.spec.js:724:5 › The totals column is one column (URS-055) › VV-SYS-214: An uneven split still shares the axis (2.4s)
+  ✓  410 [webkit] › tests-e2e/dialog.spec.js:72:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-171: Adding a derived figure uses the product dialog (1.4s)
+  ✓  412 [webkit] › tests-e2e/dialog.spec.js:120:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-173: Enter confirms, Escape cancels, focus is placed and restored (1.1s)
+  ✓  408 [webkit] › tests-e2e/counting-workflow.spec.js:793:5 › Audio modes (URS-108) › VV-SYS-223: Counting is unaffected by the audio mode (2.7s)
+  ✓  411 [webkit] › tests-e2e/dialog.spec.js:90:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-172: Invalid input is refused with a reason, and the dialog stays open (1.7s)
+  ✓  413 [webkit] › tests-e2e/dialog.spec.js:149:5 › Dialogs replace native browser prompts (SYS-244) › VV-SYS-174: Tab is trapped inside the dialog (1.1s)
+  ✓  414 [webkit] › tests-e2e/dialog.spec.js:171:5 › A dialog is modal for the keyboard too (SYS-246) › VV-SYS-175: A counting key pressed while a dialog is open does not count (1.5s)
+  ✓  418 [webkit] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — light theme (SYS-113) › VV-SYS-177 (light): counter controls meet AA under the pointer (1.5s)
+  ✓  420 [webkit] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (analyzer-5.json): every mapped key increments and decrements (1.0s)
+  ✓  415 [webkit] › tests-e2e/dialog.spec.js:194:5 › A dialog is modal for the keyboard too (SYS-246) › VV-SYS-176: Escape cannot discard an interrupted count (2.1s)
+  ✓  416 [webkit] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — dark theme (SYS-113) › VV-SYS-177 (dark): counter controls meet AA under the pointer (1.8s)
+  ✓  422 [webkit] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (body-fluid.json): every mapped key increments and decrements (1.1s)
+  ✓  421 [webkit] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (bands-segs-10.json): every mapped key increments and decrements (1.8s)
+  ✓  423 [webkit] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (gran-combined-10.json): every mapped key increments and decrements (1.8s)
+  ✓  424 [webkit] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (mdc-2015-9.json): every mapped key increments and decrements (1.9s)
+  ✓  426 [webkit] › tests-e2e/input-integrity.spec.js:122:5 › Auto-repeat does not inflate a count (SYS-030) › VV-SYS-181: A held key adds one cell, not one per repeat (795ms)
+  ✓  427 [webkit] › tests-e2e/input-integrity.spec.js:143:5 › Auto-repeat does not inflate a count (SYS-030) › VV-SYS-182: Keystrokes composed by an input method do not count (728ms)
+  ✓  425 [webkit] › tests-e2e/input-integrity.spec.js:84:9 › Every shipped preset can un-count what it counts (SYS-032) › VV-SYS-180 (ndc-14.json): every mapped key increments and decrements (1.9s)
+  ✓  429 [webkit] › tests-e2e/input-integrity.spec.js:190:5 › Crash-recovery snapshot is bounded (URS-080) › VV-SYS-184: A stale autosave is discarded rather than resurrected (1.3s)
+  ✓  428 [webkit] › tests-e2e/input-integrity.spec.js:159:5 › An acknowledgement runs however it is dismissed (SYS-247) › VV-SYS-183: Escape on an alert still runs its continuation (1.8s)
+  ✓  430 [webkit] › tests-e2e/input-integrity.spec.js:219:5 › Crash-recovery snapshot is bounded (URS-080) › VV-SYS-185: A recent autosave is still offered (1.4s)
+  ✓  431 [webkit] › tests-e2e/input-integrity.spec.js:260:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-186: The entered WBC is corrected before any absolute count (2.6s)
+  ✓  419 [webkit] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — light theme (SYS-113) › VV-SYS-178 (light): configuration editor controls meet AA under the pointer (7.6s)
+  ✓  434 [webkit] › tests-e2e/input-integrity.spec.js:297:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-189: With no nucleated red cells the control is not offered (2.3s)
+  ✓  432 [webkit] › tests-e2e/input-integrity.spec.js:272:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-187: The correction is shown, not applied silently (2.7s)
+  ✓  433 [webkit] › tests-e2e/input-integrity.spec.js:283:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-188: An already-corrected value is used as entered (3.0s)
+  ✓  439 [webkit] › tests-e2e/input-integrity.spec.js:435:5 › The profile audio default is honoured (URS-097) › VV-SYS-194: A profile with audio disabled starts silent (680ms)
+  ✓  435 [webkit] › tests-e2e/input-integrity.spec.js:314:5 › Absolute counts are corrected for nucleated red cells (HA-105) › VV-SYS-190: Bone marrow gets no correction — erythroblasts belong in the count (2.7s)
+  ✓  436 [webkit] › tests-e2e/input-integrity.spec.js:369:5 › Absolute counts in the report are optional (SYS-251) › VV-SYS-191: When enabled, the report carries the corrected ANC and its basis (3.0s)
+  ✓  437 [webkit] › tests-e2e/input-integrity.spec.js:386:5 › Absolute counts in the report are optional (SYS-251) › VV-SYS-192: When disabled, the report is unchanged by a WBC (3.3s)
+  ✓  438 [webkit] › tests-e2e/input-integrity.spec.js:398:5 › Absolute counts in the report are optional (SYS-251) › VV-SYS-193: Declaring the WBC already corrected changes the reported figure and says so (3.3s)
+  ✓  442 [webkit] › tests-e2e/input-integrity.spec.js:490:5 › Displayed figures reconcile with each other (P0-10) › VV-SYS-197: Each row subtotal equals the sum of the cells displayed in it (1.1s)
+  ✓  443 [webkit] › tests-e2e/input-integrity.spec.js:529:5 › Displayed figures reconcile with each other (P0-10) › VV-SYS-198: The same holds at two decimal places (1.1s)
+  ✓  444 [webkit] › tests-e2e/input-integrity.spec.js:540:5 › Displayed figures reconcile with each other (P0-10) › VV-SYS-199: Session history reports at the precision the count used (1.2s)
+  ✓  417 [webkit] › tests-e2e/hover-contrast.spec.js:122:13 › Hover-state contrast — dark theme (SYS-113) › VV-SYS-178 (dark): configuration editor controls meet AA under the pointer (13.7s)
+  ✓  446 [webkit] › tests-e2e/input-integrity.spec.js:589:5 › The M:E ratio carries its own interval (HA-093) › VV-SYS-202: The same ratio at a tenth of the count reads far less precisely (1.2s)
+  ✓  445 [webkit] › tests-e2e/input-integrity.spec.js:580:5 › The M:E ratio carries its own interval (HA-093) › VV-SYS-201: The displayed ratio is accompanied by its interval (2.7s)
+  ✘  440 [webkit] › tests-e2e/input-integrity.spec.js:441:5 › The profile audio default is honoured (URS-097) › VV-SYS-195: A profile with audio enabled starts with sound (5.7s)
+  ✓  447 [webkit] › tests-e2e/input-integrity.spec.js:596:5 › The M:E ratio carries its own interval (HA-093) › VV-SYS-203: A profile with intervals disabled shows none (2.3s)
+  ✘  441 [webkit] › tests-e2e/input-integrity.spec.js:446:5 › The profile audio default is honoured (URS-097) › VV-SYS-196: The operator overrides the profile, in both directions (5.7s)
+
+
+  1) [chromium] › tests-e2e/config-and-offline.spec.js:335:5 › Configuration editor round-trip (URS-102) › VV-SYS-063: The editor preserves every field it does not itself edit 
+
+    Error: bm.audio did not survive the round trip
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 1
+
+      Object {
+        "countSound": "click",
+        "enabled": true,
+    +   "mode": "click",
+        "targetSound": "chime",
+        "typewriterSound": "typewriter",
+        "undoSound": "undo",
+      }
+
+      361 |             for (const [key, value] of Object.entries(shipped)) {
+      362 |                 expect(saved[key], `${shipped.specimenType}.${key} did not survive the round trip`)
+    > 363 |                     .toEqual(value);
+          |                      ^
+      364 |             }
+      365 |         }
+      366 |     });
+        at /Users/pg/IdeaProjects/tessera/tests-e2e/config-and-offline.spec.js:363:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium] › tests-e2e/input-integrity.spec.js:441:5 › The profile audio default is honoured (URS-097) › VV-SYS-195: A profile with audio enabled starts with sound 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('#audioLabel')
+    Expected: "Sound On"
+    Received: "Click"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 5000ms
+      - waiting for locator('#audioLabel')
+        14 × locator resolved to <span id="audioLabel">Click</span>
+           - unexpected value "Click"
+
+
+      441 |     test('VV-SYS-195: A profile with audio enabled starts with sound', async ({ page }) => {
+      442 |         await withAudio(page, true);
+    > 443 |         await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+          |                                                   ^
+      444 |     });
+      445 |
+      446 |     test('VV-SYS-196: The operator overrides the profile, in both directions', async ({ page }) => {
+        at /Users/pg/IdeaProjects/tessera/tests-e2e/input-integrity.spec.js:443:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium] › tests-e2e/input-integrity.spec.js:446:5 › The profile audio default is honoured (URS-097) › VV-SYS-196: The operator overrides the profile, in both directions 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('#audioLabel')
+    Expected: "Sound On"
+    Received: "Click"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 5000ms
+      - waiting for locator('#audioLabel')
+        14 × locator resolved to <span id="audioLabel">Click</span>
+           - unexpected value "Click"
+
+
+      449 |         await expect(page.locator('#audioLabel')).toHaveText('Sound Off');
+      450 |         await page.click('#btnToggleAudio');
+    > 451 |         await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+          |                                                   ^
+      452 |         await page.reload();
+      453 |         await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+      454 |     });
+        at /Users/pg/IdeaProjects/tessera/tests-e2e/input-integrity.spec.js:451:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-65435--profile-in-both-directions-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/input-integrity-The-profil-65435--profile-in-both-directions-chromium/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-65435--profile-in-both-directions-chromium/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/input-integrity-The-profil-65435--profile-in-both-directions-chromium/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4) [firefox] › tests-e2e/config-and-offline.spec.js:335:5 › Configuration editor round-trip (URS-102) › VV-SYS-063: The editor preserves every field it does not itself edit 
+
+    Error: bm.audio did not survive the round trip
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 1
+
+      Object {
+        "countSound": "click",
+        "enabled": true,
+    +   "mode": "click",
+        "targetSound": "chime",
+        "typewriterSound": "typewriter",
+        "undoSound": "undo",
+      }
+
+      361 |             for (const [key, value] of Object.entries(shipped)) {
+      362 |                 expect(saved[key], `${shipped.specimenType}.${key} did not survive the round trip`)
+    > 363 |                     .toEqual(value);
+          |                      ^
+      364 |             }
+      365 |         }
+      366 |     });
+        at /Users/pg/IdeaProjects/tessera/tests-e2e/config-and-offline.spec.js:363:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-firefox/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  5) [firefox] › tests-e2e/input-integrity.spec.js:441:5 › The profile audio default is honoured (URS-097) › VV-SYS-195: A profile with audio enabled starts with sound 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('#audioLabel')
+    Expected: "Sound On"
+    Received: "Click"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 5000ms
+      - waiting for locator('#audioLabel')
+        14 × locator resolved to <span id="audioLabel">Click</span>
+           - unexpected value "Click"
+
+
+      441 |     test('VV-SYS-195: A profile with audio enabled starts with sound', async ({ page }) => {
+      442 |         await withAudio(page, true);
+    > 443 |         await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+          |                                                   ^
+      444 |     });
+      445 |
+      446 |     test('VV-SYS-196: The operator overrides the profile, in both directions', async ({ page }) => {
+        at /Users/pg/IdeaProjects/tessera/tests-e2e/input-integrity.spec.js:443:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-firefox/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  6) [firefox] › tests-e2e/input-integrity.spec.js:446:5 › The profile audio default is honoured (URS-097) › VV-SYS-196: The operator overrides the profile, in both directions 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('#audioLabel')
+    Expected: "Sound On"
+    Received: "Click"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 5000ms
+      - waiting for locator('#audioLabel')
+        14 × locator resolved to <span id="audioLabel">Click</span>
+           - unexpected value "Click"
+
+
+      449 |         await expect(page.locator('#audioLabel')).toHaveText('Sound Off');
+      450 |         await page.click('#btnToggleAudio');
+    > 451 |         await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+          |                                                   ^
+      452 |         await page.reload();
+      453 |         await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+      454 |     });
+        at /Users/pg/IdeaProjects/tessera/tests-e2e/input-integrity.spec.js:451:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-65435--profile-in-both-directions-firefox/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/input-integrity-The-profil-65435--profile-in-both-directions-firefox/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-65435--profile-in-both-directions-firefox/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/input-integrity-The-profil-65435--profile-in-both-directions-firefox/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  7) [webkit] › tests-e2e/config-and-offline.spec.js:335:5 › Configuration editor round-trip (URS-102) › VV-SYS-063: The editor preserves every field it does not itself edit 
+
+    Error: bm.audio did not survive the round trip
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 1
+
+      Object {
+        "countSound": "click",
+        "enabled": true,
+    +   "mode": "click",
+        "targetSound": "chime",
+        "typewriterSound": "typewriter",
+        "undoSound": "undo",
+      }
+
+      361 |             for (const [key, value] of Object.entries(shipped)) {
+      362 |                 expect(saved[key], `${shipped.specimenType}.${key} did not survive the round trip`)
+    > 363 |                     .toEqual(value);
+          |                      ^
+      364 |             }
+      365 |         }
+      366 |     });
+        at /Users/pg/IdeaProjects/tessera/tests-e2e/config-and-offline.spec.js:363:22
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/config-and-offline-Configu-8fea7-eld-it-does-not-itself-edit-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  8) [webkit] › tests-e2e/input-integrity.spec.js:441:5 › The profile audio default is honoured (URS-097) › VV-SYS-195: A profile with audio enabled starts with sound 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('#audioLabel')
+    Expected: "Sound On"
+    Received: "Click"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 5000ms
+      - waiting for locator('#audioLabel')
+        14 × locator resolved to <span id="audioLabel">Click</span>
+           - unexpected value "Click"
+
+
+      441 |     test('VV-SYS-195: A profile with audio enabled starts with sound', async ({ page }) => {
+      442 |         await withAudio(page, true);
+    > 443 |         await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+          |                                                   ^
+      444 |     });
+      445 |
+      446 |     test('VV-SYS-196: The operator overrides the profile, in both directions', async ({ page }) => {
+        at /Users/pg/IdeaProjects/tessera/tests-e2e/input-integrity.spec.js:443:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/input-integrity-The-profil-37cfa-o-enabled-starts-with-sound-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9) [webkit] › tests-e2e/input-integrity.spec.js:446:5 › The profile audio default is honoured (URS-097) › VV-SYS-196: The operator overrides the profile, in both directions 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('#audioLabel')
+    Expected: "Sound On"
+    Received: "Click"
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toHaveText" with timeout 5000ms
+      - waiting for locator('#audioLabel')
+        14 × locator resolved to <span id="audioLabel">Click</span>
+           - unexpected value "Click"
+
+
+      449 |         await expect(page.locator('#audioLabel')).toHaveText('Sound Off');
+      450 |         await page.click('#btnToggleAudio');
+    > 451 |         await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+          |                                                   ^
+      452 |         await page.reload();
+      453 |         await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+      454 |     });
+        at /Users/pg/IdeaProjects/tessera/tests-e2e/input-integrity.spec.js:451:51
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-65435--profile-in-both-directions-webkit/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/input-integrity-The-profil-65435--profile-in-both-directions-webkit/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/input-integrity-The-profil-65435--profile-in-both-directions-webkit/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/input-integrity-The-profil-65435--profile-in-both-directions-webkit/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  9 failed
+    [chromium] › tests-e2e/config-and-offline.spec.js:335:5 › Configuration editor round-trip (URS-102) › VV-SYS-063: The editor preserves every field it does not itself edit 
+    [chromium] › tests-e2e/input-integrity.spec.js:441:5 › The profile audio default is honoured (URS-097) › VV-SYS-195: A profile with audio enabled starts with sound 
+    [chromium] › tests-e2e/input-integrity.spec.js:446:5 › The profile audio default is honoured (URS-097) › VV-SYS-196: The operator overrides the profile, in both directions 
+    [firefox] › tests-e2e/config-and-offline.spec.js:335:5 › Configuration editor round-trip (URS-102) › VV-SYS-063: The editor preserves every field it does not itself edit 
+    [firefox] › tests-e2e/input-integrity.spec.js:441:5 › The profile audio default is honoured (URS-097) › VV-SYS-195: A profile with audio enabled starts with sound 
+    [firefox] › tests-e2e/input-integrity.spec.js:446:5 › The profile audio default is honoured (URS-097) › VV-SYS-196: The operator overrides the profile, in both directions 
+    [webkit] › tests-e2e/config-and-offline.spec.js:335:5 › Configuration editor round-trip (URS-102) › VV-SYS-063: The editor preserves every field it does not itself edit 
+    [webkit] › tests-e2e/input-integrity.spec.js:441:5 › The profile audio default is honoured (URS-097) › VV-SYS-195: A profile with audio enabled starts with sound 
+    [webkit] › tests-e2e/input-integrity.spec.js:446:5 › The profile audio default is honoured (URS-097) › VV-SYS-196: The operator overrides the profile, in both directions 
+  7 skipped
+  431 passed (2.8m)

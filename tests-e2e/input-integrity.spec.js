@@ -439,8 +439,10 @@ test.describe('The profile audio default is honoured (URS-097)', () => {
     });
 
     test('VV-SYS-195: A profile with audio enabled starts with sound', async ({ page }) => {
+        // The label names the MODE since DCR-036; a profile that enables audio
+        // without naming a mode gets the click, which is the default.
         await withAudio(page, true);
-        await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+        await expect(page.locator('#audioLabel')).toHaveText('Click');
     });
 
     test('VV-SYS-196: The operator overrides the profile, in both directions', async ({ page }) => {
@@ -448,9 +450,9 @@ test.describe('The profile audio default is honoured (URS-097)', () => {
         await withAudio(page, false);
         await expect(page.locator('#audioLabel')).toHaveText('Sound Off');
         await page.click('#btnToggleAudio');
-        await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+        await expect(page.locator('#audioLabel')).toHaveText('Click');
         await page.reload();
-        await expect(page.locator('#audioLabel')).toHaveText('Sound On');
+        await expect(page.locator('#audioLabel')).toHaveText('Click');
     });
 });
 

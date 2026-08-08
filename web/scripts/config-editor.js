@@ -1469,7 +1469,18 @@
                     typewriterSound: 'typewriter'
                 },
                 (spec.raw && spec.raw.audio) || {},
-                { enabled: spec.audioEnabled !== false, mode: spec.audioMode || 'click' });
+                { enabled: spec.audioEnabled !== false });
+            // `mode` is written only when it says something the absence of the
+            // field would not. Absent means click (SYS-258), so emitting it
+            // for every profile would add a field the source never had and
+            // make an untouched save a change — which is the defect VV-SYS-063
+            // exists to catch.
+            var hadMode = !!(spec.raw && spec.raw.audio && spec.raw.audio.mode);
+            if (hadMode || (spec.audioMode && spec.audioMode !== 'click')) {
+                merged.audio.mode = spec.audioMode || 'click';
+            } else {
+                delete merged.audio.mode;
+            }
             merged.autosave = spec.autosaveEnabled !== false;
             merged.absoluteCounts = spec.absoluteCounts || 'optional';
             merged.handedness = spec.handedness || 'left';

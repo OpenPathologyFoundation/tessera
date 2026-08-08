@@ -94,9 +94,9 @@ should be quoted until someone holds the paper.
 > `node scripts/qms-signoffs.js --write` rebuilds this from the signature
 > tables in every document. Suite 14 fails the build if it goes stale.
 
-**35 signature(s) outstanding across 3 role(s).** 16 document(s) are fully signed.
+**36 signature(s) outstanding across 3 role(s).** 16 document(s) are fully signed.
 
-### Clinical Reviewer — 32 outstanding
+### Clinical Reviewer — 33 outstanding
 
 | Document | Note |
 |----------|------|
@@ -128,6 +128,7 @@ should be quoted until someone holds the paper.
 | `DCR/DCR-032-Predecessor-Profile.md` | **invited — §3 aggregation and the missing NRBC key** |
 | `DCR/DCR-035-Profile-Naming.md` | **invited — see §7** |
 | `DCR/DCR-036-Tonal-Feedback.md` | **required before Tones is made a default — see §7** |
+| `DCR/DCR-038-Pre-Validation-Corrections.md` | **SOP-001 and VV-001 changed — re-read before the study** |
 | `DHF-001-DesignHistoryFile-Index.md` | — |
 | `RA-001-RiskAnalysis-FMEA.md` | — |
 | `REF-001-StandardsAndLiterature.md` | — |

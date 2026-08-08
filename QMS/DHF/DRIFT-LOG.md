@@ -25,7 +25,7 @@ where an individual session is capable and thorough and has no memory of the
 other five documents. And it is the evidence base for the guards: each `QC-`
 identifier in the last column exists because of a specific row above it.
 
-**Counted here rather than described:** 30 incidents, of which 29 are now
+**Counted here rather than described:** 36 incidents, of which 33 are now
 prevented by an automated check. QC-027 checks both figures against the rows
 below, so this sentence cannot be the next thing to drift.
 
@@ -65,6 +65,12 @@ below, so this sentence cannot be the next thing to drift.
 | 28 | 2026-08-07 | "Bone marrow categories and M:E ratio follow ICSH 2008 §2.6" | `minimal-5` and `body-fluid` `provenance.notes` | Neither profile has a `bm` specimen or an M:E formula | Copy-pasted provenance. It was intended for the report's method statement under "Basis:" — see row 30 for why it never got there, and for the correction to this row's first wording | Naming review | DCR-035 | VV-PRE-032, VV-SYS-221 |
 | 29 | 2026-08-07 | Catalogue said "Custom (Blank Template)"; the file said "Custom (Template)" | `index.json` vs `custom.json` | Each other | The catalogue keeps its own copy of each profile's display name | Writing the VV-PRE-031 guard | DCR-035 | VV-PRE-031 |
 | 30 | 2026-08-07 | The report's method statement was designed to carry a "Basis:" line from `provenance.notes`, and never did | `buildMethodStatement` in `wbc-core.js` | `prepareConfig` built its meta as `{version, profileId, profileName}`, dropping provenance before the statement was built | A designed report element with no wiring. Unit tests constructed the meta by hand and passed, so nothing failed; the element was absent, not wrong, and absence is what tests written against the engine cannot see | Verifying a claim made in DCR-035 §3 against the running application instead of the engine | DCR-035 | VV-SYS-220 |
+| 31 | 2026-08-08 | "You pressed 'A' (blast) but meant 'V' (lymph)" | `SOP-001` §5.5, the miscount-correction procedure | The shipped default: A = monocytes, V = myelocytes, blasts = X, lymphocytes = S | Written against a key layout that predates the shipped one and never re-checked. The SOP is the document a validator rehearses, so a wrong key there is a wrong clinical instruction | Pre-validation review | DCR-038 | UD-098 |
+| 32 | 2026-08-08 | Validation scenario V6: "Press 'R' x 100 (nrbc)", "Press 'P' x 300", "Press 'L' x 50" | `VV-001` §5.4 | R = pro; P and L are unmapped in every shipped profile | The validation script itself was never executed against the profile it tests. Scenario V6 fails at step 2 | Pre-validation review | DCR-038 | UD-098 |
+| 33 | 2026-08-08 | Monthly QC enters `gran` and `eryth` and cites test VV-CALC-007 | `SOP-001` §6.2 | Neither category exists in the default profile; VV-CALC-007 exists in no test file | A QC procedure that cannot be performed, mandated monthly | Pre-validation review | DCR-038 | UD-098 |
+| 34 | 2026-08-08 | "No data is stored in permanent browser storage" | `SOP-001` §8 data-handling attestation | Autosave writes the accession number, counts and morphology text to localStorage | The attestation a deploying laboratory's privacy review relies on. Same false-privacy class as incident 5, on a different document | Pre-validation review | DCR-038 | — |
+| 35 | 2026-08-08 | "'Start Count' button is visible but disabled … becomes enabled once a valid case number is entered" | `SOP-001` §5.1, §5.2 | `requireCaseNumber` is false in all eight profiles; the button is enabled and the field optional | Described a software control that was never built, so the procedural control it replaced was never written down either | Pre-validation review | DCR-038 | — |
+| 36 | 2026-08-08 | In-app help listed seven profiles: "full 14-part consensus, harmonized 9-part, legacy 9-part, minimal 5-part … frequency-ergonomic, right-hand" | `web/help.html` §Profiles | Every one withdrawn by DCR-035 or never shipped | Incident 25's class recurring on a page its guard (UD-095) did not cover — and `help.html` is precached for offline use | Pre-validation review | DCR-038 | UD-097 |
 
 ---
 
@@ -121,6 +127,7 @@ recurrence.
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| H | 2026-08-08 | QMS | Rows 31–36 added (DCR-038): the pre-validation audit of every surface a validating pathologist reads. Five of the six are in SOP-001 and VV-001 — the documents a validator rehearses and executes — and none was covered by any guard, because the guards built so far check generated figures and profile names, not procedures. |
 | G | 2026-08-07 | QMS | Row 30 added and row 28 corrected (DCR-035): the false provenance never reached a report, because a second defect dropped provenance before the method statement was built. Two defects that cancelled. |
 | F | 2026-08-07 | QMS | Rows 27–29 added (DCR-035): profile names that asserted rather than described, a copy-pasted provenance note that printed a false basis into clinical reports, and a display name the catalogue and the file disagreed about. VV-PRE-030..034. |
 | E | 2026-08-07 | QMS | Row 26 added (DCR-033): the drift-control machinery drifted from itself — the writer and the reader of the evidence bundles disagreed on what makes a run admissible. QC-028. |

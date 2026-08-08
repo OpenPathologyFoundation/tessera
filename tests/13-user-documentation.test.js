@@ -432,6 +432,155 @@ describe('User guide tracks the shipped configuration (URS-092)', () => {
         }
     });
 
+    it('UD-098: Every key a procedure names maps to the category it claims', () => {
+        /**
+         * SOP-001's miscount-correction example read "You pressed 'A' (blast)
+         * but meant 'V' (lymph)". In the shipped default A is monocytes and V
+         * is myelocytes; blasts are X and lymphocytes are S. A validator
+         * following it deletes a monocyte and adds a myelocyte.
+         *
+         * VV-001's scenario V6 instructed "Press 'R' x 100 (nrbc)", "Press 'P'
+         * x 300", "Press 'L' x 50" — R is pro, and P and L are unmapped, so
+         * the scenario could not be executed at all.
+         *
+         * These are procedures a validating pathologist rehearses and runs.
+         * Nothing checked them against the profile, because the guards built
+         * before this one check generated figures and profile names, not the
+         * body of a procedure.
+         */
+        const ROOT = path.join(__dirname, '..');
+        const Core = require(path.join(ROOT, 'web', 'scripts', 'wbc-core.js'));
+        const shipped = Core.normalizeConfig(JSON.parse(fs.readFileSync(
+            path.join(ROOT, 'web', 'settings', 'templates.json'), 'utf-8')));
+
+        // key -> cell type, from the profile these documents describe.
+        const mapping = {};
+        for (const spec of shipped.specimenTypes) {
+            for (const [key, cell] of Object.entries(spec.outCodes)) mapping[key] = cell;
+        }
+
+        // "'X' (blasts)", "**'B'** x 100 (nrbc=100)", "Shift+X to remove the blast"
+        const PAIR = /['*]*'([A-Z])'['*]*[^(\n]{0,40}\(([a-z_]+)/g;
+        const offenders = [];
+
+        for (const rel of [path.join('QMS', 'DHF', 'SOP-001-StandardOperatingProcedure.md'),
+            path.join('QMS', 'DHF', 'VV-001-VerificationValidationProtocol.md')]) {
+            const text = fs.readFileSync(path.join(ROOT, rel), 'utf-8');
+            text.split('\n').forEach((line, i) => {
+                for (const m of line.matchAll(PAIR)) {
+                    const [, key, claimed] = m;
+                    // Prose names cells in full — "lymphocytes" for `lymph`,
+                    // "blast" for `blasts` — so either being a prefix of the
+                    // other counts as agreement. A genuine mismatch (mono vs
+                    // blast) shares no prefix and is still caught.
+                    const cell = mapping[key];
+                    const agrees = cell && (cell.startsWith(claimed.slice(0, 4)) ||
+                        claimed.startsWith(cell.slice(0, 4)));
+                    if (!cell) {
+                        offenders.push(`${rel}:${i + 1} names key '${key}', which the shipped profile does not map`);
+                    } else if (!agrees) {
+                        offenders.push(`${rel}:${i + 1} says '${key}' is "${claimed}"; it is "${cell}"`);
+                    }
+                }
+            });
+        }
+        assert.deepEqual(offenders, [],
+            'a procedure names a key that does not do what it says:\n  ' + offenders.join('\n  '));
+    });
+
+    it('UD-099: A procedure only enters categories the profile has', () => {
+        // SOP-001's monthly QC entered `gran` and `eryth`, neither of which
+        // exists in the default profile, and cited a test id (VV-CALC-007)
+        // present in no test file. A QC procedure that cannot be performed.
+        const ROOT = path.join(__dirname, '..');
+        const Core = require(path.join(ROOT, 'web', 'scripts', 'wbc-core.js'));
+        const shipped = Core.normalizeConfig(JSON.parse(fs.readFileSync(
+            path.join(ROOT, 'web', 'settings', 'templates.json'), 'utf-8')));
+        const known = new Set();
+        for (const spec of shipped.specimenTypes) {
+            spec.categories.upper.concat(spec.categories.lower).forEach(c => known.add(c));
+        }
+
+        const sop = fs.readFileSync(path.join(
+            ROOT, 'QMS', 'DHF', 'SOP-001-StandardOperatingProcedure.md'), 'utf-8');
+        const qc = /### 6\.2 Periodic Verification([\s\S]*?)###/.exec(sop);
+        assert.ok(qc, 'SOP-001 has no §6.2 periodic verification');
+
+        const offenders = [];
+        for (const m of qc[1].matchAll(/\|\s*([A-Z])\s*\|\s*([a-z_]+)\s*\|/g)) {
+            const [, key, cell] = m;
+            if (!known.has(cell)) offenders.push(`§6.2 enters "${cell}", which no shipped specimen has`);
+        }
+        assert.deepEqual(offenders, [], offenders.join('; '));
+
+        // And any verification id it cites must exist in the suite.
+        for (const m of qc[1].matchAll(/\b(VV-[A-Z]+-\d+)\b/g)) {
+            const id = m[1];
+            const found = fs.readdirSync(path.join(ROOT, 'tests'))
+                .filter(n => n.endsWith('.test.js'))
+                .some(n => fs.readFileSync(path.join(ROOT, 'tests', n), 'utf-8').includes(id));
+            assert.ok(found, `SOP-001 §6.2 cites ${id}, which exists in no test file`);
+        }
+    });
+
+    it('UD-097: No operator-facing page names a withdrawn profile', () => {
+        /**
+         * UD-095 checks the USER-GUIDE against the catalogue. It did not cover
+         * `web/help.html`, which is precached for offline use and listed seven
+         * profiles of which every one was withdrawn or had never existed —
+         * drift incident 25's class recurring on a page its guard did not
+         * reach. README and the calculation reference carried the same names.
+         *
+         * The class, not the file: any page an operator reads must not name a
+         * profile the catalogue does not offer.
+         */
+        const ROOT = path.join(__dirname, '..');
+        const cat = JSON.parse(fs.readFileSync(path.join(
+            ROOT, 'web', 'settings', 'presets', 'index.json'), 'utf-8'));
+        // No live catalogue name contains a withdrawn one as a substring, so
+        // no exemption is needed — and an exemption here is dangerous. The
+        // first version skipped any line that also named a live profile, which
+        // made the catalogue LIST immune: the one line most likely to be
+        // wrong, and the line this guard exists for. The revert-check caught
+        // it by passing when it should have failed.
+        const live = new Set(cat.presets.map(p => p.name.toLowerCase()));
+        for (const name of live) {
+            assert.ok(!['consensus', 'harmonized', 'legacy', 'minimal'].some(w => name.includes(w)),
+                `catalogue name "${name}" contains a withdrawn word — the guard below would misfire`);
+        }
+
+        // Names withdrawn by DCR-035, and two that never shipped.
+        const WITHDRAWN = [
+            'consensus-14', 'harmonized-9', 'legacy-9', 'minimal-5', 'legacy-mdc',
+            'full 14-part consensus', 'harmonized 10-part', 'harmonized 9-part',
+            'legacy 10-part', 'legacy 9-part', 'minimal 5-part', 'legacy mdc',
+            'frequency-ergonomic', 'right-hand preset'
+        ];
+        const PAGES = ['README.md', 'USER-GUIDE.md',
+            path.join('web', 'help.html'),
+            path.join('web', 'methods.html'),
+            path.join('web', 'calculation-reference.html'),
+            path.join('web', 'counter.html')];
+
+        const offenders = [];
+        for (const rel of PAGES) {
+            const full = path.join(ROOT, rel);
+            if (!fs.existsSync(full)) continue;
+            const text = fs.readFileSync(full, 'utf-8');
+            text.split('\n').forEach((line, i) => {
+                const lower = line.toLowerCase();
+                for (const name of WITHDRAWN) {
+                    if (lower.includes(name)) {
+                        offenders.push(`${rel}:${i + 1} names "${name}"`);
+                    }
+                }
+            });
+        }
+        assert.deepEqual(offenders, [],
+            'operator-facing pages name profiles the catalogue does not offer:\n  ' +
+            offenders.join('\n  '));
+    });
+
     it('UD-096: The predecessor profile is documented with its divergences', () => {
         // An operator switching for familiarity must be told where the
         // familiarity stops. The profile is coarser than ICSH and its report

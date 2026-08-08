@@ -64,8 +64,8 @@ This SOP applies to all clinical laboratory personnel who use the WBC ΔΣ appli
 2. Navigate to the WBC ΔΣ application URL.
 3. Verify that the application loads completely:
    - Page title displays "WBC ΔΣ"
-   - Counting table is visible
-   - "Start Count" button is visible but disabled
+   - The case-entry screen is visible
+   - "Start Count" button is visible and **enabled**
    - Case number input field is empty and ready for input
 
 **Troubleshooting**: If the application fails to load or displays an error about configuration, contact IT Support. Do not proceed with manual calculations.
@@ -76,7 +76,12 @@ This SOP applies to all clinical laboratory personnel who use the WBC ΔΣ appli
 2. Click in the **"Case / Accession #"** input field.
 3. Type the accession number exactly as it appears on the specimen label.
 4. **CRITICAL: Verify the entered case number matches the specimen** by comparing the screen display with the slide label. This step prevents results from being attributed to the wrong patient.
-5. The "Start Count" button will become enabled once a valid case number is entered.
+5. **The application does not enforce this step.** Every shipped profile sets
+   `requireCaseNumber: false`, so "Start Count" is enabled with the field empty
+   and a count can be completed without an identifier. Entering it is a
+   procedural control owned by this SOP, not a software control — which is why
+   step 4 is marked CRITICAL. A laboratory that wants the software to enforce it
+   sets `requireCaseNumber: true` in its profile (Configuration Editor).
 
 **Acceptable formats**: Alphanumeric characters, hyphens, and forward slashes (e.g., S25-1234, H25-00567, 25-A/12345).
 
@@ -159,7 +164,12 @@ are configurable, and a laboratory that adapts the profile changes them.
 If you press the wrong key:
 - Hold **Shift** and press the **key of the cell type you want to correct** to subtract 1 from that cell.
 - Then press the **correct key** to add 1 to the right cell type.
-- **Example**: You pressed 'A' (blast) but meant 'V' (lymph). Press **Shift+A** to remove the blast, then press **V** to add the lymphocyte.
+- **Example** (default profile, §4.1): you pressed **'X'** (blasts) but meant
+  **'S'** (lymphocytes). Press **Shift+X** to remove the blast, then press **S**
+  to add the lymphocyte.
+- **The keys above are those of the shipped default profile.** If your
+  laboratory has loaded a different profile, read the key from the cell's own
+  tile on screen — every tile shows its key beneath the count.
 - A cell count cannot go below zero.
 
 ### 5.6 Recording Morphology Observations
@@ -253,11 +263,36 @@ Before first use each day (or after application updates):
 8. Reset the application.
 
 ### 6.2 Periodic Verification
-Monthly or after any application update:
-1. Perform the **VV-CALC-007 standard differential test**:
-   - Enter: blast=2, pro=5, gran=60, eryth=10, baso=1, eos=3, plasma=2, lymph=12, mono=5 (total=100)
-2. Verify all percentages match expected values exactly.
-3. Document the QC check result.
+Monthly or after any application update, on the **default profile** (§4.1):
+
+1. Start a bone marrow count and enter this 100-cell vector. The key for each
+   category is given first; each tile also shows its key on screen.
+
+   | Key | Category | Count | Expected % |
+   |-----|----------|-------|-----------|
+   | X | blasts | 2 | 2% |
+   | R | pro | 5 | 5% |
+   | V | myelo | 20 | 20% |
+   | C | meta | 20 | 20% |
+   | D | bands | 20 | 20% |
+   | F | poly | 10 | 10% |
+   | B | nrbc | 10 | 10% |
+   | Z | baso | 1 | 1% |
+   | G | eos | 3 | 3% |
+   | E | plasma | 2 | 2% |
+   | S | lymph | 5 | 5% |
+   | A | mono | 2 | 2% |
+
+2. Verify the grand total reads **100**, every percentage matches the table, and
+   the percentages **sum to exactly 100.0%**.
+3. Verify the **M:E ratio reads 8.3:1** with interval **4.4–15.8**.
+4. Document the QC check result.
+
+**If any figure differs**, stop and follow §6.3. Do not adjust the software.
+
+*(The automated suite verifies the same arithmetic continuously; the register of
+implemented verification cases is in VV-001 §4. This monthly check confirms the
+deployed instance behaves as the verified build does.)*
 
 ### 6.3 Discrepancy Handling
 If the application produces unexpected results:
@@ -273,7 +308,7 @@ If the application produces unexpected results:
 
 | Concern | Policy |
 |---------|--------|
-| **Data Storage** | All count data exists only in browser memory. No data is transmitted to any server. No data is stored in permanent browser storage. |
+| **Data Storage** | No data is transmitted to any server. Counts, the case/accession number and morphology comments are written to **browser localStorage** by the autosave feature, so an interrupted count can be recovered; that record persists on the workstation until the count is completed, reset, or the browser's site data is cleared. Session history and the active configuration also persist locally. **On a shared workstation, treat the browser profile as holding patient-identifiable data** and either use non-identifying case references or clear site data between operators. Autosave can be disabled per profile (`autosave: false`). |
 | **Session History** | Stored in browser sessionStorage; automatically cleared when the tab/window is closed. |
 | **Patient Information** | Only the accession number is entered. No patient name, DOB, or other PHI is captured by the application. |
 | **Data of Record** | The application is a **counting aid**. The data of record is what is entered into the LIS/EMR. The application does not replace the LIS. |

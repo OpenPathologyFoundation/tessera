@@ -75,7 +75,8 @@ mapping is always the one displayed beneath each column while counting.
 | Q | Other (see note) |
 
 Left-handed by default, so the right hand stays on the microscope. A right-hand
-mapping ships as a preset, and the Configuration Editor can assign any layout.
+mapping is one click in the Configuration Editor (*auto-assign right-hand
+keys*); it is a key assignment rather than a separate profile.
 
 **On "Other":** count only unclassifiable haemopoietic cells here. Megakaryocytes,
 macrophages, osteoblasts, osteoclasts, stromal cells, smudged cells and
@@ -161,8 +162,8 @@ myelocytes, metamyelocytes, bands and segmented neutrophils together, another
 covers promyelocytes and myelocytes, another basophils and mast cells. Peripheral
 blood has no key for nucleated red cells at all, so this profile cannot report
 NRBC per 100 WBC. A count taken here cannot be re-expressed against ICSH
-categories without counting again. For new work, prefer **Full 14-Part
-Consensus**.
+categories without counting again. For new work, prefer **14-Type Nucleated
+Differential**.
 
 **To make it your laboratory's default**, load it, adjust anything you want in
 the Configuration Editor, then **Export Config** and deploy that file as

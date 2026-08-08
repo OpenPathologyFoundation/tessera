@@ -14,13 +14,13 @@ WBC ΔΣ enables medical technologists and pathologists to perform manual differ
 
 | Feature | Description |
 |---------|-------------|
-| **Case Identification** | Mandatory case/accession number before counting can begin. Displayed persistently. |
+| **Case Identification** | Optional case/accession number, displayed persistently once entered. Every shipped profile sets `requireCaseNumber: false`; a laboratory can make it mandatory in its own profile. |
 | **Two Specimen Types** | Bone Marrow and Peripheral Blood (14 cell types each, configurable) |
 | **Keyboard Counting** | Single-key increment, ergonomic left-hand zone: home row ASDFG, bottom ZXCVB, top QWERT |
 | **Undo/Correction** | Shift + key decrements by 1 (cannot go below zero) |
 | **Real-Time Percentages** | Auto-calculated with 2 decimal precision as you count |
 | **Visual Feedback** | Green flash on increment, amber flash on decrement |
-| **Progress Bar** | Tracks count toward minimum threshold (200 BM / 100 PB) |
+| **Progress Bar** | Tracks count toward the profile's target (default 500 BM / 200 PB). Reaching it is advisory, never blocking. |
 | **Minimum Count Enforcement** | Warning dialog when completing below threshold with explicit override |
 | **Morphology Comments** | Free-text field, keyboard-isolated (typing doesn't trigger counts) |
 | **Institutional Templates** | Yale SOM, Precipio DX, MGH for BM; MGH for PB |
@@ -35,7 +35,7 @@ WBC ΔΣ enables medical technologists and pathologists to perform manual differ
 
 ## Keyboard Mappings — Ergonomic Left-Hand Layout
 
-The default Consensus-14 profile maps all 14 cell types to the **left-hand ergonomic zone** (ASDFG / ZXCVB / QWERT). The same keys are used for both Bone Marrow and Peripheral Blood.
+The default **14-Type Nucleated Differential** profile (`ndc-14`) maps all 14 cell types to the **left-hand ergonomic zone** (ASDFG / ZXCVB / QWERT). The same keys are used for both Bone Marrow and Peripheral Blood.
 
 ### Home Row (most common cells)
 
@@ -68,7 +68,7 @@ The default Consensus-14 profile maps all 14 cell types to the **left-hand ergon
 
 **Shift + key** = undo (decrement by 1)
 
-A **right-hand** preset is also available (HJKL; / NM,./ / YUIOP) for left-handed operators. Key mappings are fully customizable via the [Configuration Editor](web/editor.html) or by editing `templates.json`.
+A right-hand layout (HJKL; / NM,./ / YUIOP) is one click in the [Configuration Editor](web/editor.html) — *auto-assign right-hand keys*. It is a key assignment, not a separate profile. Key mappings are fully customizable there or by editing `templates.json`.
 
 ---
 
@@ -205,7 +205,7 @@ Add a new object to the `templates` array for any specimen type:
 {
     "tplCode": "mylab",
     "tplName": "My Laboratory",
-    "outSentence": "A {{total}}-cell count: {{blast}}% blasts, {{pro}}% promyelocytes..."
+    "outSentence": "A {{total}}-cell count: {{blasts}}% blasts, {{pro}}% promyelocytes..."
 }
 ```
 
@@ -216,10 +216,13 @@ Available placeholders: `{{total}}`, `{{caseNumber}}`, `{{comments}}`, and any c
 ```json
 {
     "specimenType": "bm",
-    "minCellCount": 500,
+    "targetCount": 500,
     ...
 }
 ```
+
+`minCellCount` was the v1 field name and no longer exists; the v2 schema calls
+it `targetCount`, and reaching it is advisory rather than blocking.
 
 ### Changing Keyboard Mappings
 
@@ -356,7 +359,7 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
 | **RA-001** | FMEA risk analysis: 55 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan; register of 781 implemented verification cases, generated from the runners |
+| **TP-001** | Test plan; register of 784 implemented verification cases, generated from the runners |
 | **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |

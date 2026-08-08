@@ -68,14 +68,14 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**781 verification cases** across 28 series and 4 layers, run as 849 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**784 verification cases** across 28 series and 4 layers, run as 852 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 25 (001–028) | Static | QMS counted quantities |
 | `SC-*` | 33 (001–064) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 96 (001–135) | Behaviour | Application behaviour in a DOM |
-| `UD-*` | 52 (001–096) | Static | User-facing documentation |
+| `UD-*` | 55 (001–099) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-AUD-*` | 19 (001–019) | Static | Audio engine structure |
 | `VV-CALC-*` | 24 (001–030) | Unit | Calculation engine vectors |
@@ -326,6 +326,9 @@ lives in **RTM-001 §5**, which cites the identifiers registered here.
 | UD-094 | The ratio-interval table is engine-produced (G-2) | Static | `tests/13-user-documentation.test.js` |
 | UD-095 | The guide lists the presets the catalogue actually offers | Static | `tests/13-user-documentation.test.js` |
 | UD-096 | The predecessor profile is documented with its divergences | Static | `tests/13-user-documentation.test.js` |
+| UD-097 | No operator-facing page names a withdrawn profile | Static | `tests/13-user-documentation.test.js` |
+| UD-098 | Every key a procedure names maps to the category it claims | Static | `tests/13-user-documentation.test.js` |
+| UD-099 | A procedure only enters categories the profile has | Static | `tests/13-user-documentation.test.js` |
 
 #### VV-ABS-* — Absolute counts and the analyser WBC
 
@@ -1131,9 +1134,9 @@ Demonstrate that WBC ΔΣ v2.0 meets user needs as defined in URS-001 v2.0 when 
 | Step | User Action | Expected System Behavior | URS Trace |
 |------|------------|-------------------------|-----------|
 | 1 | Select BM. Start Count. | M:E ratio display present (N/A initially). | URS-035 |
-| 2 | Press 'R' x 100 (nrbc=100). | M:E ratio = "0.0:1" (no myeloid cells). | URS-035 |
-| 3 | Press 'P' x 300 (poly=300). | M:E ratio updates to reflect myeloid/erythroid = 300/100 = 3.0:1. | URS-035 |
-| 4 | Press 'L' x 50 (blasts=50). | M:E ratio updated to reflect new myeloid total. | URS-035 |
+| 2 | Press **'B'** x 100 (nrbc=100). | M:E ratio = "0.0:1" (no myeloid cells). | URS-035 |
+| 3 | Press **'F'** x 300 (poly=300). | M:E ratio = **3.0:1**, interval **2.4–3.8** (300 myeloid / 100 erythroid). | URS-035 |
+| 4 | Press **'X'** x 50 (blasts=50). | Blasts join the M:E numerator per ICSH §2.6: ratio = **3.5:1**, interval **2.8–4.4**. | URS-035 |
 | 5 | Click Count Done. Check output. | M:E ratio in output matches live display. | URS-035, URS-050 |
 | 6 | Select PB. Start new count. | M:E ratio not displayed for PB. | URS-035 |
 

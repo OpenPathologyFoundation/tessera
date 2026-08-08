@@ -21,13 +21,13 @@
 
 ## 1. Executive Summary
 
-**<!-- qms:fact tests_total -->1147<!-- /qms:fact --> tests ran across 3 verification layers and 3 browser engines, with 0 failures and <!-- qms:fact tests_skipped -->7<!-- /qms:fact --> documented skips.**
+**<!-- qms:fact tests_total -->1150<!-- /qms:fact --> tests ran across 3 verification layers and 3 browser engines, with 0 failures and <!-- qms:fact tests_skipped -->7<!-- /qms:fact --> documented skips.**
 
 | Metric | Value |
 |--------|-------|
-| Unit, static and behavioural tests | **<!-- qms:fact tests_node -->700<!-- /qms:fact -->** |
+| Unit, static and behavioural tests | **<!-- qms:fact tests_node -->703<!-- /qms:fact -->** |
 | System (browser) tests | **<!-- qms:fact tests_browser -->447<!-- /qms:fact -->** (chromium, firefox, webkit) |
-| **Total** | **<!-- qms:fact tests_total -->1147<!-- /qms:fact -->** |
+| **Total** | **<!-- qms:fact tests_total -->1150<!-- /qms:fact -->** |
 | Passed | all but the documented skips |
 | Failed | **0** |
 | Skipped (documented, §6) | **<!-- qms:fact tests_skipped -->7<!-- /qms:fact -->** |
@@ -37,7 +37,7 @@
 | Exit code | 0 |
 
 Command: see `command.txt` in the evidence bundle this reports —
-`<!-- qms:fact evidence_run_id -->2026-08-07_220538_run<!-- /qms:fact -->`.
+`<!-- qms:fact evidence_run_id -->2026-08-08_054652_run<!-- /qms:fact -->`.
 Regenerate this evidence with `npm run test:qms`. The figures above are written
 by that run and must not be edited by hand.
 
@@ -630,7 +630,7 @@ provide.
 
 ## 7. Conclusion
 
-All <!-- qms:fact tests_total -->1147<!-- /qms:fact --> automated tests pass with no failures, across three browser
+All <!-- qms:fact tests_total -->1150<!-- /qms:fact --> automated tests pass with no failures, across three browser
 engines. For the first time in this
 product's design history the verification evidence exercises the shipped
 application: the calculation engine is called directly, the application is
@@ -652,6 +652,13 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-08T09:46:52.334Z
+- Command: `npm test && npx playwright test`
+- Exit Code: 0
+- Result: **PASS**
+- Code identity: `cac6f54537969c26112e1659e05e307dec58e446` (clean tree)
+- Evidence: `QMS/DHF/TestEvidence/2026-08-08_054652_run/`
+
 - Date (UTC): 2026-08-08T02:05:38.645Z
 - Command: `npm test && npx playwright test`
 - Exit Code: 0

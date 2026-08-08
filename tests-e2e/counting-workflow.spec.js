@@ -757,3 +757,59 @@ test.describe('The totals column is one column (URS-055)', () => {
         expect(Math.abs(upper - me)).toBeLessThanOrEqual(1);
     });
 });
+
+// ================================================================
+test.describe('Audio modes (URS-108)', () => {
+
+    /**
+     * Three modes, cycled from one control and persisted for the session.
+     * jsdom covers what each mode requests; only a real browser covers the
+     * control, the label and sessionStorage surviving a reload.
+     */
+    test('VV-SYS-222: The control cycles three modes and the choice survives a reload', async ({ page }) => {
+        await page.goto('/counter.html');
+        const label = page.locator('#audioLabel');
+
+        // The shipped default is the click, so nothing changes for an
+        // operator who never touches the control.
+        await expect(label).toHaveText('Click');
+
+        await page.click('#btnToggleAudio');
+        await expect(label).toHaveText('Tones');
+
+        await page.reload();
+        await expect(label).toHaveText('Tones');
+
+        await page.click('#btnToggleAudio');
+        await expect(label).toHaveText('Sound Off');
+        await page.reload();
+        await expect(label).toHaveText('Sound Off');
+
+        // Back round to the start.
+        await page.click('#btnToggleAudio');
+        await expect(label).toHaveText('Click');
+    });
+
+    test('VV-SYS-223: Counting is unaffected by the audio mode', async ({ page }) => {
+        // HA-108: audio is supplementary. Whatever the mode, the count is the
+        // count — so an operator who loses audio loses nothing they relied on.
+        const totals = [];
+        for (const mode of ['off', 'click', 'tones']) {
+            // The mode is seeded rather than cycled with the control: counting
+            // and then reloading raises the interrupted-count recovery prompt,
+            // which covers the toggle and made this time out rather than fail.
+            await page.addInitScript(m => {
+                sessionStorage.setItem('wbcds_audio', m);
+                localStorage.removeItem('wbcds_autosave');
+            }, mode);
+            await page.goto('/counter.html');
+            await page.click('#btnStartCount');
+            for (const k of ['a', 's', 'd']) {
+                for (let i = 0; i < 4; i++) await page.keyboard.press(k);
+            }
+            totals.push(await page.locator('#val-grand-total').innerText());
+        }
+        expect(new Set(totals).size).toBe(1);
+        expect(totals[0]).toBe('12');
+    });
+});

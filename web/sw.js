@@ -32,7 +32,10 @@
 // v2.17.0 — webfonts self-hosted. The cache key MUST change: an installed
 // browser would otherwise keep serving pages that still <link> to Google's
 // CDN, so the very workstation the change is for would not receive it.
-const CACHE_VERSION = 'wbcds-v2.21.0';
+// v2.22.0 — tonal feedback. wbc-tones.js is a new shell asset, so the key
+// must change or an installed browser serves a page that references a file
+// its cache does not hold.
+const CACHE_VERSION = 'wbcds-v2.22.0';
 const SHELL_CACHE = CACHE_VERSION + '-shell';
 const DATA_CACHE = CACHE_VERSION + '-data';
 
@@ -58,6 +61,7 @@ const SHELL_ASSETS = [
     './styles/theme.css',
     './scripts/wbc-core.js',
     './scripts/wbc-dialog.js',
+    './scripts/wbc-tones.js',
     './scripts/mdc-app.js',
     './scripts/config-editor.js'
 ];

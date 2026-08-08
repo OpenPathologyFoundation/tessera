@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 3.3 |
+| **Version** | 3.4 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -371,6 +371,11 @@ Phase 2 item.
 | SYS-251 | A profile SHALL be able to select whether absolute counts appear in the report (`absoluteCountsInReport`), defaulting to **off**. When selected, `{{<cellType>_abs}}`, `{{wbcEntered}}`, `{{wbcUsed}}` and `{{wbcBasis}}` SHALL resolve, and the report SHALL be re-rendered once an analyser WBC is entered. | URS-036, URS-102 |
 | SYS-252 | Where no analyser WBC has been entered, an absolute-count placeholder SHALL resolve to an explicit statement that it was not provided, and SHALL NOT render as blank or as zero. | URS-036, HA-106 |
 | SYS-253 | The configuration editor SHALL list every placeholder the active profile resolves, including the per-100 and absolute-count forms. | URS-102 |
+| SYS-254 | Tone frequency SHALL be derived as f = 130.81 · 2^(s/12) where s = 12·floor(j/5) + P[j mod 5], P = [0,3,5,7,10], j = k − 1 + max(0, floor((14 − n)/2)), for category position k of n tallied categories in displayed order. The system SHALL NOT provide any configuration of scale, key or per-category tone. | URS-108 |
+| SYS-255 | Adjacent categories SHALL differ by at least two semitones at every profile size, and tone frequency SHALL increase monotonically with category position. | URS-108 |
+| SYS-256 | An undone cell SHALL sound its own category's frequency, at lower gain and shorter duration than the increment, with a downward glide. | URS-108 |
+| SYS-257 | Each tone SHALL be varied per press by a bounded random detune and gain factor, from an injectable random source. Variation SHALL remain small enough that no category can be confused with an adjacent one. | URS-108 |
+| SYS-258 | Audio SHALL offer three modes — off, click, tones — selectable by the operator, persisted for the session, and defaulted by the profile. A session choice SHALL override the profile default in either direction. A category the mapping cannot place SHALL fall back to the click rather than to silence. | URS-108 |
 
 ### 4.22 Configuration Validation Requirements (URS-021, URS-022)
 
@@ -476,6 +481,7 @@ Phase 2 item.
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
 | B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
 | C | 2026-02-20 | QMS | Added theme toggle requirements |
+| M | 2026-08-07 | QMS | v3.4 (DCR-036): SYS-254–SYS-258 added for tonal feedback. The mapping formula is stated exactly, including the clamp that keeps profiles larger than fourteen categories audible; the discrimination guarantee is a requirement rather than a property of the chosen constants; and the fallback for an unplaceable category is the click, never silence — silence reads as a missed keypress. |
 | L | 2026-08-07 | QMS | v3.3 (DCR-029): SYS-205 restated. It forbade thresholding a ratio "because no confidence interval is computed for a ratio" — false since DCR-026, which computes one. The requirement stands; its reason does not. A threshold is a value on the 0-100 percentage scale (validateConfig bounds it there) and a ratio is not on that scale. The validation message now says so and tells the operator to express the subset as a percentage formula. |
 | K | 2026-08-05 | QMS | v2.7 (DCR-010): added SYS-230–SYS-235, reporting policy. Rounding method, decimal precision and the M:E convention are now selections rather than fixed behaviour. |
 | J | 2026-08-05 | QMS | v2.6: added SYS-220–SYS-224, operator documentation, verified against the shipped configuration and engine (suite 13). |

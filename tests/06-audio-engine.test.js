@@ -80,13 +80,21 @@ describe('Audio Engine — Toggle State (URS-097)', () => {
 
 describe('Audio Engine — Integration Points', () => {
 
-    it('VV-AUD-015: playClick is called on increment in onKeyDown', () => {
-        // Verify the pattern: increment followed by playClick
-        assert.ok(jsCode.includes('AudioEngine.playClick()'), 'Must call playClick on increment');
+    it('VV-AUD-015: An increment routes through the mode-aware entry point', () => {
+        // Was: a grep for `AudioEngine.playClick()`. That asserted a call site
+        // rather than a behaviour, so it broke the moment the call site gained
+        // a mode — and it would have kept passing if the call had been left
+        // behind in dead code. TC-B095 and TC-B097 assert the behaviour in
+        // jsdom; this keeps the routing honest at the source level.
+        assert.ok(jsCode.includes('AudioEngine.playCount('),
+            'increments must go through playCount, which chooses click or tone');
+        assert.ok(!/AudioEngine\.playClick\(\);\s*\n\s*\}\s*\n\s*updateCounterDisplay/.test(jsCode),
+            'the increment path must not call playClick directly any more');
     });
 
-    it('VV-AUD-016: playUndo is called on decrement in onKeyDown', () => {
-        assert.ok(jsCode.includes('AudioEngine.playUndo()'), 'Must call playUndo on decrement');
+    it('VV-AUD-016: A decrement routes through the mode-aware entry point', () => {
+        assert.ok(jsCode.includes('AudioEngine.playUndoAt('),
+            'decrements must go through playUndoAt, which sounds the category undone');
     });
 
     it('VV-AUD-017: playChime is called when target is first reached', () => {

@@ -85,6 +85,30 @@ comment instead.
 
 ---
 
+## Sound
+
+The control in the header cycles three settings:
+
+| Setting | What you hear |
+|---|---|
+| **Sound Off** | Nothing |
+| **Click** | One short click per counted cell — the default |
+| **Tones** | A distinct pitch for each category |
+
+**Tones exist so you can hear *which* key registered without looking up.** A
+click tells you a key was pressed; a tone tells you which one, so a hand that
+has drifted one key across is audible immediately. You are not expected to learn
+the pitches — only to notice when a press does not sound like the last fifty.
+
+The pitch comes from the category's position in your profile, so it needs no
+setting and cannot disagree with the layout on screen. Your choice lasts for the
+session; a profile can set the default in the Configuration Editor.
+
+Sound is always supplementary. The count and the on-screen flash are identical
+in all three settings, so nothing is lost if audio is unavailable.
+
+---
+
 ## What you will see on screen
 
 | Element | Meaning |

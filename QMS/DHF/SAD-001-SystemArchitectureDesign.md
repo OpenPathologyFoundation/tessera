@@ -136,6 +136,7 @@ execute shipped code rather than a copy of it.
 |                                                                            |
 |  +--------------------------------+   +--------------------------------+   |
 |  |  wbc-core.js   CALCULATION     |   |  wbc-dialog.js   DIALOG        |   |
+|  |  wbc-tones.js  TONE MAPPING    |   |                                |   |
 |  |                                |   |                                |   |
 |  |  denominator policy            |   |  alert / confirm / form        |   |
 |  |  rounding (3 policies)         |   |  focus trapped and restored    |   |
@@ -303,7 +304,21 @@ artefact are the same bytes.
   tally (HA-102).
 - **Design detail**: SDD-001 §3.18
 
-#### 3.2.12 Configuration Editor (`config-editor.js`)
+#### 3.2.12 Tonal Feedback Mapping (`wbc-tones.js`)
+
+- **Responsibility**: the category-to-pitch mapping, envelope parameters and
+  per-press humanisation. Pure functions; no AudioContext, no DOM.
+- **Architectural significance**: the mapping is **derived from the profile's
+  category order and cannot be configured**. There is no tone field in the
+  schema, so no tone can disagree with the profile it belongs to — the same
+  rule as the keyboard grid in `wbc-core.js`. Being DOM-free, the mapping is
+  unit-tested through `require`, which is what allows the discrimination
+  guarantee (≥2 semitones between adjacent categories, at every profile size)
+  to be asserted rather than assumed.
+- **Design detail**: SDD-001 §3.19
+- **SRS Trace**: SYS-254 to SYS-258
+
+#### 3.2.13 Configuration Editor (`config-editor.js`)
 
 - **Responsibility**: Drag-and-drop layout, key capture, report templates, the
   morphology checklist, and the Counting Policy panel.
@@ -562,6 +577,7 @@ web/
 ├── scripts/
 │   ├── wbc-core.js               # Calculation engine — DOM-free (§3.2.9)
 │   ├── wbc-dialog.js             # Shared dialog widget (§3.2.11)
+│   ├── wbc-tones.js              # Category-to-pitch mapping (§3.2.12)
 │   ├── mdc-app.js                # Counter: state and rendering
 │   └── config-editor.js          # Editor: layout, keys, counting policy
 └── settings/

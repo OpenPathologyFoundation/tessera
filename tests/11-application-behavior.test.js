@@ -789,12 +789,31 @@ describe('Behaviour — Theme and Audio (URS-095, URS-097)', () => {
         h.close();
     });
 
-    it('TC-B092: Audio toggle flips state and persists', async () => {
+    it('TC-B092: The audio control cycles three modes and persists each', async () => {
+        // Off / Click / Tones (DCR-036). The shipped default is Click, so the
+        // profile behaves exactly as before until an operator asks otherwise.
         const h = await boot();
-        assert.equal(h.text('audioLabel'), 'Sound On');
+        assert.equal(h.text('audioLabel'), 'Click');
+
+        h.click('btnToggleAudio');
+        assert.equal(h.text('audioLabel'), 'Tones');
+        assert.equal(h.window.sessionStorage.getItem('wbcds_audio'), 'tones');
+
         h.click('btnToggleAudio');
         assert.equal(h.text('audioLabel'), 'Sound Off');
         assert.equal(h.window.sessionStorage.getItem('wbcds_audio'), 'off');
+
+        h.click('btnToggleAudio');
+        assert.equal(h.text('audioLabel'), 'Click');
+        assert.equal(h.window.sessionStorage.getItem('wbcds_audio'), 'click');
+        h.close();
+    });
+
+    it('TC-B094: A session saved before there were three modes still reads', async () => {
+        // `on` was written by every session before DCR-036 and means the
+        // click, which is what those operators were hearing.
+        const h = await boot({ sessionStorage: { wbcds_audio: 'on' } });
+        assert.equal(h.text('audioLabel'), 'Click');
         h.close();
     });
 
@@ -1238,5 +1257,119 @@ describe('Behaviour — Method provenance (URS-052, URS-055)', () => {
         const panel = h.document.querySelector('.tab-panel').textContent;
         assert.doesNotMatch(panel, /undefined|\[object/);
         h.close();
+    });
+});
+
+// ================================================================
+describe('Behaviour — Tonal feedback (URS-108, DCR-036)', () => {
+
+    /**
+     * The unit suite proves the mapping. These prove the application uses it:
+     * that a keypress for a category requests that category's frequency, that
+     * an undo requests the same note damped, and that Off requests nothing.
+     *
+     * Asserted against the recording AudioContext in the harness, which
+     * captures WHAT was requested. A stub that counted events could not check
+     * a claim about pitch, and the claim is entirely about pitch.
+     */
+    const Tones = require('../web/scripts/wbc-tones.js');
+
+    /** The specimen profile the counter is currently showing. */
+    const active = h => h.hooks.state.config.find(
+        s => s.specimenType === h.hooks.state.specimenType) || h.hooks.state.config[0];
+
+    /** Position of a cell type in the displayed order, and how many there are. */
+    function place(h, cellType) {
+        const spec = active(h);
+        const order = spec.categories.upper.concat(spec.categories.lower);
+        return { k: order.indexOf(cellType) + 1, n: order.length, order };
+    }
+
+    async function inTones(opts = {}) {
+        return counting(Object.assign({ sessionStorage: { wbcds_audio: 'tones' } }, opts));
+    }
+
+    it('TC-B095: A counted category sounds its own pitch', async () => {
+        const h = await inTones({ caseNumber: 'T1' });
+        const spec = active(h);
+
+        // Two different keys must produce two different, correct frequencies.
+        const keys = Object.keys(spec.outCodes);
+        const seen = [];
+        for (const key of keys.slice(0, 4)) {
+            const before = h.audioEvents.length;
+            h.press(key, 1);
+            assert.ok(h.audioEvents.length > before, `key ${key} produced no tone`);
+            const ev = h.audioEvents[h.audioEvents.length - 1];
+            const { k, n } = place(h, spec.outCodes[key]);
+            const want = Tones.frequencyFor(k, n);
+            // Humanisation detunes by up to ±10 cents, so compare in cents.
+            const cents = Math.abs(1200 * Math.log2(ev.freq / want));
+            assert.ok(cents <= 10.001,
+                `${spec.outCodes[key]}: heard ${ev.freq.toFixed(1)} Hz, expected ` +
+                `${want.toFixed(1)} Hz (${cents.toFixed(1)} cents off)`);
+            seen.push(ev.freq);
+        }
+        assert.equal(new Set(seen).size, seen.length, 'two categories sounded alike');
+        h.close();
+    });
+
+    it('TC-B096: An undo sounds the same note, quieter and falling', async () => {
+        const h = await inTones({ caseNumber: 'T2' });
+        const spec = active(h);
+        const key = Object.keys(spec.outCodes)[0];
+
+        h.press(key, 1);
+        const up = h.audioEvents[h.audioEvents.length - 1];
+        h.press(key, 1, { shift: true });   // the harness option is `shift`
+        const down = h.audioEvents[h.audioEvents.length - 1];
+
+        const cents = Math.abs(1200 * Math.log2(down.freq / up.freq));
+        assert.ok(cents <= 20.001, 'the undo must sound the category that was undone');
+        assert.ok(down.peakGain < up.peakGain, 'the undo must be quieter');
+        assert.ok(down.freqEnd !== null && down.freqEnd < down.freq,
+            'the undo must glide downward — putting it back');
+        h.close();
+    });
+
+    it('TC-B097: Click mode is unchanged, and Off makes no sound', async () => {
+        // The shipped default must behave exactly as before the feature.
+        const click = await counting({ caseNumber: 'T3',
+            sessionStorage: { wbcds_audio: 'click' } });
+        const spec = active(click);
+        const key = Object.keys(spec.outCodes)[0];
+        const other = Object.keys(spec.outCodes)[1];
+
+        click.press(key, 1);
+        const a = click.audioEvents[click.audioEvents.length - 1];
+        click.press(other, 1);
+        const b = click.audioEvents[click.audioEvents.length - 1];
+        assert.equal(a.freq, 800, 'click mode must keep the 800 Hz click');
+        assert.equal(a.freq, b.freq, 'click mode must not vary by category');
+        click.close();
+
+        const off = await counting({ caseNumber: 'T4',
+            sessionStorage: { wbcds_audio: 'off' } });
+        const before = off.audioEvents.length;
+        off.press(key, 3);
+        assert.equal(off.audioEvents.length, before, 'Off must request nothing');
+        off.close();
+    });
+
+    it('TC-B098: The visual flash is identical in every mode', async () => {
+        // Audio is supplementary by design (HA-108). Whatever the mode, the
+        // count and the flash must be the same, so an operator who loses audio
+        // loses nothing they were relying on.
+        const counts = [];
+        for (const mode of ['off', 'click', 'tones']) {
+            const h = await counting({ caseNumber: 'T5',
+                sessionStorage: { wbcds_audio: mode } });
+            const spec = active(h);
+            const key = Object.keys(spec.outCodes)[0];
+            h.press(key, 5);
+            counts.push(h.hooks.state.counts[spec.outCodes[key]]);
+            h.close();
+        }
+        assert.deepEqual(counts, [5, 5, 5], 'the count differed by audio mode');
     });
 });

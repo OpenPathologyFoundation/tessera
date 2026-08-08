@@ -97,13 +97,13 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**763 verification cases** across 27 series and 4 layers, run as 831 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**781 verification cases** across 28 series and 4 layers, run as 849 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 25 (001–028) | Static | QMS counted quantities |
 | `SC-*` | 33 (001–064) | Unit | Standards conformance (ICSH) |
-| `TC-B*` | 91 (001–135) | Behaviour | Application behaviour in a DOM |
+| `TC-B*` | 96 (001–135) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 52 (001–096) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-AUD-*` | 19 (001–019) | Static | Audio engine structure |
@@ -125,8 +125,9 @@ auditing how the plan changed.
 | `VV-SCH-*` | 23 (001–023) | Unit | v2 configuration schema |
 | `VV-SRC-*` | 76 (001–076) | Static | Application source integrity (static) |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 129 (001–221) | System | System verification in a real browser |
+| `VV-SYS-*` | 131 (001–223) | System | System verification in a real browser |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
+| `VV-TON-*` | 11 (001–013) | Unit | — |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
 
 #### QC-* — QMS counted quantities
@@ -261,8 +262,13 @@ auditing how the plan changed.
 | TC-B088 | Session history lists completed counts and opens read-only detail | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B090 | Theme toggles and persists to sessionStorage | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B091 | Ctrl+Shift+L toggles the theme without disturbing counting | Behaviour | `tests/11-application-behavior.test.js` |
-| TC-B092 | Audio toggle flips state and persists | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B092 | The audio control cycles three modes and persists each | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B093 | Counting emits audio feedback when enabled | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B094 | A session saved before there were three modes still reads | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B095 | A counted category sounds its own pitch | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B096 | An undo sounds the same note, quieter and falling | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B097 | Click mode is unchanged, and Off makes no sound | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B098 | The visual flash is identical in every mode | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B100 | NRBC counted in PB do not dilute the leucocyte percentages | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B101 | NRBC display per 100 WBC rather than a percentage | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B102 | The grand total distinguishes the differential from the overall tally | Behaviour | `tests/11-application-behavior.test.js` |
@@ -380,8 +386,8 @@ auditing how the plan changed.
 | VV-AUD-012 | AudioEngine.enabled property exists | Static | `tests/06-audio-engine.test.js` |
 | VV-AUD-013 | Toggle updates the audio label | Static | `tests/06-audio-engine.test.js` |
 | VV-AUD-014 | Audio toggle button is referenced in HTML | Static | `tests/06-audio-engine.test.js` |
-| VV-AUD-015 | playClick is called on increment in onKeyDown | Static | `tests/06-audio-engine.test.js` |
-| VV-AUD-016 | playUndo is called on decrement in onKeyDown | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-015 | An increment routes through the mode-aware entry point | Static | `tests/06-audio-engine.test.js` |
+| VV-AUD-016 | A decrement routes through the mode-aware entry point | Static | `tests/06-audio-engine.test.js` |
 | VV-AUD-017 | playChime is called when target is first reached | Static | `tests/06-audio-engine.test.js` |
 | VV-AUD-018 | playTypewriter is called on morphology comment input | Static | `tests/06-audio-engine.test.js` |
 | VV-AUD-019 | Sound frequency values are defined for each sound type | Static | `tests/06-audio-engine.test.js` |
@@ -1003,6 +1009,8 @@ auditing how the plan changed.
 | VV-SYS-219 | A current profile raises no offer | System | `tests-e2e/config-and-offline.spec.js` |
 | VV-SYS-220 | The rendered report states the profile's basis | System | `tests-e2e/config-and-offline.spec.js` |
 | VV-SYS-221 | A profile with no bone marrow states no bone marrow basis | System | `tests-e2e/config-and-offline.spec.js` |
+| VV-SYS-222 | The control cycles three modes and the choice survives a reload | System | `tests-e2e/counting-workflow.spec.js` |
+| VV-SYS-223 | Counting is unaffected by the audio mode | System | `tests-e2e/counting-workflow.spec.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 
@@ -1016,6 +1024,22 @@ auditing how the plan changed.
 | VV-THR-006 | Validation rejects an unresolvable or out-of-range threshold | Unit | `tests/01-calculation-engine.test.js` |
 | VV-THR-007 | A category outside the differential cannot be a threshold target | Unit | `tests/01-calculation-engine.test.js` |
 | VV-THR-008 | No thresholds configured yields no evaluation | Unit | `tests/01-calculation-engine.test.js` |
+
+#### VV-TON-* — verification cases
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-TON-001 | The scale is the minor pentatonic, rooted at C3 | Unit | `tests/15-tonal-feedback.test.js` |
+| VV-TON-002 | Adjacent categories are at least two semitones apart | Unit | `tests/15-tonal-feedback.test.js` |
+| VV-TON-003 | Pitch ascends with position, always | Unit | `tests/15-tonal-feedback.test.js` |
+| VV-TON-004 | The stated ranges hold for the shipped profile sizes | Unit | `tests/15-tonal-feedback.test.js` |
+| VV-TON-005 | Small profiles are centred, not left in the mud | Unit | `tests/15-tonal-feedback.test.js` |
+| VV-TON-006 | A profile larger than the reference still sounds | Unit | `tests/15-tonal-feedback.test.js` |
+| VV-TON-007 | An unplaceable category has no frequency, rather than a wrong one | Unit | `tests/15-tonal-feedback.test.js` |
+| VV-TON-010 | An increment has a real attack | Unit | `tests/15-tonal-feedback.test.js` |
+| VV-TON-011 | An undo is the same note, damped and falling | Unit | `tests/15-tonal-feedback.test.js` |
+| VV-TON-012 | Humanisation is bounded, and its randomness is injectable | Unit | `tests/15-tonal-feedback.test.js` |
+| VV-TON-013 | Cents convert to a frequency ratio | Unit | `tests/15-tonal-feedback.test.js` |
 
 #### VV-TPL-* — Output templates
 

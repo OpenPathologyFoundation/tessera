@@ -3,7 +3,7 @@
  * =========================================
  *
  * Boots the REAL counter.html together with the REAL wbc-core.js,
- * wbc-dialog.js and mdc-app.js inside jsdom, so behavioural tests exercise
+ * wbc-dialog.js, wbc-tones.js and mdc-app.js inside jsdom, so behavioural tests exercise
  * shipped code paths —
  * the phase machine, keyboard handler, autosave and DOM rendering — rather
  * than a re-implementation of them. See DCR-004.
@@ -24,6 +24,7 @@ const WEB = path.join(ROOT, 'web');
 const HTML = fs.readFileSync(path.join(WEB, 'counter.html'), 'utf-8');
 const CORE_JS = fs.readFileSync(path.join(WEB, 'scripts', 'wbc-core.js'), 'utf-8');
 const DIALOG_JS = fs.readFileSync(path.join(WEB, 'scripts', 'wbc-dialog.js'), 'utf-8');
+const TONES_JS = fs.readFileSync(path.join(WEB, 'scripts', 'wbc-tones.js'), 'utf-8');
 const APP_JS = fs.readFileSync(path.join(WEB, 'scripts', 'mdc-app.js'), 'utf-8');
 const DEFAULT_CONFIG = JSON.parse(
     fs.readFileSync(path.join(WEB, 'settings', 'templates.json'), 'utf-8'));
@@ -35,6 +36,21 @@ function stripScripts(html) {
         .replace(/<link\b[^>]*>/gi, '');
 }
 
+/**
+ * A recording AudioContext.
+ *
+ * It records WHAT was requested — frequency, waveform, peak gain, glide — not
+ * merely that something was. The tonal feedback mode's whole claim is that the
+ * pitch identifies the category, and a stub that counts events cannot check a
+ * claim about pitch.
+ *
+ * Every method the engine calls must exist here. A missing one throws into the
+ * engine's own best-effort catch, which turns a broken tone into silence and a
+ * failing assertion into a passing one.
+ *
+ * Events keep a `.length` and stringify as 'tone', so assertions written
+ * against the counting stub still read the same.
+ */
 function makeAudioStub(events) {
     function Ctx() {
         this.state = 'running';
@@ -42,16 +58,50 @@ function makeAudioStub(events) {
     }
     Ctx.prototype.resume = function () {};
     Ctx.prototype.createOscillator = function () {
+        const ev = {
+            kind: 'tone', type: '', freq: null, freqEnd: null,
+            peakGain: null, toString() { return 'tone'; }
+        };
         return {
-            type: '', frequency: { value: 0 },
-            connect() {}, start() { events.push('tone'); }, stop() {}
+            _ev: ev,
+            set type(v) { ev.type = v; },
+            get type() { return ev.type; },
+            frequency: {
+                set value(v) { ev.freq = v; },
+                get value() { return ev.freq; },
+                setValueAtTime(v) { ev.freq = v; },
+                exponentialRampToValueAtTime(v) { ev.freqEnd = v; },
+                linearRampToValueAtTime(v) { ev.freqEnd = v; }
+            },
+            // The oscillator connects INTO the gain node, so it can read the
+            // envelope peak off it when the note actually starts.
+            connect(target) { ev._gain = target; },
+            disconnect() {},
+            start() {
+                if (ev._gain && ev._gain.gain) ev.peakGain = ev._gain.gain._peak;
+                delete ev._gain;
+                events.push(ev);
+            },
+            stop() {},
+            set onended(fn) { ev.onended = fn; }
         };
     };
     Ctx.prototype.createGain = function () {
-        return {
-            gain: { value: 0, exponentialRampToValueAtTime() {} },
-            connect() {}
+        const g = {
+            gain: {
+                _peak: null,
+                set value(v) { g.gain._peak = Math.max(g.gain._peak || 0, v); },
+                get value() { return g.gain._peak; },
+                setValueAtTime(v) { /* the floor before the attack */ },
+                exponentialRampToValueAtTime(v) {
+                    // The attack target is the peak; the decay target is ~0.
+                    if (v > (g.gain._peak || 0) && v > 0.005) g.gain._peak = v;
+                },
+                linearRampToValueAtTime() {}
+            },
+            connect() {}, disconnect() {}
         };
+        return g;
     };
     return Ctx;
 }
@@ -115,7 +165,7 @@ async function boot(opts = {}) {
     // --- inject application scripts in load order --------------------------
     // Appended to <head>, not <body>: a script element's source counts toward
     // body.textContent, which would pollute every text assertion in the suite.
-    for (const src of [CORE_JS, DIALOG_JS, APP_JS]) {
+    for (const src of [CORE_JS, DIALOG_JS, TONES_JS, APP_JS]) {
         const s = w.document.createElement('script');
         s.textContent = src;
         w.document.head.appendChild(s);

@@ -113,20 +113,28 @@
                 this.ctx = new (window.AudioContext || window.webkitAudioContext)();
             } catch (e) { /* no audio support */ }
 
-            if (specConfig && specConfig.audio && specConfig.audio.enabled === false) {
-                this.enabled = false;
-            }
+            var audio = (specConfig && specConfig.audio) || {};
+            this.mode = audio.enabled === false ? 'off'
+                : (audio.mode === 'tones' ? 'tones' : 'click');
 
             // A session choice overrides the profile default, in both
             // directions — the operator at the bench has the last word.
+            // `on` is the value written before there were three modes; it
+            // means the click, which is what those sessions were hearing.
             try {
                 var saved = sessionStorage.getItem(AUDIO_KEY);
-                if (saved === 'off') this.enabled = false;
-                else if (saved === 'on') this.enabled = true;
+                if (saved === 'off') this.mode = 'off';
+                else if (saved === 'on' || saved === 'click') this.mode = 'click';
+                else if (saved === 'tones') this.mode = 'tones';
             } catch (e) { /* graceful degradation */ }
 
+            this.enabled = this.mode !== 'off';
             state.audioEnabled = this.enabled;
+            state.audioMode = this.mode;
         },
+
+        /** Modes in cycle order. */
+        MODES: ['off', 'click', 'tones'],
 
         _playTone: function (freq, type, duration) {
             if (!this.enabled || !this.ctx) return;
@@ -151,6 +159,73 @@
 
         playUndo: function () {
             this._playTone(400, 'sine', 10);
+        },
+
+        /**
+         * A counted cell. In `tones` mode the pitch identifies WHICH category,
+         * which is the bit the click cannot carry; in `click` mode nothing
+         * changes.
+         *
+         * `k` is 1-indexed position in the displayed order, `n` the number of
+         * tallied categories. A profile the mapping cannot place (no
+         * categories, index out of range) falls back to the click rather than
+         * going silent — silence would read as a missed keypress.
+         */
+        playCount: function (k, n) {
+            if (this.mode !== 'tones') { this.playClick(); return; }
+            var freq = WBCTones.frequencyFor(k, n);
+            if (freq === null) { this.playClick(); return; }
+            this._playShaped(freq, WBCTones.humanize(WBCTones.toneParams('increment'), this.rng));
+        },
+
+        /** An undone cell, at its own pitch — the operator hears what went back. */
+        playUndoAt: function (k, n) {
+            if (this.mode !== 'tones') { this.playUndo(); return; }
+            var freq = WBCTones.frequencyFor(k, n);
+            if (freq === null) { this.playUndo(); return; }
+            this._playShaped(freq, WBCTones.humanize(WBCTones.toneParams('undo'), this.rng));
+        },
+
+        /** Injectable so a test can pin the humanisation. */
+        rng: null,
+
+        /**
+         * A shaped tone: real attack, exponential decay, optional glide.
+         *
+         * The attack matters. `_playTone` sets its gain directly and ramps
+         * down, so every note begins with a step discontinuity — an onset
+         * click on top of the waveform, and a large part of why the square
+         * wave is tiring at several hundred repetitions.
+         */
+        _playShaped: function (freq, p) {
+            if (this.mode === 'off' || !this.ctx) return;
+            try {
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                var now = this.ctx.currentTime;
+                var attack = p.attackMs / 1000;
+                var end = p.durationMs / 1000;
+
+                var osc = this.ctx.createOscillator();
+                var gain = this.ctx.createGain();
+                osc.type = p.type;
+                osc.frequency.setValueAtTime(freq * WBCTones.centsToRatio(p.detuneCents || 0), now);
+                if (p.glideCents) {
+                    osc.frequency.exponentialRampToValueAtTime(
+                        freq * WBCTones.centsToRatio((p.detuneCents || 0) + p.glideCents),
+                        now + end);
+                }
+                gain.gain.setValueAtTime(0.0001, now);
+                gain.gain.exponentialRampToValueAtTime(p.peakGain, now + attack);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + end);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + end);
+                osc.onended = function () {
+                    try { osc.disconnect(); gain.disconnect(); } catch (e) { /* already gone */ }
+                };
+            } catch (e) { /* best-effort */ }
         },
 
         playChime: function () {
@@ -179,10 +254,13 @@
         },
 
         toggle: function () {
-            this.enabled = !this.enabled;
+            var at = this.MODES.indexOf(this.mode);
+            this.mode = this.MODES[(at + 1) % this.MODES.length];
+            this.enabled = this.mode !== 'off';
             state.audioEnabled = this.enabled;
+            state.audioMode = this.mode;
             try {
-                sessionStorage.setItem(AUDIO_KEY, this.enabled ? 'on' : 'off');
+                sessionStorage.setItem(AUDIO_KEY, this.mode);
             } catch (e) { /* graceful degradation */ }
             updateAudioToggle();
         }
@@ -192,8 +270,11 @@
         var label = el('audioLabel');
         var btn = el('btnToggleAudio');
         if (!label || !btn) return;
-        label.textContent = AudioEngine.enabled ? 'Sound On' : 'Sound Off';
+        var LABELS = { off: 'Sound Off', click: 'Click', tones: 'Tones' };
+        label.textContent = LABELS[AudioEngine.mode] || 'Sound Off';
         btn.setAttribute('aria-pressed', String(AudioEngine.enabled));
+        btn.setAttribute('title', 'Audio feedback: ' + (LABELS[AudioEngine.mode] || 'Sound Off') +
+            ' — click to cycle Off, Click, Tones');
     }
 
     // ================================================================
@@ -1120,18 +1201,25 @@
         var cellType = outCodes[key];
         var isDecrement = ev.shiftKey;
 
+        // Position in the displayed order, which is what the tone is derived
+        // from (SYS-254). Computed here rather than stored, so it cannot
+        // disagree with the profile.
+        var order = specConfig.categories.upper.concat(specConfig.categories.lower);
+        var k = order.indexOf(cellType) + 1;   // 0 -> not displayed -> falls back
+        var n = order.length;
+
         if (isDecrement) {
             // Decrement (SYS-032, SYS-033) — never below zero
             if (state.counts[cellType] > 0) {
                 state.counts[cellType]--;
                 flashCell(cellType, 'decrement');
-                AudioEngine.playUndo();
+                AudioEngine.playUndoAt(k, n);
             }
         } else {
             // Increment (SYS-031)
             state.counts[cellType]++;
             flashCell(cellType, 'increment');
-            AudioEngine.playClick();
+            AudioEngine.playCount(k, n);
         }
 
         updateCounterDisplay();

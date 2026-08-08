@@ -66,6 +66,7 @@
                 handedness: 'left',
                 absoluteCounts: 'optional',
                 audioEnabled: true,
+                audioMode: 'click',
                 autosaveEnabled: true,
                 absoluteCountsInReport: false,
                 rounding: 'largest-remainder',
@@ -179,6 +180,7 @@
                     handedness: spec.handedness || 'left',
                     absoluteCounts: spec.absoluteCounts || 'optional',
                     audioEnabled: spec.audio ? spec.audio.enabled : true,
+                    audioMode: (spec.audio && spec.audio.mode) || 'click',
                     autosaveEnabled: spec.autosave !== false
                 };
                 Object.keys(policyDefaults(spec)).forEach(function (k) {
@@ -559,6 +561,7 @@
         document.getElementById('handedness').value = spec.handedness || 'left';
         document.getElementById('absoluteCounts').value = spec.absoluteCounts || 'optional';
         document.getElementById('audioEnabled').checked = spec.audioEnabled !== false;
+        document.getElementById('audioMode').value = spec.audioMode || 'click';
         document.getElementById('autosaveEnabled').checked = spec.autosaveEnabled !== false;
     }
 
@@ -582,6 +585,10 @@
         });
         document.getElementById('absoluteCounts').addEventListener('change', function () {
             getActiveSpec().absoluteCounts = this.value;
+        });
+        document.getElementById('audioMode').addEventListener('change', function () {
+            getActiveSpec().audioMode = this.value;
+            markDirty();
         });
         document.getElementById('audioEnabled').addEventListener('change', function () {
             getActiveSpec().audioEnabled = this.checked;
@@ -1354,6 +1361,7 @@
                 handedness: 'left',
                 absoluteCounts: 'optional',
                 audioEnabled: true,
+                audioMode: 'click',
                 autosaveEnabled: true,
                 absoluteCountsInReport: false,
                 rounding: 'largest-remainder',
@@ -1461,7 +1469,7 @@
                     typewriterSound: 'typewriter'
                 },
                 (spec.raw && spec.raw.audio) || {},
-                { enabled: spec.audioEnabled !== false });
+                { enabled: spec.audioEnabled !== false, mode: spec.audioMode || 'click' });
             merged.autosave = spec.autosaveEnabled !== false;
             merged.absoluteCounts = spec.absoluteCounts || 'optional';
             merged.handedness = spec.handedness || 'left';

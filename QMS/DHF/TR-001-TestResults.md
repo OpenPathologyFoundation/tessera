@@ -652,6 +652,13 @@ specified requirements as traced in RTM-001 v3.0.
 ---
 
 ## 9. Automated Run Log
+- Date (UTC): 2026-08-08T00:37:06.839Z
+- Command: `npm test && npx playwright test`
+- Exit Code: 1
+- Result: **FAIL**
+- Code identity: `30cdb2b3fdb0df87f257521211ef557c8c6ca3d7` (clean tree)
+- Evidence: `QMS/DHF/TestEvidence/2026-08-07_203706_run/`
+
 - Date (UTC): 2026-08-08T00:16:18.175Z
 - Command: `npm test && npx playwright test`
 - Exit Code: 1

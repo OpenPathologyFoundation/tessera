@@ -606,10 +606,23 @@ test.describe('The totals column is one column (URS-055)', () => {
     }
 
     async function countAcross(page) {
+        // Waits for the grid before pressing and for the tally after, because
+        // everything downstream MEASURES GEOMETRY. Without the waits the
+        // measurement races the render: VV-SYS-215 failed once on WebKit under
+        // full-suite load and passed on every isolated re-run, which is the
+        // signature of a race rather than a defect. Retrying would have hidden
+        // it; waiting for the state the assertions depend on removes it.
         await page.click('text=Start Count');
-        for (const k of ['a', 's', 'd', 'f', 'g', 'h', 'z', 'x', 'c', 'v', 'b', 'n']) {
+        await expect(page.locator('#phase-counting')).toBeVisible();
+        await expect(page.locator('#val-grand-total')).toBeVisible();
+
+        const keys = ['a', 's', 'd', 'f', 'g', 'h', 'z', 'x', 'c', 'v', 'b', 'n'];
+        for (const k of keys) {
             for (let i = 0; i < 3; i++) await page.keyboard.press(k);
         }
+        // The grand total having left zero proves the presses landed and the
+        // display has been rewritten, so the layout being measured is settled.
+        await expect(page.locator('#val-grand-total')).not.toHaveText('0');
     }
 
     // Absence is checked before measuring. `boundingBox()` on a locator that

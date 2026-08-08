@@ -141,6 +141,11 @@ test.describe('Configuration controls (URS-103)', () => {
             }));
         });
         await page.reload();
+        // The app boots asynchronously — it fetches templates.json before
+        // resolving which profile wins. Asserting on the selector before that
+        // resolves reads the previous render, which is why this failed only
+        // under full-suite load.
+        await waitForAppReady(page);
         await expect(page.locator('#specimenType option')).toHaveText(['Stale Marrow']);
 
         await page.click('#btnResetConfig');

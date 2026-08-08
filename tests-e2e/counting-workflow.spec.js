@@ -603,6 +603,15 @@ test.describe('The totals column is one column (URS-055)', () => {
         await expect(overlay).toContainText('9-Type — 2015 Counter Layout');
         await overlay.getByRole('button', { name: 'OK' }).click();
         await expect(overlay).toBeHidden();
+
+        // Loading a preset re-renders the case-entry screen. Wait for the
+        // profile to be the active one before counting with it, or a slow
+        // render under load lets Start Count fire against the previous
+        // profile — measured geometry then belongs to the wrong layout.
+        await page.waitForFunction(() => {
+            const h = window.__wbcTestHooks;
+            return !!(h && h.state.configMeta && h.state.configMeta.profileId === 'mdc-2015-9');
+        });
     }
 
     async function countAcross(page) {

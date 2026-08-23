@@ -94,9 +94,9 @@ should be quoted until someone holds the paper.
 > `node scripts/qms-signoffs.js --write` rebuilds this from the signature
 > tables in every document. Suite 14 fails the build if it goes stale.
 
-**44 signature(s) outstanding across 6 role(s).** 16 document(s) are fully signed.
+**48 signature(s) outstanding across 6 role(s).** 16 document(s) are fully signed.
 
-### Clinical Reviewer — 35 outstanding
+### Clinical Reviewer — 36 outstanding
 
 | Document | Note |
 |----------|------|
@@ -131,6 +131,7 @@ should be quoted until someone holds the paper.
 | `DCR/DCR-038-Pre-Validation-Corrections.md` | **SOP-001 and VV-001 changed — re-read before the study** |
 | `DCR/DCR-039-Pre-Validation-Majors.md` | **SOP-001 changed again — §5.9 and §7 in particular** |
 | `DCR/DCR-040-Counting-Policy-Review.md` | **required — this is their change; §2 monocytes decision is the Design Engineer's and invites comment** |
+| `DCR/DCR-042-Release-Coherence.md` | **invited — §1 is the first defect this project found through use rather than review** |
 | `DHF-001-DesignHistoryFile-Index.md` | — |
 | `RA-001-RiskAnalysis-FMEA.md` | — |
 | `REF-001-StandardsAndLiterature.md` | — |
@@ -143,26 +144,29 @@ should be quoted until someone holds the paper.
 | `SOP-001-StandardOperatingProcedure.md` | — |
 | `URS-001_UserRequirementsSpecification_v2.0.md` | — |
 
-### Design Engineer — 2 outstanding
+### Design Engineer — 3 outstanding
 
 | Document | Note |
 |----------|------|
 | `DCR/DCR-040-Counting-Policy-Review.md` | — |
 | `DCR/DCR-041-README-Currency.md` | — |
+| `DCR/DCR-042-Release-Coherence.md` | — |
 
-### Quality Assurance — 2 outstanding
-
-| Document | Note |
-|----------|------|
-| `DCR/DCR-040-Counting-Policy-Review.md` | — |
-| `DCR/DCR-041-README-Currency.md` | — |
-
-### Regulatory Affairs — 2 outstanding
+### Quality Assurance — 3 outstanding
 
 | Document | Note |
 |----------|------|
 | `DCR/DCR-040-Counting-Policy-Review.md` | — |
 | `DCR/DCR-041-README-Currency.md` | — |
+| `DCR/DCR-042-Release-Coherence.md` | — |
+
+### Regulatory Affairs — 3 outstanding
+
+| Document | Note |
+|----------|------|
+| `DCR/DCR-040-Counting-Policy-Review.md` | — |
+| `DCR/DCR-041-README-Currency.md` | — |
+| `DCR/DCR-042-Release-Coherence.md` | — |
 
 ### Regulatory Reviewer — 1 outstanding
 

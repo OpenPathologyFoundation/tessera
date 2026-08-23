@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | URS-001 |
-| **Version** | 2.0 (Rev O) |
+| **Version** | 2.0 (Rev P) |
 | **Product** | WBC ΔΣ (Eukrasia) |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-05 |
@@ -175,6 +175,7 @@ This URS covers all user-facing functionality of WBC ΔΣ including specimen ide
 | URS-106 | The system SHALL cache the active configuration profile in browser localStorage. After initial configuration, no network connection SHALL be required. | **P1 – High** | _New._ Supports offline operation per URS-094. |
 | URS-107 | The system SHALL allow configuration of output template definitions. | **P1 – High** | _Carried from v1.0 URS-101._ Institutions have different reporting formats. |
 | URS-108 | The system SHALL offer an audio mode in which each counted category sounds a distinct pitch, derived from the profile's category order and not separately configurable. The mode SHALL be operator-selectable and SHALL NOT alter any counted value or visual feedback. | **P2 – Medium** | _New 2026-08-07 (DCR-036)._ The operator's eyes are on the microscope, so audio is the only feedback channel that is free — which is why sound exists in this application at all. The present click carries one bit: *a* key registered. A per-category tone carries the bit that matters, *which* key registered, making a displaced hand or a wrong key catchable without looking up. Precedent: the variable-pitch pulse oximeter, by which clinicians detect desaturation by ear. The claim is discrimination, not identification — the operator need not name a pitch, only notice that this press did not sound like the last fifty. Deriving pitch from category order rather than configuring it means no tone can disagree with the profile it belongs to. |
+| URS-109 | The system SHALL NOT interpret a configuration profile with application code that predates the meaning of its fields. Where that situation arises it SHALL be stated to the operator, and the system SHALL update itself to the newer code when it can do so without disturbing a count. | **P1 – High** | _New 2026-08-23 (Rev P, DCR-042)._ Found on a pilot workstation: the counter displayed a 500-cell target for a profile that states none, because the browser held the current profile and a release-old application shell. Nothing on screen indicated a mismatch — the profile version shown in the report footer was correct, which is what makes the class dangerous. The operator has no way to detect it and no way to fix it beyond clearing site data. |
 
 ---
 
@@ -265,6 +266,7 @@ The tool is given into the hands of the user. Governance of configuration profil
 | L | 2026-08-05 | QMS | URS-034 amended again: the rounding policy is now selectable rather than mandated, with largest remainder as the documented default. Decimal precision likewise. Mandating a single reporting policy contradicted the design principle that institutional variation lives in configuration. |
 | K | 2026-08-05 | QMS | URS-092 expanded: operator-facing documentation must state how figures are calculated, on what basis, and the limitations of manual differential counting. |
 | J | 2026-08-05 | QMS | URS-055 added: state the conventions that produced a result, not only which profile produced it. URS-052 amended to make explicit that "all output" includes the clipboard — the pasted record previously carried no profile attribution. |
+| P | 2026-08-23 | QMS | URS-109 added (DCR-042): code and configuration must come from the same release, and the system says so when they do not. Found live rather than by review. |
 | O | 2026-08-23 | QMS | URS-041 and URS-105 amended (DCR-040): a profile may state that it has no target cell count, at the request of the reviewing haematopathologists — the counter they use displays a running total and nothing else. The advisory becomes conditional on a target existing; URS-037's interval does not, and is what keeps the imprecision of a short count visible. |
 | N | 2026-08-06 | QMS | URS-032 amended: precision is configurable, not fixed at a minimum of 2 places, resolving a direct contradiction with SYS-232. The requirement now also obliges the tool to state what precision a count of a given size supports, rather than displaying digits that imply more than the measurement carries. Independent review finding C-3. |
 | M | 2026-08-06 | QMS | URS-039 rationale corrected: the non-erythroid blast denominator was withdrawn by the **WHO 2016 revision** (Arber et al., [S10]), not by WHO 2022. WHO 2022 and ICC 2022 retained the all-nucleated-cells denominator. Citation error found by independent review (DCR-017). |

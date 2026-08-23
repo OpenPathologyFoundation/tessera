@@ -1159,7 +1159,8 @@
                 version: raw.version || '2.0',
                 profileId: raw.profileId || 'custom',
                 profileName: raw.profileName || 'Custom Profile',
-                provenance: raw.provenance || null
+                provenance: raw.provenance || null,
+                minAppVersion: raw.minAppVersion || null
             };
         } else {
             throw new Error('Invalid config format: expected an array or an object with a specimenTypes array');
@@ -1187,6 +1188,7 @@
             profileId: meta.profileId,
             profileName: meta.profileName,
             provenance: meta.provenance || null,
+            minAppVersion: meta.minAppVersion || null,
             specimenTypes: specimenTypes
         };
     }
@@ -1522,6 +1524,47 @@
     }
 
     /**
+     * Whether this build is too old to interpret a profile (SYS-259, HA-111).
+     *
+     * The supersede mechanism sends a corrected profile to installed browsers,
+     * and `sw.js` fetches configuration network-first so it arrives at once.
+     * The application *shell* is cache-first, so it can be a release behind.
+     * The two together produce a mixed-version state: new profile, old code.
+     *
+     * Observed live on a pilot workstation. DCR-040 gave `targetCount: null`
+     * the meaning "this laboratory states no target". Pre-DCR-040 code tested
+     * `!spec.targetCount`, which is true for null, so it substituted the
+     * 500-cell default — a figure the laboratory had not chosen, displayed as
+     * though it had. The reported percentages were unaffected and the profile's
+     * own version was displayed correctly throughout, which is what makes this
+     * class dangerous: nothing on screen said the code and the configuration
+     * disagreed about what a field means.
+     *
+     * A profile therefore declares the oldest build that can read it, and only
+     * when it actually uses semantics an older build gets wrong — a blanket
+     * declaration would refuse profiles that are in fact interpretable, which
+     * is its own kind of harm on a workstation that cannot update today.
+     *
+     * A MALFORMED declaration is ignored rather than treated as blocking: it is
+     * a broken statement, not a claim about this build, and refusing to count
+     * over it would be a worse failure than the one being prevented. VV-PRE-028
+     * holds the shipped profiles to a well-formed value.
+     *
+     * An UNKNOWN application version blocks, because the question this function
+     * answers is "can I prove this build is new enough", and it cannot.
+     *
+     * @returns {string|null} the version required, when this build is older
+     */
+    function profileRequiresNewerApp(meta, appVersion) {
+        var DOTTED = /^\d+(\.\d+)*$/;
+        if (!meta || !meta.minAppVersion) return null;
+        var need = String(meta.minAppVersion);
+        if (!DOTTED.test(need)) return null;
+        if (!appVersion || !DOTTED.test(String(appVersion))) return need;
+        return compareVersions(need, String(appVersion)) > 0 ? need : null;
+    }
+
+    /**
      * Numeric dotted-version comparison. Returns >0 when a is newer than b.
      */
     function compareVersions(a, b) {
@@ -1703,6 +1746,7 @@
         RENAMED_PROFILES: RENAMED_PROFILES,
         renamedSuccessor: renamedSuccessor,
         isCacheSuperseded: isCacheSuperseded,
-        compareVersions: compareVersions
+        compareVersions: compareVersions,
+        profileRequiresNewerApp: profileRequiresNewerApp
     };
 }));

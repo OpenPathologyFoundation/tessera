@@ -114,6 +114,7 @@ URS (User Need) -> SRS (System Req) -> SDD (Design) -> TP/VV (Verification)
 |--------|----------------|-----------|-----|------|--------------|-------|----------|
 | URS-040 | "Count Done" available at any total > 0 | SYS-050, SYS-051 | 3.4.4 | — | TC-B030, VV-SYS-020 | B, S | Full |
 | URS-041 | Non-blocking advisory note below target; never an enforced override; no note where a profile states no target | SYS-052, SYS-053 | 3.4.4 | HA-030 | VV-LOW-001..004, VV-E2E-023, TC-B081, TC-B082, TC-B138, VV-SYS-021, VV-SYS-224 | U, B, S | Full |
+| HA-111 | Code and profile from different releases | SYS-259, SYS-260, SYS-261 | VV-VER-001..002, TC-B139..B142 | U, B |
 | URS-042 | "Continue Counting" preserves all tallies | SYS-057, SYS-058 | 3.4.4 | HA-071 | VV-E2E-050, TC-B032, VV-SYS-030 | U, B, S | Full |
 | URS-043 | *Withdrawn in URS v2.0* | — | — | — | — | — | n/a |
 
@@ -179,6 +180,7 @@ URS (User Need) -> SRS (System Req) -> SDD (Design) -> TP/VV (Verification)
 | URS-103 | Import and export a configuration profile | SYS-105, SYS-106 | 3.11 | HA-061 | TC-B060..B064, VV-SYS-050..053 | B, S | Full |
 | URS-104 | Left- and right-hand default key mappings | SYS-154, SYS-155 | 3.17 | — | suite 09 (`right-hand` preset), suite 10 (auto-assign) | U | Full |
 | URS-105 | Configurable target count per specimen type, or none; evidence-based defaults where unstated | SYS-103 | 3.8 | — | suite 04 (default targets), TC-B019, VV-SYS-016, VV-TGT-001..003, TC-B136, TC-B137 | U, B, S | Full |
+| URS-109 | Code and configuration from the same release; stated when not, and self-updating when idle | SYS-259, SYS-260, SYS-261 | 3.8 | HA-111 | VV-VER-001, VV-VER-002, TC-B139..B142, VV-PRE-028, VV-PRE-029 | U, B | Full |
 | URS-106 | Cache the active profile in localStorage; no network needed after first load | SYS-107, SYS-108 | 3.11 | HA-060 | TC-B070..B074, VV-SYS-054, VV-SYS-090 | B, S | Full |
 | URS-107 | Configurable output template definitions | SYS-100, SYS-102 | 3.8 | HA-051 | VV-E2E-012, VV-E2E-013, VV-SYS-051 | U, S | Full |
 
@@ -278,9 +280,9 @@ editor (URS-102).
 
 | Dimension | Items | Covered | Coverage | Notes |
 |-----------|-------|---------|----------|-------|
-| URS v2.0 → SRS | 70 active requirements (URS-043 withdrawn) | 52 | **100%** | No requirement is deferred |
-| SRS → Verification | 204 requirements | 134 | **100%** | 4 verified by inspection, tagged **I** in §5 |
-| FMEA → Verification | 55 hazards (5 new in RA-001 v2.1) | 34 | **100%** | RA-001 v2.1 re-scored under DCR-004; see RA-001 §5.2.1 |
+| URS v2.0 → SRS | 71 active requirements (URS-043 withdrawn) | 52 | **100%** | No requirement is deferred |
+| SRS → Verification | 207 requirements | 134 | **100%** | 4 verified by inspection, tagged **I** in §5 |
+| FMEA → Verification | 56 hazards (5 new in RA-001 v2.1) | 34 | **100%** | RA-001 v2.1 re-scored under DCR-004; see RA-001 §5.2.1 |
 | URS → Validation | 52 | 52 | **100%** | Scenario V1 executed end to end as VV-SYS-020 |
 
 **Automated test totals**: <!-- qms:fact tests_node -->714<!-- /qms:fact --> unit + behavioural, <!-- qms:fact tests_browser -->450<!-- /qms:fact --> system (132 x 3 browser

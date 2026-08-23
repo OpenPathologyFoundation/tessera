@@ -499,7 +499,10 @@ describe('Behaviour — Configuration Controls (URS-103, HA-060, HA-061)', () =>
         h.close();
     });
 
-    it('TC-B061: Reset to Default confirms, clears the cache and reloads', async () => {
+    it('TC-B061: Reset to Default confirms and clears the cache', async () => {
+        // Named for what it checks. It used to say "and reloads", which it has
+        // never verified: jsdom refuses `location.reload` and the harness's
+        // stub for it does not take (DCR-042).
         const h = await boot({ localStorage: { wbcds_config: clone(DEFAULT_CONFIG) } });
         h.click('btnResetConfig');
         assert.ok(h.modal().open, 'Reset to Default must prompt');
@@ -691,6 +694,82 @@ describe('Behaviour — Results, Export and Absolute Counts', () => {
         h.press('X', 10);
         h.click('btnCountDone');
         assert.ok(!h.visible('low-count-note'));
+        h.close();
+    });
+
+    it('TC-B139: A profile needing a newer build is refused, not misread (DCR-042)', async () => {
+        // The live case: sw.js fetches configuration network-first and the app
+        // shell cache-first, so a workstation can hold the current profile and
+        // a release-old shell. Counting continues on the profile this code can
+        // read, and the operator is told which is which.
+        const cached = clone(DEFAULT_CONFIG);
+        cached.profileId = 'ndc-14';
+        cached.version = '2.6';
+        const shipped = clone(DEFAULT_CONFIG);
+        shipped.profileId = 'ndc-14';
+        shipped.version = '2.7';
+        shipped.minAppVersion = '99.0.0';
+        shipped.specimenTypes[0].specimenLabel = 'FROM THE FUTURE';
+
+        const h = await boot({ config: shipped, localStorage: { wbcds_config: cached } });
+        assert.equal(h.hooks.state.configMeta.version, '2.6',
+            'the profile this build cannot read was applied anyway');
+        assert.notEqual(h.hooks.getSpecConfig().specimenLabel, 'FROM THE FUTURE');
+
+        const m = h.modal();
+        assert.ok(m.open, 'the refusal must be stated, not silent');
+        assert.match(m.message, /99\.0\.0/, 'it must name the version required');
+        assert.match(m.message, /NOT been applied/i);
+        assert.match(m.message, /[Rr]eload/, 'and say what to do about it');
+        h.close();
+    });
+
+    it('TC-B140: With no readable profile at all, it refuses to start (DCR-042)', async () => {
+        // Refusing is the correct outcome. Counting with a profile whose fields
+        // this build reads differently is the failure being prevented.
+        const shipped = clone(DEFAULT_CONFIG);
+        shipped.minAppVersion = '99.0.0';
+        const h = await boot({ config: shipped });
+        assert.ok(h.el('config-error'), 'the application started anyway');
+        assert.match(h.document.body.textContent, /99\.0\.0/);
+        assert.match(h.document.body.textContent, /clear the site data|[Rr]eload/);
+        h.close();
+    });
+
+    it('TC-B141: A current build applies a profile that declares its own version', async () => {
+        const shipped = clone(DEFAULT_CONFIG);
+        shipped.minAppVersion = '0.0.1';
+        shipped.specimenTypes[0].specimenLabel = 'APPLIED';
+        const h = await boot({ config: shipped });
+        assert.equal(h.hooks.getSpecConfig().specimenLabel, 'APPLIED');
+        assert.ok(!h.modal().open, 'a satisfiable declaration must be silent');
+        h.close();
+    });
+
+    it('TC-B142: A shell update reloads at case-entry, never mid-count (DCR-042)', async () => {
+        // jsdom has no service worker, so the decision is exercised directly:
+        // what matters is WHEN the reload is taken, not what fired it.
+        const h = await counting({ caseNumber: 'C1' });
+        h.hooks.state.shellUpdatePending = true;
+
+        h.press('X', 5);
+        assert.equal(h.hooks.reloadIfIdle(), false, 'reloaded during a count');
+        assert.equal(h.hooks.state.shellUpdatePending, true, 'the update was dropped, not deferred');
+
+        h.click('btnCountDone');
+        assert.equal(h.hooks.reloadIfIdle(), false, 'reloaded while results were on screen');
+        assert.equal(h.hooks.state.shellUpdatePending, true);
+
+        // New Case returns to case-entry and clears the tally; the deferred
+        // reload is taken there, where it is invisible. The navigation itself
+        // is not observable — jsdom refuses `location.reload` and the harness
+        // cannot stub it (see app-harness.js) — so what is asserted is the
+        // decision and the one-shot flag it clears. A second assertion that the
+        // flag stays clear matters as much: were it not cleared, every later
+        // return to case-entry would reload again.
+        h.click('btnNewCase');
+        assert.equal(h.hooks.state.shellUpdatePending, false, 'the update was never taken');
+        assert.equal(h.hooks.reloadIfIdle(), false, 'the update would be taken a second time');
         h.close();
     });
 

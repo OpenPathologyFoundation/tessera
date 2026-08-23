@@ -245,6 +245,14 @@ it `targetCount`, and reaching it is advisory rather than blocking. Set it to
 `null` for a laboratory that counts to no target: omitting the field takes the
 default instead, so the absence has to be stated rather than implied.
 
+A profile that relies on a field whose meaning changed in a particular release
+declares that release at the top level, as `"minAppVersion": "2.23.0"`. An older
+application refuses such a profile and says so rather than reading it by the
+older rules — the service worker fetches configuration network-first and the
+application shell cache-first, so a browser can hold a newer profile than the
+code running in it (DCR-042). Declare it only where the semantics actually
+changed; a profile that needs nothing should claim nothing.
+
 ### Changing Keyboard Mappings
 
 ```json
@@ -352,7 +360,7 @@ CI can run `npm test` for quick feedback, but **QMS evidence requires `npm run t
 | 08 | `tests/08-config-schema-v2.test.js` | Unit | v2 schema; `normalizeConfig` round-trip; reserved placeholder names |
 | 09 | `tests/09-preset-catalog.test.js` | Unit | Preset catalogue integrity and ergonomic zones |
 | 10 | `tests/10-config-editor.test.js` | Static | Editor structure, JS integrity, key assignment controls |
-| 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 99 tests |
+| 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 103 tests |
 | E2E | `tests-e2e/*.spec.js` | **System** | The deployed application in Chromium, Firefox and WebKit — 150 specs x 3 engines |
 | **Total** | | | **<!-- qms:fact tests_total -->1164<!-- /qms:fact --> tests** (<!-- qms:fact tests_node -->714<!-- /qms:fact --> Node + <!-- qms:fact tests_browser -->450<!-- /qms:fact --> browser), of which <!-- qms:fact tests_skipped -->7<!-- /qms:fact --> are documented skips |
 
@@ -381,12 +389,12 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | Document | Purpose |
 |----------|---------|
 | **DHF-001** | Design History File index and intended use statement |
-| **URS-001** | 70 user requirements with priority and clinical rationale |
-| **SRS-001** | 204 testable system requirements derived from URS |
+| **URS-001** | 71 user requirements with priority and clinical rationale |
+| **SRS-001** | 207 testable system requirements derived from URS |
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
-| **RA-001** | FMEA risk analysis: 55 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan; register of 795 implemented verification cases, generated from the runners |
+| **RA-001** | FMEA risk analysis: 56 hazards, severity/occurrence/detectability scoring |
+| **TP-001** | Test plan; register of 803 implemented verification cases, generated from the runners |
 | **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |

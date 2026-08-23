@@ -1,13 +1,14 @@
 {
-  "version": "2.3",
+  "version": "2.4",
   "profileId": "mdc-2015-9",
   "profileName": "9-Type — 2015 Counter Layout",
+  "minAppVersion": "2.23.0",
   "provenance": {
     "standard": "None — reproduces a predecessor application",
     "citation": "WBC ΔΣ predecessor: Backbone.js/JSP Manual Differential Counter, 2015, retained at legacy/ and described in DCR-004. Configuration recovered from web/settings/templates.json at commit aa88da4 and verified by executing the application under Playwright (DCR-032).",
     "notes": "This profile exists so an operator familiar with the predecessor tool can switch without relearning the keyboard. Its nine categories are COARSER than ICSH 2008 §2.6: 'gran' aggregates myelocytes, metamyelocytes, bands and segmented neutrophils into one key; 'pro' covers promyelocytes and myelocytes together; 'baso' covers basophils and mast cells. A count taken in this profile therefore cannot be reported against the ICSH nucleated differential count without re-counting. Prefer ndc-14 for new work. Two counting-policy decisions are the reviewing haematopathologists' and are recorded in DCR-040: blasts are outside the M:E numerator, and no target cell count is stated — see targetCount and the ME_ratio basis."
   },
-  "description": "The 2015 predecessor counter's layout, key-for-key: A S D F Z X C V B, with its Yale SOM, Precipio DX and MGH report templates. Categories are aggregated as that tool aggregated them, and no target cell count is displayed, as it displayed none. Blasts take no part in the M:E ratio. Percentages use this application's rounding rather than the predecessor's — see provenance.",
+  "description": "The 2015 predecessor counter's layout, key-for-key: A S D F Z X C V B, with its Yale SOM, Precipio DX and MGH report templates. Categories are aggregated as that tool aggregated them, and no target cell count is displayed, as it displayed none. Blasts take no part in the M:E ratio. Percentages use this application's rounding rather than the predecessor's — see provenance. Requires application 2.23.0 or newer: an older build reads its stated absence of a target as an omission and substitutes a default (DCR-042).",
   "specimenTypes": [
     {
       "specimenType": "bm",

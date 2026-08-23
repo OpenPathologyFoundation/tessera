@@ -681,6 +681,7 @@ The single closure-scoped `state` object in `mdc-app.js`:
 | `morphChecked` | array | Morphology checklist selections (URS-073) |
 | `sessionHistory` | array | Completed sessions this browser session |
 | `activeTab`, `theme`, `audioEnabled`, `autosaveEnabled`, `targetReachedNotified` | — | Presentation and one-shot flags |
+| `shellUpdatePending` | boolean | A newer application shell has taken over this page. The reload that would adopt it waits for the case-entry screen, because reloading during a count is worse than running one release behind for another minute (DCR-042) |
 
 Percentages, intervals, per-100 values, derived figures and the method statement
 are **not stored in `state`**. They are computed from `counts` by `wbc-core.js`

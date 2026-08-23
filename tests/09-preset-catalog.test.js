@@ -576,6 +576,41 @@ describe('Profile names state contents, not assertions (URS-101)', () => {
         return (spec.categories.upper || []).length + (spec.categories.lower || []).length;
     }
 
+    it('VV-PRE-028: A declared minimum application version is one this build meets', () => {
+        /**
+         * A profile may declare the oldest build that can interpret it
+         * (DCR-042). Shipping one that names a version newer than the
+         * application it ships WITH would refuse itself on first load — the
+         * profile and the code travel in the same repository, so there is no
+         * version skew to allow for here, only a typo to catch.
+         */
+        const pkg = JSON.parse(fs.readFileSync(
+            path.join(__dirname, '..', 'package.json'), 'utf-8'));
+        for (const entry of catalogue.presets) {
+            const cfg = read(entry.file);
+            if (cfg.minAppVersion === undefined || cfg.minAppVersion === null) continue;
+            assert.match(String(cfg.minAppVersion), /^\d+(\.\d+)*$/,
+                `${entry.profileId}: minAppVersion "${cfg.minAppVersion}" is not a dotted version, ` +
+                'so it is ignored at runtime and states nothing');
+            assert.equal(
+                Core.profileRequiresNewerApp({ minAppVersion: cfg.minAppVersion }, pkg.version), null,
+                `${entry.profileId}: needs application ${cfg.minAppVersion}, but this repository ` +
+                `ships ${pkg.version} — the profile would refuse to load in its own release`);
+        }
+    });
+
+    it('VV-PRE-029: The profile that needs a newer build says so', () => {
+        // mdc-2015-9 states no target (DCR-040). Pre-2.23.0 code reads that as
+        // an omission and substitutes the 500-cell default, which is how the
+        // defect reached a pilot workstation. The declaration is what stops it.
+        const cfg = read('mdc-2015-9.json');
+        assert.ok(cfg.minAppVersion,
+            'the profile whose semantics older builds get wrong declares nothing');
+        assert.equal(Core.profileRequiresNewerApp(
+            { minAppVersion: cfg.minAppVersion }, '2.22.3'), cfg.minAppVersion,
+            'the declaration must actually refuse the build that misread it');
+    });
+
     it('VV-PRE-030: Every number in a name is that profile\'s tallied category count', () => {
         // harmonized-9 tallied ten. The id, the name and the description were
         // three writers for one fact, and two of them were wrong.

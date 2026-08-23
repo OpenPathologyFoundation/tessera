@@ -35,7 +35,8 @@
         theme: 'dark',
         audioEnabled: true,
         autosaveEnabled: true,
-        targetReachedNotified: false
+        targetReachedNotified: false,
+        shellUpdatePending: false  // a newer application shell has taken over (DCR-042)
     };
 
     // Storage keys
@@ -46,7 +47,7 @@
      * which version produced a report. QC-016 holds it equal to
      * package.json, DHF-001 and the service-worker cache key.
      */
-    const APP_VERSION = '2.23.1';
+    const APP_VERSION = '2.24.0';
 
     const AUDIO_KEY = 'wbcds_audio';
     const CONFIG_CACHE_KEY = 'wbcds_config';
@@ -324,11 +325,20 @@
                 // so `buildMethodStatement` emitted that entry only in unit
                 // tests that constructed the meta themselves — the shipped
                 // report never carried a basis at all. See DCR-035 §3.
-                meta: {
-                    version: norm.version, profileId: norm.profileId,
-                    profileName: norm.profileName, provenance: norm.provenance,
-                    appVersion: APP_VERSION
-                },
+                // Copied wholesale rather than re-listed. Re-listing is what
+                // lost `provenance`, and it would have lost `minAppVersion`
+                // too: a field added to the normalized meta reached the engine
+                // and stopped here, at a literal nobody thought to extend.
+                // Now the only fields named are the one this layer ADDS and
+                // the one it must not copy (DCR-042).
+                meta: (function () {
+                    var meta = {};
+                    Object.keys(norm).forEach(function (k) {
+                        if (k !== 'specimenTypes') meta[k] = norm[k];
+                    });
+                    meta.appVersion = APP_VERSION;
+                    return meta;
+                }()),
                 specimenTypes: norm.specimenTypes,
                 errors: errors
             };
@@ -370,17 +380,33 @@
         var chosenRaw = null;
         var notice = null;
 
-        if (cached && cached.ok && shipped && shipped.ok &&
+        // A profile that declares a build newer than this one is not applied,
+        // and is refused BEFORE the supersede branch: the whole point is the
+        // case where the newer profile is the shipped one and this shell is a
+        // release behind (HA-111, DCR-042). Counting continues on the profile
+        // this code can actually read, and the operator is told why.
+        var tooNew = null;
+        function readable(candidate) {
+            if (!candidate || !candidate.ok) return false;
+            var need = Core.profileRequiresNewerApp(candidate.meta, APP_VERSION);
+            if (!need) return true;
+            tooNew = { meta: candidate.meta, need: need };
+            return false;
+        }
+        var cachedOk = readable(cached);
+        var shippedOk = readable(shipped);
+
+        if (cachedOk && shippedOk &&
             Core.isCacheSuperseded(cached.meta, shipped.meta)) {
             chosen = shipped;
             chosenRaw = shippedRaw;
             notice = 'Configuration profile "' + shipped.meta.profileName + '" was updated to version ' +
                 shipped.meta.version + '. The newer built-in profile has been applied.';
             cacheConfig(shippedRaw);
-        } else if (cached && cached.ok) {
+        } else if (cachedOk) {
             chosen = cached;
             chosenRaw = cachedRaw;
-        } else if (shipped && shipped.ok) {
+        } else if (shippedOk) {
             chosen = shipped;
             chosenRaw = shippedRaw;
             if (cached && !cached.ok) {
@@ -391,8 +417,27 @@
             cacheConfig(shippedRaw);
         }
 
+        // Stated whichever way it resolves. A refused profile that leaves a
+        // usable fallback is a notice; one that leaves nothing is fatal, and
+        // refusing to start is the correct outcome — counting with a profile
+        // whose fields this build reads differently is the failure being
+        // prevented, not an inconvenience to work around.
+        if (tooNew && chosen) {
+            notice = 'Configuration profile "' + tooNew.meta.profileName + '" (version ' +
+                tooNew.meta.version + ') needs application version ' + tooNew.need +
+                '. This browser is running ' + APP_VERSION + ', so the profile has NOT been ' +
+                'applied and counting continues on "' + chosen.meta.profileName + '". ' +
+                'Reload the page to update the application, then it will apply.';
+        }
+
         if (!chosen) {
             var errs = [];
+            if (tooNew) {
+                errs.push('Profile "' + tooNew.meta.profileName + '" needs application version ' +
+                    tooNew.need + '; this browser is running ' + APP_VERSION + '. ' +
+                    'Reload the page to update the application. If it does not update, clear the ' +
+                    'site data for this address, which discards the cached application shell.');
+            }
             if (cached && !cached.ok) errs.push('Saved profile: ' + cached.errors.join('; '));
             if (shipped && !shipped.ok) errs.push('Built-in profile: ' + shipped.errors.join('; '));
             if (!cached && !shipped) errs.push('Could not load settings/templates.json and no saved profile exists.');
@@ -404,6 +449,7 @@
         state.configMeta = chosen.meta;
         loadSessionHistory();
         init();
+        watchForShellUpdate();
 
         // A cached profile whose id was renamed (DCR-035) is still perfectly
         // usable, so it is NOT replaced: the operator may have adapted it, and
@@ -2573,6 +2619,47 @@
     // ================================================================
     // PHASE MANAGEMENT
     // ================================================================
+    /**
+     * Reload when a newer application shell takes over — but only when idle.
+     *
+     * `sw.js` calls `skipWaiting()` and `clients.claim()`, so a new worker
+     * controls this page as soon as it activates. The scripts already running
+     * in the tab are still the old ones, and stay old until a navigation. That
+     * window is what produced HA-111: a pilot workstation ran a release-old
+     * shell against a current profile and displayed a target the laboratory had
+     * not set.
+     *
+     * Reloading closes the window. Reloading DURING A COUNT would be a worse
+     * defect than the one being fixed — the operator's eyes are on the
+     * microscope, and although autosave would offer the tally back, an
+     * unrequested reload mid-count is not acceptable. So the reload waits for
+     * the case-entry screen, where it is indistinguishable from arriving there
+     * normally, and `showPhase` calls back in when the operator finishes.
+     *
+     * `hadController` distinguishes an UPDATE from a first registration: on a
+     * browser's first visit the worker claims an uncontrolled page, which fires
+     * the same event and must not reload anything.
+     */
+    function watchForShellUpdate() {
+        if (typeof navigator === 'undefined' || !navigator.serviceWorker) return;
+        var hadController = !!navigator.serviceWorker.controller;
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (!hadController || state.shellUpdatePending) return;
+            state.shellUpdatePending = true;
+            reloadIfIdle();
+        });
+    }
+
+    /** @returns {boolean} whether the reload was taken */
+    function reloadIfIdle() {
+        if (!state.shellUpdatePending) return false;
+        if (state.phase !== 'case-entry') return false;
+        if (getTotal() > 0) return false;
+        state.shellUpdatePending = false;
+        location.reload();
+        return true;
+    }
+
     function showPhase(phase) {
         state.phase = phase;
         el('phase-case-entry').classList.add('hidden');
@@ -2591,6 +2678,9 @@
         if (specWrap) specWrap.classList.toggle('hidden', phase !== 'counting');
 
         document.body.classList.toggle('counting-active', phase === 'counting');
+
+        // A shell update that arrived mid-count is taken here (DCR-042).
+        if (phase === 'case-entry') reloadIfIdle();
     }
 
     // ================================================================
@@ -2667,7 +2757,8 @@
             importConfig: importConfig,
             resetConfigToDefault: resetConfigToDefault,
             openPresetCatalog: openPresetCatalog,
-            loadPreset: loadPreset
+            loadPreset: loadPreset,
+            reloadIfIdle: reloadIfIdle
         };
     }
 

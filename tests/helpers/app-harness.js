@@ -137,7 +137,16 @@ async function boot(opts = {}) {
         return 'blob:mock/' + downloads.length;
     };
     w.URL.revokeObjectURL = () => {};
-    // jsdom does not implement navigation; keep reload observable instead.
+    // jsdom does not implement navigation.
+    //
+    // NOTE (DCR-042): this stub DOES NOT TAKE in the jsdom version in use —
+    // `window.location`'s properties are unforgeable, `defineProperty` throws,
+    // and the catch below leaves jsdom's own not-implemented handler in place.
+    // `reloads.count` therefore stays 0 however many times the application
+    // reloads. It is kept because it costs nothing and would start working if
+    // jsdom's behaviour changes, but **a test must not assert on it**: assert
+    // the decision that leads to the reload instead. TC-B061 named a reload it
+    // was not checking for exactly this reason.
     const reloads = { count: 0 };
     try {
         Object.defineProperty(w.location, 'reload', {

@@ -704,6 +704,40 @@ describe('Diagnostic thresholds (URS-038, ICSH 2008 §2.6)', () => {
         assert.ok(errs.some(e => /outside the differential denominator/.test(e)), errs.join('; '));
     });
 
+    it('VV-VER-001: A profile declares the oldest build that can read it (DCR-042)', () => {
+        const m = v => ({ profileName: 'P', minAppVersion: v });
+        assert.equal(Core.profileRequiresNewerApp(m('2.23.0'), '2.22.3'), '2.23.0',
+            'an older build must be told it cannot read the profile');
+        assert.equal(Core.profileRequiresNewerApp(m('2.23.0'), '2.23.0'), null);
+        assert.equal(Core.profileRequiresNewerApp(m('2.23.0'), '2.24.1'), null);
+        assert.equal(Core.profileRequiresNewerApp(m('2.23.0'), '10.0.0'), null,
+            'the comparison is numeric, not lexicographic');
+        assert.equal(Core.profileRequiresNewerApp({ profileName: 'P' }, '1.0.0'), null,
+            'a profile that claims nothing blocks nothing');
+
+        // A broken statement is not a claim about this build, and refusing to
+        // count over one would be a worse failure than the one prevented.
+        assert.equal(Core.profileRequiresNewerApp(m('next'), '1.0.0'), null);
+        assert.equal(Core.profileRequiresNewerApp(m(''), '1.0.0'), null);
+
+        // But an unknown application version blocks: the question is whether
+        // this build can be PROVED new enough, and it cannot.
+        assert.equal(Core.profileRequiresNewerApp(m('2.23.0'), undefined), '2.23.0');
+    });
+
+    it('VV-VER-002: The declaration survives normalization (DCR-042)', () => {
+        const norm = Core.normalizeConfig({
+            version: '2.4', profileId: 'p', profileName: 'P', minAppVersion: '2.23.0',
+            specimenTypes: [{ specimenType: 'bm', categories: { upper: [], lower: [] }, outCodes: {}, templates: [] }]
+        });
+        assert.equal(norm.minAppVersion, '2.23.0',
+            'the declaration is meta, and the app reads it off the normalized config');
+        assert.equal(Core.normalizeConfig({
+            version: '2.0', profileId: 'p', profileName: 'P',
+            specimenTypes: [{ specimenType: 'bm', categories: { upper: [], lower: [] }, outCodes: {}, templates: [] }]
+        }).minAppVersion, null, 'absent stays absent rather than becoming a version');
+    });
+
     it('VV-TGT-001: A profile may state no target, but not a broken one (DCR-040)', () => {
         const base = {
             specimenType: 'bm',

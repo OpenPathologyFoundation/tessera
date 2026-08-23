@@ -97,13 +97,13 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**795 verification cases** across 29 series and 4 layers, run as 864 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**803 verification cases** across 30 series and 4 layers, run as 872 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 25 (001–028) | Static | QMS counted quantities |
 | `SC-*` | 33 (001–064) | Unit | Standards conformance (ICSH) |
-| `TC-B*` | 99 (001–138) | Behaviour | Application behaviour in a DOM |
+| `TC-B*` | 103 (001–142) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 57 (001–101) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-AUD-*` | 19 (001–019) | Static | Audio engine structure |
@@ -118,7 +118,7 @@ auditing how the plan changed.
 | `VV-KBD-*` | 6 (001–006) | Unit | — |
 | `VV-LOW-*` | 6 (001–006) | Unit | Sub-target advisory |
 | `VV-ME-*` | 13 (001–016) | Unit | Myeloid-to-erythroid ratio |
-| `VV-PRE-*` | 33 (001–035) | Unit | Preset catalogue integrity |
+| `VV-PRE-*` | 35 (001–035) | Unit | Preset catalogue integrity |
 | `VV-PROV-*` | 9 (001–009) | Unit | Method provenance |
 | `VV-RND-*` | 7 (001–007) | Unit | Rounding policy |
 | `VV-SAV-*` | 18 (001–018) | Static | Autosave and crash recovery (static) |
@@ -130,6 +130,7 @@ auditing how the plan changed.
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TON-*` | 11 (001–013) | Unit | — |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
+| `VV-VER-*` | 2 (001–002) | Unit | — |
 
 #### QC-* — QMS counted quantities
 
@@ -241,7 +242,7 @@ auditing how the plan changed.
 | TC-B054 | Finalizing a count clears the autosave record | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B055 | A profile with autosave:false writes no record | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B060 | Export Config produces a downloadable profile | Behaviour | `tests/11-application-behavior.test.js` |
-| TC-B061 | Reset to Default confirms, clears the cache and reloads | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B061 | Reset to Default confirms and clears the cache | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B062 | Import Config applies a valid profile | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B063 | Import rejects a structurally invalid profile without applying it | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B064 | Import rejects malformed JSON | Behaviour | `tests/11-application-behavior.test.js` |
@@ -302,6 +303,10 @@ auditing how the plan changed.
 | TC-B136 | A profile that states no target shows no progress row (DCR-040) | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B137 | No target, no chime — and none on the first cell (DCR-040) | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B138 | No target, no sub-target advisory and no basis text (DCR-040) | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B139 | A profile needing a newer build is refused, not misread (DCR-042) | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B140 | With no readable profile at all, it refuses to start (DCR-042) | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B141 | A current build applies a profile that declares its own version | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B142 | A shell update reloads at case-entry, never mid-count (DCR-042) | Behaviour | `tests/11-application-behavior.test.js` |
 
 #### UD-* — User-facing documentation
 
@@ -710,6 +715,8 @@ auditing how the plan changed.
 | VV-PRE-025 | The M:E field the predecessor left blank is computed | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-026 | The profile declares that it is coarser than ICSH | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-027 | Blasts take no part in this profile's M:E ratio (DCR-040) | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-028 | A declared minimum application version is one this build meets | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-029 | The profile that needs a newer build says so | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-030 | Every number in a name is that profile's tallied category count | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-031 | The catalogue, the file and its contents agree | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-032 | Provenance claims only what the profile implements | Unit | `tests/09-preset-catalog.test.js` |
@@ -1070,6 +1077,13 @@ auditing how the plan changed.
 | VV-TPL-003 | MGH BM template renders with no unresolved placeholders | Unit | `tests/02-configuration.test.js` |
 | VV-TPL-004 | MGH PB template renders with no unresolved placeholders | Unit | `tests/02-configuration.test.js` |
 | VV-TPL-005 | BM template {{ME_ratio}} placeholder is resolved by formula key | Unit | `tests/02-configuration.test.js` |
+
+#### VV-VER-* — verification cases
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-VER-001 | A profile declares the oldest build that can read it (DCR-042) | Unit | `tests/01-calculation-engine.test.js` |
+| VV-VER-002 | The declaration survives normalization (DCR-042) | Unit | `tests/01-calculation-engine.test.js` |
 
 <!-- END GENERATED: verification-index -->
 

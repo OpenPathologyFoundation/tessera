@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 3.5 |
+| **Version** | 3.6 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -376,6 +376,9 @@ Phase 2 item.
 | SYS-256 | An undone cell SHALL sound its own category's frequency, at lower gain and shorter duration than the increment, with a downward glide. | URS-108 |
 | SYS-257 | Each tone SHALL be varied per press by a bounded random detune and gain factor, from an injectable random source. Variation SHALL remain small enough that no category can be confused with an adjacent one. | URS-108 |
 | SYS-258 | Audio SHALL offer three modes — off, click, tones — selectable by the operator, persisted for the session, and defaulted by the profile. A session choice SHALL override the profile default in either direction. A category the mapping cannot place SHALL fall back to the click rather than to silence. | URS-108 |
+| SYS-259 | A configuration profile MAY declare `minAppVersion`, the oldest application version that can interpret it. Where the running application is older, the system SHALL NOT apply that profile; it SHALL state both versions and what to do, and SHALL continue on a profile it can interpret, or refuse to start if there is none. A profile SHALL declare this only where its semantics are misread by older builds. | URS-109 | Test |
+| SYS-260 | Where a newer application shell takes control of the page, the system SHALL reload to adopt it rather than continue on the code already running. | URS-109 | Test |
+| SYS-261 | That reload SHALL be taken only at the case-entry screen with no cells counted. A count in progress SHALL defer it until the operator returns to case-entry. | URS-109, URS-061 | Test |
 
 ### 4.22 Configuration Validation Requirements (URS-021, URS-022)
 
@@ -481,6 +484,7 @@ Phase 2 item.
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
 | B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
 | C | 2026-02-20 | QMS | Added theme toggle requirements |
+| O | 2026-08-23 | QMS | v3.6 (DCR-042): SYS-259 to SYS-261 added for the mixed-version state of HA-111 — a profile declares the oldest build that can read it, and a newer shell is adopted by reloading, but never during a count. |
 | N | 2026-08-23 | QMS | v3.5 (DCR-040): SYS-052, SYS-053 and SYS-183 amended for a profile that states no target. `targetCount: null` is a stated absence and is distinct from an omitted field, which still takes the URS-105 default; the advisory and the method statement's target basis are conditional on a target existing; the differential denominator remains displayed either way. A profile may not state no target AND disable confidence intervals — the two are HA-030's controls and one must remain. |
 | M | 2026-08-07 | QMS | v3.4 (DCR-036): SYS-254–SYS-258 added for tonal feedback. The mapping formula is stated exactly, including the clamp that keeps profiles larger than fourteen categories audible; the discrimination guarantee is a requirement rather than a property of the chosen constants; and the fallback for an unplaceable category is the click, never silence — silence reads as a missed keypress. |
 | L | 2026-08-07 | QMS | v3.3 (DCR-029): SYS-205 restated. It forbade thresholding a ratio "because no confidence interval is computed for a ratio" — false since DCR-026, which computes one. The requirement stands; its reason does not. A threshold is a value on the 0-100 percentage scale (validateConfig bounds it there) and a ratio is not on that scale. The validation message now says so and tells the operator to express the subset as a percentage formula. |

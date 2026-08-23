@@ -1,0 +1,9 @@
+date_utc=2026-08-23T17:23:53.302Z
+node=v26.5.0
+platform=darwin
+arch=arm64
+cwd=/Users/pg/IdeaProjects/tessera
+npm=11.17.0
+git_commit=c6b7f34d352268bc1da841133b1dd576e78cc771
+git_branch=dcr-040-counting-policy
+tree_state=clean

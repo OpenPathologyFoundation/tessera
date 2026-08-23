@@ -508,6 +508,34 @@ describe('A closure closes everywhere (URS-092)', () => {
                 }]).length === 0,
                 forbid: /every profile (has|must have|defines|states) a target|a target is always (shown|displayed)|the target cannot be (removed|disabled|turned off)|targetCount is (required|mandatory)/i,
                 scope: ['web/scripts', 'web', 'QMS/DHF']
+            },
+            {
+                // Drift-log §3 predicted this one and it happened: SC-060 makes
+                // the FACT enforceable — no page may reference another origin —
+                // and nothing stopped a prose table from naming a CDN as the
+                // delivery mechanism for an asset that ships in the repository.
+                // README's stack table said the fonts came from Google Fonts
+                // (CDN) for as long as they have been vendored.
+                //
+                // No Core export anchors this; the capability is a property of
+                // the tree, which is what `holds` is for.
+                label: 'the fonts are vendored, not fetched from a CDN',
+                holds: () => {
+                    const web = path.join(__dirname, '..', 'web');
+                    const hits = [];
+                    (function walk(dir) {
+                        for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+                            const full = path.join(dir, e.name);
+                            if (e.isDirectory()) { walk(full); continue; }
+                            if (!/\.(js|html|css|json)$/.test(e.name)) continue;
+                            if (/fonts\.googleapis\.com|fonts\.gstatic\.com/
+                                .test(fs.readFileSync(full, 'utf-8'))) hits.push(full);
+                        }
+                    })(web);
+                    return hits.length === 0;
+                },
+                forbid: /Google Fonts \(CDN\)|Google Fonts CDN|fonts[^.\n]{0,40}\bfrom (?:a |the )?CDN\b/i,
+                scope: ['.', 'web', 'QMS/DHF']
             }
         ];
 
@@ -522,12 +550,15 @@ describe('A closure closes everywhere (URS-092)', () => {
 
         const offenders = [];
         for (const claim of CLAIMS) {
-            assert.equal(typeof Core[claim.export], 'function',
-                `${claim.export} is not exported — either the capability went, ` +
-                'or this table is describing something that no longer exists');
+            const name = claim.export || claim.label;
+            if (claim.export) {
+                assert.equal(typeof Core[claim.export], 'function',
+                    `${claim.export} is not exported — either the capability went, ` +
+                    'or this table is describing something that no longer exists');
+            }
             if (claim.holds) {
                 assert.ok(claim.holds(),
-                    `${claim.export}: the capability this row describes no longer holds, ` +
+                    `${name}: the capability this row describes no longer holds, ` +
                     'so the text it forbids may have become true again');
             }
             for (const dir of claim.scope) {
@@ -538,13 +569,19 @@ describe('A closure closes everywhere (URS-092)', () => {
                         // such a row explains itself. Same exemption the change
                         // records get, and for the same reason.
                         if (/^\|\s*[A-Z]{1,2}\s*\|\s*\d{4}-\d{2}-\d{2}\s*\|/.test(line)) return;
-                        // And the drift log, whose every row IS a quotation of
-                        // a claim that stopped being true. A log of false
-                        // claims must be able to state one.
-                        if (/DRIFT-LOG/.test(file)) return;
+                        // And any document that is itself a dated record of a
+                        // past state. The drift log's every row IS a quotation
+                        // of a claim that stopped being true, so a log of false
+                        // claims must be able to state one; an independent
+                        // review records what was found on the day it was
+                        // written; a remediation instruction describes the
+                        // defect it was written to fix. Editing one to satisfy
+                        // this check would falsify the record, which is the
+                        // same rule that keeps `QMS/DHF/DCR/` out of scope.
+                        if (/DRIFT-LOG|REVIEW-\d{4}|DRIFT-REMEDIATION/.test(file)) return;
                         if (claim.forbid.test(line)) {
                             offenders.push(`${path.relative(ROOT, file)}:${i + 1} — ` +
-                                `${claim.export} exists, but this says it does not`);
+                                `${name} holds, but this says otherwise`);
                         }
                     });
                 }

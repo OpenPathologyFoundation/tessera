@@ -25,7 +25,7 @@ where an individual session is capable and thorough and has no memory of the
 other five documents. And it is the evidence base for the guards: each `QC-`
 identifier in the last column exists because of a specific row above it.
 
-**Counted here rather than described:** 48 incidents, of which 39 are now
+**Counted here rather than described:** 49 incidents, of which 40 are now
 prevented by an automated check. QC-027 checks both figures against the rows
 below, so this sentence cannot be the next thing to drift.
 
@@ -83,6 +83,7 @@ below, so this sentence cannot be the next thing to drift.
 | 46 | 2026-08-23 | A malformed target count was silently replaced with 500 | `normalizeConfig` | `validateConfig`, which never saw the value it was meant to reject: `!spec.targetCount` had already substituted the default for `0`, `NaN` and `''` | A default-filling branch written as a truthiness test, which conflates "absent" with "wrong" | Writing VV-TGT-001 for the new `null` case | DCR-040 | `VV-TGT-001` |
 | 47 | 2026-08-23 | Scenario V2 told the validator the progress row reads `50 / 200 (200)` | `VV-001` §5.4 V2 | The application renders `50 / 200 (target)` | A scripted expected-result written from memory of the format rather than from the screen; the same class as incident 32, in the same section of the same document | DCR-040 sweep | DCR-040 | — (see §3) |
 | 48 | 2026-08-23 | A test reported "no Load button in the preset catalogue" | `VV-SYS-215` helper, `counting-workflow.spec.js` | The button exists; the list is rendered asynchronously and the helper used `page.evaluate`, which does not auto-wait as a locator does. Measured: `#preset-list button` counted immediately after the click gave `[6,6,0,0,0,6,0,0]` on one engine | Three races have now been removed from this one test, and each earlier fix guarded the step *after* the one that raced. The first attempt at THIS fix also missed: the same click-then-evaluate block existed three times in the file and the wait was added to one of them, so the gate failed again on a different test | The release gate, on a second evidence run under load | DCR-040 | The three blocks are now one `loadPresetFromCatalogue` helper, so the wait exists once |
+| 49 | 2026-08-23 | "Fonts | Inter + JetBrains Mono | **Google Fonts (CDN)**" | `README.md` stack table | The three families ship at `web/vendor/fonts/`, and no page in `web/` references `fonts.googleapis.com` or `fonts.gstatic.com` — SC-060 has forbidden it since DCR-030 | **§3 of this log predicted it.** Row 21's entry says the fact is guarded and the prose is not: "a stack table could name the wrong delivery mechanism for a local asset and no test would notice". Same table, one row down | A question about where to start the application, which sent someone into the README | DCR-041 | QC-025 gains a claims row anchored on the tree rather than on a Core export |
 
 ---
 
@@ -90,12 +91,18 @@ below, so this sentence cannot be the next thing to drift.
 
 Honesty about the guards matters as much as the guards.
 
-- **Row 21 is guarded only in part.** `SC-060` now makes the underlying fact
-  enforceable — no page may reference another origin — so the README's "no
-  external request" claim cannot silently become false. What is still
-  unguarded is the *prose*: a stack table could name the wrong delivery
-  mechanism for a local asset and no test would notice. Asserting phrasing
-  against `<script>` tags would test the wording rather than the fact.
+- **Row 21 is guarded only in part — and the unguarded half then failed.** The
+  paragraph below stood here unchanged while the thing it describes happened:
+  `SC-060` makes the underlying fact enforceable — no page may reference another
+  origin — so the README's "no external request" claim cannot silently become
+  false, but *"a stack table could name the wrong delivery mechanism for a local
+  asset and no test would notice"*. That is incident 49, in the same table, one
+  row down. QC-025 now carries a claims row for it, anchored on the tree rather
+  than on a Core export. What remains unguarded is narrower and still real: the
+  row knows one delivery mechanism for one asset class, so a future vendored
+  dependency described as remote would still pass. **A predicted drift with no
+  guard built is a decision to accept it**, and this one names the cost of
+  writing the prediction down instead.
 - **Row 23 is guarded for the fonts, not for Tailwind.** `SC-063` requires each
   bundled font family to ship its licence and appear in `NOTICE`. The vendored
   Tailwind bundle is now declared there, but nothing fails if a future vendored
@@ -148,6 +155,7 @@ recurrence.
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | I | 2026-08-08 | QMS | Rows 37–43 added (DCR-039): the majors left standing after the blockers were cleared. Four are SOP-001 describing behaviour that was never built — a fixed key assignment, a case-number dialog, a blocking completion warning — and two are profile text that prints into a clinical report. The seventh is the first CODE defect this file has recorded since the drift work began: a key that could be decremented but never incremented. |
+| J | 2026-08-23 | QMS | Row 49 added (DCR-041): the fonts row of README's stack table, which §3 predicted and which went unnoticed for as long as the fonts have been vendored. §3 rewritten to record that the prediction came true and what the narrower residual gap now is. |
 | I | 2026-08-23 | QMS | Rows 44–48 added (DCR-040). Row 44 is the first found by a clinical reviewer rather than by audit or by a session's own sweep, and it is the deepest: a profile was reconstructed from a predecessor's configuration file without checking which fields that predecessor's code read, so a declared setting shipped as a behaviour from DCR-032 (2026-08-07) until now. Rows 45 and 47 are ordinary sweep findings; row 46 is a code defect the new option surfaced. |
 | H | 2026-08-08 | QMS | Rows 31–36 added (DCR-038): the pre-validation audit of every surface a validating pathologist reads. Five of the six are in SOP-001 and VV-001 — the documents a validator rehearses and executes — and none was covered by any guard, because the guards built so far check generated figures and profile names, not procedures. |
 | G | 2026-08-07 | QMS | Row 30 added and row 28 corrected (DCR-035): the false provenance never reached a report, because a second defect dropped provenance before the method statement was built. Two defects that cancelled. |

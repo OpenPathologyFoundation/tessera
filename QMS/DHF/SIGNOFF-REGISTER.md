@@ -94,7 +94,7 @@ should be quoted until someone holds the paper.
 > `node scripts/qms-signoffs.js --write` rebuilds this from the signature
 > tables in every document. Suite 14 fails the build if it goes stale.
 
-**41 signature(s) outstanding across 6 role(s).** 16 document(s) are fully signed.
+**44 signature(s) outstanding across 6 role(s).** 16 document(s) are fully signed.
 
 ### Clinical Reviewer — 35 outstanding
 
@@ -143,23 +143,26 @@ should be quoted until someone holds the paper.
 | `SOP-001-StandardOperatingProcedure.md` | — |
 | `URS-001_UserRequirementsSpecification_v2.0.md` | — |
 
-### Design Engineer — 1 outstanding
+### Design Engineer — 2 outstanding
 
 | Document | Note |
 |----------|------|
 | `DCR/DCR-040-Counting-Policy-Review.md` | — |
+| `DCR/DCR-041-README-Currency.md` | — |
 
-### Quality Assurance — 1 outstanding
-
-| Document | Note |
-|----------|------|
-| `DCR/DCR-040-Counting-Policy-Review.md` | — |
-
-### Regulatory Affairs — 1 outstanding
+### Quality Assurance — 2 outstanding
 
 | Document | Note |
 |----------|------|
 | `DCR/DCR-040-Counting-Policy-Review.md` | — |
+| `DCR/DCR-041-README-Currency.md` | — |
+
+### Regulatory Affairs — 2 outstanding
+
+| Document | Note |
+|----------|------|
+| `DCR/DCR-040-Counting-Policy-Review.md` | — |
+| `DCR/DCR-041-README-Currency.md` | — |
 
 ### Regulatory Reviewer — 1 outstanding
 

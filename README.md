@@ -10,6 +10,24 @@ WBC ΔΣ enables medical technologists and pathologists to perform manual differ
 
 ---
 
+## Run it locally
+
+From the **repository root** — the directory holding `package.json`, not `web/`:
+
+```bash
+cd /path/to/tessera
+npm run serve
+```
+
+Then open **<http://localhost:8089/>**. The root URL serves `counter.html`, so
+there is no filename to type. Stop the server with Ctrl-C.
+
+No install step and no dependencies are needed to run it: `serve.js` uses Node's
+own `http` module, and the application is static files. `npm install` is only
+needed to run the tests. To use a different port, `PORT=3000 npm run serve`.
+
+---
+
 ## Features
 
 | Feature | Description |
@@ -78,7 +96,7 @@ A right-hand layout (HJKL; / NM,./ / YUIOP) is one click in the [Configuration E
 |-------|-----------|-------|
 | Frontend | Vanilla JavaScript (ES5+) | Zero framework dependencies |
 | Styling | Tailwind CSS (vendored, `web/vendor/tailwind.js`) | Utility-first, Bauhaus-minimal design |
-| Fonts | Inter + JetBrains Mono | Google Fonts (CDN) |
+| Fonts | Inter, JetBrains Mono, Libre Franklin | Self-hosted in `web/vendor/fonts/`; no external request (URS-094). Licences in `NOTICE` |
 | Server | Any static file server | No backend logic required |
 | Config | `settings/templates.json` | Cell types, keys, templates are all configurable |
 | Tests | Node.js built-in test runner | Zero npm dependencies for testing |
@@ -94,11 +112,12 @@ The application is entirely client-side. Any web server that can serve static fi
 #### Using npm (recommended — zero dependencies)
 
 ```bash
+cd /path/to/tessera        # the repository root, where package.json is
 npm run serve
 # Open http://localhost:8089/
 ```
 
-The built-in `serve.js` uses Node's native `http` module — no extra packages needed. To change the port: `PORT=3000 npm run serve`
+The built-in `serve.js` uses Node's native `http` module — no extra packages needed. It serves the `web/` directory, so run it from the repository root rather than from inside `web/`. To change the port: `PORT=3000 npm run serve`
 
 #### Using Nginx
 
@@ -211,7 +230,7 @@ Add a new object to the `templates` array for any specimen type:
 
 Available placeholders: `{{total}}`, `{{caseNumber}}`, `{{comments}}`, and any cell type name from `outCodes`.
 
-### Changing the Minimum Cell Count
+### Changing the Target Cell Count
 
 ```json
 {
@@ -247,18 +266,24 @@ Keys must be single characters (letters or punctuation like `;`, `,`, `.`, `/`).
 .
 ├── CONTRIBUTING.md
 ├── LICENSE
-├── QMS/                 # Quality Management System
+├── NOTICE               # Third-party attributions and the reserved marks
+├── QMS/                 # Quality Management System (Design History File)
 ├── README.md
 ├── SECURITY.md
 ├── SUPPORT.md
+├── TRADEMARKS.md
+├── USER-GUIDE.md        # Operator documentation
 ├── assets/              # Branding assets (logo is restricted; see License section)
 │   └── card.png
+├── evidence/            # Background research behind the design decisions
+├── legacy/              # The 2015 predecessor, retained for the mdc-2015-9 profile
 ├── package-lock.json
 ├── package.json
-├── scripts/
-├── serve.js
-├── TRADEMARKS.md
-├── tests/
+├── playwright.config.js
+├── scripts/             # QMS drift-control generators (counts, facts, registers)
+├── serve.js             # Static server for local use; serves web/
+├── tests/               # Unit and behavioural suites (node --test)
+├── tests-e2e/           # System suites (Playwright, three engines)
 └── web/                 # Static app (deploy this folder)
 ```
 

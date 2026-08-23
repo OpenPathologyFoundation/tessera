@@ -177,6 +177,14 @@ threshold.
 The target is advisory. You can finish at any count, and finishing below target
 produces a note stating the precision your count achieved.
 
+A profile may also state **no target**, and `mdc-2015-9` now does — the
+haematopathologists piloting the tool asked for it, on the ground that the
+counter they use displays none (DCR-040). Where there is no target there is no
+progress bar and no sub-target note. What does not depend on a target, and does
+not go: the number of cells counted, on screen and in the report, and the
+confidence interval beside every percentage. A profile cannot give up both that
+interval and the target; the configuration is rejected.
+
 > **Q5.** Are the defaults right? Should a 300-cell marrow profile ship
 > alongside the 500-cell one?
 

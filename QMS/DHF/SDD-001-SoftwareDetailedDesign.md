@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SDD-001 |
-| **Version** | 3.0 |
+| **Version** | 3.1 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-06 |
@@ -260,7 +260,9 @@ FUNCTION updateCounterDisplay()
         el('val-me-ratio').textContent = computeMERatio(specConfig) || 'N/A'
     END IF
 
-    // Progress bar
+    // Progress bar. Rendered only where the profile states a target; with none,
+    // the elements are absent and the grand total is the count (DCR-040).
+    IF TYPEOF specConfig.targetCount IS NOT number THEN RETURN
     pctProgress = MIN((total / specConfig.targetCount) * 100, 100)
     el('progress-bar').style.width = pctProgress + '%'
     IF total >= targetCount THEN bar color = emerald ELSE bar color = blue
@@ -498,9 +500,11 @@ async function loadConfig() {
         const resp = await fetch('settings/templates.json');
         if (!resp.ok) throw new Error('HTTP ' + resp.status);
         state.config = await resp.json();
-        // Add targetCount defaults if missing
+        // Add targetCount defaults where the field is ABSENT. An explicit null
+        // is a profile stating it has no target and must survive (DCR-040); a
+        // zero or a NaN is a mistake, left for validateConfig to report.
         state.config.forEach(function (spec) {
-            if (!spec.targetCount) {
+            if (spec.targetCount === undefined) {
                 spec.targetCount = DEFAULT_TARGET[spec.specimenType] || 200;
             }
         });
@@ -602,7 +606,8 @@ has not shipped since v2.0, and omitted every field added by DCR-006 onward.
     {
       "specimenType": "bm",
       "specimenLabel": "Bone Marrow",
-      "targetCount": 500,              // advisory, never enforced (URS-041)
+      "targetCount": 500,              // advisory, never enforced (URS-041);
+                                      // null = this profile states no target
       "targetCountBasis": "ICSH 2008 §2.6: at least 500 cells when …",
 
       "categories": {                  // display order; two rows
@@ -1079,6 +1084,7 @@ phase and in the hover state (VV-SYS-160 to 178).
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | 3.0 | 2026-08-06 | QMS | **Revised for everything built since DCR-006.** §3.9 to §3.18 added: reset lifecycle, the calculation engine (denominator policy, rounding, Wilson intervals, thresholds, derived figures, validation, method provenance), configuration lifecycle, audio, absolute counts and the NRBC correction, autosave, offline operation, the preset catalogue, the configuration editor and the shared dialog. §3.5.2 marked superseded — it described a percentage computation the product has not used since DCR-006. §3.8 schema replaced; it documented a nine-category layout and key mappings that have not shipped since v2.0. §5 rewritten: it stated that Tailwind loads from a CDN, which would defeat URS-094. Closes the RTM-001 citations of §3.9, §3.11 to §3.17 and §5.1, which pointed at sections that did not exist. See DCR-019. |
+| 3.1 | 2026-08-23 | QMS | §3 progress-bar pseudocode returns where the profile states no target; the configuration-load pseudocode fills the default only for an ABSENT field, since an explicit null is a stated policy and a zero or NaN is a mistake for validateConfig to report; the schema comment records the null convention (DCR-040). |
 | A | 2026-02-18 | QMS | Initial draft -- detailed design |
 | B | 2026-02-19 | QMS | Added session export design notes |
 | C | 2026-02-20 | QMS | Added theme toggle design notes |

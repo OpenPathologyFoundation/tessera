@@ -42,8 +42,8 @@
       "profileId": "mdc-2015-9",
       "file": "mdc-2015-9.json",
       "name": "9-Type — 2015 Counter Layout",
-      "summary": "Nine tallied categories reproducing the 2015 predecessor counter's key layout, with its Yale SOM, Precipio DX and MGH report templates.",
-      "specimens": "BM (200) - PB (100)"
+      "summary": "Nine tallied categories reproducing the 2015 predecessor counter's key layout, with its Yale SOM, Precipio DX and MGH report templates. States no target cell count, as that tool did not; blasts take no part in the M:E ratio (DCR-040).",
+      "specimens": "BM - PB (no target)"
     },
     {
       "profileId": "custom",

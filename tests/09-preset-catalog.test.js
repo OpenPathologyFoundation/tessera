@@ -68,8 +68,10 @@ describe('Preset Catalog — Schema Conformance', () => {
             for (const spec of config.specimenTypes) {
                 assert.ok(typeof spec.specimenType === 'string' && spec.specimenType.length > 0,
                     filename + '/' + spec.specimenType + ': must have specimenType');
-                assert.ok(typeof spec.targetCount === 'number' && spec.targetCount > 0,
-                    filename + '/' + spec.specimenType + ': targetCount must be positive number');
+                assert.ok(spec.targetCount === null ||
+                    (typeof spec.targetCount === 'number' && spec.targetCount > 0),
+                    filename + '/' + spec.specimenType + ': targetCount must be a positive ' +
+                    'number, or null for a profile that states no target');
                 assert.ok(typeof spec.categories === 'object',
                     filename + '/' + spec.specimenType + ': must have categories');
                 assert.ok(Array.isArray(spec.categories.upper),
@@ -406,14 +408,73 @@ describe('The predecessor profile reproduces the predecessor (URS-101)', () => {
         }
     });
 
-    it('VV-PRE-023: The minimums and report templates are the predecessor\'s', () => {
+    it('VV-PRE-023: The predecessor\'s unread minimum is not displayed as a target', () => {
+        /**
+         * The predecessor's configuration declared `minCellCount` — 200 for
+         * marrow, 100 for blood — and **its code never read it**. No progress
+         * bar, no target, no advisory: a running total was all it ever showed.
+         *
+         * This profile originally carried those numbers as displayed targets
+         * (DCR-032), which reproduced the predecessor's configuration rather
+         * than its behaviour. DCR-040 removes them, at the request of the
+         * reviewing haematopathologists, who asked for the counter they use.
+         *
+         * The claim is verified, not restated: if the retained source is ever
+         * found to read the field, this fails and the reasoning above is wrong.
+         */
+        const files = [];
+        (function walk(dir) {
+            for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+                const full = path.join(dir, e.name);
+                if (e.isDirectory()) walk(full);
+                else files.push(full);
+            }
+        })(path.join(__dirname, '..', 'legacy'));
+        const readers = files
+            .filter(f => /minCellCount/.test(fs.readFileSync(f, 'utf-8')))
+            .map(f => path.relative(path.join(__dirname, '..'), f));
+        assert.deepEqual(readers, [],
+            'the predecessor source references minCellCount after all — it did display ' +
+            'a target, and removing this profile\'s was wrong');
+
         for (const [type, want] of Object.entries(PREDECESSOR)) {
             const s = spec(type);
-            assert.equal(s.targetCount, want.minCellCount,
-                `${type}: target differs from the predecessor's minimum`);
+            assert.equal(s.targetCount, null,
+                `${type}: states a target of ${s.targetCount}; the predecessor showed none, ` +
+                `having only declared ${want.minCellCount} in a field it never read`);
+            assert.ok(!s.targetCountBasis,
+                `${type}: states a basis for a target the profile does not have`);
             assert.deepEqual(s.templates.map(t => t.tplCode), want.templates,
                 `${type}: the institutional report templates differ`);
         }
+    });
+
+    it('VV-PRE-027: Blasts take no part in this profile\'s M:E ratio (DCR-040)', () => {
+        /**
+         * ICSH 2008 §2.6 names "myeloblasts" in the M:E numerator while listing
+         * "blast cells" among the categories of the nucleated differential
+         * count. This profile has one lineage-agnostic blast key, so putting it
+         * in the numerator asserts that every blast counted is myeloid — the
+         * assumption that fails in exactly the marrows where the ratio is read.
+         *
+         * Monocytes are retained, per the same section.
+         */
+        const f = spec('bm').formulas.ME_ratio;
+        assert.ok(!f.numerator.includes('blasts'),
+            'blasts are back in the M:E numerator');
+        assert.ok(f.numerator.includes('mono'),
+            'monocytes belong in the numerator per ICSH 2008 §2.6');
+        assert.match(f.basis, /blasts are excluded/i,
+            'the departure from ICSH must be stated where the report can carry it');
+
+        // The reason it matters, at the magnitudes it matters at. A marrow with
+        // 70% blasts of a lineage the count cannot call:
+        const blastRich = { blasts: 350, pro: 7, gran: 33, baso: 1, eos: 2,
+                            mono: 5, lymph: 40, plasma: 2, nrbc: 60 };
+        assert.equal(Core.computeRatio(blastRich, f), '0.8:1');
+        assert.equal(Core.computeRatio(blastRich,
+            Object.assign({}, f, { numerator: f.numerator.concat('blasts') })), '6.6:1',
+            'if these agree, excluding blasts has stopped changing anything');
     });
 
     it('VV-PRE-024: A counted cell is never reported as absent', () => {

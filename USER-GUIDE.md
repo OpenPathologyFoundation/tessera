@@ -115,7 +115,7 @@ in all three settings, so nothing is lost if audio is unavailable.
 | Element | Meaning |
 |---------|---------|
 | **Grand total** | Cells in the differential. Peripheral blood shows `180 + 20` when cells are counted outside it, such as NRBC. |
-| **Progress bar** | Toward the configured target. Advisory — never blocks finishing. |
+| **Progress bar** | Toward the configured target. Advisory — never blocks finishing. Absent where the profile states no target, in which case the grand total is the count. |
 | **M:E ratio** | Live, per ICSH 2008 §2.6. Hover for the convention and its caveat. |
 | **Percentage under each cell** | Of the differential denominator. Peripheral blood NRBC show as `11.1/100` — per 100 WBC, not a percentage. |
 | **Interval on the results screen** | 95% confidence interval, e.g. `15.0–26.1%`. The precision your cell count achieved. |
@@ -144,9 +144,9 @@ disagree, check that first.
 **Preset Profiles → 9-Type — 2015 Counter Layout → Load.**
 
 Your keys are unchanged: `A S D F` across the top, `Z X C V B` below, mapped to
-the same cell types in the same order. Bone marrow still targets 200 cells and
-peripheral blood 100, and the Yale SOM, Precipio DX and MGH report wordings are
-the ones you know.
+the same cell types in the same order, and the Yale SOM, Precipio DX and MGH
+report wordings are the ones you know. As on the old counter, **no target is
+displayed** — the grand total counts up and you finish when you are finished.
 
 Three things are deliberately different, all of them corrections:
 
@@ -155,6 +155,16 @@ Three things are deliberately different, all of them corrections:
 | A cell seen once in 201 | reported `0%` | reported `0.5%` |
 | The nine percentages | summed to 99 | sum to 100 |
 | M:E ratio in the Precipio report | printed `_` | computed, with its interval |
+
+The ratio is computed **without blasts in the numerator**, at the request of the
+haematopathologists reviewing the tool. ICSH 2008 §2.6 names *myeloblasts*
+there, while listing *blast cells* among the categories to count; one blast key
+cannot tell those apart, so this profile declines to attribute blasts to either
+lineage. In a normal marrow that moves the ratio by less than its own confidence
+interval. In a blast-rich marrow it is the difference between reporting myeloid
+hyperplasia and reporting the suppressed granulopoiesis that is there. The
+14-Type profile keeps the ICSH set, so a report from either states which
+convention produced it.
 
 **Read the profile's provenance before relying on it.** Its nine categories are
 coarser than the ICSH standard the other profiles follow: one key covers

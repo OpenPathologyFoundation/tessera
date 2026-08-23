@@ -1046,6 +1046,39 @@ test.describe('The predecessor profile is reachable and countable (URS-101)', ()
         expect(pdx).toMatch(/M:E ratio \| \d+\.\d:1/);
         expect(pdx).not.toMatch(/M:E ratio \| _ \|/);
     });
+
+    test('VV-SYS-224: No target on screen, and a short count raises no advisory (DCR-040)', async ({ page }) => {
+        /**
+         * The reviewing haematopathologists asked for the counter they use,
+         * which shows a running total and no target. The predecessor declared a
+         * 200-cell minimum in configuration and never read it (VV-PRE-023);
+         * this is the same thing seen from the browser, where the progress row
+         * and the sub-target advisory actually appeared.
+         *
+         * Twenty cells: far enough below the 200 this profile used to state
+         * that the advisory would have fired.
+         */
+        await loadLegacyMdc(page);
+        await page.click('text=Start Count');
+
+        const counting = await page.locator('#phase-counting').innerText();
+        expect(counting).not.toContain('(target)');
+        expect(counting).not.toContain('Progress');
+
+        const press = async (k, n) => { for (let i = 0; i < n; i++) await page.keyboard.press(k); };
+        await press('a', 2); await press('d', 18);
+        // The count itself is untouched — it is the target that is gone.
+        expect(await page.locator('#val-grand-total').innerText()).toBe('20');
+
+        await page.click('text=Count Done');
+        const report = await page.locator('body').innerText();
+        expect(report).toContain('A 20-cell count');
+        expect(report).not.toMatch(/20-cell count \(target/);
+        expect(report).not.toContain('Basis for the target');
+        expect(report).not.toContain('Target count:');
+        // What replaced it stays: the interval beside each percentage.
+        expect(report).toMatch(/\d+\.\d+\s*[–-]\s*\d+\.\d+/);
+    });
 });
 
 // ================================================================

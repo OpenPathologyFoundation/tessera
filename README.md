@@ -20,8 +20,8 @@ WBC ΔΣ enables medical technologists and pathologists to perform manual differ
 | **Undo/Correction** | Shift + key decrements by 1 (cannot go below zero) |
 | **Real-Time Percentages** | Auto-calculated with 2 decimal precision as you count |
 | **Visual Feedback** | Green flash on increment, amber flash on decrement |
-| **Progress Bar** | Tracks count toward the profile's target (default 500 BM / 200 PB). Reaching it is advisory, never blocking. |
-| **Sub-target advisory** | Completing below the target is **never blocked**. The report carries a note stating the count, the target, and the confidence interval that count supports — so the imprecision is quantified rather than merely flagged. |
+| **Progress Bar** | Tracks count toward the profile's target (default 500 BM / 200 PB). Reaching it is advisory, never blocking. A profile may state no target, and then no progress bar is shown — the grand total is the count. |
+| **Sub-target advisory** | Completing below the target is **never blocked**. The report carries a note stating the count, the target, and the confidence interval that count supports — so the imprecision is quantified rather than merely flagged. Where a profile states no target the note does not arise; the per-percentage intervals do not depend on it, and a profile may not give up both. |
 | **Morphology Comments** | Free-text field, keyboard-isolated (typing doesn't trigger counts) |
 | **Institutional Templates** | Yale SOM, Precipio DX, MGH for BM; MGH for PB |
 | **Copy to Clipboard** | One-click copy of formatted output for LIS/EMR |
@@ -222,7 +222,9 @@ Available placeholders: `{{total}}`, `{{caseNumber}}`, `{{comments}}`, and any c
 ```
 
 `minCellCount` was the v1 field name and no longer exists; the v2 schema calls
-it `targetCount`, and reaching it is advisory rather than blocking.
+it `targetCount`, and reaching it is advisory rather than blocking. Set it to
+`null` for a laboratory that counts to no target: omitting the field takes the
+default instead, so the absence has to be stated rather than implied.
 
 ### Changing Keyboard Mappings
 
@@ -325,8 +327,8 @@ CI can run `npm test` for quick feedback, but **QMS evidence requires `npm run t
 | 08 | `tests/08-config-schema-v2.test.js` | Unit | v2 schema; `normalizeConfig` round-trip; reserved placeholder names |
 | 09 | `tests/09-preset-catalog.test.js` | Unit | Preset catalogue integrity and ergonomic zones |
 | 10 | `tests/10-config-editor.test.js` | Static | Editor structure, JS integrity, key assignment controls |
-| 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 96 tests |
-| E2E | `tests-e2e/*.spec.js` | **System** | The deployed application in Chromium, Firefox and WebKit — 149 specs x 3 engines |
+| 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 99 tests |
+| E2E | `tests-e2e/*.spec.js` | **System** | The deployed application in Chromium, Firefox and WebKit — 150 specs x 3 engines |
 | **Total** | | | **<!-- qms:fact tests_total -->1152<!-- /qms:fact --> tests** (<!-- qms:fact tests_node -->705<!-- /qms:fact --> Node + <!-- qms:fact tests_browser -->447<!-- /qms:fact --> browser), of which <!-- qms:fact tests_skipped -->7<!-- /qms:fact --> are documented skips |
 
 See `QMS/DHF/DCR/DCR-004-Verification-Integrity-Remediation.md` for why the
@@ -359,7 +361,7 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
 | **RA-001** | FMEA risk analysis: 55 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan; register of 786 implemented verification cases, generated from the runners |
+| **TP-001** | Test plan; register of 795 implemented verification cases, generated from the runners |
 | **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |

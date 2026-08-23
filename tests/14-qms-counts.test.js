@@ -493,6 +493,21 @@ describe('A closure closes everywhere (URS-092)', () => {
                 export: 'ratioInterval',
                 forbid: /no (confidence )?interval is computed for (a|the) ratio|ratio carries no confidence interval/i,
                 scope: ['web/scripts', 'web', 'QMS/DHF']
+            },
+            {
+                // DCR-040. This capability is behavioural rather than a named
+                // function — `validateConfig` would still exist with it
+                // removed — so the row anchors on what the code does, which is
+                // what `holds` is for.
+                export: 'validateConfig',
+                holds: () => Core.validateConfig([{
+                    specimenType: 'bm', targetCount: null,
+                    categories: { upper: ['blasts'], lower: ['poly'] },
+                    outCodes: { X: 'blasts', F: 'poly' },
+                    templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }]
+                }]).length === 0,
+                forbid: /every profile (has|must have|defines|states) a target|a target is always (shown|displayed)|the target cannot be (removed|disabled|turned off)|targetCount is (required|mandatory)/i,
+                scope: ['web/scripts', 'web', 'QMS/DHF']
             }
         ];
 
@@ -510,6 +525,11 @@ describe('A closure closes everywhere (URS-092)', () => {
             assert.equal(typeof Core[claim.export], 'function',
                 `${claim.export} is not exported — either the capability went, ` +
                 'or this table is describing something that no longer exists');
+            if (claim.holds) {
+                assert.ok(claim.holds(),
+                    `${claim.export}: the capability this row describes no longer holds, ` +
+                    'so the text it forbids may have become true again');
+            }
             for (const dir of claim.scope) {
                 for (const file of files(dir)) {
                     fs.readFileSync(file, 'utf-8').split('\n').forEach((line, i) => {

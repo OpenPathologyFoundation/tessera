@@ -1,18 +1,18 @@
 {
-  "version": "2.2",
+  "version": "2.3",
   "profileId": "mdc-2015-9",
   "profileName": "9-Type — 2015 Counter Layout",
   "provenance": {
     "standard": "None — reproduces a predecessor application",
     "citation": "WBC ΔΣ predecessor: Backbone.js/JSP Manual Differential Counter, 2015, retained at legacy/ and described in DCR-004. Configuration recovered from web/settings/templates.json at commit aa88da4 and verified by executing the application under Playwright (DCR-032).",
-    "notes": "This profile exists so an operator familiar with the predecessor tool can switch without relearning the keyboard. Its nine categories are COARSER than ICSH 2008 §2.6: 'gran' aggregates myelocytes, metamyelocytes, bands and segmented neutrophils into one key; 'pro' covers promyelocytes and myelocytes together; 'baso' covers basophils and mast cells. A count taken in this profile therefore cannot be reported against the ICSH nucleated differential count without re-counting. Prefer ndc-14 for new work."
+    "notes": "This profile exists so an operator familiar with the predecessor tool can switch without relearning the keyboard. Its nine categories are COARSER than ICSH 2008 §2.6: 'gran' aggregates myelocytes, metamyelocytes, bands and segmented neutrophils into one key; 'pro' covers promyelocytes and myelocytes together; 'baso' covers basophils and mast cells. A count taken in this profile therefore cannot be reported against the ICSH nucleated differential count without re-counting. Prefer ndc-14 for new work. Two counting-policy decisions are the reviewing haematopathologists' and are recorded in DCR-040: blasts are outside the M:E numerator, and no target cell count is stated — see targetCount and the ME_ratio basis."
   },
-  "description": "The 2015 predecessor counter's layout, key-for-key: A S D F Z X C V B, with its Yale SOM, Precipio DX and MGH report templates. Categories are aggregated as that tool aggregated them. Percentages use this application's rounding rather than the predecessor's — see provenance.",
+  "description": "The 2015 predecessor counter's layout, key-for-key: A S D F Z X C V B, with its Yale SOM, Precipio DX and MGH report templates. Categories are aggregated as that tool aggregated them, and no target cell count is displayed, as it displayed none. Blasts take no part in the M:E ratio. Percentages use this application's rounding rather than the predecessor's — see provenance.",
   "specimenTypes": [
     {
       "specimenType": "bm",
       "specimenLabel": "Bone Marrow",
-      "targetCount": 200,
+      "targetCount": null,
       "requireCaseNumber": false,
       "upperRowAbnormal": false,
       "categories": {
@@ -50,7 +50,6 @@
         "ME_ratio": {
           "label": "M:E Ratio",
           "numerator": [
-            "blasts",
             "pro",
             "gran",
             "baso",
@@ -61,7 +60,7 @@
             "nrbc"
           ],
           "precision": 1,
-          "basis": "ICSH 2008 §2.6: all granulocytes and monocytes and their precursors over erythroblasts at all stages; lymphocytes and plasma cells take no part. The predecessor's Precipio DX template reserved a field for this ratio and printed a literal underscore — it was never computed. It is computed here (DCR-032)."
+          "basis": "All granulocytes and monocytes and their precursors over erythroblasts at all stages; lymphocytes and plasma cells take no part (ICSH 2008 §2.6). Blasts are EXCLUDED, which is a deliberate departure from the wording of that section and the decision of the reviewing haematopathologists (DCR-040). ICSH names 'myeloblasts' in the ratio while its nucleated differential count lists 'blast cells'; this profile has one lineage-agnostic blast key, so including it would assert that every blast counted is myeloid. In a normal marrow the exclusion moves the ratio by less than its own confidence interval; in a blast-rich marrow it is the difference between reporting myeloid hyperplasia and reporting the suppressed granulopoiesis that is actually there. Monocytes are retained, per ICSH; a competing convention excludes them. The predecessor's Precipio DX template reserved a field for this ratio and printed a literal underscore — it was never computed. It is computed here (DCR-032)."
         }
       },
       "templates": [
@@ -98,7 +97,6 @@
         "display": 2,
         "report": 1
       },
-      "targetCountBasis": "The predecessor tool's own minimum for bone marrow was 200 cells and this profile preserves it. ICSH 2008 §2.6 asks for at least 500 when a precise percentage of an abnormal cell type is required for diagnosis, and at least 300 when the differential is not essential to it — so a 200-cell marrow count will raise the sub-target advisory, which is correct.",
       "confidenceIntervals": {
         "enabled": true,
         "level": 0.95
@@ -107,7 +105,7 @@
     {
       "specimenType": "pb",
       "specimenLabel": "Peripheral Blood",
-      "targetCount": 100,
+      "targetCount": null,
       "requireCaseNumber": false,
       "upperRowAbnormal": false,
       "categories": {
@@ -164,7 +162,6 @@
         "display": 2,
         "report": 1
       },
-      "targetCountBasis": "The predecessor tool's own minimum for peripheral blood was 100 cells and this profile preserves it. CLSI H20-A2's reference method is two reviewers counting 200 cells each; 100 is half one observer's share, so the sub-target advisory will fire and state the imprecision.",
       "confidenceIntervals": {
         "enabled": true,
         "level": 0.95

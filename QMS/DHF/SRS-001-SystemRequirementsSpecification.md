@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SRS-001 |
-| **Version** | 3.4 |
+| **Version** | 3.5 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-02-24 |
@@ -112,8 +112,8 @@ This SRS covers the functional, performance, interface, data, and security requi
 |----|------------|-----------|-------------------|
 | SYS-050 | The system SHALL render a "Count Done" button. | URS-040 | Inspection |
 | SYS-051 | The "Count Done" button SHALL be disabled until "Start Count" has been pressed and at least one cell has been counted (total > 0). | URS-040 | Test |
-| SYS-052 | The system SHALL define an advisory target cell count per specimen type, loaded from the `targetCount` field in the configuration. Default values: BM = 500, PB = 200. The target is informational and does not block count completion. _Amended from v1.0: was `minCellCount` with BM=200, PB=100 as enforced minimums._ | URS-041, URS-105 | Test |
-| SYS-053 | When "Count Done" is clicked and total count is below the configured `targetCount`, the system SHALL display a non-blocking informational note (e.g., "216-cell count; statistical confidence reduced for populations <5%") within the results view. The system SHALL NOT display a modal dialog or require explicit override. _Amended from v1.0: was a blocking warning dialog with Continue/Cancel._ | URS-041 | Test |
+| SYS-052 | The system SHALL define an advisory target cell count per specimen type, loaded from the `targetCount` field in the configuration. Default values: BM = 500, PB = 200. The target is informational and does not block count completion. A profile MAY state that it has no target, as `targetCount: null`, in which case no target is displayed and no sub-target advisory arises; an ABSENT field takes the default rather than meaning none. _Amended from v1.0: was `minCellCount` with BM=200, PB=100 as enforced minimums. Amended DCR-040: a stated absence is distinct from an omission._ | URS-041, URS-105 | Test |
+| SYS-053 | When "Count Done" is clicked and the profile states a target, and the total count is below that `targetCount`, the system SHALL display a non-blocking informational note (e.g., "216-cell count; statistical confidence reduced for populations <5%") within the results view. The system SHALL NOT display a modal dialog or require explicit override. _Amended from v1.0: was a blocking warning dialog with Continue/Cancel._ | URS-041 | Test |
 | SYS-054 | After "Count Done" is confirmed, the system SHALL detach the keydown event listener. The listener may be re-attached if the user invokes "Continue Counting." _Amended from v1.0: was permanently detached._ | URS-040 | Test |
 | SYS-055 | After "Count Done" is confirmed, the system SHALL set all count displays to a read-only presentation. Inputs may be re-enabled if the user invokes "Continue Counting." _Amended from v1.0: was permanently locked._ | URS-040 | Test |
 | SYS-056 | After "Count Done" is confirmed, the system SHALL generate output for all configured templates, substituting cell percentages, totals, derived formula values, and morphology comments. | URS-050 | Test |
@@ -203,7 +203,7 @@ Added in v2.2 under DCR-006.
 | SYS-180 | A configuration profile SHALL be able to designate cell categories that are counted but excluded from the percentage denominator (`denominatorExcludes`). | URS-030 |
 | SYS-181 | Percentages SHALL be computed over the denominator excluding those categories, and the included categories SHALL still sum to exactly 100 (SYS-044). | URS-030, URS-034 |
 | SYS-182 | An excluded category SHALL NOT be reported as a percentage of the differential. It SHALL be reported per 100 units of the denominator where the profile defines `per100Reporting`, and as "N/A" where the denominator is zero. | URS-030 |
-| SYS-183 | The target count, the progress indicator and the low-count advisory SHALL be measured against the differential denominator, not the total cells tallied, because the target expresses a number of classified cells. | URS-024, URS-041 |
+| SYS-183 | The target count, the progress indicator and the low-count advisory SHALL be measured against the differential denominator, not the total cells tallied, because the target expresses a number of classified cells. Where a profile states no target, the differential denominator SHALL still be displayed during counting — it is the count, not the target, that ICSH 2008 §2.6 requires be stated. | URS-024, URS-041 |
 | SYS-184 | Output SHALL distinguish the differential denominator (`{{total}}`) from the total cells tallied (`{{totalCounted}}`), and SHALL provide `{{<cellType>_per100}}` for excluded categories. Absolute counts SHALL NOT be derived for an excluded category. | URS-036, URS-052 |
 | SYS-185 | Configuration validation SHALL reject a profile that excludes every category from the denominator, that names an undisplayed category in `denominatorExcludes` or `per100Reporting`, or that requests per-100 reporting for a category still inside the denominator. | URS-100 |
 
@@ -481,6 +481,7 @@ Phase 2 item.
 | A | 2026-02-18 | QMS | Initial draft - system requirements derived from URS-001 |
 | B | 2026-02-19 | QMS | Added session export requirements (CSV/JSON) |
 | C | 2026-02-20 | QMS | Added theme toggle requirements |
+| N | 2026-08-23 | QMS | v3.5 (DCR-040): SYS-052, SYS-053 and SYS-183 amended for a profile that states no target. `targetCount: null` is a stated absence and is distinct from an omitted field, which still takes the URS-105 default; the advisory and the method statement's target basis are conditional on a target existing; the differential denominator remains displayed either way. A profile may not state no target AND disable confidence intervals — the two are HA-030's controls and one must remain. |
 | M | 2026-08-07 | QMS | v3.4 (DCR-036): SYS-254–SYS-258 added for tonal feedback. The mapping formula is stated exactly, including the clamp that keeps profiles larger than fourteen categories audible; the discrimination guarantee is a requirement rather than a property of the chosen constants; and the fallback for an unplaceable category is the click, never silence — silence reads as a missed keypress. |
 | L | 2026-08-07 | QMS | v3.3 (DCR-029): SYS-205 restated. It forbade thresholding a ratio "because no confidence interval is computed for a ratio" — false since DCR-026, which computes one. The requirement stands; its reason does not. A threshold is a value on the 0-100 percentage scale (validateConfig bounds it there) and a ratio is not on that scale. The validation message now says so and tells the operator to express the subset as a percentage formula. |
 | K | 2026-08-05 | QMS | v2.7 (DCR-010): added SYS-230–SYS-235, reporting policy. Rounding method, decimal precision and the M:E convention are now selections rather than fixed behaviour. |

@@ -10,6 +10,41 @@
  * executed end to end.
  */
 const { test, expect } = require('@playwright/test');
+
+/**
+ * Load a preset from the catalogue by its displayed name, and return the
+ * confirmation overlay.
+ *
+ * One helper rather than three copies of the same block. This race has been
+ * removed from this file three times — DCR-039 twice, DCR-040 once — and
+ * survived because the block was duplicated and each fix reached one copy.
+ * `page.evaluate` does not auto-wait the way a locator does, so the click on
+ * "Preset Profiles" only STARTS the fetch and render; scanning immediately
+ * finds an empty list and reports "no Load button", which reads as a missing
+ * control rather than a slow one. Measured: the button count immediately after
+ * the click came back `[6,6,0,0,0,6,0,0]` on one engine.
+ *
+ * The evaluate is kept rather than replaced with a locator chain because it
+ * also asserts the row shape (a catalogue row has at most two buttons), which
+ * is what stops it matching the wrong row.
+ */
+async function loadPresetFromCatalogue(page, name) {
+    await page.click('text=Preset Profiles');
+    await expect(page.locator('#preset-list button')).not.toHaveCount(0);
+    const clicked = await page.evaluate((wanted) => {
+        for (const btn of document.querySelectorAll('button')) {
+            if (btn.textContent.trim() !== 'Load') continue;
+            let row = btn.parentElement;
+            while (row && !row.textContent.includes(wanted)) row = row.parentElement;
+            if (row && row.querySelectorAll('button').length <= 2) { btn.click(); return true; }
+        }
+        return false;
+    }, name);
+    expect(clicked).toBe(true);
+    const overlay = page.locator('#modal-overlay');
+    await expect(overlay).toContainText(name);
+    return overlay;
+}
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -588,19 +623,7 @@ test.describe('The totals column is one column (URS-055)', () => {
      * the two subtotals and the grand total must coincide.
      */
     async function loadLegacyMdc(page) {
-        await page.click('text=Preset Profiles');
-        const ok = await page.evaluate(() => {
-            for (const b of document.querySelectorAll('button')) {
-                if (b.textContent.trim() !== 'Load') continue;
-                let row = b.parentElement;
-                while (row && !row.textContent.includes('9-Type — 2015 Counter Layout')) row = row.parentElement;
-                if (row && row.querySelectorAll('button').length <= 2) { b.click(); return true; }
-            }
-            return false;
-        });
-        expect(ok).toBe(true);
-        const overlay = page.locator('#modal-overlay');
-        await expect(overlay).toContainText('9-Type — 2015 Counter Layout');
+        const overlay = await loadPresetFromCatalogue(page, '9-Type — 2015 Counter Layout');
         await overlay.getByRole('button', { name: 'OK' }).click();
         await expect(overlay).toBeHidden();
 
@@ -708,19 +731,7 @@ test.describe('The totals column is one column (URS-055)', () => {
          */
         await page.setViewportSize({ width: 1440, height: 900 });
         await page.goto('/counter.html');
-        await page.click('text=Preset Profiles');
-        const ok = await page.evaluate(() => {
-            for (const b of document.querySelectorAll('button')) {
-                if (b.textContent.trim() !== 'Load') continue;
-                let row = b.parentElement;
-                while (row && !row.textContent.includes('10-Type — Bands & Segs Separate')) row = row.parentElement;
-                if (row && row.querySelectorAll('button').length <= 2) { b.click(); return true; }
-            }
-            return false;
-        });
-        expect(ok).toBe(true);
-        const overlay = page.locator('#modal-overlay');
-        await expect(overlay).toContainText('10-Type — Bands & Segs Separate');
+        const overlay = await loadPresetFromCatalogue(page, '10-Type — Bands & Segs Separate');
         await overlay.getByRole('button', { name: 'OK' }).click();
         await expect(overlay).toBeHidden();
         await countAcross(page);
@@ -748,19 +759,7 @@ test.describe('The totals column is one column (URS-055)', () => {
         // misalignment visible in the first place.
         await page.setViewportSize({ width: 1440, height: 900 });
         await page.goto('/counter.html');
-        await page.click('text=Preset Profiles');
-        const clicked = await page.evaluate(() => {
-            for (const btn of document.querySelectorAll('button')) {
-                if (btn.textContent.trim() !== 'Load') continue;
-                let row = btn.parentElement;
-                while (row && !row.textContent.includes('9-Type — 2015 Counter Layout')) row = row.parentElement;
-                if (row && row.querySelectorAll('button').length <= 2) { btn.click(); return true; }
-            }
-            return false;
-        });
-        expect(clicked).toBe(true);
-        const overlay = page.locator('#modal-overlay');
-        await expect(overlay).toContainText('9-Type — 2015 Counter Layout');
+        const overlay = await loadPresetFromCatalogue(page, '9-Type — 2015 Counter Layout');
         await overlay.getByRole('button', { name: 'OK' }).click();
         await expect(overlay).toBeHidden();
 

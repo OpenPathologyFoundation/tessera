@@ -94,9 +94,9 @@ should be quoted until someone holds the paper.
 > `node scripts/qms-signoffs.js --write` rebuilds this from the signature
 > tables in every document. Suite 14 fails the build if it goes stale.
 
-**37 signature(s) outstanding across 3 role(s).** 16 document(s) are fully signed.
+**41 signature(s) outstanding across 6 role(s).** 16 document(s) are fully signed.
 
-### Clinical Reviewer — 34 outstanding
+### Clinical Reviewer — 35 outstanding
 
 | Document | Note |
 |----------|------|
@@ -130,6 +130,7 @@ should be quoted until someone holds the paper.
 | `DCR/DCR-036-Tonal-Feedback.md` | **required before Tones is made a default — see §7** |
 | `DCR/DCR-038-Pre-Validation-Corrections.md` | **SOP-001 and VV-001 changed — re-read before the study** |
 | `DCR/DCR-039-Pre-Validation-Majors.md` | **SOP-001 changed again — §5.9 and §7 in particular** |
+| `DCR/DCR-040-Counting-Policy-Review.md` | **required — this is their change; §2 monocytes decision is the Design Engineer's and invites comment** |
 | `DHF-001-DesignHistoryFile-Index.md` | — |
 | `RA-001-RiskAnalysis-FMEA.md` | — |
 | `REF-001-StandardsAndLiterature.md` | — |
@@ -141,6 +142,24 @@ should be quoted until someone holds the paper.
 |----------|------|
 | `SOP-001-StandardOperatingProcedure.md` | — |
 | `URS-001_UserRequirementsSpecification_v2.0.md` | — |
+
+### Design Engineer — 1 outstanding
+
+| Document | Note |
+|----------|------|
+| `DCR/DCR-040-Counting-Policy-Review.md` | — |
+
+### Quality Assurance — 1 outstanding
+
+| Document | Note |
+|----------|------|
+| `DCR/DCR-040-Counting-Policy-Review.md` | — |
+
+### Regulatory Affairs — 1 outstanding
+
+| Document | Note |
+|----------|------|
+| `DCR/DCR-040-Counting-Policy-Review.md` | — |
 
 ### Regulatory Reviewer — 1 outstanding
 

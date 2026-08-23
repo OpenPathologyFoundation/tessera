@@ -25,7 +25,7 @@ where an individual session is capable and thorough and has no memory of the
 other five documents. And it is the evidence base for the guards: each `QC-`
 identifier in the last column exists because of a specific row above it.
 
-**Counted here rather than described:** 43 incidents, of which 36 are now
+**Counted here rather than described:** 48 incidents, of which 39 are now
 prevented by an automated check. QC-027 checks both figures against the rows
 below, so this sentence cannot be the next thing to drift.
 
@@ -78,6 +78,11 @@ below, so this sentence cannot be the next thing to drift.
 | 41 | 2026-08-08 | A 200-cell CLSI rationale printed on a 100-cell report | `analyzer-5` `targetCountBasis` | The profile targets 100 | `targetCountBasis` prints into the report method statement, so every analyzer-5 report stated a basis for a target it does not use | Pre-validation review, second pass | DCR-039 | UD-101 |
 | 42 | 2026-08-08 | "Do NOT count into this category: … macrophages … metastatic tumour cells" | `body-fluid` `categoryNotes.other` | This panel has `malignant` and `mono_macro` keys for exactly those cells | The bone-marrow note copied onto a panel whose purpose is counting what the marrow excludes. It instructed operators to discard the panel's own findings | Pre-validation review, second pass | DCR-039 | — |
 | 43 | 2026-08-08 | A key captured with Shift (`:` for `;`) validated cleanly | `validateConfig`, and the editor's key capture | Shift+key is the decrement, so such a cell could be un-counted but never counted | Validation checked that keys were unique and mapped, not that they were typeable. No shipped preset was affected; the editor could produce one | Pre-validation review, second pass | DCR-039 | `isCountableKey` in validateConfig; rejected at capture |
+| 44 | 2026-08-23 | "The minimums and report templates are the predecessor's" — a fidelity claim covering the target counts | `VV-PRE-023`, `mdc-2015-9` `targetCount` 200/100, USER-GUIDE "still targets 200 cells" | The predecessor declared `minCellCount` in its configuration and its code never read it; the identifier appears nowhere in `legacy/`. It displayed no target, no progress bar and no advisory | The profile was reconstructed from the predecessor's **configuration file** without checking which fields its code consumed. A declared setting was read as a behaviour | Reviewing haematopathologists, who asked why a target was shown at all | DCR-040 | `VV-PRE-023` now greps `legacy/` for the identifier rather than restating the claim |
+| 45 | 2026-08-23 | Document header version fields, stale against their own revision histories: RA-001 "2.9" with rows to v3.8, URS-001 v2.0 "Rev L" with rows to N, SAD-001 "3.0" with rows to 3.2 | `RA-001`, `URS-001_…_v2.0.md`, `SAD-001` §headers | The revision-history tables in the same three files | Appending a revision row is the visible act; the header field two hundred lines above it is not in view while doing so | DCR-040 sweep | DCR-040 | — (see §3) |
+| 46 | 2026-08-23 | A malformed target count was silently replaced with 500 | `normalizeConfig` | `validateConfig`, which never saw the value it was meant to reject: `!spec.targetCount` had already substituted the default for `0`, `NaN` and `''` | A default-filling branch written as a truthiness test, which conflates "absent" with "wrong" | Writing VV-TGT-001 for the new `null` case | DCR-040 | `VV-TGT-001` |
+| 47 | 2026-08-23 | Scenario V2 told the validator the progress row reads `50 / 200 (200)` | `VV-001` §5.4 V2 | The application renders `50 / 200 (target)` | A scripted expected-result written from memory of the format rather than from the screen; the same class as incident 32, in the same section of the same document | DCR-040 sweep | DCR-040 | — (see §3) |
+| 48 | 2026-08-23 | A test reported "no Load button in the preset catalogue" | `VV-SYS-215` helper, `counting-workflow.spec.js` | The button exists; the list is rendered asynchronously and the helper used `page.evaluate`, which does not auto-wait as a locator does. Measured: `#preset-list button` counted immediately after the click gave `[6,6,0,0,0,6,0,0]` on one engine | Three races have now been removed from this one test, and each earlier fix guarded the step *after* the one that raced. The first attempt at THIS fix also missed: the same click-then-evaluate block existed three times in the file and the wait was added to one of them, so the gate failed again on a different test | The release gate, on a second evidence run under load | DCR-040 | The three blocks are now one `loadPresetFromCatalogue` helper, so the wait exists once |
 
 ---
 
@@ -99,6 +104,14 @@ Honesty about the guards matters as much as the guards.
 - **Rows 5–8 are guarded for SAD-001 specifically** (UD-070…UD-074), not as a
   class. A different architecture document drifting the same way would not be
   caught.
+- **Row 45 is unguarded.** Nothing compares a document's header version field
+  with the newest row of its own revision history, and both were wrong in the
+  same way in two documents at once — which is the signature of a class, not an
+  accident. The check is cheap and worth building; it is not built here because
+  the revision tables are not uniformly ordered (RA-001's runs A, B, K…P, T, S,
+  R, Q, then J…C), so "the newest row" is not yet a thing a script can read.
+  Ordering them would mean rewriting historical rows, which the convention
+  above forbids.
 - **QC-022 is inert until a clean-tree evidence bundle exists.** It reports the
   skip rather than passing silently, but a repository that never runs
   `npm run test:qms` on a clean tree gets agreement between documents without
@@ -135,6 +148,7 @@ recurrence.
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | I | 2026-08-08 | QMS | Rows 37–43 added (DCR-039): the majors left standing after the blockers were cleared. Four are SOP-001 describing behaviour that was never built — a fixed key assignment, a case-number dialog, a blocking completion warning — and two are profile text that prints into a clinical report. The seventh is the first CODE defect this file has recorded since the drift work began: a key that could be decremented but never incremented. |
+| I | 2026-08-23 | QMS | Rows 44–48 added (DCR-040). Row 44 is the first found by a clinical reviewer rather than by audit or by a session's own sweep, and it is the deepest: a profile was reconstructed from a predecessor's configuration file without checking which fields that predecessor's code read, so a declared setting shipped as a behaviour from DCR-032 (2026-08-07) until now. Rows 45 and 47 are ordinary sweep findings; row 46 is a code defect the new option surfaced. |
 | H | 2026-08-08 | QMS | Rows 31–36 added (DCR-038): the pre-validation audit of every surface a validating pathologist reads. Five of the six are in SOP-001 and VV-001 — the documents a validator rehearses and executes — and none was covered by any guard, because the guards built so far check generated figures and profile names, not procedures. |
 | G | 2026-08-07 | QMS | Row 30 added and row 28 corrected (DCR-035): the false provenance never reached a report, because a second defect dropped provenance before the method statement was built. Two defects that cancelled. |
 | F | 2026-08-07 | QMS | Rows 27–29 added (DCR-035): profile names that asserted rather than described, a copy-pasted provenance note that printed a false basis into clinical reports, and a display name the catalogue and the file disagreed about. VV-PRE-030..034. |

@@ -365,6 +365,15 @@ describe('Calculation Engine — Low Count Advisory (URS-041, SYS-053)', () => {
         assert.equal(Core.buildLowCountNote(501, 500), null);
     });
 
+    it('VV-LOW-004: A profile that states no target produces no note (DCR-040)', () => {
+        // Not "the target was met" and not "the target is malformed": there is
+        // no target, so there is no shortfall to report. The confidence
+        // interval beside each percentage carries the imprecision instead, and
+        // validateConfig will not let a profile give up both.
+        assert.equal(Core.buildLowCountNote(12, null, 0.95,
+            'ICSH 2008 §2.6: at least 500 cells...'), null);
+    });
+
     it('VV-LOW-003: Missing or invalid target produces no note', () => {
         assert.equal(Core.buildLowCountNote(100, 0), null);
         assert.equal(Core.buildLowCountNote(100, undefined), null);
@@ -695,6 +704,64 @@ describe('Diagnostic thresholds (URS-038, ICSH 2008 §2.6)', () => {
         assert.ok(errs.some(e => /outside the differential denominator/.test(e)), errs.join('; '));
     });
 
+    it('VV-TGT-001: A profile may state no target, but not a broken one (DCR-040)', () => {
+        const base = {
+            specimenType: 'bm',
+            categories: { upper: ['blasts'], lower: ['poly'] },
+            outCodes: { X: 'blasts', F: 'poly' },
+            templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }]
+        };
+        const errsFor = extra => Core.validateConfig([Object.assign({}, base, extra)])
+            .filter(e => /targetCount|no target/.test(e));
+
+        assert.deepEqual(errsFor({ targetCount: null }), [],
+            'null is a laboratory stating it does not count to a target');
+        assert.deepEqual(errsFor({ targetCount: 300 }), []);
+
+        // A zero or a negative is a mistake, not a policy — and it must not be
+        // read as "no target" either, or a typo becomes a silent change of
+        // clinical behaviour.
+        for (const bad of [0, -1, '500', NaN, undefined]) {
+            assert.ok(errsFor({ targetCount: bad }).length,
+                `targetCount ${String(bad)} was accepted`);
+        }
+    });
+
+    it('VV-TGT-002: No target and no intervals is refused (HA-030, DCR-040)', () => {
+        // HA-030's two controls are the sub-target advisory and the confidence
+        // interval printed beside every percentage; RA-001 scores the residual
+        // risk Low on the strength of the second. Either may go. Both leaves a
+        // count too small to answer the question with nothing that says so.
+        const base = {
+            specimenType: 'bm', targetCount: null,
+            categories: { upper: ['blasts'], lower: ['poly'] },
+            outCodes: { X: 'blasts', F: 'poly' },
+            templates: [{ tplCode: 't', tplName: 'T', outSentence: '{{total}}' }]
+        };
+        assert.ok(Core.validateConfig([Object.assign({}, base,
+            { confidenceIntervals: { enabled: false } })])
+            .some(e => /must leave confidence intervals enabled/.test(e)));
+
+        // Each alone is allowed.
+        assert.deepEqual(Core.validateConfig([base]), []);
+        assert.deepEqual(Core.validateConfig([Object.assign({}, base,
+            { targetCount: 500, confidenceIntervals: { enabled: false } })]), []);
+    });
+
+    it('VV-TGT-003: Absent takes the default; null survives normalization', () => {
+        // The distinction the whole option rests on. `!spec.targetCount` read
+        // both as "missing" and would have turned a stated policy into 500.
+        const norm = Core.normalizeConfig({
+            version: '2.0', profileId: 'p', profileName: 'P',
+            specimenTypes: [
+                { specimenType: 'bm', categories: { upper: [], lower: [] }, outCodes: {}, templates: [] },
+                { specimenType: 'pb', targetCount: null, categories: { upper: [], lower: [] }, outCodes: {}, templates: [] }
+            ]
+        });
+        assert.equal(norm.specimenTypes[0].targetCount, 500, 'absent must still take the default');
+        assert.equal(norm.specimenTypes[1].targetCount, null, 'null must survive');
+    });
+
     it('VV-THR-008: No thresholds configured yields no evaluation', () => {
         assert.deepEqual(Core.evaluateThresholds(counts({ blasts: 40, poly: 160 }), {}), []);
         assert.deepEqual(Core.evaluateThresholds(zeroCounts(), SPEC), [],
@@ -773,9 +840,21 @@ describe('Method provenance (URS-055, DCR-009)', () => {
 
     it('VV-PROV-007: The statement flattens for template substitution', () => {
         const text = Core.formatMethodStatement(
-            Core.buildMethodStatement({ targetCountBasis: 'ICSH 2008 §2.6.' }, META), ' ');
+            Core.buildMethodStatement({ targetCount: 500, targetCountBasis: 'ICSH 2008 §2.6.' }, META), ' ');
         assert.match(text, /Profile: 14-Type Nucleated Differential/);
         assert.match(text, /Target count: ICSH 2008/);
+    });
+
+    it('VV-PROV-009: A basis with no target to justify is not stated (DCR-040)', () => {
+        // The configuration editor edits the target and its basis through
+        // separate controls, so a profile that states no target may still carry
+        // the text. Printing it would attribute to the report a rule the
+        // profile does not apply.
+        const entries = Core.buildMethodStatement(
+            { targetCount: null, targetCountBasis: 'ICSH 2008 §2.6.' }, META);
+        assert.equal(entries.find(e => e.label === 'Target count'), undefined);
+        assert.ok(entries.find(e => e.label === 'Profile'),
+            'the rest of the statement must be unaffected');
     });
 
     it('VV-PROV-008: methodNotes is available to templates and cannot be shadowed', () => {

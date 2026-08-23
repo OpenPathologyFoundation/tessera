@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SOP-001 |
-| **Version** | 2.1 |
+| **Version** | 2.2 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Status** | **Issued for local adoption** — to be reviewed and signed by the adopting laboratory. Key mappings, targets and completion behaviour corrected 2026-08-06 against the shipped profile (DCR-015); any locally printed copy of v1.0 must be withdrawn. |
@@ -198,11 +198,18 @@ During or after counting, you may enter morphology observations:
 
    The target is **advisory, not enforced** (URS-041). Nothing blocks you from
    finishing earlier or continuing beyond it.
+
+   **A profile may state no target** (DCR-040), in which case no progress bar
+   appears and step 3 does not arise. The grand total is then the only figure
+   tracking the count, and the judgement in step 3 is entirely yours — as it
+   is anyway, since the software cannot know what the count is for.
 2. Click the **"Count Done"** button.
 3. **If the count is below the target**, the results screen carries an advisory
    stating the count reached and the confidence interval it supports. It does
    not block, and there is no dialog to dismiss. Judge whether the count is
-   adequate for the question being asked.
+   adequate for the question being asked. The confidence interval beside each
+   percentage is present whether or not the profile states a target, and is
+   what the judgement should rest on.
 4. After count completion:
    - Keyboard counting stops, and further keystrokes cannot alter the tally.
    - Output reports are generated in the tabbed output area.
@@ -384,6 +391,7 @@ I have read and understand SOP-001 for the WBC ΔΣ application. I have been tra
 | A | 2026-02-18 | QMS | Initial draft - complete SOP |
 | B | 2026-08-06 | QMS | v2.0 (DCR-015): key tables regenerated from the shipped profile after the v2.0 layout change; operator documentation aligned with the 14-category profile. |
 | C | 2026-08-08 | QMS | v2.1 (DCR-038): pre-validation corrections. §5.5 miscount example named keys that do not do what it said (A was called blasts; A is monocytes). §6.2 monthly QC entered categories the profile does not have and cited a test that does not exist; replaced with an engine-derived 100-cell vector. §8 attested that nothing is written to permanent browser storage, which autosave contradicts. §5.1/§5.2 described a Start button gated on a case number, which was never built — the identification check is procedural and is now stated as such. §5.9 Method 1 described a case-number-change dialog that does not exist. §7 item 6 said keys are fixed, contradicting §4.1 and the Configuration Editor. Profile version stamp corrected to v2.6. |
+| D | 2026-08-23 | QMS | v2.2 (DCR-040): §5.7 covers a profile that states no target — no progress bar, no sub-target advisory, and the judgement resting on the confidence interval, which is present either way. |
 
 ## 13. Approval Signatures
 

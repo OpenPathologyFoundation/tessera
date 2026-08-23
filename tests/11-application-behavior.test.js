@@ -694,6 +694,57 @@ describe('Behaviour — Results, Export and Absolute Counts', () => {
         h.close();
     });
 
+    it('TC-B136: A profile that states no target shows no progress row (DCR-040)', async () => {
+        // The reviewing haematopathologists asked for the counter they use,
+        // which shows a running total and nothing else. What must NOT disappear
+        // with the target is the count itself: the Grand Total carries the
+        // differential denominator, which is the number the progress row showed.
+        const cfg = clone(DEFAULT_CONFIG);
+        cfg.specimenTypes.forEach(s => { s.targetCount = null; });
+        const h = await counting({ config: cfg, caseNumber: 'C1' });
+
+        assert.equal(h.el('progress-label'), null, 'the target label is still rendered');
+        assert.equal(h.el('progress-bar'), null, 'the progress bar is still rendered');
+        assert.ok(!/\(target\)/.test(h.document.getElementById('phase-counting').textContent),
+            'the counting screen still says "target" somewhere');
+
+        h.press('X', 7);
+        assert.equal(h.text('val-grand-total'), '7',
+            'the running count must survive the target it was displayed beside');
+        h.close();
+    });
+
+    it('TC-B137: No target, no chime — and none on the first cell (DCR-040)', async () => {
+        // `total >= null` is `total >= 0`. Without a type check the chime would
+        // sound on the first keystroke of every count.
+        const cfg = clone(DEFAULT_CONFIG);
+        cfg.specimenTypes.forEach(s => { s.targetCount = null; });
+        const h = await counting({ config: cfg, caseNumber: 'C1' });
+        h.key('X');
+        assert.equal(h.hooks.state.targetReachedNotified, false, 'chimed on the first cell');
+        h.press('X', 40);
+        assert.equal(h.hooks.state.targetReachedNotified, false, 'chimed with no target set');
+        h.close();
+    });
+
+    it('TC-B138: No target, no sub-target advisory and no basis text (DCR-040)', async () => {
+        const cfg = clone(DEFAULT_CONFIG);
+        cfg.specimenTypes.forEach(s => { s.targetCount = null; });
+        const h = await counting({ config: cfg, caseNumber: 'C1' });
+        h.press('X', 12);
+        h.click('btnCountDone');
+        assert.equal(h.hooks.state.phase, 'results');
+        assert.ok(!h.visible('low-count-note'), 'a 12-cell count raised an advisory anyway');
+
+        // The basis rides in the method statement as well as the advisory, and
+        // the profile still carries the text — it is the target that is gone.
+        const results = h.document.getElementById('phase-results').textContent;
+        assert.ok(!/Basis for the target/.test(results));
+        assert.ok(!/Target count:/.test(results),
+            'the method statement still justifies a target the profile does not state');
+        h.close();
+    });
+
     it('TC-B083: CSV export contains the traceability columns and the counted data', async () => {
         const h = await counting({ caseNumber: 'S25-1234' });
         h.press('X', 10);

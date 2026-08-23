@@ -214,6 +214,17 @@ where ICSH would exclude them. A laboratory needing that distinction should
 configure separate myeloid and lymphoid blast categories. Recorded in RA-001 as
 HA-091.
 
+**A second route, shipped 2026-08-23 (DCR-040).** The haematopathologists
+piloting the tool asked for blasts to be excluded from the ratio outright, and
+`mdc-2015-9` now does that. It is the cheaper answer to the same problem: rather
+than asking the operator for a lineage call the morphology may not support, the
+profile declines to attribute blasts to either lineage. The cost is confined to
+marrows where blasts are few, and there it is smaller than the ratio's own
+confidence interval; the benefit is confined to marrows where blasts dominate,
+and there it is the whole figure. `ndc-14` keeps the ICSH set — a profile
+claiming literal conformance must behave as its citation says, which is what
+makes it worth comparing against.
+
 ### 3.6 Report content
 
 ICSH §2.6 requires that "the total number of cells counted in the NDC should be
@@ -375,7 +386,7 @@ combined category and count what it can reliably distinguish.
 | No prompt to extend the count when an abnormal percentage sits near a diagnostic threshold | [S1] §2.6 | **Closed** — URS-038, module M5, DCR-008 |
 | Target count rule is unconditional; ICSH makes 500 vs 300 depend on diagnostic intent | [S1] §2.6 | **Open** — profiles should offer both with the rule stated |
 | `other` category has no ICSH counterpart and may capture cells ICSH excludes | [S1] §2.6 | **Partially addressed** — guidance added; see RA-001 HA-090 |
-| Generic `blasts` category cannot distinguish myeloblasts for M:E purposes | [S1] §2.6 | **Documented limitation** — RA-001 HA-091 |
+| Generic `blasts` category cannot distinguish myeloblasts for M:E purposes | [S1] §2.6 | **Documented limitation** — RA-001 HA-091. Two routes now available: separate blast categories, or excluding blasts from the numerator, which `mdc-2015-9` does (DCR-040, §3.5) |
 | No confidence interval on reported percentages | [S7]; [S8] | **Closed** — module M4, DCR-007 |
 | No interval on the M:E **ratio**, the least precise figure reported | Derivation, §3.8; [S7] | **Closed** — DCR-026: the odds transform of the Wilson interval on the conditional binomial. Fieller rejected (degenerates with no erythroid cells); bootstrap rejected (stochastic in a reported figure). RA-001 HA-093 closed. |
 | No comparison against published normal ranges for the NDC | [S1] §2.6 | Out of scope — requires age-stratified reference data |
@@ -388,6 +399,7 @@ combined category and count what it can reliably distinguish.
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
 | D | 2026-08-05 | QMS | Added [S8] (Hedley 2025, ICSH WBC reference method) and [S9], both open access and held in full text. §2.1 added: CLSI H20-A2 resolved without purchase — its specification is quoted in [S8]. §3.9 added: quantified limitations of manual differential counting, for user-facing documentation. |
+| D | 2026-08-23 | QMS | §3.5 records a second route for the generic-blasts limitation of HA-091: `mdc-2015-9` excludes blasts from the M:E numerator (DCR-040). The gap-table row is updated with it. The limitation itself is unchanged and remains open for any profile that keeps the ICSH set, which `ndc-14` does by design. |
 | C | 2026-08-05 | QMS | §3.4 updated: the ICSH §2.6 near-threshold direction is implemented under URS-038 (DCR-008) and the gap is closed. §5 revised. |
 | B | 2026-08-05 | QMS | Added [S7] (Brown, Cai & DasGupta) as the basis for choosing Wilson over Wald. Added §3.7 sampling precision and §3.8 on what Rümke's warning actually concerns — ratios, not single percentages, which makes the M:E display the affected element. |
 | A | 2026-08-05 | QMS | Initial issue. ICSH 2008 [S1] verified against full text; counting model, M:E definition and target counts traced to source. Sources not held in full text explicitly marked. |

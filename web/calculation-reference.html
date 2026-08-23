@@ -327,10 +327,13 @@
     </div>
     <div class="mt-3 p-4 cfg bg-slate-800/50 rounded text-xs">
         <p class="font-semibold text-accent">Configurable</p>
-        <p class="mt-1 text-slate-400"><code>targetCount</code> per specimen type. The target is
+        <p class="mt-1 text-slate-400"><code>targetCount</code> per specimen type, or
+        <code>null</code> for a laboratory that counts to no target. The target is
         <strong>advisory and never enforced</strong>: you may finish at any count above zero. Finishing
         below target produces a note stating the precision achieved rather than blocking you &mdash; a
-        paucicellular aspirate may make a longer count impossible, and you are the one who knows that.</p>
+        paucicellular aspirate may make a longer count impossible, and you are the one who knows that.
+        Where a profile states no target there is no progress bar and no note; the confidence intervals
+        remain, and a profile that gives up both is rejected.</p>
     </div>
 
     <!-- ================= 3 ================= -->
@@ -578,7 +581,7 @@ M:E =  ────────────────────────�
         <tbody>
         <tr><td>Cell categories</td><td class="text-accent">Configurable</td><td>ICSH 2008 §2.6, fourteen categories</td></tr>
         <tr><td>Keyboard mapping</td><td class="text-accent">Configurable</td><td>Left-hand ergonomic</td></tr>
-        <tr><td>Target cell count</td><td class="text-accent">Configurable</td><td>BM 500, PB 200</td></tr>
+        <tr><td>Target cell count</td><td class="text-accent">Configurable</td><td>BM 500, PB 200, or none</td></tr>
         <tr><td>Denominator: which categories count</td><td class="text-accent">Configurable</td><td>BM all; PB excludes NRBC</td></tr>
         <tr><td>Per-100 reporting</td><td class="text-accent">Configurable</td><td>NRBC per 100 WBC in blood</td></tr>
         <tr><td>Rounding policy</td><td class="text-accent">Configurable</td><td>Largest remainder</td></tr>

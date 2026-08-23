@@ -574,14 +574,33 @@
         // Find BM/PB specific targets, or use current spec
         var bmSpec = editorState.specimenTypes.find(function (s) { return s.specimenType === 'bm'; });
         var pbSpec = editorState.specimenTypes.find(function (s) { return s.specimenType === 'pb'; });
-        document.getElementById('targetBm').value = bmSpec ? bmSpec.targetCount : spec.targetCount;
-        document.getElementById('targetPb').value = pbSpec ? pbSpec.targetCount : spec.targetCount;
+        document.getElementById('targetBm').value = targetFieldValue(bmSpec ? bmSpec.targetCount : spec.targetCount);
+        document.getElementById('targetPb').value = targetFieldValue(pbSpec ? pbSpec.targetCount : spec.targetCount);
 
         document.getElementById('handedness').value = spec.handedness || 'left';
         document.getElementById('absoluteCounts').value = spec.absoluteCounts || 'optional';
         document.getElementById('audioEnabled').checked = spec.audioEnabled !== false;
         document.getElementById('audioMode').value = spec.audioMode || 'click';
         document.getElementById('autosaveEnabled').checked = spec.autosaveEnabled !== false;
+    }
+
+    /**
+     * A target for the number field, and back again (DCR-040).
+     *
+     * A profile that states no target holds `null`, which an <input> would show
+     * as the string "null"; and an emptied field means "no target" rather than
+     * "fall back to 500", which is the reading `parseInt(...) || 500` gave it.
+     * A non-empty but unusable entry still falls back, because a half-typed
+     * number must not silently become a policy.
+     */
+    function targetFieldValue(v) {
+        return typeof v === 'number' ? v : '';
+    }
+
+    function parseTargetField(raw, fallback) {
+        if (String(raw).trim() === '') return null;
+        var n = parseInt(raw, 10);
+        return (isFinite(n) && n > 0) ? n : fallback;
     }
 
     function wireSettings() {
@@ -593,11 +612,11 @@
         });
         document.getElementById('targetBm').addEventListener('input', function () {
             var bmSpec = editorState.specimenTypes.find(function (s) { return s.specimenType === 'bm'; });
-            if (bmSpec) bmSpec.targetCount = parseInt(this.value) || 500;
+            if (bmSpec) bmSpec.targetCount = parseTargetField(this.value, 500);
         });
         document.getElementById('targetPb').addEventListener('input', function () {
             var pbSpec = editorState.specimenTypes.find(function (s) { return s.specimenType === 'pb'; });
-            if (pbSpec) pbSpec.targetCount = parseInt(this.value) || 200;
+            if (pbSpec) pbSpec.targetCount = parseTargetField(this.value, 200);
         });
         document.getElementById('handedness').addEventListener('change', function () {
             getActiveSpec().handedness = this.value;

@@ -46,7 +46,7 @@
      * which version produced a report. QC-016 holds it equal to
      * package.json, DHF-001 and the service-worker cache key.
      */
-    const APP_VERSION = '2.22.3';
+    const APP_VERSION = '2.23.0';
 
     const AUDIO_KEY = 'wbcds_audio';
     const CONFIG_CACHE_KEY = 'wbcds_config';
@@ -1234,9 +1234,12 @@
         updateCounterDisplay();
 
         // Target reached chime — measured against the differential, since the
-        // target is a number of classified cells.
+        // target is a number of classified cells. A profile that states no
+        // target has nothing to reach: without the type check `total >= null`
+        // is `total >= 0` and the chime would sound on the first cell.
         var total = getDifferentialTotal();
-        if (total >= specConfig.targetCount && !state.targetReachedNotified) {
+        if (typeof specConfig.targetCount === 'number' &&
+            total >= specConfig.targetCount && !state.targetReachedNotified) {
             state.targetReachedNotified = true;
             AudioEngine.playChime();
         }
@@ -1441,15 +1444,21 @@
         });
 
         // --- PROGRESS BAR (toward target count) ---
-        html += '<div class="mt-4">';
-        html += '<div class="flex justify-between text-[11px] text-slate-500 mb-1">';
-        html += '<span>Progress</span>';
-        html += '<span id="progress-label">0 / ' + specConfig.targetCount + ' (target)</span>';
-        html += '</div>';
-        html += '<div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">';
-        html += '<div id="progress-bar" class="h-full bg-blue-600 rounded-full transition-all duration-150" style="width: 0%"></div>';
-        html += '</div>';
-        html += '</div>';
+        // Omitted entirely where the profile states no target (DCR-040): a bar
+        // with no end is not a progress bar, and the running count it carried
+        // is already above it as the Grand Total, which shows the differential
+        // denominator. Nothing about the count becomes invisible.
+        if (typeof specConfig.targetCount === 'number') {
+            html += '<div class="mt-4">';
+            html += '<div class="flex justify-between text-[11px] text-slate-500 mb-1">';
+            html += '<span>Progress</span>';
+            html += '<span id="progress-label">0 / ' + specConfig.targetCount + ' (target)</span>';
+            html += '</div>';
+            html += '<div class="h-1.5 bg-slate-800 rounded-full overflow-hidden">';
+            html += '<div id="progress-bar" class="h-full bg-blue-600 rounded-full transition-all duration-150" style="width: 0%"></div>';
+            html += '</div>';
+            html += '</div>';
+        }
 
         html += '</div>'; // max-w container
 
@@ -1713,8 +1722,11 @@
             node.textContent = (r && r.display) || 'N/A';
         });
 
-        // Progress bar — against the differential, matching the target's meaning
+        // Progress bar — against the differential, matching the target's meaning.
+        // Absent where the profile states no target; the elements are not in the
+        // DOM and `total / null` would be Infinity.
         var targetCount = specConfig.targetCount;
+        if (typeof targetCount !== 'number') return;
         var pctProgress = Math.min((total / targetCount) * 100, 100);
         var bar = el('progress-bar');
         if (bar) {

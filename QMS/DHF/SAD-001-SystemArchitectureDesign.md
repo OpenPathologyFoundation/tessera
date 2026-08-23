@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Document ID** | SAD-001 |
-| **Version** | 3.0 |
+| **Version** | 3.3 |
 | **Product** | WBC ΔΣ |
 | **Date Created** | 2026-02-18 |
 | **Date Revised** | 2026-08-06 |
@@ -262,7 +262,7 @@ artefact are the same bytes.
 - **SRS Trace**: SYS-100 through SYS-103
 
 #### 3.2.13 Progress Indicator
-- **Responsibility**: Displays live counting progress in "N / target (target)" format. Updates on every keypress to show how close the operator is to the advisory target count for the active specimen type.
+- **Responsibility**: Displays live counting progress in "N / target (target)" format. Updates on every keypress to show how close the operator is to the advisory target count for the active specimen type. Absent where the profile states no target (DCR-040): the component is not rendered, and the grand total carries the count.
 - **Inputs**: Current total count; target count from configuration
 - **Outputs**: Rendered progress text in the counting UI
 - **SRS Trace**: SYS-040
@@ -436,6 +436,7 @@ selector. Neither happens.
    percentages with intervals
    NEAR A DIAGNOSTIC THRESHOLD advisory, if any interval spans one
    sub-target advisory, if below target        <- both ADVISORY, never blocking
+                                               (and only if the profile states one)
    method statement (disclosure)
    tabbed output, each carrying "[profileId vX.Y · timestamp]"  (URS-052)
        |
@@ -781,6 +782,7 @@ within the same profile; changing the profile itself returns to IDLE.
 | 3.0 | 2026-08-06 | QMS | **Revised for drift.** §7.1 stated "sessionStorage only … no localStorage" and that output avoided `innerHTML`; both false, and the same privacy claim corrected in README.md under DCR-015 had not been propagated. §3.2.3 and §7.2 carried the key mapping withdrawn at v2.0. Tailwind was described as CDN-delivered in three places, which would defeat URS-094. §5.2 listed a file that does not exist and omitted three of four scripts, the service worker, the stylesheet, the vendored bundle and the preset catalogue; §5.3 described a single script tag. §3.2.9 to §3.2.13 added for the calculation engine, configuration lifecycle, dialog, editor and offline shell — five components previously absent. See DCR-021. |
 | 3.1 | 2026-08-06 | QMS | §3.1 redrawn by layer — the previous diagram was a flat grid of counter features that omitted every module added since DCR-006, including the engine that computes every number in it. §4 flows rewritten: they stopped at "recalculate percentages" and "compile the template", omitting the denominator policy, rounding, confidence intervals, the threshold advisory, the method statement, autosave and every keyboard guard. §4.4 claimed reset clears the specimen type and re-enables a locked selector; it preserves the type and nothing is ever locked. §4.5 (configuration resolution) added, previously absent. UD-075 to UD-078. |
 | 3.2 | 2026-08-06 | QMS | §6 rewritten. §6.1 omitted three transitions that exist — the mid-count specimen switch, crash recovery back into COUNTING, and the reason URS-043 was withdrawn — and implied the specimen selector locks. §6.2 documented nine of fifteen state fields and recorded the tally as "closure state, lost on page close", which autosave made false. §6.3 (state at rest) and §6.4 (configuration state) added: both localStorage keys were undocumented, including the recovery snapshot that holds patient data. UD-079 to UD-081 extract the state fields and storage keys from the source, so an undocumented field fails the build. |
+| 3.3 | 2026-08-23 | QMS | §3.2 progress component and the §4 results flow record that both are conditional on the profile stating a target (DCR-040). The header version had stood at 3.0 since revision 3.0 while the table had reached 3.2; corrected here (drift log incident 45). |
 | A | 2026-02-18 | QMS | Initial draft — architecture defined |
 | B | 2026-02-19 | QMS | Component descriptions refined |
 | C | 2026-02-20 | QMS | Data flow diagrams updated |

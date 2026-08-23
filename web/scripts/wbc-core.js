@@ -37,6 +37,11 @@
     //   type is required for diagnosis, at least 300 when the differential is
     //   not essential to it. A profile expresses which applies through
     //   targetCount and targetCountBasis.
+    //
+    // A profile may also state NO target, as `targetCount: null` (DCR-040).
+    // That is distinct from omitting the field, which takes the default above:
+    // absent means "unstated, use the evidence-based figure", null means "this
+    // laboratory does not count to a target". Nothing below invents one for it.
     var DEFAULT_TARGET = { bm: 500, pb: 200 };
     var FALLBACK_TARGET = 200;
 
@@ -932,7 +937,11 @@
             entries.push({ label: 'Rounding', text: ROUNDING_TEXT[s.rounding] });
         }
 
-        if (s.targetCountBasis) {
+        // Stated only where there is a target for it to justify. A profile that
+        // states no target may still carry the basis text — the configuration
+        // editor edits the two through separate controls — and printing it would
+        // attribute to the report a rule the profile does not apply (DCR-040).
+        if (s.targetCountBasis && typeof s.targetCount === 'number') {
             entries.push({ label: 'Target count', text: s.targetCountBasis });
         }
 
@@ -971,6 +980,12 @@
      * Advisory note shown when a count finishes below the configured target
      * (URS-041 / SYS-053). Returns null when the target has been met.
      * Non-blocking by design: the target is advisory, never enforced.
+     *
+     * Also returns null when the profile states no target (`targetCount: null`,
+     * DCR-040) — there is no shortfall to report against a figure the
+     * laboratory has not adopted. The confidence interval beside each
+     * percentage is what carries the imprecision in that case, and
+     * validateConfig will not let a profile give up both.
      */
     function buildLowCountNote(total, targetCount, level, basis) {
         if (typeof targetCount !== 'number' || targetCount <= 0) return null;
@@ -1152,7 +1167,11 @@
 
         specimenTypes.forEach(function (spec) {
             if (!spec || typeof spec !== 'object') return;
-            if (!spec.targetCount) {
+            // Only an ABSENT target takes the default. `null` is a profile
+            // stating it has no target and must survive normalization; a 0 or a
+            // negative is a mistake and is left for validateConfig to report,
+            // rather than silently becoming 500.
+            if (spec.targetCount === undefined) {
                 spec.targetCount = DEFAULT_TARGET[spec.specimenType] || FALLBACK_TARGET;
             }
             if (!spec.specimenLabel) {
@@ -1275,8 +1294,29 @@
                 });
             }
 
-            if (typeof spec.targetCount !== 'number' || spec.targetCount <= 0) {
-                errors.push(name + ': targetCount must be a positive number');
+            // isFinite as well as the type: NaN is a number, and NaN <= 0 is
+            // false, so a target parsed from a malformed field used to pass
+            // validation and render as "0 / NaN (target)". It only reaches here
+            // now that normalizeConfig no longer treats every falsy value as
+            // absent — the price of letting null through is checking the rest.
+            if (spec.targetCount !== null &&
+                (typeof spec.targetCount !== 'number' || !isFinite(spec.targetCount) ||
+                 spec.targetCount <= 0)) {
+                errors.push(name + ': targetCount must be a positive number, ' +
+                    'or null for a profile that states no target');
+            }
+
+            // HA-030 (a count finalized with too few cells) has two controls:
+            // the sub-target advisory and the confidence interval printed beside
+            // every percentage. RA-001 scores the residual risk Low on the
+            // strength of the second. A profile may drop either — dropping both
+            // leaves a count too small to answer the question with nothing on
+            // screen or in the report that says so.
+            if (spec.targetCount === null && spec.confidenceIntervals &&
+                spec.confidenceIntervals.enabled === false) {
+                errors.push(name + ': a profile that states no target must leave ' +
+                    'confidence intervals enabled. With neither, nothing reports ' +
+                    'the imprecision of a short count (HA-030).');
             }
 
             // Denominator policy (URS-030). A category may be counted without

@@ -97,13 +97,13 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**786 verification cases** across 28 series and 4 layers, run as 854 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**795 verification cases** across 29 series and 4 layers, run as 864 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
 | `QC-*` | 25 (001–028) | Static | QMS counted quantities |
 | `SC-*` | 33 (001–064) | Unit | Standards conformance (ICSH) |
-| `TC-B*` | 96 (001–135) | Behaviour | Application behaviour in a DOM |
+| `TC-B*` | 99 (001–138) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 57 (001–101) | Static | User-facing documentation |
 | `VV-ABS-*` | 7 (001–024) | Unit | Absolute counts and the analyser WBC |
 | `VV-AUD-*` | 19 (001–019) | Static | Audio engine structure |
@@ -118,14 +118,15 @@ auditing how the plan changed.
 | `VV-KBD-*` | 6 (001–006) | Unit | — |
 | `VV-LOW-*` | 6 (001–006) | Unit | Sub-target advisory |
 | `VV-ME-*` | 13 (001–016) | Unit | Myeloid-to-erythroid ratio |
-| `VV-PRE-*` | 32 (001–035) | Unit | Preset catalogue integrity |
-| `VV-PROV-*` | 8 (001–008) | Unit | Method provenance |
+| `VV-PRE-*` | 33 (001–035) | Unit | Preset catalogue integrity |
+| `VV-PROV-*` | 9 (001–009) | Unit | Method provenance |
 | `VV-RND-*` | 7 (001–007) | Unit | Rounding policy |
 | `VV-SAV-*` | 18 (001–018) | Static | Autosave and crash recovery (static) |
 | `VV-SCH-*` | 23 (001–023) | Unit | v2 configuration schema |
 | `VV-SRC-*` | 76 (001–076) | Static | Application source integrity (static) |
 | `VV-SUB-*` | 7 (001–007) | Unit | Subset percentages |
-| `VV-SYS-*` | 131 (001–223) | System | System verification in a real browser |
+| `VV-SYS-*` | 132 (001–224) | System | System verification in a real browser |
+| `VV-TGT-*` | 3 (001–003) | Unit | — |
 | `VV-THR-*` | 8 (001–008) | Unit | Diagnostic thresholds |
 | `VV-TON-*` | 11 (001–013) | Unit | — |
 | `VV-TPL-*` | 5 (001–005) | Unit | Output templates |
@@ -298,6 +299,9 @@ auditing how the plan changed.
 | TC-B133 | A template may place the method statement inline | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B134 | The peripheral blood method statement declares the denominator | Behaviour | `tests/11-application-behavior.test.js` |
 | TC-B135 | A profile with no provenance still produces valid output | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B136 | A profile that states no target shows no progress row (DCR-040) | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B137 | No target, no chime — and none on the first cell (DCR-040) | Behaviour | `tests/11-application-behavior.test.js` |
+| TC-B138 | No target, no sub-target advisory and no basis text (DCR-040) | Behaviour | `tests/11-application-behavior.test.js` |
 
 #### UD-* — User-facing documentation
 
@@ -653,7 +657,7 @@ auditing how the plan changed.
 | VV-LOW-001 | Below-target count produces a non-blocking note | Unit | `tests/01-calculation-engine.test.js` |
 | VV-LOW-002 | Reaching the target produces no note | Unit | `tests/01-calculation-engine.test.js` |
 | VV-LOW-003 | Missing or invalid target produces no note | Unit | `tests/01-calculation-engine.test.js` |
-| VV-LOW-004 | The advisory states an actual interval, not a vague warning | Unit | `tests/01-calculation-engine.test.js` |
+| VV-LOW-004 | A profile that states no target produces no note (DCR-040) | Unit | `tests/01-calculation-engine.test.js` |
 | VV-LOW-005 | The stated interval matches the engine | Unit | `tests/01-calculation-engine.test.js` |
 | VV-LOW-006 | The advisory honours the configured confidence level | Unit | `tests/01-calculation-engine.test.js` |
 
@@ -701,10 +705,11 @@ auditing how the plan changed.
 | VV-PRE-020 | Every selectable preset configures confidence intervals (P0-9) | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-021 | Every key maps to the category the predecessor mapped it to | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-022 | The keys are the predecessor's nine, in its order | Unit | `tests/09-preset-catalog.test.js` |
-| VV-PRE-023 | The minimums and report templates are the predecessor's | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-023 | The predecessor's unread minimum is not displayed as a target | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-024 | A counted cell is never reported as absent | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-025 | The M:E field the predecessor left blank is computed | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-026 | The profile declares that it is coarser than ICSH | Unit | `tests/09-preset-catalog.test.js` |
+| VV-PRE-027 | Blasts take no part in this profile's M:E ratio (DCR-040) | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-030 | Every number in a name is that profile's tallied category count | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-031 | The catalogue, the file and its contents agree | Unit | `tests/09-preset-catalog.test.js` |
 | VV-PRE-032 | Provenance claims only what the profile implements | Unit | `tests/09-preset-catalog.test.js` |
@@ -724,6 +729,7 @@ auditing how the plan changed.
 | VV-PROV-006 | An empty profile yields an empty statement, not a stub | Unit | `tests/01-calculation-engine.test.js` |
 | VV-PROV-007 | The statement flattens for template substitution | Unit | `tests/01-calculation-engine.test.js` |
 | VV-PROV-008 | methodNotes is available to templates and cannot be shadowed | Unit | `tests/01-calculation-engine.test.js` |
+| VV-PROV-009 | A basis with no target to justify is not stated (DCR-040) | Unit | `tests/01-calculation-engine.test.js` |
 
 #### VV-RND-* — Rounding policy
 
@@ -1016,6 +1022,15 @@ auditing how the plan changed.
 | VV-SYS-221 | A profile with no bone marrow states no bone marrow basis | System | `tests-e2e/config-and-offline.spec.js` |
 | VV-SYS-222 | The control cycles three modes and the choice survives a reload | System | `tests-e2e/counting-workflow.spec.js` |
 | VV-SYS-223 | Counting is unaffected by the audio mode | System | `tests-e2e/counting-workflow.spec.js` |
+| VV-SYS-224 | No target on screen, and a short count raises no advisory (DCR-040) | System | `tests-e2e/config-and-offline.spec.js` |
+
+#### VV-TGT-* — verification cases
+
+| ID | Verifies | Layer | File |
+|----|----------|-------|------|
+| VV-TGT-001 | A profile may state no target, but not a broken one (DCR-040) | Unit | `tests/01-calculation-engine.test.js` |
+| VV-TGT-002 | No target and no intervals is refused (HA-030, DCR-040) | Unit | `tests/01-calculation-engine.test.js` |
+| VV-TGT-003 | Absent takes the default; null survives normalization | Unit | `tests/01-calculation-engine.test.js` |
 
 #### VV-THR-* — Diagnostic thresholds
 

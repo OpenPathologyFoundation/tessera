@@ -322,6 +322,6 @@ statement and in every export.
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
 | **Clinical Reviewer** | | | **required — this is their change; §2 monocytes decision is the Design Engineer's and invites comment** |
-| Design Engineer | | | |
-| Quality Assurance | | | |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-23 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-23 |
 | Regulatory Affairs | | | |

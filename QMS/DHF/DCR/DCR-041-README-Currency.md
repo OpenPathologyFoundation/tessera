@@ -125,6 +125,6 @@ stack table.
 
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
-| Design Engineer | | | |
-| Quality Assurance | | | |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-23 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-23 |
 | Regulatory Affairs | | | |

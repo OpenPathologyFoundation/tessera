@@ -167,6 +167,6 @@ creates this window, and both remain correct.
 | Role | Name | Signature | Date |
 |------|------|-----------|------|
 | **Clinical Reviewer** | | | **invited — §1 is the first defect this project found through use rather than review** |
-| Design Engineer | | | |
-| Quality Assurance | | | |
+| Design Engineer | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-23 |
+| Quality Assurance | Peter Gershkovich, M.D., M.H.A. | /s/ Peter Gershkovich — info@openpathology.tech | 2026-08-23 |
 | Regulatory Affairs | | | |

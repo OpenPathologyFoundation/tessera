@@ -122,7 +122,11 @@ function measure() {
     const byId = new Map((manifest ? manifest.incidents : []).map(i => [i.id, i]));
     const commit = git(['rev-parse', 'HEAD']);
     const tag = git(['describe', '--exact-match', '--tags', 'HEAD']);
-    const dirty = git(['status', '--porcelain']);
+    // The generator's own outputs do not make the tree dirty for its purposes:
+    // results.json is stamped with the commit it measured, and facts.json is
+    // what is being written. Anything else uncommitted does.
+    const OWN = /^(..) replay\/(results|facts|baseline)\.json$/;
+    const dirty = (git(['status', '--porcelain']) || '').split('\n').filter(l => l && !OWN.test(l)).join('\n');
 
     // --- incidents: the log is the dataset; the manifest is the classification.
     const incidents = {

@@ -617,6 +617,158 @@ describe('A closure closes everywhere (URS-092)', () => {
 });
 
 // ================================================================
+describe('The drift log is replayed, and the paper about it reads only measured facts (URS-092)', () => {
+
+    /**
+     * DCR-043. The log's "Prevented by" column was written by hand, once per
+     * row, when each guard was built. Nothing re-asked whether the guard still
+     * catches the incident, or whether it catches the class. `replay/` turns
+     * that column into a measurement: every row gets an instance patch and a
+     * class patch, and `npm run replay` applies each to a fresh worktree of a
+     * fixed commit and records which checks fired.
+     *
+     * These tests cannot run the replay — it runs the build, and this suite
+     * runs inside it — so they hold the artifacts to the protocol: every row
+     * is covered, the committed results are admissible and complete, and the
+     * manuscript's numbers are the generator's, not the author's.
+     */
+    const ROOT = path.join(__dirname, '..');
+    const REPLAY = path.join(ROOT, 'replay');
+    const readJson = f => JSON.parse(fs.readFileSync(f, 'utf-8'));
+
+    it('QC-029: Every drift-log row has a classification, an instance patch and a class patch', () => {
+        // The closure-sweep rule, made executable for the replay: a row appended
+        // to the log without its two patches fails here, so the dataset the
+        // paper measures cannot silently stop covering the log.
+        const log = fs.readFileSync(path.join(__dirname, '..', 'QMS', 'DHF', 'DRIFT-LOG.md'), 'utf-8');
+        const rows = log.split('\n').filter(l => /^\| \d+ \| \d{4}-\d{2}-\d{2} \|/.test(l))
+            .map(l => Number(l.split('|')[1].trim()));
+        assert.ok(rows.length >= 20, 'the row parser is broken');
+
+        const manifest = readJson(path.join(REPLAY, 'incidents.json'));
+        const classes = new Set(Object.keys(manifest.classes));
+        const detections = new Set(Object.keys(manifest.classification.detection_classes));
+        const byId = new Map(manifest.incidents.map(i => [i.id, i]));
+        const missing = [];
+        for (const id of rows) {
+            const nn = String(id).padStart(2, '0');
+            const inc = byId.get(id);
+            if (!inc) { missing.push(`row ${id}: no entry in replay/incidents.json`); continue; }
+            if (!classes.has(inc.class)) missing.push(`row ${id}: class "${inc.class}" is not in the taxonomy`);
+            if (!detections.has(inc.detection)) missing.push(`row ${id}: detection "${inc.detection}" is not a detection class`);
+            if (typeof inc.correct_work !== 'boolean') missing.push(`row ${id}: correct_work is not decided`);
+            for (const kind of ['instance', 'class']) {
+                const file = path.join(REPLAY, 'patches', `${nn}-${kind}.json`);
+                if (!fs.existsSync(file)) { missing.push(`row ${id}: replay/patches/${nn}-${kind}.json is absent`); continue; }
+                let p;
+                try { p = readJson(file); } catch (e) { missing.push(`row ${id}: ${nn}-${kind}.json does not parse`); continue; }
+                if (p.incident !== id || p.kind !== kind) missing.push(`row ${id}: ${nn}-${kind}.json describes incident ${p.incident} ${p.kind}`);
+                if (!['edit', 'revert', 'none'].includes(p.mode)) missing.push(`row ${id}: ${nn}-${kind}.json has mode "${p.mode}"`);
+                if (p.mode === 'edit' && !(Array.isArray(p.edits) && p.edits.length)) missing.push(`row ${id}: ${nn}-${kind}.json carries no edits`);
+                if (p.mode === 'none' && !p.reason) missing.push(`row ${id}: ${nn}-${kind}.json replays nothing and says not why`);
+                if (!p.builder) missing.push(`row ${id}: ${nn}-${kind}.json names no builder`);
+                if (kind === 'class' && !p.same_class_because) missing.push(`row ${id}: ${nn}-class.json does not say why it is the same class`);
+            }
+        }
+        // And no patch for a row that does not exist.
+        for (const name of fs.readdirSync(path.join(REPLAY, 'patches'))) {
+            const m = /^(\d+)-(instance|class)\.json$/.exec(name);
+            if (m && !rows.includes(Number(m[1]))) missing.push(`${name} replays a row the log does not have`);
+        }
+        assert.deepEqual(missing, [], 'the replay does not cover the log:\n  ' + missing.join('\n  '));
+    });
+
+    it('QC-030: The committed replay results are admissible, complete and self-consistent', () => {
+        // Like QC-022: before the first clean-tree run there is nothing to hold
+        // the tree to, and that is said out loud rather than passed silently.
+        const file = path.join(REPLAY, 'results.json');
+        if (!fs.existsSync(file)) {
+            console.log('    (skipped: no replay/results.json yet — run `npm run replay` on a clean tree)');
+            return;
+        }
+        const r = readJson(file);
+        assert.equal(r.provisional, false, 'the committed results were measured on a dirty tree and describe no commit');
+        assert.equal(r.dry_run, false, 'the committed results are a dry run');
+        assert.match(r.commit, /^[0-9a-f]{40}$/, 'results carry no commit hash');
+        const known = require('node:child_process').spawnSync('git', ['cat-file', '-e', `${r.commit}^{commit}`], { cwd: ROOT });
+        assert.equal(known.status, 0, `results were measured at ${r.commit}, which this repository does not contain`);
+        assert.equal(r.controls.negative.got, 'green', 'the negative control was red: the unmodified commit does not build');
+        assert.equal(r.controls.positive.got, 'red', 'the positive control was green: a hand-edited version did not fail the build');
+
+        // Every incident in the manifest, both kinds, is in the results.
+        const manifest = readJson(path.join(REPLAY, 'incidents.json'));
+        const have = new Set(r.runs.map(x => `${x.incident}-${x.kind}`));
+        const absent = [];
+        for (const i of manifest.incidents) for (const k of ['instance', 'class']) if (!have.has(`${i.id}-${k}`)) absent.push(`${i.id} ${k}`);
+        assert.deepEqual(absent, [], 'results do not cover these patches:\n  ' + absent.join('\n  '));
+
+        // The summary is the runs, counted — not a second writer of the same fact.
+        for (const kind of ['instance', 'class']) {
+            const s = r.summary[kind];
+            assert.ok(s, `no ${kind} summary`);
+            for (const status of ['caught', 'caught_incidentally', 'caught_unattributed', 'escaped', 'unapplied', 'not_replayed']) {
+                const n = r.runs.filter(x => x.kind === kind && x.status === status).length;
+                assert.equal(s[status], n, `${kind} summary says ${status}=${s[status]}, the runs say ${n}`);
+            }
+        }
+        // A patch that no longer applies is a patch to rebuild, not a result to carry.
+        const unapplied = r.runs.filter(x => x.status === 'unapplied').map(x => `${x.incident} ${x.kind}: ${x.reason}`);
+        assert.deepEqual(unapplied, [], 'these patches did not apply at the measured commit — rebuild them:\n  ' + unapplied.join('\n  '));
+    });
+
+    it('QC-031: The manuscript, where present, states only what the facts file says', () => {
+        // The manuscript is private until the preprint, so a clone has nothing
+        // here. Where it exists, a manuscript that carries no marker has not
+        // yet joined the suite: its typed numbers are reported as the work
+        // list (`npm run lint:manuscript`) and nothing fails. From the first
+        // marker on, it is held to all of it — every marker must agree with
+        // replay/facts.json and no integer may be typed.
+        const paper = require(path.join(__dirname, '..', 'scripts', 'qms-paper-facts.js'));
+        const linter = require(path.join(__dirname, '..', 'scripts', 'qms-manuscript-lint.js'));
+        if (!fs.existsSync(paper.MANUSCRIPT)) {
+            console.log('    (skipped: no manuscript/ in this clone)');
+            return;
+        }
+        if (!fs.existsSync(paper.FACTS)) {
+            console.log('    (skipped: no replay/facts.json yet — run `node scripts/qms-paper-facts.js --write`)');
+            return;
+        }
+        const facts = readJson(paper.FACTS);
+        const markers = paper.readManuscriptMarkers(paper.MANUSCRIPT);
+        const { errors } = linter.lint(paper.MANUSCRIPT, facts);
+        if (markers.length === 0) {
+            console.log(`    (manuscript carries no qms:fact marker yet; ${errors.length} typed number(s) — ` +
+                'run `npm run lint:manuscript` for the work list)');
+            return;
+        }
+        assert.deepEqual(errors, [], 'the manuscript states numbers the facts file does not:\n  ' + errors.join('\n  '));
+    });
+
+    it('QC-032: TR-001 §1.1 states the baseline test count that was measured, not one that was remembered', () => {
+        // Incident 53. Three documents carried three figures for the number of
+        // tests at the v2.0 baseline — 379, 191, 146 — and none was tied to a
+        // commit. `qms-paper-facts.js --baseline` measures it at the newest
+        // commit on or before the date TR-001 states, and this holds the live
+        // comparison table to that measurement. DCR-004 keeps its figure: a
+        // change record is a dated record of what was believed when it was
+        // written.
+        const file = path.join(REPLAY, 'baseline.json');
+        if (!fs.existsSync(file)) {
+            console.log('    (skipped: no replay/baseline.json yet — run `node scripts/qms-paper-facts.js --baseline`)');
+            return;
+        }
+        const b = readJson(file);
+        const tr = fs.readFileSync(path.join(__dirname, '..', 'QMS', 'DHF', 'TR-001-TestResults.md'), 'utf-8');
+        const stated = /\| Tests recorded \| (\d+) \|/.exec(tr);
+        assert.ok(stated, 'TR-001 §1.1 no longer states a baseline test count');
+        assert.equal(Number(stated[1]), b.tests.total,
+            `TR-001 §1.1 says ${stated[1]} tests at the v2.0 baseline; replay/baseline.json measured ${b.tests.total} at ${b.commit.slice(0, 7)}`);
+        assert.ok(tr.includes(b.commit.slice(0, 7)),
+            'TR-001 §1.1 does not name the commit the baseline figure was measured at');
+    });
+});
+
+// ================================================================
 describe('The licence and the reserved marks stay stated (URS-092)', () => {
 
     /**

@@ -1,0 +1,19 @@
+{
+  "incident": 6,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SAD-001 describes Tailwind as CDN-delivered in two places while it ships vendored at web/vendor/tailwind.js",
+  "edits": [
+    {
+      "file": "QMS/DHF/SAD-001-SystemArchitectureDesign.md",
+      "find": "| Tailwind CSS, **vendored** | Utility-first styling with no build step. Served from `web/vendor/tailwind.js` and precached:",
+      "replace": "| Tailwind CSS (CDN) | Utility-first styling with no build step. Loaded from `cdn.tailwindcss.com` at page load:"
+    },
+    {
+      "file": "QMS/DHF/SAD-001-SystemArchitectureDesign.md",
+      "find": "| Styling | Vendored Tailwind + `web/styles/theme.css` |",
+      "replace": "| Styling | Tailwind CDN + `web/styles/theme.css` |"
+    }
+  ]
+}

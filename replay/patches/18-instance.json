@@ -1,0 +1,14 @@
+{
+  "incident": 18,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "REF-001 §5 gap table marks the M:E interval \"Open — needs Fieller or bootstrap\" while §3.8 above it and RA-001 say HA-093 is closed",
+  "edits": [
+    {
+      "file": "QMS/DHF/REF-001-StandardsAndLiterature.md",
+      "find": "| No interval on the M:E **ratio**, the least precise figure reported | Derivation, §3.8; [S7] | **Closed** — DCR-026:",
+      "replace": "| No interval on the M:E **ratio**, the least precise figure reported (HA-093) | Derivation, §3.8; [S7] | **Open** — needs Fieller or bootstrap. DCR-026:"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "incident": 30,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "prepareConfig rebuilds the profile meta from a field list that omits provenance, so the report's method statement loses its Basis line",
+  "edits": [
+    {
+      "file": "web/scripts/mdc-app.js",
+      "find": "                meta: (function () {\n                    var meta = {};\n                    Object.keys(norm).forEach(function (k) {\n                        if (k !== 'specimenTypes') meta[k] = norm[k];\n                    });\n                    meta.appVersion = APP_VERSION;\n                    return meta;",
+      "replace": "                meta: (function () {\n                    var meta = { version: norm.version, profileId: norm.profileId,\n                        profileName: norm.profileName, minAppVersion: norm.minAppVersion };\n                    meta.appVersion = APP_VERSION;\n                    return meta;"
+    }
+  ],
+  "extra_cmd": [
+    "npx",
+    "playwright",
+    "test",
+    "--grep",
+    "VV-SYS-220",
+    "--project=chromium"
+  ]
+}

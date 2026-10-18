@@ -1,0 +1,14 @@
+{
+  "incident": 36,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "help.html lists seven profiles by names the catalogue withdrew or never shipped",
+  "edits": [
+    {
+      "file": "web/help.html",
+      "find": "(14-Type Nucleated Differential; 10-Type — Bands+Segs Combined; 10-Type — Bands & Segs Separate; 5-Type — Analyzer Categories; Body Fluid — 7 Types; 9-Type — 2015 Counter Layout)",
+      "replace": "(full 14-part consensus, harmonized 9-part, legacy 9-part, minimal 5-part, body fluid, frequency-ergonomic, right-hand)"
+    }
+  ]
+}

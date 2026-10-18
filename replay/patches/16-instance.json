@@ -1,0 +1,19 @@
+{
+  "incident": 16,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "README states 1039 tests with 3 documented skips while TR-001 and the evidence state different totals",
+  "edits": [
+    {
+      "file": "README.md",
+      "find": "<!-- qms:fact tests_total -->1172<!-- /qms:fact -->",
+      "replace": "<!-- qms:fact tests_total -->1039<!-- /qms:fact -->"
+    },
+    {
+      "file": "README.md",
+      "find": "<!-- qms:fact tests_skipped -->7<!-- /qms:fact -->",
+      "replace": "<!-- qms:fact tests_skipped -->3<!-- /qms:fact -->"
+    }
+  ]
+}

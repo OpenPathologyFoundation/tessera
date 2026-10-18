@@ -1,0 +1,15 @@
+{
+  "incident": 21,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "README offline note says the dialog script is fetched from a CDN, though wbc-dialog.js is served locally and the app makes no external request.",
+  "same_class_because": "Stale delivery-mechanism claim like row 21 (Tailwind as CDN), but about the dialog script rather than Tailwind or fonts.",
+  "edits": [
+    {
+      "file": "README.md",
+      "find": "The application makes **no external request**. Every asset — scripts, styles, Tailwind and the three",
+      "replace": "The application makes one external request: the dialog script (`wbc-dialog.js`) is fetched from a CDN. Every other asset — styles, Tailwind and the three"
+    }
+  ]
+}

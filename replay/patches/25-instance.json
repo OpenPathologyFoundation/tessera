@@ -1,0 +1,14 @@
+{
+  "incident": 25,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "USER-GUIDE lists two preset profiles (frequency-ergonomic, right-hand) that the catalogue withdrew",
+  "edits": [
+    {
+      "file": "USER-GUIDE.md",
+      "find": "9-Type — 2015 Counter Layout.",
+      "replace": "9-Type — 2015 Counter Layout, frequency-ergonomic, right-hand."
+    }
+  ]
+}

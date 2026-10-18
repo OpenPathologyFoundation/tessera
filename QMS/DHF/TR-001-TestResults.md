@@ -45,10 +45,18 @@ by that run and must not be edited by hand.
 
 | | v2.0 (2026-02-24) | v2.1.0 (this run) |
 |---|---|---|
-| Tests recorded | 191 | 768 |
+| Tests recorded | 156 | 768 |
 | Tests executing shipped application code | **0** | 768 |
 | Layers | Mirrored logic + static text assertions | Unit (shipped engine) + jsdom behaviour + browser system |
 | Browser engines | none | Chromium, Firefox, WebKit |
+
+The v2.0 figure is measured, not remembered. `node scripts/qms-paper-facts.js
+--baseline` runs the suite at `52e2a4c`, the newest commit on or before the
+baseline date above, and writes `replay/baseline.json`; QC-032 holds this table
+to that file. This table said 191, and DCR-004 §1 says 379, and neither figure
+was tied to a commit — the February evidence bundles record 153. DCR-004 keeps
+its figure because a change record is a dated record of what was believed when
+it was written. Drift-log incident 53 (DCR-043).
 
 This is not a like-for-like comparison. As recorded in DCR-004 §1, no test in
 the v2.0 baseline executed the application: the calculation suites

@@ -1,0 +1,19 @@
+{
+  "incident": 27,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "The default profile's name and catalogue entry say 13-Type while the profile tallies fourteen categories",
+  "edits": [
+    {
+      "file": "web/settings/presets/ndc-14.json",
+      "find": "\"profileName\": \"14-Type Nucleated Differential\",",
+      "replace": "\"profileName\": \"13-Type Nucleated Differential\","
+    },
+    {
+      "file": "web/settings/presets/index.json",
+      "find": "\"name\": \"14-Type Nucleated Differential\",",
+      "replace": "\"name\": \"13-Type Nucleated Differential\","
+    }
+  ]
+}

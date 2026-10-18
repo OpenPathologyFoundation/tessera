@@ -1,0 +1,13 @@
+{
+  "incident": 3,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "TP-001 section 4.2 states that the Priority 1 set is test cases TC-B901 to TC-B905, which exist in no test file.",
+  "same_class_because": "The test plan numbers cases that exist in no test file, but in the TC-B series (not the withdrawn TC-0xx numbering) and in the risk-priority prose of section 4.2 rather than in the section 5 case specifications.",
+  "edits": [
+    { "file": "QMS/DHF/TP-001-TestPlan.md",
+      "find": "Tests addressing FMEA-identified hazards with pre-mitigation RPN >= 50 are **Priority 1** (must pass before release).",
+      "replace": "Tests addressing FMEA-identified hazards with pre-mitigation RPN >= 50 are **Priority 1** (must pass before release); the Priority 1 set is TC-B901 to TC-B905." }
+  ]
+}

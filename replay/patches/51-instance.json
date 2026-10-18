@@ -1,0 +1,14 @@
+{
+  "incident": 51,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "prepareConfig rebuilds the profile meta from a field list again, so minAppVersion reaches the engine and stops there",
+  "edits": [
+    {
+      "file": "web/scripts/mdc-app.js",
+      "find": "                meta: (function () {\n                    var meta = {};\n                    Object.keys(norm).forEach(function (k) {\n                        if (k !== 'specimenTypes') meta[k] = norm[k];\n                    });\n                    meta.appVersion = APP_VERSION;\n                    return meta;",
+      "replace": "                meta: (function () {\n                    var meta = { version: norm.version, profileId: norm.profileId,\n                        profileName: norm.profileName, provenance: norm.provenance };\n                    meta.appVersion = APP_VERSION;\n                    return meta;"
+    }
+  ]
+}

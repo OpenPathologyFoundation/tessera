@@ -1,0 +1,15 @@
+{
+  "incident": 11,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "The test-summary.md of bundle 2026-08-23_151758_run names `npm run test:all` while the bundle's command.txt records `npm test && npx playwright test`.",
+  "same_class_because": "Evidence records the identity of what was run, and here two records in one bundle name different commands; it differs from the row, where TR-001 rather than a bundle's own summary named the wrong command.",
+  "edits": [
+    {
+      "file": "QMS/DHF/TestEvidence/2026-08-23_151758_run/test-summary.md",
+      "find": "- Command: `npm test && npx playwright test`",
+      "replace": "- Command: `npm run test:all`"
+    }
+  ]
+}

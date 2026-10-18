@@ -1,0 +1,24 @@
+{
+  "incident": 32,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "Validation scenario V6 tells the validator to press R for nrbc, P for poly and L for blasts — keys that are unmapped or map elsewhere",
+  "edits": [
+    {
+      "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+      "find": "| 2 | Press **'B'** x 100 (nrbc=100). |",
+      "replace": "| 2 | Press **'R'** x 100 (nrbc=100). |"
+    },
+    {
+      "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+      "find": "| 3 | Press **'F'** x 300 (poly=300). |",
+      "replace": "| 3 | Press **'P'** x 300 (poly=300). |"
+    },
+    {
+      "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+      "find": "| 4 | Press **'X'** x 50 (blasts=50). |",
+      "replace": "| 4 | Press **'L'** x 50 (blasts=50). |"
+    }
+  ]
+}

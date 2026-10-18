@@ -1,0 +1,14 @@
+{
+  "incident": 37,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SOP-001 §9 states that key assignment is fixed per specimen type and that operators must contact the laboratory director, while §4.1 says keys are configurable",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "6. **Cell categories and their keys are configurable, not fixed.** The\n   Configuration Editor (linked from the case-entry screen) changes\n   categories, keys, targets and report wording.",
+      "replace": "6. **Keyboard key assignment is fixed per specimen type.** To change a key\n   assignment, contact the laboratory director; keys cannot be changed in the\n   application."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "incident": 41,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "analyzer-5 prints a 200-cell CLSI rationale into reports for a profile that targets 100: the basis text names only the 200-cell reference method and never the profile's own target",
+  "edits": [
+    {
+      "file": "web/settings/presets/analyzer-5.json",
+      "find": "\"targetCountBasis\": \"100 cells is the screening target for a 5-part differential, half one observer's share of the CLSI H20-A2 reference method (two reviewers counting 200 cells each). At 100 cells the confidence intervals shown beside each percentage are correspondingly wide; extend the count when a figure sits near a decision threshold.\"",
+      "replace": "\"targetCountBasis\": \"200 cells is one observer's share of the CLSI H20-A2 reference method (two reviewers counting 200 cells each); extend the count when a figure sits near a decision threshold.\""
+    }
+  ]
+}

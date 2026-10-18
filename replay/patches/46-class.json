@@ -1,0 +1,15 @@
+{
+  "incident": 46,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "validateConfig guards the rounding-method check with a truthiness test (spec.rounding &&) instead of !== undefined, so an empty-string or 0 rounding value skips validation.",
+  "same_class_because": "A default/absence test is written as truthiness and conflates 'absent' with 'wrong', but on the rounding field in validateConfig rather than targetCount in normalizeConfig.",
+  "edits": [
+    {
+      "file": "web/scripts/wbc-core.js",
+      "find": "if (spec.rounding !== undefined &&",
+      "replace": "if (spec.rounding &&"
+    }
+  ]
+}

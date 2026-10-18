@@ -70,3 +70,6 @@ sources/
 .claude/
 # exclude manuscript work for now.
 manuscript/
+
+# Replay runner output — one file per patch, regenerated on every run
+replay/logs/

@@ -1,0 +1,14 @@
+{
+  "incident": 29,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "The catalogue says \"Custom (Template)\" while the profile file says \"Custom (Blank Template)\"",
+  "edits": [
+    {
+      "file": "web/settings/presets/index.json",
+      "find": "\"name\": \"Custom (Blank Template)\",",
+      "replace": "\"name\": \"Custom (Template)\","
+    }
+  ]
+}

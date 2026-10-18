@@ -1,0 +1,15 @@
+{
+  "incident": 5,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "USER-GUIDE.md 'Data and privacy' claims completed counts persist in the browser's local storage after the browser closes, when they are held in sessionStorage and lost with the tab.",
+  "same_class_because": "Operator-facing documentation states a storage location and lifetime the code does not implement; the row's instance was SAD-001 §7.1 and the localStorage autosave, this one is the user guide and the session history.",
+  "edits": [
+    {
+      "file": "USER-GUIDE.md",
+      "find": "- Completed counts last for the browser session only, unless exported to CSV or JSON.",
+      "replace": "- Completed counts are kept in your browser's local storage and remain available after the browser is closed, until you clear site data."
+    }
+  ]
+}

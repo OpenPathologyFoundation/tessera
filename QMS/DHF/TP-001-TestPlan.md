@@ -97,11 +97,11 @@ auditing how the plan changed.
 > the test files. Suite 14 fails the build if it is stale, and if any identifier
 > cited by RTM-001 or TR-001 does not exist here.
 
-**803 verification cases** across 30 series and 4 layers, run as 872 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
+**807 verification cases** across 30 series and 4 layers, run as 876 tests.  Every test carries an identifier; a case running more than once is parametrised — one per shipped preset, per theme, or per surface.
 
 | Series | Cases | Layer(s) | Covers |
 |--------|-------|----------|--------|
-| `QC-*` | 25 (001–028) | Static | QMS counted quantities |
+| `QC-*` | 29 (001–032) | Static | QMS counted quantities |
 | `SC-*` | 33 (001–064) | Unit | Standards conformance (ICSH) |
 | `TC-B*` | 103 (001–142) | Behaviour | Application behaviour in a DOM |
 | `UD-*` | 57 (001–101) | Static | User-facing documentation |
@@ -161,6 +161,10 @@ auditing how the plan changed.
 | QC-026 | TR-001 reports a run that is admissible as release evidence | Static | `tests/14-qms-counts.test.js` |
 | QC-027 | The drift log counts its own rows, and nothing else counts them | Static | `tests/14-qms-counts.test.js` |
 | QC-028 | A failing run is not admissible evidence, however clean the tree | Static | `tests/14-qms-counts.test.js` |
+| QC-029 | Every drift-log row has a classification, an instance patch and a class patch | Static | `tests/14-qms-counts.test.js` |
+| QC-030 | The committed replay results are admissible, complete and self-consistent | Static | `tests/14-qms-counts.test.js` |
+| QC-031 | The manuscript, where present, states only what the facts file says | Static | `tests/14-qms-counts.test.js` |
+| QC-032 | TR-001 §1.1 states the baseline test count that was measured, not one that was remembered | Static | `tests/14-qms-counts.test.js` |
 
 #### SC-* — Standards conformance (ICSH)
 

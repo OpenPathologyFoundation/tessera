@@ -1,0 +1,15 @@
+{
+  "incident": 25,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "README says the right-hand layout is also shipped as a 'right-hand' preset profile, a profile withdrawn from the catalogue.",
+  "same_class_because": "A withdrawn preset is still named in a guide-like document not swept after the catalogue changed; the row's instance was USER-GUIDE, this is README.",
+  "edits": [
+    {
+      "file": "README.md",
+      "find": "It is a key assignment, not a separate profile.",
+      "replace": "It is also shipped as the `right-hand` preset profile."
+    }
+  ]
+}

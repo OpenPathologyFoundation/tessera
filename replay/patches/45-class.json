@@ -1,0 +1,15 @@
+{
+  "incident": 45,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "SDD-001's header Version field reads 3.0 while its newest revision-history row is 3.1.",
+  "same_class_because": "A document header version field is left behind its own revision history, as in the row, but in SDD-001 rather than RA-001, URS-001 or SAD-001.",
+  "edits": [
+    {
+      "file": "QMS/DHF/SDD-001-SoftwareDetailedDesign.md",
+      "find": "| **Version** | 3.1 |",
+      "replace": "| **Version** | 3.0 |"
+    }
+  ]
+}

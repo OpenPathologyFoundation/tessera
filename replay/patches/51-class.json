@@ -1,0 +1,15 @@
+{
+  "incident": 51,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "normalizeConfig's returned metadata literal no longer lists minAppVersion, so the field is dropped from the normalized meta although the input branch reads it.",
+  "same_class_because": "A configuration-metadata field list omits a field the engine reads, but in the return literal of normalizeConfig in wbc-core.js rather than the prepareConfig literal in mdc-app.js, and the dropped field is minAppVersion.",
+  "edits": [
+    {
+      "file": "web/scripts/wbc-core.js",
+      "find": "minAppVersion: meta.minAppVersion || null,",
+      "replace": ""
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "incident": 43,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "validateConfig's reserved-placeholder check uses indexOf(ct) > 0 instead of !== -1, so a cell type named with the first reserved placeholder name is accepted.",
+  "same_class_because": "A validation rule is weakened from the start by an off-by-one, but it is the reserved-placeholder rule rather than the countable-key (Shift) rule, and a profile naming the first placeholder would corrupt report output instead of being un-countable.",
+  "edits": [
+    {
+      "file": "web/scripts/wbc-core.js",
+      "find": "if (RESERVED_PLACEHOLDERS.indexOf(ct) !== -1) {",
+      "replace": "if (RESERVED_PLACEHOLDERS.indexOf(ct) > 0) {"
+    }
+  ]
+}

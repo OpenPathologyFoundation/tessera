@@ -1,0 +1,15 @@
+{
+  "incident": 34,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "SOP-003 Data Handling now asserts the application writes nothing to browser storage beyond the theme, though autosave persists the accession number, counts and comments to localStorage.",
+  "same_class_because": "A data-handling attestation in an operations SOP describes storage behaviour that does not ship; the row's instance was SOP-001 §8, this is SOP-003 with a different wording of the same false-privacy claim.",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-003-Operations.md",
+      "find": "- Session data is temporary and cleared when the browser tab is closed.",
+      "replace": "- Nothing is written to permanent browser storage other than the theme preference; all session data is cleared when the browser tab is closed."
+    }
+  ]
+}

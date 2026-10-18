@@ -1,0 +1,14 @@
+{
+  "incident": 22,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "The service worker no longer precaches the webfonts, so the offline claim holds only after a successful online fetch",
+  "edits": [
+    {
+      "file": "web/sw.js",
+      "find": "    './vendor/fonts/fonts.css',\n    './vendor/fonts/inter-latin.woff2',\n    './vendor/fonts/inter-greek.woff2',\n    './vendor/fonts/inter-latin-ext.woff2',\n    './vendor/fonts/jetbrains-mono-latin.woff2',\n    './vendor/fonts/jetbrains-mono-latin-ext.woff2',\n    './vendor/fonts/libre-franklin-latin.woff2',\n    './vendor/fonts/libre-franklin-latin-ext.woff2',\n",
+      "replace": ""
+    }
+  ]
+}

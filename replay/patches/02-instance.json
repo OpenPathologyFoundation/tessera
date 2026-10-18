@@ -1,0 +1,14 @@
+{
+  "incident": 2,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "RTM-001 cites a verification identifier (VV-CALC-918) that no protocol document defines and no test implements",
+  "edits": [
+    {
+      "file": "QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md",
+      "find": "| HA-021 | VV-CALC-001, VV-CALC-018 | U | Full |",
+      "replace": "| HA-021 | VV-CALC-001, VV-CALC-918 | U | Full |"
+    }
+  ]
+}

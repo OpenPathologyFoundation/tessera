@@ -1,0 +1,14 @@
+{
+  "incident": 52,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "TC-B061 is named for a reload it never asserts",
+  "edits": [
+    {
+      "file": "tests/11-application-behavior.test.js",
+      "find": "    it('TC-B061: Reset to Default confirms and clears the cache', async () => {",
+      "replace": "    it('TC-B061: Reset to Default confirms, clears the cache and reloads', async () => {"
+    }
+  ]
+}

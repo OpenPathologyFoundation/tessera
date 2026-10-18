@@ -1,0 +1,15 @@
+{
+  "incident": 12,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "CLINICAL-REVIEW-BRIEF states the tests run across two browsers while TR-001 and RTM-001 record three engines.",
+  "same_class_because": "The brief keeps its own hand-written copy of a fact another document owns (browser engine count), as in the row, but the fact is the browser count rather than the signature register.",
+  "edits": [
+    {
+      "file": "QMS/DHF/CLINICAL-REVIEW-BRIEF.md",
+      "find": "automated tests across three browsers",
+      "replace": "automated tests across two browsers"
+    }
+  ]
+}

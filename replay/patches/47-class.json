@@ -1,0 +1,15 @@
+{
+  "incident": 47,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "VV-001 Scenario V6 step 1 expects the M:E ratio display to read 0.0:1 initially, but the application renders N/A before any cells are counted.",
+  "same_class_because": "A scripted expected result written from memory of a display format rather than the screen; the row's instance was the V2 progress row, this is the V6 M:E initial display.",
+  "edits": [
+    {
+      "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+      "find": "| 1 | Select BM. Start Count. | M:E ratio display present (N/A initially). | URS-035 |",
+      "replace": "| 1 | Select BM. Start Count. | M:E ratio display present (reads 0.0:1 initially). | URS-035 |"
+    }
+  ]
+}

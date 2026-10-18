@@ -1,0 +1,14 @@
+{
+  "incident": 5,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SAD-001 §7.1 states \"sessionStorage only … No localStorage\" while the crash-recovery snapshot holds the accession number and comments in localStorage",
+  "edits": [
+    {
+      "file": "QMS/DHF/SAD-001-SystemArchitectureDesign.md",
+      "find": "| **Data at rest — sessionStorage** | Session history and the theme. Cleared when the tab closes. |",
+      "replace": "| **Data at rest** | sessionStorage only … No localStorage, no cookies, no IndexedDB. Cleared when the tab closes. |"
+    }
+  ]
+}

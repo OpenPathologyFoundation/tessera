@@ -1,0 +1,14 @@
+{
+  "incident": 13,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "The clinical brief §6 lists the M:E interval as an open limitation, a week after DCR-026 closed it",
+  "edits": [
+    {
+      "file": "QMS/DHF/CLINICAL-REVIEW-BRIEF.md",
+      "find": "3. **The M:E interval is derived here, not borrowed.** This brief originally",
+      "replace": "3. **No confidence interval is computed for the M:E ratio.** This brief originally"
+    }
+  ]
+}

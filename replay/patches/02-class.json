@@ -1,0 +1,13 @@
+{
+  "incident": 2,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "TR-001 records a PASS result for VV-ABS-901, an absolute-count verification identifier that no test implements.",
+  "same_class_because": "A traceability document cites a verification identifier that points at nothing, but the ghost is a single VV-ABS identifier in a TR-001 result row rather than the row's 61 identifiers across RTM-001 and TR-001.",
+  "edits": [
+    { "file": "QMS/DHF/TR-001-TestResults.md",
+      "find": "| VV-ABS-001/002 | Absolute count arithmetic; non-positive WBC yields null, not NaN | **PASS** |",
+      "replace": "| VV-ABS-001/002/901 | Absolute count arithmetic; non-positive WBC yields null, not NaN | **PASS** |" }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "incident": 28,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "analyzer-5 provenance.notes states the peripheral blood NRBC convention, but the 5-category analyzer profile tallies no NRBC.",
+  "same_class_because": "Provenance note copied from ndc-14 into a profile whose facts differ, like row 28; the copied fact is the NRBC convention in analyzer-5, not the ICSH marrow note in minimal-5/body-fluid.",
+  "edits": [
+    {
+      "file": "web/settings/presets/analyzer-5.json",
+      "find": "Categories match the automated analyzer 5-part differential.",
+      "replace": "Categories match the automated analyzer 5-part differential. The peripheral blood NRBC convention follows DCR-006."
+    }
+  ]
+}

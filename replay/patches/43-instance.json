@@ -1,0 +1,14 @@
+{
+  "incident": 43,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "validateConfig accepts a key that needs Shift, so a cell on it could be un-counted but never counted",
+  "edits": [
+    {
+      "file": "web/scripts/wbc-core.js",
+      "find": "                if (!isCountableKey(key)) {",
+      "replace": "                if (false && !isCountableKey(key)) {"
+    }
+  ]
+}

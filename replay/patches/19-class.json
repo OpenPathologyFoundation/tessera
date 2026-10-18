@@ -1,0 +1,15 @@
+{
+  "incident": 19,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "calculation-reference.html limitations list states absolute counts are never computed, though computeAbsolute derives them from an analyser WBC.",
+  "same_class_because": "Capability-absence claim in a live document that the code no longer supports; unlike row 19 (ratio intervals in a comment/message/SRS) it denies absolute-count derivation in the calculation reference.",
+  "edits": [
+    {
+      "file": "web/calculation-reference.html",
+      "find": "<li><strong class=\"text-slate-200\">No absolute counts without your input</strong> &mdash; computed only when you supply an analyser white cell count, and never derived for categories outside the differential.</li>",
+      "replace": "<li><strong class=\"text-slate-200\">No absolute counts</strong> &mdash; this counter does not compute absolute concentrations; it reports percentages only.</li>"
+    }
+  ]
+}

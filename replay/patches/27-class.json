@@ -1,0 +1,15 @@
+{
+  "incident": 27,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "analyzer-5.json description says target 100 but its targetCount is changed to 200.",
+  "same_class_because": "A profile holds its target count in prose and in a field, the same two-writers shape as the row, but for target count in analyzer-5 rather than the category count in harmonized-9.",
+  "edits": [
+    {
+      "file": "web/settings/presets/analyzer-5.json",
+      "find": "\"targetCount\": 100,",
+      "replace": "\"targetCount\": 200,"
+    }
+  ]
+}

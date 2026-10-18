@@ -1,0 +1,15 @@
+{
+  "incident": 33,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "SOP-003 Monitoring instructs a periodic QC run entering categories 'neut' and 'erythroid' (absent from the default profile) and recording against VV-CALC-950, which exists in no test file.",
+  "same_class_because": "An operations procedure mandates a check that cannot be performed, naming categories and a verification case that do not exist; the row's instance was SOP-001 §6.2 with gran/eryth and VV-CALC-007, this one is SOP-003.",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-003-Operations.md",
+      "find": "- Periodically verify keyboard mappings and template outputs match local SOP.",
+      "replace": "- Periodically verify keyboard mappings and template outputs match local SOP. Monthly, enter the `neut` and `erythroid` categories from the SOP-001 §6.2 vector and record the result against VV-CALC-950."
+    }
+  ]
+}

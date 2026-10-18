@@ -1,0 +1,15 @@
+{
+  "incident": 37,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "README Limitations adds a limit that report templates are fixed and can only be changed by the maintainers, though the Configuration Editor changes report wording and templates.",
+  "same_class_because": "A limitations list states a false limit about configurability that the product contradicts elsewhere; the row's instance was SOP-001 §7 on key assignment, this is README Limitations on report templates.",
+  "edits": [
+    {
+      "file": "README.md",
+      "find": "4. **No multi-user or collaborative features.** It is a single-operator tool.",
+      "replace": "4. **No multi-user or collaborative features.** It is a single-operator tool.\n4a. **Report templates are fixed.** Output wording cannot be changed by the laboratory; contact the maintainers to request a different template."
+    }
+  ]
+}

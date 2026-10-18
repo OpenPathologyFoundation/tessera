@@ -1,0 +1,14 @@
+{
+  "incident": 46,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "normalizeConfig fills the default target on a truthiness test, so 0, NaN and '' silently become 500 before validation sees them",
+  "edits": [
+    {
+      "file": "web/scripts/wbc-core.js",
+      "find": "            if (spec.targetCount === undefined) {",
+      "replace": "            if (!spec.targetCount) {"
+    }
+  ]
+}

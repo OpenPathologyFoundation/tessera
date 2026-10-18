@@ -1,0 +1,14 @@
+{
+  "incident": 12,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "The clinical brief restates a hand-maintained list of eleven documents needing signature instead of pointing at the generated register",
+  "edits": [
+    {
+      "file": "QMS/DHF/CLINICAL-REVIEW-BRIEF.md",
+      "find": "**The list lives in [`SIGNOFF-REGISTER.md`](SIGNOFF-REGISTER.md), not here.**",
+      "replace": "**The eleven documents that need your signature:** URS-001 v2.0, RA-001, REF-001, DCR-004, DCR-005, DCR-006, DCR-007, DCR-008, DCR-009, DCR-016 and DCR-022."
+    }
+  ]
+}

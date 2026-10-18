@@ -1,0 +1,14 @@
+{
+  "incident": 1,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "README's QMS table states 49 user requirements against the 71 URS-001 carries",
+  "edits": [
+    {
+      "file": "README.md",
+      "find": "| **URS-001** | 71 user requirements with priority and clinical rationale |",
+      "replace": "| **URS-001** | 49 user requirements with priority and clinical rationale |"
+    }
+  ]
+}

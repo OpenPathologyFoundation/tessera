@@ -1,0 +1,14 @@
+{
+  "incident": 35,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SOP-001 §5.1 says the Start Count button is disabled until a valid case number is entered; the field is optional and the button enabled",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "   - \"Start Count\" button is visible and **enabled**",
+      "replace": "   - \"Start Count\" button is visible but **disabled** until a valid case number is entered"
+    }
+  ]
+}

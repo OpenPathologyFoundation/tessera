@@ -1,0 +1,15 @@
+{
+  "incident": 38,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "README.md states the retained 2015 predecessor serves the mdc-2015-9 profile at v2.3 while the shipped profile file is v2.4.",
+  "same_class_because": "A profile-version stamp quoted in a document is left behind the shipped profile's version, as in the row, but for a different profile (mdc-2015-9) in a different document (README).",
+  "edits": [
+    {
+      "file": "README.md",
+      "find": "retained for the mdc-2015-9 profile",
+      "replace": "retained for the mdc-2015-9 profile (v2.3)"
+    }
+  ]
+}

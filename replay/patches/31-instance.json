@@ -1,0 +1,14 @@
+{
+  "incident": 31,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SOP-001 §5.5's miscount example says the operator pressed 'A' (blast), a key that records monocytes in the shipped profile",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "you pressed **'X'** (blasts) but meant",
+      "replace": "you pressed **'A'** (blast) but meant"
+    }
+  ]
+}

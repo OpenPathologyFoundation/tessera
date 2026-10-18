@@ -1,0 +1,14 @@
+{
+  "incident": 49,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "README's stack table says the fonts come from Google Fonts (CDN) while they ship in web/vendor/fonts/",
+  "edits": [
+    {
+      "file": "README.md",
+      "find": "| Fonts | Inter, JetBrains Mono, Libre Franklin | Self-hosted in `web/vendor/fonts/`; no external request (URS-094). Licences in `NOTICE` |",
+      "replace": "| Fonts | Inter, JetBrains Mono, Libre Franklin | Google Fonts (CDN) |"
+    }
+  ]
+}

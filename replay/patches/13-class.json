@@ -1,0 +1,15 @@
+{
+  "incident": 13,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "CLINICAL-REVIEW-BRIEF §6 item 4 says the independent review findings (DCR-015 to DCR-026) remain open, though they were closed.",
+  "same_class_because": "A closure (independent review findings) is not carried into the brief, which still describes the open state; the row's instance was the M:E interval limitation.",
+  "edits": [
+    {
+      "file": "QMS/DHF/CLINICAL-REVIEW-BRIEF.md",
+      "find": "findings are closed (DCR-015 through DCR-026)",
+      "replace": "findings remain open (DCR-015 through DCR-026)"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "incident": 18,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "REF-001 §2.1, titled 'resolved without purchase', now concludes that purchasing H20-A2 is required before release.",
+  "same_class_because": "A single document contradicts its own closed resolution of the CLSI H20-A2 item between heading and conclusion; the row's instance was the §5 gap table versus §3.8.",
+  "edits": [
+    {
+      "file": "QMS/DHF/REF-001-StandardsAndLiterature.md",
+      "find": "**Purchasing H20-A2 is therefore not required for the current requirement set.**",
+      "replace": "**Purchasing H20-A2 is therefore required before a baseline is released.**"
+    }
+  ]
+}

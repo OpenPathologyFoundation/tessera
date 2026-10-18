@@ -1,0 +1,13 @@
+{
+  "incident": 4,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "RTM-001 row URS-022 claims coverage by VV-A11Y-001, a series the verification register never enumerates.",
+  "same_class_because": "The matrix manufactures the appearance of coverage by citing an identifier with no registered series, the mirror of tests that no identifier can cite; the row instead concerns a whole nonexistent series on one URS row.",
+  "edits": [
+    { "file": "QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md",
+      "find": "| URS-022 | Key mapping displayed at all times | SYS-023 | 3.4.2 | — | VV-SYS-013 | S | Full |",
+      "replace": "| URS-022 | Key mapping displayed at all times | SYS-023 | 3.4.2 | — | VV-SYS-013, VV-A11Y-001 | S | Full |" }
+  ]
+}

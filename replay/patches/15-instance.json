@@ -1,0 +1,19 @@
+{
+  "incident": 15,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "Three product versions live at once: DHF-001 says 2.7.1 and the service-worker cache key says 2.3.0 against package.json",
+  "edits": [
+    {
+      "file": "QMS/DHF/DHF-001-DesignHistoryFile-Index.md",
+      "find": "| **Product Version** | 2.24.1",
+      "replace": "| **Product Version** | 2.7.1 "
+    },
+    {
+      "file": "web/sw.js",
+      "find": "const CACHE_VERSION = 'wbcds-v2.24.1';",
+      "replace": "const CACHE_VERSION = 'wbcds-v2.3.0';"
+    }
+  ]
+}

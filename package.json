@@ -1,6 +1,6 @@
 {
   "name": "wbc-delta-sigma",
-  "version": "2.24.0",
+  "version": "2.24.1",
   "description": "WBC ΔΣ — Keyboard-driven manual differential WBC counting tool for hematology",
   "main": "web/scripts/mdc-app.js",
   "scripts": {
@@ -9,6 +9,9 @@
     "test:e2e": "playwright test",
     "test:all": "npm test && npm run test:e2e",
     "test:qms": "node scripts/qms-run-tests.js",
+    "replay": "node replay/run.js",
+    "paper:facts": "node scripts/qms-paper-facts.js --write",
+    "lint:manuscript": "node scripts/qms-manuscript-lint.js",
     "serve": "node serve.js"
   },
   "keywords": [

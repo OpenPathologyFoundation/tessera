@@ -1,0 +1,14 @@
+{
+  "incident": 42,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "The body-fluid panel's `other` note tells operators not to count macrophages or metastatic tumour cells, which the panel has keys for",
+  "edits": [
+    {
+      "file": "web/settings/presets/body-fluid.json",
+      "find": "\"other\": \"Unclassifiable nucleated cells only. **This panel has its own categories for cells the marrow guidance excludes** — count malignant and metastatic tumour cells on `malignant`, and macrophages on `mono_macro`, not here.",
+      "replace": "\"other\": \"Do NOT count into this category: endothelial cells, macrophages, osteoblasts, osteoclasts, metastatic tumour cells."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "incident": 8,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SAD-001 §3.2.3 states the v1.0 key mapping, withdrawn at v2.0, as the mapping in code",
+  "edits": [
+    {
+      "file": "QMS/DHF/SAD-001-SystemArchitectureDesign.md",
+      "find": "is **not fixed in code** — the literal mapping previously given here was withdrawn at v2.0.",
+      "replace": "is fixed in code: R = nrbc, L = blasts, O = pro, M = myelo, T = meta, C = plasma, S = mast, B = bands, P = poly, A = baso, E = eos, N = mono, Y = lymph, X = other."
+    }
+  ]
+}

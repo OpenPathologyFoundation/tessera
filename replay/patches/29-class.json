@@ -1,0 +1,15 @@
+{
+  "incident": 29,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "index.json summary for body-fluid says five categories while body-fluid.json describes seven.",
+  "same_class_because": "The catalogue keeps its own copy of profile text and one copy was changed without the file, as in the row, but for the summary of body-fluid rather than the name of custom.",
+  "edits": [
+    {
+      "file": "web/settings/presets/index.json",
+      "find": "\"summary\": \"Seven categories for CSF, serous and synovial fluid differentials, including mesothelial and malignant cells.\",",
+      "replace": "\"summary\": \"Five categories for CSF, serous and synovial fluid differentials, including mesothelial and malignant cells.\","
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "incident": 53,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "TR-001 §9 run-log entry for the 2026-08-23T19:17:58Z run keeps Result PASS and its evidence bundle but its Code identity is replaced by 'unknown (not recorded)', so the PASS cannot be tied to a commit or tree state.",
+  "same_class_because": "Test evidence is recorded as a PASS without the identity of what it measured (no commit, no tree state), the class definition's core, whereas row 53's own instance is an unsourced baseline test count in TR-001 §1.1.",
+  "edits": [
+    { "file": "QMS/DHF/TR-001-TestResults.md",
+      "find": "- Code identity: `6f1174e3ee16322e2aacf9396466c100b5285c07` (clean tree)",
+      "replace": "- Code identity: unknown (not recorded)" }
+  ]
+}

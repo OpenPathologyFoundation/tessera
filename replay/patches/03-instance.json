@@ -1,0 +1,14 @@
+{
+  "incident": 3,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "TP-001's register carries a TC-0xx number (TC-042) that no test file carries",
+  "edits": [
+    {
+      "file": "QMS/DHF/TP-001-TestPlan.md",
+      "find": "| VV-CALC-001 | All zeros returns 0.00 for every cell (SYS-042, HA-021) | Unit | `tests/01-calculation-engine.test.js` |",
+      "replace": "| VV-CALC-001 | All zeros returns 0.00 for every cell (SYS-042, HA-021) | Unit | `tests/01-calculation-engine.test.js` |\n| TC-042 | Percentage calculation, planned case | Unit | `tests/01-calculation-engine.test.js` |"
+    }
+  ]
+}

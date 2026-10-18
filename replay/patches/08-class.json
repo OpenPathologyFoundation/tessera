@@ -1,0 +1,15 @@
+{
+  "incident": 8,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "web/methods.html section 3 cites Rümke 1985 as the basis of the M:E ratio's imprecision although REF-001 [S4] withdrew that source.",
+  "same_class_because": "A source withdrawn in REF-001 and the brief is still described as current in a companion artifact (methods page), where the row's instance was a withdrawn key mapping retained in SAD-001.",
+  "edits": [
+    {
+      "file": "web/methods.html",
+      "find": "own. Treat small differences between successive ratios with caution, and read",
+      "replace": "own (Rümke CL, Blood Cells 1985;11:137, whose analysis the interval below follows). Treat small differences between successive ratios with caution, and read"
+    }
+  ]
+}

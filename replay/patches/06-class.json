@@ -1,0 +1,15 @@
+{
+  "incident": 6,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "SOP-002 Deployment procedure step 4 tells the deployer to ensure the host can reach cdn.tailwindcss.com because Tailwind is delivered from the CDN, when it is vendored at web/vendor/tailwind.js.",
+  "same_class_because": "Documentation describes a delivery mechanism that no longer ships (CDN rather than vendored Tailwind); the row's instance was SAD-001, this one is the deployment SOP.",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-002-Deployment.md",
+      "find": "   - Ensure the entry point is `counter.html`.",
+      "replace": "   - Ensure the entry point is `counter.html`.\n   - Ensure the target host can reach `cdn.tailwindcss.com`; the Tailwind CSS framework is delivered from the CDN at page load."
+    }
+  ]
+}

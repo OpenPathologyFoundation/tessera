@@ -1,0 +1,15 @@
+{
+  "incident": 44,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "mdc-2015-9 states target counts of 200 cells, a fidelity claim the predecessor's code never implemented",
+  "edits": [
+    {
+      "file": "web/settings/presets/mdc-2015-9.json",
+      "find": "\"targetCount\": null,",
+      "replace": "\"targetCount\": 200,",
+      "all": true
+    }
+  ]
+}

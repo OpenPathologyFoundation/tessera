@@ -1,0 +1,15 @@
+{
+  "incident": 42,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "gran-combined-10 bone marrow categoryNotes.myelo says there is no promyelocyte category, copied from bands-segs-10; this profile has pro.",
+  "same_class_because": "Guidance copied from a profile where it is true onto one where it is false, as row 42 copied the bone-marrow note; here a different profile and category (myelo).",
+  "edits": [
+    {
+      "file": "web/settings/presets/gran-combined-10.json",
+      "find": "ICSH 2008 §2.6 lists mast cells separately; the 14-Type Nucleated Differential provides that category.",
+      "replace": "ICSH 2008 §2.6 lists mast cells separately; the 14-Type Nucleated Differential provides that category.\",\n        \"myelo\": \"Myelocytes. **This profile has no separate promyelocyte category**; a marrow requiring the promyelocyte percentage should be counted in the 14-Type Nucleated Differential or the 10-Type Bands+Segs Combined profile, both of which have one."
+    }
+  ]
+}

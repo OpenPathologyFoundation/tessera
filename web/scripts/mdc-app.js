@@ -47,7 +47,7 @@
      * which version produced a report. QC-016 holds it equal to
      * package.json, DHF-001 and the service-worker cache key.
      */
-    const APP_VERSION = '2.24.0';
+    const APP_VERSION = '2.24.1';
 
     const AUDIO_KEY = 'wbcds_audio';
     const CONFIG_CACHE_KEY = 'wbcds_config';

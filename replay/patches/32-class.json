@@ -1,0 +1,15 @@
+{
+  "incident": 32,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "VV-001 Scenario V2 step 4 expects Count Done below target to raise a blocking confirmation dialog that must be dismissed, when the software shows a non-blocking advisory on the results screen and has no such dialog.",
+  "same_class_because": "A validation script step describes behaviour the software does not have, so the scenario fails when executed; the row's instance was V6's keys, this one is V2's expected behaviour.",
+  "edits": [
+    {
+      "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+      "find": "Non-blocking informational note: count below 200 advisory target. Output generated directly.",
+      "replace": "A confirmation dialog \"Count is below the 200-cell target - finish anyway?\" must be dismissed with Finish before the output is generated."
+    }
+  ]
+}

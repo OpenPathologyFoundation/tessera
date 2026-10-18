@@ -1,0 +1,14 @@
+{
+  "incident": 23,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "NOTICE carries no licence declaration for the vendored Tailwind bundle",
+  "edits": [
+    {
+      "file": "NOTICE",
+      "find": "`web/vendor/tailwind.js` is Tailwind CSS, MIT licensed, Copyright Tailwind Labs.\n\n",
+      "replace": ""
+    }
+  ]
+}

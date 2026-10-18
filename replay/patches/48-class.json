@@ -1,0 +1,15 @@
+{
+  "incident": 48,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "VV-SYS-123 replaces the auto-waiting toBeHidden assertion with a non-waiting isVisible() read taken immediately after Count Done, so it reports 'no advisory' even if the advisory renders a moment later.",
+  "same_class_because": "A check reports a false absence because a non-waiting read races an asynchronous render, but in the near-threshold advisory test rather than the preset-catalogue Load-button helper.",
+  "edits": [
+    {
+      "file": "tests-e2e/counting-workflow.spec.js",
+      "find": "        await count(page, 'f', 500);\n        await page.click('#btnCountDone');\n        await expect(page.locator('#threshold-note')).toBeHidden();",
+      "replace": "        await count(page, 'f', 500);\n        await page.click('#btnCountDone');\n        expect(await page.locator('#threshold-note').isVisible()).toBe(false);"
+    }
+  ]
+}

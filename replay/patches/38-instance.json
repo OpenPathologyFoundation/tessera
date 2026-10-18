@@ -1,0 +1,14 @@
+{
+  "incident": 38,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SOP-001's key table is stamped as generated from ndc-14 v2.5 while the shipped profile is v2.6",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "Generated from the shipped profile `ndc-14 (formerly consensus-14)` v2.6. **The",
+      "replace": "Generated from the shipped profile `ndc-14 (formerly consensus-14)` v2.5. **The"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "incident": 9,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "web/help.html Home Row table assigns segmented neutrophils (poly) to the key P, when the shipped profile maps F to poly and P is unmapped.",
+  "same_class_because": "Operator documentation instructs a key layout that the shipped profile does not have; the row's instance was SOP-001's layout, this one is the in-app quick-start key table.",
+  "edits": [
+    {
+      "file": "web/help.html",
+      "find": "text-slate-200\">F</kbd></td><td class=\"py-2 pr-4 font-mono text-slate-400\">poly</td>",
+      "replace": "text-slate-200\">P</kbd></td><td class=\"py-2 pr-4 font-mono text-slate-400\">poly</td>"
+    }
+  ]
+}

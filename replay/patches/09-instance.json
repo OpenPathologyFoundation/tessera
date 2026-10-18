@@ -1,0 +1,21 @@
+{
+  "incident": 9,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SOP-001 instructs operators that A = blasts and X = monocytes, a layout that no longer ships",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "| **A** | mono | Monocytes |",
+      "replace": "| **A** | blasts | Blasts |",
+      "all": true
+    },
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "| **X** | blasts | Blasts |",
+      "replace": "| **X** | mono | Monocytes |",
+      "all": true
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "incident": 52,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "TC-B054's title is extended to claim that finalizing also clears the recovery prompt, though the test asserts only that the autosave record is null.",
+  "same_class_because": "A test is named for behaviour broader than the assertions it makes, but for a different test (TC-B054, autosave) and a different unasserted behaviour (the recovery prompt) than TC-B061's reload.",
+  "edits": [
+    {
+      "file": "tests/11-application-behavior.test.js",
+      "find": "TC-B054: Finalizing a count clears the autosave record'",
+      "replace": "TC-B054: Finalizing a count clears the autosave record and never offers recovery afterwards'"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "incident": 26,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "qms-facts.js admits a bundle on tree state alone, while qms-run-tests.js requires clean AND passing — two definitions of admissible evidence",
+  "edits": [
+    {
+      "file": "scripts/qms-facts.js",
+      "find": "    if (environment(dir).tree_state !== 'clean') return false;\n    const facts = path.join(dir, 'facts.json');\n    if (!fs.existsSync(facts)) return false;\n    try {\n        return JSON.parse(fs.readFileSync(facts, 'utf-8')).status === 'PASS';\n    } catch (e) {\n        return false;\n    }",
+      "replace": "    if (environment(dir).tree_state !== 'clean') return false;\n    return fs.existsSync(path.join(dir, 'facts.json'));"
+    }
+  ]
+}

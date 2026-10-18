@@ -1,0 +1,13 @@
+{
+  "incident": 4,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "A test exists that carries no verification identifier, so no traceability document can cite it",
+  "edits": [
+    {
+      "file": "tests/01-calculation-engine.test.js",
+      "append": "\n\ndescribe('Unregistered', () => {\n    it('a test with no verification identifier', () => {\n        assert.ok(true);\n    });\n});\n"
+    }
+  ]
+}

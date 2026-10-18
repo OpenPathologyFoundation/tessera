@@ -1,0 +1,11 @@
+{
+  "incident": 24,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "README's feature table says Bone Marrow and Peripheral Blood have 12 cell types each, in a running-prose sentence, while the default profile and SRS-001 define 14.",
+  "same_class_because": "A measured quantity (cell types per specimen) sits in a prose sentence in a different document and no generator owns it, as with the row's drift-log totals in the CLAUDE.md preamble, but the fact is a profile property rather than a log count.",
+  "edits": [
+    { "file": "README.md", "find": "Bone Marrow and Peripheral Blood (14 cell types each, configurable)", "replace": "Bone Marrow and Peripheral Blood (12 cell types each, configurable)" }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "incident": 30,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "VV-E2E-021 hand-builds its session in the test-local buildSession with a methodNotes field and asserts the CSV header carries methodNotes, so the shipped session path's omission of it could not be seen.",
+  "same_class_because": "A designed report element is verified only on an input the test constructs by hand (the test-local buildSession in suite 05) instead of the one the application builds, but the element is the session/CSV methodNotes column rather than the method-statement Basis line.",
+  "edits": [
+    {
+      "file": "tests/05-end-to-end-data-integrity.test.js",
+      "find": "        morphologyComments: comments || '',",
+      "replace": "        morphologyComments: comments || '',\n        methodNotes: 'ICSH 2008',"
+    },
+    {
+      "file": "tests/05-end-to-end-data-integrity.test.js",
+      "find": "'percentages', 'outputs'].forEach(col => {",
+      "replace": "'percentages', 'outputs', 'methodNotes'].forEach(col => {"
+    }
+  ]
+}

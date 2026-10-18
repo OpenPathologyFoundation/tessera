@@ -1,0 +1,11 @@
+{
+  "incident": 1,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "README's Test Suite Overview table states that suite 11 (application behaviour in jsdom) contains 131 tests, a hand-typed per-suite figure that does not match the suite.",
+  "same_class_because": "A table cell states a count of tests that a person typed and nobody re-measured, like the row's headline figures, but it is the per-suite count in the README test table rather than the requirement, hazard or executed-test headline figures.",
+  "edits": [
+    { "file": "README.md", "find": "The application executed in jsdom — 103 tests", "replace": "The application executed in jsdom — 131 tests" }
+  ]
+}

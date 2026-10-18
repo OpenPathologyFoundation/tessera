@@ -1,0 +1,15 @@
+{
+  "incident": 40,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "SOP-001 §5.10 tells the operator to click a Clear History button to delete session entries, but no such control exists in the application.",
+  "same_class_because": "A procedural step for a control that does not exist, in the document validators follow; the row's instance was the §5.9 case-number clearing dialog, this is a §5.10 history-clearing button.",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "2. Previously completed counts during this browser session are listed by case number and timestamp.",
+      "replace": "2. Previously completed counts during this browser session are listed by case number and timestamp. To remove all entries, click **Clear History** and confirm in the dialog that appears."
+    }
+  ]
+}

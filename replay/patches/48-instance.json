@@ -1,0 +1,8 @@
+{
+  "incident": 48,
+  "kind": "instance",
+  "mode": "none",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "A browser test reported \"no Load button\" because its click-then-evaluate block did not wait for an asynchronous render",
+  "reason": "a load-dependent race: re-splitting loadPresetFromCatalogue into click-then-evaluate reproduces the false report only probabilistically (measured [6,6,0,0,0,6,0,0] across engines in DCR-040), so one replay run cannot classify it"
+}

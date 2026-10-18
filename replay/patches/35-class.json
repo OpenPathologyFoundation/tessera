@@ -1,0 +1,15 @@
+{
+  "incident": 35,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "SOP-002 post-deploy smoke check says Start Count stays disabled until a case number is entered, but requireCaseNumber is false in every profile and the button is always enabled.",
+  "same_class_because": "A procedure relies on a software control that was never built (a disabled Start Count button); the row's instance was SOP-001 §5.1/5.2, this is the deployment SOP's smoke check.",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-002-Deployment.md",
+      "find": "     - Case number entry required.",
+      "replace": "     - Start Count stays disabled until a case number is entered."
+    }
+  ]
+}

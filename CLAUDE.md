@@ -39,7 +39,8 @@ copying from it.
    configurability creates a consistency obligation, add the **check**, not the
    cut.
 4. **Extend the machinery that exists.** `scripts/qms-counts.js`,
-   `qms-facts.js`, `qms-signoffs.js`, `qms-verification-index.js` and
+   `qms-facts.js`, `qms-signoffs.js`, `qms-verification-index.js`,
+   `qms-paper-facts.js`, `qms-manuscript-lint.js`, `replay/run.js` and
    `tests/14-qms-counts.test.js` are the drift-control system. Add to them. No
    new framework, no new dependency, no parallel script.
 5. **Measure every number you write.** Never copy a figure from a document,
@@ -57,7 +58,11 @@ sweeps all of these before it finishes:
 5. Shipped source comments and operator-facing strings
 6. `web/methods.html`, `web/calculation-reference.html`
 7. The QC-025 claims table in suite 14 — add a row for the new capability
-8. `QMS/DHF/DRIFT-LOG.md` — if the closure revealed a stale claim, log it
+8. `QMS/DHF/DRIFT-LOG.md` — if the closure revealed a stale claim, log it,
+   and give the new row its classification in `replay/incidents.json` and its
+   two patches under `replay/patches/` (QC-029 fails otherwise; the class
+   patch is built by someone who has not read the consistency suite — see
+   `replay/README.md`)
 9. **This file.** The sweep used to end at step 8, and that omission is
    incident 24: DCR-030 appended two rows to the log and left `CLAUDE.md`'s
    opening paragraph describing a smaller one. The document that tells you to
@@ -80,6 +85,8 @@ Run the generator instead:
 | `SIGNOFF-REGISTER.md` §3 | `node scripts/qms-signoffs.js --write` |
 | Verification registers in VV-001, TP-001 | `node scripts/qms-verification-index.js --write` |
 | TR-001 totals and run log | `npm run test:qms` |
+| `replay/results.json` | `npm run replay` (clean tree) |
+| `replay/facts.json`, `replay/baseline.json`, the manuscript's markers | `node scripts/qms-paper-facts.js --write` (clean tree) and `--baseline` |
 
 ## Before you finish
 
@@ -88,6 +95,10 @@ Run the generator instead:
 - Before claiming release evidence: **clean tree**, then `npm run test:qms`. A
   bundle from a dirty tree measures code that exists in no commit and is marked
   PROVISIONAL; it will not write the documents without `--provisional`.
+- Before tagging a release the manuscript will describe: clean tree, then
+  `npm run replay`, then `node scripts/qms-paper-facts.js --write`. A guard
+  that stops catching its incident fails the replay. `npm run lint:manuscript`
+  is the submission gate: no number in the paper may be typed.
 - Revert-check every new test: remove the fix, confirm the test fails with the
   original symptom. More than once in this repository a test has passed against
   broken code, and twice the revert-check found the test wrong before the code.

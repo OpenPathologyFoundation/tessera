@@ -1,0 +1,15 @@
+{
+  "incident": 50,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "mdc-2015-9.json declares minAppVersion 2.25.0, newer than the 2.24.1 application that ships it.",
+  "same_class_because": "A profile and the application release disagree on version (a profile requiring a build newer than the shipped one), like the row's release skew, but via the declared minimum rather than the service-worker cache split.",
+  "edits": [
+    {
+      "file": "web/settings/presets/mdc-2015-9.json",
+      "find": "\"minAppVersion\": \"2.23.0\"",
+      "replace": "\"minAppVersion\": \"2.25.0\""
+    }
+  ]
+}

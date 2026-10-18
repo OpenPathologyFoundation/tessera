@@ -1,0 +1,15 @@
+{
+  "incident": 20,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "DHF-001 document table lists DCR-035 as Approved though the sign-off state is held in the change record and register.",
+  "same_class_because": "DHF-001 restates approval state owned elsewhere, as in the row, but the restated fact is a DCR status rather than the clinical signature count.",
+  "edits": [
+    {
+      "file": "QMS/DHF/DHF-001-DesignHistoryFile-Index.md",
+      "find": "| DCR-035 | Design Change Record — Profile Names State Contents | Change Control | **In Review** |",
+      "replace": "| DCR-035 | Design Change Record — Profile Names State Contents | Change Control | **Approved** |"
+    }
+  ]
+}

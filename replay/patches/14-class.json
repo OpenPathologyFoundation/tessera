@@ -1,0 +1,15 @@
+{
+  "incident": 14,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "REF-001 gains a live-support entry [S11], an unpublished conference abstract whose text is recorded as not obtainable, cited as the basis for the 300-cell non-inferiority claim.",
+  "same_class_because": "Like row 14 it carries a source nobody on the project could obtain as live support rather than withdrawn, but it is a new reference ([S11], an abstract) supporting a different claim (the count-size claim) instead of Rümke [S4] supporting the ratio-precision claim.",
+  "edits": [
+    {
+      "file": "QMS/DHF/REF-001-StandardsAndLiterature.md",
+      "find": "| Scope of CLSI H20-A2; laboratory-specific criteria |",
+      "replace": "| Scope of CLSI H20-A2; laboratory-specific criteria |\n| **[S11]** | Laboratory Haematology Working Party. Reproducibility of 300-cell versus 500-cell manual differentials: a multicentre audit. Conference abstract, 1991. | Primary text not held (abstract not obtainable); carried as non-blocking | Corroborates [S5]: 300-cell counts are diagnostically non-inferior |"
+    }
+  ]
+}

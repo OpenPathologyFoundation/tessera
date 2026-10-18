@@ -1,0 +1,15 @@
+{
+  "incident": 31,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "SOP-001 §6.2 monthly QC vector assigns the blasts category to key A, which in the shipped default profile is monocytes (blasts are X).",
+  "same_class_because": "A procedure the validator rehearses states a wrong key against the shipped default, written against an old layout and not re-checked; the row's instance was the §5.5 miscount example, this one is the §6.2 QC vector table.",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "| X | blasts | 2 | 2% |",
+      "replace": "| A | blasts | 2 | 2% |"
+    }
+  ]
+}

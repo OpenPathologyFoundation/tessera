@@ -1,0 +1,14 @@
+{
+  "incident": 47,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "Validation scenario V2 tells the validator the progress row reads \"50 / 200 (200)\" while the application renders \"(target)\"",
+  "edits": [
+    {
+      "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+      "find": "Progress shows \"50 / 200 (target)\".",
+      "replace": "Progress shows \"50 / 200 (200)\"."
+    }
+  ]
+}

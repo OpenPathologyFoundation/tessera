@@ -1,0 +1,22 @@
+{
+  "incident": 28,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "The body-fluid profile's provenance note claims bone marrow categories and an M:E ratio following ICSH 2008 §2.6, for a profile with neither",
+  "edits": [
+    {
+      "file": "web/settings/presets/body-fluid.json",
+      "find": "\"notes\": \"Practice-based body fluid panel; see CLSI H56 (REF-001 [S3]). Not held in full text.\"",
+      "replace": "\"notes\": \"Bone marrow categories and M:E ratio follow ICSH 2008 §2.6.\""
+    }
+  ],
+  "extra_cmd": [
+    "npx",
+    "playwright",
+    "test",
+    "--grep",
+    "VV-SYS-221",
+    "--project=chromium"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "incident": 44,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "The analyzer-5 preset description claims its targets and report templates are those of the 14-Type profile, but its target is 100 cells against 500/200 and it has its own templates.",
+  "same_class_because": "A preset carries a fidelity claim about targets that the profile data does not support; the row's instance was the mdc-2015-9 predecessor claim, this is analyzer-5 and the 14-Type profile.",
+  "edits": [
+    {
+      "file": "web/settings/presets/analyzer-5.json",
+      "find": "Peripheral blood only; target 100.",
+      "replace": "Peripheral blood only; target 100. Targets and report templates are those of the 14-Type profile."
+    }
+  ]
+}

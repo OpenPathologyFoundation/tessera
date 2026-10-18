@@ -1,0 +1,14 @@
+{
+  "incident": 34,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SOP-001 §7 attests that no data is stored in permanent browser storage while autosave writes to localStorage",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "| **Data Storage** | No data is transmitted to any server. Counts, the case/accession number and morphology comments are written to **browser localStorage** by the autosave feature,",
+      "replace": "| **Data Storage** | No data is transmitted to any server. No data is stored in permanent browser storage; counts are held in memory only,"
+    }
+  ]
+}

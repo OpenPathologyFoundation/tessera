@@ -25,7 +25,7 @@ where an individual session is capable and thorough and has no memory of the
 other five documents. And it is the evidence base for the guards: each `QC-`
 identifier in the last column exists because of a specific row above it.
 
-**Counted here rather than described:** 52 incidents, of which 42 are now
+**Counted here rather than described:** 53 incidents, of which 43 are now
 prevented by an automated check. QC-027 checks both figures against the rows
 below, so this sentence cannot be the next thing to drift.
 
@@ -87,6 +87,7 @@ below, so this sentence cannot be the next thing to drift.
 | 50 | 2026-08-23 | The counter displayed `0 / 500 (target)` for a profile that states no target, and a sub-target advisory beneath the result | The running application on a pilot workstation | `mdc-2015-9` v2.3, which states none — and whose old target was 200, so 500 came from neither the profile nor its predecessor but from the default an older build substitutes | `sw.js` fetches configuration network-first and the shell cache-first. Both are correct alone; together they let the newest profile be read by the previous release's code. Pre-DCR-040 code tested `!spec.targetCount`, and `!null` is true | **Use.** The first defect this project found by someone operating it rather than by audit or review | DCR-042 | SYS-259 (a profile declares the oldest build that can read it), SYS-260/261 (the shell updates itself, never mid-count); VV-VER-001/002, TC-B139..142, VV-PRE-028/029 |
 | 51 | 2026-08-23 | `prepareConfig` built the profile metadata from a field list, so a field added to the engine reached the application and stopped | `mdc-app.js` `prepareConfig` | `normalizeConfig`, which had already carried `minAppVersion` | **The comment directly above that literal records the same structure losing `provenance` under DCR-035.** The instance was fixed and the shape kept | Writing TC-B140, which asserts the refusal rather than the acceptance | DCR-042 | The meta is copied wholesale; only the field this layer adds is named. TC-B140 |
 | 52 | 2026-08-23 | `TC-B061: Reset to Default confirms, clears the cache **and reloads**` | `tests/11-application-behavior.test.js` | The test asserts the cache is cleared and nothing else; jsdom's `window.location` is unforgeable, so the harness's `reload` stub never takes and `reloads.count` stays 0 however many times the application reloads | A test named for the behaviour it was written to cover rather than the assertions it makes. Dead instrumentation nobody had cause to check | Trying to use `reloads.count` in a new test | DCR-042 | — (see §3) |
+| 53 | 2026-10-18 | "379 passing tests, 100% pass rate" at the v2.0 baseline; "Tests recorded: 191" for the same baseline | DCR-004 §1; TR-001 §1.1; the manuscript draft, which repeated 379 | `52e2a4c`, the newest commit on or before the baseline date TR-001 states, runs **156** tests; the February evidence bundles record 153; no commit and no bundle produces 191 or 379 | A baseline figure recorded without the commit it measured, then carried forward by documents that each took the previous one as its source — row 10's class, one layer up. The figure was quoted for two months by every document about the baseline and checked by none, because nothing could check a number with no commit under it | Manuscript preparation: the facts generator built for the paper measured the baseline at its commit instead of reading it from DCR-004 | DCR-043 | QC-032 (TR-001 §1.1 states the measured figure and names the commit); QC-031 (the manuscript reads it by marker); DCR-004 keeps its figure as a dated record |
 
 ---
 
@@ -127,6 +128,18 @@ Honesty about the guards matters as much as the guards.
   skip rather than passing silently, but a repository that never runs
   `npm run test:qms` on a clean tree gets agreement between documents without
   agreement with reality.
+- **The "Prevented by" column is now measured, and the measurement is not the
+  column.** `replay/` (DCR-043) re-introduces every row above against a fixed
+  commit — the row's own contradiction, and a different one of the same class
+  — and `replay/results.json` records which checks fired. Where the column
+  names a guard that did not fire, the column is what is wrong, and the
+  manuscript's taxonomy table is generated from the results rather than from
+  this file. Two limits, stated here so they are not inferred: the replay is
+  inert until `npm run replay` is run on a clean tree, as QC-022 is until an
+  evidence bundle exists, and QC-030 says so rather than passing; and a row
+  whose guard is a code path rather than a test identifier (rows 43 and 48)
+  cannot be attributed by name, so a red build there is recorded as caught but
+  unattributed, which is a smaller claim than "guarded".
 
 ---
 
@@ -158,6 +171,7 @@ recurrence.
 
 | Rev | Date | Author | Description |
 |-----|------|--------|-------------|
+| L | 2026-10-18 | QMS | Row 53 added (DCR-043): the v2.0 baseline test count, quoted as 379 by DCR-004 and as 191 by TR-001 for two months, measures 156 at the only commit it could describe. Found by the facts generator built for the manuscript, which measures the baseline instead of reading it. §3 gains the replay: every row above now has an instance patch and a class patch under `replay/`, and the "Prevented by" column is checked against what actually fires rather than trusted. |
 | I | 2026-08-08 | QMS | Rows 37–43 added (DCR-039): the majors left standing after the blockers were cleared. Four are SOP-001 describing behaviour that was never built — a fixed key assignment, a case-number dialog, a blocking completion warning — and two are profile text that prints into a clinical report. The seventh is the first CODE defect this file has recorded since the drift work began: a key that could be decremented but never incremented. |
 | K | 2026-08-23 | QMS | Rows 50–52 added (DCR-042). Row 50 is the first incident in this log found through USE: a pilot workstation ran a current profile against a release-old application shell and displayed a target the laboratory had not set, with every traceability field on screen correct. Rows 51 and 52 were found while fixing it — a metadata field list that had already lost `provenance` once, and a test whose name claimed an assertion it does not make. |
 | J | 2026-08-23 | QMS | Row 49 added (DCR-041): the fonts row of README's stack table, which §3 predicted and which went unnoticed for as long as the fonts have been vendored. §3 rewritten to record that the prediction came true and what the narrower residual gap now is. |

@@ -1,0 +1,35 @@
+{
+  "incident": 10,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "A new evidence bundle records tree_state=DIRTY and no git_branch yet claims status PASS, and TR-001's Evidence Folder header is pointed at it.",
+  "same_class_because": "Like the row, test evidence is recorded without a trustworthy identity of what it measured (uncommitted tree, no branch), but here the bundle is a new directory with a dirty-tree stamp and TR-001 cites it as release evidence.",
+  "edits": [
+    {
+      "file": "QMS/DHF/TestEvidence/2026-08-24_090000_run/command.txt",
+      "create": "npm test && npx playwright test\n"
+    },
+    {
+      "file": "QMS/DHF/TestEvidence/2026-08-24_090000_run/environment.txt",
+      "create": "date_utc=2026-08-24T13:00:00.000Z\nnode=v26.5.0\nplatform=darwin\narch=arm64\ncwd=/Users/pg/IdeaProjects/tessera\nnpm=11.17.0\ngit_commit=b33743a2c27d44108ae727d8ee7ea4a5b1563c0e\ntree_state=DIRTY\n"
+    },
+    {
+      "file": "QMS/DHF/TestEvidence/2026-08-24_090000_run/facts.json",
+      "create": "{\n  \"tests_total\": 1172,\n  \"tests_node\": 722,\n  \"tests_browser\": 450,\n  \"tests_skipped\": 7,\n  \"evidence_run_id\": \"2026-08-24_090000_run\",\n  \"measured_at\": \"2026-08-24T13:00:00.000Z\",\n  \"git_commit\": \"b33743a2c27d44108ae727d8ee7ea4a5b1563c0e\",\n  \"tree_state\": \"DIRTY\",\n  \"layers\": \"node+playwright\",\n  \"status\": \"PASS\"\n}\n"
+    },
+    {
+      "file": "QMS/DHF/TestEvidence/2026-08-24_090000_run/test-summary.md",
+      "create": "# Test Run Summary\n\n- Date (UTC): 2026-08-24T13:00:00.000Z\n- Node layer: PASS\n- System layer (Playwright, 3 engines): PASS\n- Command: `npm test && npx playwright test`\n- Exit Code: node=0, playwright=0\n- Result: **PASS**\n- Evidence Folder: `QMS/DHF/TestEvidence/2026-08-24_090000_run`\n"
+    },
+    {
+      "file": "QMS/DHF/TestEvidence/2026-08-24_090000_run/test-output-raw.txt",
+      "create": "# tests 722\n# pass 715\n# skipped 7\n# fail 0\n"
+    },
+    {
+      "file": "QMS/DHF/TR-001-TestResults.md",
+      "find": "| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-06_073300_review-p0-remediation/`",
+      "replace": "| **Evidence Folder** | `QMS/DHF/TestEvidence/2026-08-24_090000_run/`"
+    }
+  ]
+}

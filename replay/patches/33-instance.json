@@ -1,0 +1,19 @@
+{
+  "incident": 33,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SOP-001 §6.2 monthly QC enters `gran` and `eryth` categories that the default profile lacks and cites VV-CALC-007, which exists in no test file",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "   | D | bands | 20 | 20% |\n   | F | poly | 10 | 10% |",
+      "replace": "   | D | gran | 20 | 20% |\n   | F | eryth | 10 | 10% |"
+    },
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "2. Verify the grand total reads **100**, every percentage matches the table, and",
+      "replace": "2. Verify the grand total reads **100** (test VV-CALC-007), every percentage matches the table, and"
+    }
+  ]
+}

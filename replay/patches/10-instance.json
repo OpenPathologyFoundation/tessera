@@ -1,0 +1,31 @@
+{
+  "incident": 10,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "TR-001 reports an evidence bundle whose environment.txt records no commit and a dirty tree, with facts.json claiming PASS",
+  "edits": [
+    {
+      "file": "QMS/DHF/TestEvidence/2026-10-18_000000_run/environment.txt",
+      "create": "date_utc=2026-10-18T00:00:00.000Z\nnode=v26.5.0\nplatform=darwin\narch=arm64\ncwd=/Users/pg/IdeaProjects/tessera\nnpm=11.17.0\ngit_commit=unknown\ngit_branch=unknown\ntree_state=DIRTY\n"
+    },
+    {
+      "file": "QMS/DHF/TestEvidence/2026-10-18_000000_run/facts.json",
+      "create": "{\n  \"tests_total\": 1172,\n  \"tests_node\": 722,\n  \"tests_browser\": 450,\n  \"tests_skipped\": 7,\n  \"evidence_run_id\": \"2026-10-18_000000_run\",\n  \"measured_at\": \"2026-10-18T00:00:00.000Z\",\n  \"git_commit\": \"unknown\",\n  \"tree_state\": \"DIRTY\",\n  \"layers\": \"node+playwright\",\n  \"status\": \"PASS\"\n}\n"
+    },
+    {
+      "file": "QMS/DHF/TestEvidence/2026-10-18_000000_run/command.txt",
+      "create": "npm test && npx playwright test\n"
+    },
+    {
+      "file": "QMS/DHF/TestEvidence/2026-10-18_000000_run/test-summary.md",
+      "create": "# Test Run Summary\n\n- Result: **PASS** (Approved)\n"
+    },
+    {
+      "file": "QMS/DHF/TR-001-TestResults.md",
+      "find": "<!-- qms:fact evidence_run_id -->2026-08-23_215308_run<!-- /qms:fact -->",
+      "replace": "<!-- qms:fact evidence_run_id -->2026-10-18_000000_run<!-- /qms:fact -->",
+      "all": true
+    }
+  ]
+}

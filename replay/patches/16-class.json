@@ -1,0 +1,15 @@
+{
+  "incident": 16,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "README test-total table states 9 documented skips while the evidence-run marker in TR-001, RTM-001 states 7.",
+  "same_class_because": "Another copy of a measured test total (tests_skipped) disagrees with its sibling copies; the row's instance was the grand total and TR-001.",
+  "edits": [
+    {
+      "file": "README.md",
+      "find": "<!-- qms:fact tests_skipped -->7<!-- /qms:fact --> are documented skips",
+      "replace": "<!-- qms:fact tests_skipped -->9<!-- /qms:fact --> are documented skips"
+    }
+  ]
+}

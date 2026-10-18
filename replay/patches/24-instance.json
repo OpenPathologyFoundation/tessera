@@ -1,0 +1,14 @@
+{
+  "incident": 24,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "CLAUDE.md states the drift log's totals from memory (\"records 21 occasions … Sixteen were introduced by sessions doing correct work\")",
+  "edits": [
+    {
+      "file": "CLAUDE.md",
+      "find": "Read `QMS/DHF/DRIFT-LOG.md` before your first substantive change. It records\nevery occasion on which this file claimed something that had stopped being true.",
+      "replace": "Read `QMS/DHF/DRIFT-LOG.md` before your first substantive change. It records 21 occasions on which this file claimed something that had stopped being true. Sixteen were introduced by sessions doing correct work."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "incident": 14,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "REF-001 cites [S4] (Rümke 1985) as held, live support for the imprecision of a single percentage",
+  "edits": [
+    {
+      "file": "QMS/DHF/REF-001-StandardsAndLiterature.md",
+      "find": "| **[S4]** | ~~Rümke CL. The imprecision of the ratio of two percentages observed in differential white blood cell counts: a warning. *Blood Cells* 1985;11(1):137–140. PMID 4074888~~ | **WITHDRAWN 2026-08-06 — not obtainable** | Nothing. No requirement, calculation or claim rests on it. See §3.8 |",
+      "replace": "| **[S4]** | Rümke CL. The imprecision of the ratio of two percentages observed in differential white blood cell counts: a warning. *Blood Cells* 1985;11(1):137–140. PMID 4074888 | Held — primary text | The imprecision of a single percentage at the recommended counts; URS-037 |"
+    }
+  ]
+}

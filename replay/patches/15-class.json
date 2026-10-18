@@ -1,0 +1,15 @@
+{
+  "incident": 15,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "web/scripts/mdc-app.js APP_VERSION is 2.23.0 while package.json, DHF-001 and the sw.js cache key say 2.24.1.",
+  "same_class_because": "A version identifier was advanced in package.json and sw.js but not in the application's own APP_VERSION constant, unlike the row's package.json/DHF-001/sw.js split.",
+  "edits": [
+    {
+      "file": "web/scripts/mdc-app.js",
+      "find": "const APP_VERSION = '2.24.1';",
+      "replace": "const APP_VERSION = '2.23.0';"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "incident": 23,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "NOTICE no longer declares Libre Franklin, although web/vendor/fonts/ still ships libre-franklin files and the NOTICE text says three typefaces.",
+  "same_class_because": "A vendored asset is shipped without its licence declaration in NOTICE; the row's instance was Tailwind, this removes a bundled font's notice instead.",
+  "edits": [
+    {
+      "file": "NOTICE",
+      "find": "  - Libre Franklin — Copyright 2020 The Libre Franklin Project Authors\n    https://github.com/googlefonts/Libre-Franklin · `web/vendor/fonts/libre-franklin-OFL.txt`\n",
+      "replace": ""
+    }
+  ]
+}

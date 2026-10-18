@@ -1,0 +1,15 @@
+{
+  "incident": 17,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "DHF-001 §7.4 gains an outstanding item 5 saying acceptance of the residual Medium risks is outstanding, while RA-001 §6.4 marks it Closed 2026-08-05.",
+  "same_class_because": "An action closed in RA-001 is re-listed as open in DHF-001 §7.4; the row's instance was hazard HA-093 rather than the residual-risk acceptance action.",
+  "edits": [
+    {
+      "file": "QMS/DHF/DHF-001-DesignHistoryFile-Index.md",
+      "find": "   the odds transform of a Wilson interval on the conditional binomial.",
+      "replace": "   the odds transform of a Wilson interval on the conditional binomial.\n5. Acceptance of the residual Medium risks (HA-001, HA-002) by the Document\n   Owner is outstanding (RA-001 §6.4)."
+    }
+  ]
+}

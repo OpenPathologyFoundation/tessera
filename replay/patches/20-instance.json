@@ -1,0 +1,14 @@
+{
+  "incident": 20,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "DHF-001 §7.2 restates the sign-off register as a hand-maintained list of change records and \"the eleven documents listed as In Review\"",
+  "edits": [
+    {
+      "file": "QMS/DHF/DHF-001-DesignHistoryFile-Index.md",
+      "find": "| **In Review** | Enumerated in `SIGNOFF-REGISTER.md`, which is generated from the signature tables themselves |",
+      "replace": "| **In Review** | DCR-004, DCR-005, DCR-006, DCR-007, DCR-008, DCR-009, and the eleven documents listed as In Review |"
+    }
+  ]
+}

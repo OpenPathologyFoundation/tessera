@@ -1,0 +1,15 @@
+{
+  "incident": 36,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "SOP-001 §9 item 6 states the shipped profiles are full 14-part consensus, harmonized 9-part, legacy 9-part and minimal 5-part, names that no longer exist in the catalogue.",
+  "same_class_because": "Withdrawn profile names remain in a document the catalogue change did not sweep; the row's instance was web/help.html, this is SOP-001.",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "   Configuration Editor (linked from the case-entry screen) changes",
+      "replace": "   Configuration Editor (linked from the case-entry screen; shipped profiles are full 14-part consensus, harmonized 9-part, legacy 9-part and minimal 5-part) changes"
+    }
+  ]
+}

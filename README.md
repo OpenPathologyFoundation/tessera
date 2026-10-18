@@ -288,7 +288,8 @@ Keys must be single characters (letters or punctuation like `;`, `,`, `.`, `/`).
 ├── package-lock.json
 ├── package.json
 ├── playwright.config.js
-├── scripts/             # QMS drift-control generators (counts, facts, registers)
+├── replay/              # The drift log re-introduced row by row against a fixed commit; the facts file the paper reads
+├── scripts/             # QMS drift-control generators (counts, facts, registers, paper facts, manuscript lint)
 ├── serve.js             # Static server for local use; serves web/
 ├── tests/               # Unit and behavioural suites (node --test)
 ├── tests-e2e/           # System suites (Playwright, three engines)
@@ -342,6 +343,21 @@ If multiple Draft DCRs exist, specify which to update:
 npm run test:qms -- --dcr DCR-001-Theme-Export-Clipboard-QMS
 ```
 
+### Replay: does the build still catch what the drift log records?
+
+`QMS/DHF/DRIFT-LOG.md` names, for every incident, the check that now prevents
+it. That column was written by hand. `replay/` turns it into a measurement:
+each row has a patch that re-creates its own contradiction and a patch that
+introduces a different one of the same class, built by someone who has not
+read the checks. `npm run replay` applies every patch to a fresh worktree of a
+fixed commit, runs the build, and records in `replay/results.json` which checks
+fired — caught, caught by something else, or escaped — with a negative and a
+positive control first. A guard that stops catching its incident fails the
+run. `node scripts/qms-paper-facts.js --write` then generates `replay/facts.json`,
+the only source for any number in the manuscript about this machinery, and
+`npm run lint:manuscript` refuses a manuscript that types one. The protocol is
+in `replay/README.md`.
+
 ### CI / GitHub Actions (Optional)
 
 CI can run `npm test` for quick feedback, but **QMS evidence requires `npm run test:qms`** so the run is archived under `QMS/DHF/TestEvidence/`. If you later add CI artifacts, ensure the evidence bundle is preserved and referenced in TR-001.
@@ -394,7 +410,7 @@ The `QMS/DHF/` directory contains the complete Design History File per 21 CFR Pa
 | **SAD-001** | System architecture, component diagram, data flows, state machine |
 | **SDD-001** | Detailed software design with pseudocode for all algorithms |
 | **RA-001** | FMEA risk analysis: 56 hazards, severity/occurrence/detectability scoring |
-| **TP-001** | Test plan; register of 803 implemented verification cases, generated from the runners |
+| **TP-001** | Test plan; register of 807 implemented verification cases, generated from the runners |
 | **VV-001** | Verification & validation protocol with 15 calculation vectors and 6 clinical validation scenarios |
 | **RTM-001** | Bidirectional requirements traceability matrix (100% coverage) |
 | **SOP-001** | Standard operating procedure for clinical use |

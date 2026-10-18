@@ -1,0 +1,15 @@
+{
+  "incident": 22,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "methods.html states percentage rounding is fixed to one method, though a profile can select largest-remainder, largest-count or independent.",
+  "same_class_because": "A limit stated as absolute after the code offered the choice, as row 22 stated an offline limit; this one concerns the rounding method rather than offline use.",
+  "edits": [
+    {
+      "file": "web/methods.html",
+      "find": "        one unit of the last decimal shown.",
+      "replace": "        one unit of the last decimal shown. Rounding is fixed: no other rounding method can be selected."
+    }
+  ]
+}

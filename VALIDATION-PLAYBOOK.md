@@ -115,9 +115,13 @@ Hand nothing here to Claude Code except where marked — this is your checklist.
 ## Phase 5 — The papers (any time after Phase 4)
 
 19. Tag the post-validation release; mint a Zenodo DOI for it.
-20. Reconcile `manuscript/PAPER-1-DRAFT.md` against that tag — the claims
-    register pass from `PAPER-1-OUTLINE.md` §8. Numbers that have certainly
-    moved: incident count (23 → 36+), DCR count (30 → 39+), test totals.
+20. Reconcile `manuscript/PAPER-1-DRAFT.md` against that tag. On the clean
+    tree at the tag: `npm run replay`, then
+    `node scripts/qms-paper-facts.js --write` (regenerates `replay/facts.json`
+    and rewrites the manuscript's `qms:fact` markers), then
+    `npm run lint:manuscript` — every number it lists is one the draft still
+    types instead of reading. Numbers that have certainly moved: incident
+    count, DCR count, test totals, and the baseline test count (incident 53).
     *Why at the tag and not at submission:* the paper must describe a commit
     a reviewer can check out, or the paper about drift has drifted.
 21. Fill the two TODO citations, venue author guidelines, AI-assistance

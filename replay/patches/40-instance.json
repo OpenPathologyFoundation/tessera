@@ -1,0 +1,14 @@
+{
+  "incident": 40,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "SOP-001 §5.9 describes clearing the case number mid-count and a confirmation dialog, a flow that never existed",
+  "edits": [
+    {
+      "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+      "find": "**The case number cannot be edited mid-count.** The field exists only on the\ncase-entry screen; during counting the case is shown as a read-only badge. There\nis no change-the-case-number dialog — to correct a mistyped accession number,\nfinish or **Reset** the count and start again.",
+      "replace": "**Method 1a: Change the case number mid-count.** Clear the current case number\nin the case field; a confirmation dialog will appear. Confirm to continue the\ncount under the new case number."
+    }
+  ]
+}

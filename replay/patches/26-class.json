@@ -1,0 +1,15 @@
+{
+  "incident": 26,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "qms-run-tests.js writes tests_total as node plus browser passed only, so the written total no longer equals tests_node + tests_browser that every document states.",
+  "same_class_because": "Two definitions of one quantity (total tests) in the writer, as with two definitions of admissible evidence, but the pair is total versus sum of parts rather than the clean-tree condition.",
+  "edits": [
+    {
+      "file": "scripts/qms-run-tests.js",
+      "find": "tests_total: nodeTests + e2eTotal,",
+      "replace": "tests_total: nodeTests + e2ePassed,"
+    }
+  ]
+}

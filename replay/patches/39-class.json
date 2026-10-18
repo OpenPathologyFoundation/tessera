@@ -1,0 +1,15 @@
+{
+  "incident": 39,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "README features table claims Session Export shows a confirmation dialog warning that exported files contain accession numbers before download; no such dialog exists.",
+  "same_class_because": "A feature description names a modal dialog that was never built; the row's instance was the sub-target warning dialog, this is an export-time dialog on a different feature row.",
+  "edits": [
+    {
+      "file": "README.md",
+      "find": "| **Session Export** | Export session history to CSV/JSON for local records |",
+      "replace": "| **Session Export** | Export session history to CSV/JSON for local records; a warning dialog asks the operator to confirm before any file containing accession numbers is downloaded |"
+    }
+  ]
+}

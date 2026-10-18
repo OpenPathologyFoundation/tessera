@@ -6,7 +6,7 @@
 |-------|-------------------------------------------------------------------------------------------------------------------------|
 | **Document ID** | DHF-001                                                                                                                 |
 | **Product Name** | WBC ΔΣ                                                                                                                 |
-| **Product Version** | 2.24.0                                                                                                                     |
+| **Product Version** | 2.24.1                                                                                                                     |
 | **Classification** | Clinical Laboratory Aid - Software                                                                                      |
 | **Intended Use** | Keyboard-driven manual differential white blood cell counting tool for hematology laboratory personnel                  |
 | **Software Safety Class** | **Class A** (IEC 62304 §4.3) — confirmed 2026-08-05, see §3.1 |
@@ -307,6 +307,7 @@ requires the classification to be reassessed before release.
 | CRB-001 | Clinical Review Brief (`CLINICAL-REVIEW-BRIEF.md`) — the request put to reviewing haematopathologists | Review Record | Issued |
 | SGR-001 | Sign-off Register (`SIGNOFF-REGISTER.md`) — which approvals are outstanding, generated from the signature tables themselves | Review Record | Generated |
 | DRL-001 | Drift Log (`DRIFT-LOG.md`) — every claim this file made that had stopped being true, with the guard that now prevents it | Quality Record | Append-only |
+| RPL-001 | Replay (`replay/`) — every drift-log row re-introduced against a fixed commit, as its own contradiction and as another of its class, with the checks that fired; and the facts file the manuscript about this machinery reads its numbers from | Quality Record | Generated |
 | TR-001 | Test Execution Results v3.1 | Evidence | Draft |
 | SOP-001 | Standard Operating Procedure | Procedure | Draft |
 | SOP-002 | Deployment Procedure | Procedure | Draft |
@@ -369,6 +370,7 @@ superseded banner and RTM-001 v3.0 is re-keyed to v2.0.
 | C | 2026-02-20 | QMS | Added design change record entry |
 | D | 2026-02-24 | QMS | Updated to v2.0: 14-cell unified layout, advisory targets, M:E ratio, Continue Counting |
 | M | 2026-08-05 | QMS | v2.7.1: CAL-001 moved from a Markdown file in this directory to `web/calculation-reference.html`, so that it ships with the product, is reachable from the case-entry screen, the Methods page and the results screen, and is available offline. The Markdown file is retained as the document control record. Held in one place to avoid the drift recorded as HA-097. |
+| AS | 2026-10-18 | QMS | v2.24.1 (DCR-043): the drift log's "Prevented by" column becomes a measurement. `replay/` holds, for every row, the row's own contradiction and a different one of its class as patches; `npm run replay` applies each to a fresh worktree of a fixed commit and records which checks fired, with controls, stamped with the commit it measured. `scripts/qms-paper-facts.js` generates every number the manuscript about this machinery may state, and `scripts/qms-manuscript-lint.js` refuses a typed one. Building the generator found incident 53: the v2.0 baseline test count, quoted as 379 by DCR-004 and 191 by TR-001 since August, measures 156 at the only commit it could describe. No product behaviour changes; the version moves so the record names this state. QC-029 to QC-032. |
 | AR | 2026-08-23 | QMS | v2.24.0 (DCR-042): the first defect this project found through use. A pilot workstation displayed a 500-cell target for a profile that states none, because `sw.js` fetches configuration network-first and the application shell cache-first — so the browser held the current profile and the previous release's code, which reads `targetCount: null` as an omission. Every traceability field on screen was correct while the two halves disagreed about what a field means, which is why detection scored 5. A profile now declares the oldest build that can interpret it and is refused by anything older, with both versions stated; and the application adopts a newer shell by reloading at the case-entry screen, never during a count. Two defects found while building it: `prepareConfig` rebuilt profile metadata from a field list that had already lost `provenance` once under DCR-035, and `TC-B061` claimed to verify a reload it never asserted. HA-111, URS-109, SYS-259–261; incidents 50–52. |
 | AQ | 2026-08-23 | QMS | v2.23.1 (DCR-041): the README could not tell a reader which directory starts the application, and fixing that found three claims in the same file that had stopped being true. One of them — the stack table calling the vendored fonts "Google Fonts (CDN)" — is drift the log had **predicted**: §3 recorded, under incident 21, that the fact was guarded and the prose was not, and the prose then failed in the same table one row down. QC-025 gains a claims row anchored on the tree rather than on a Core export, an optional `export`, and an exemption for dated historical records, which state false claims because they are the record of finding them. Incident 49. |
 | AP | 2026-08-23 | QMS | v2.23.0 (DCR-040): the first change set driven by clinical review of the running tool rather than by audit. Two counting-policy decisions, both the reviewing haematopathologists': blasts leave the M:E numerator of `mdc-2015-9`, and that profile states no target cell count. The first is the second mitigation for HA-091 — ICSH names *myeloblasts* in the ratio while listing *blast cells* among the categories, and one lineage-agnostic blast key cannot honour both — and it is the one a laboratory can act on at the scope. The second is a fidelity correction as much as a preference: the predecessor declared a 200-cell minimum in configuration and its code never read it, so the profile had been reproducing a setting rather than a behaviour. `targetCount: null` is now a stated absence, distinct from an omitted field; a profile may not state no target AND disable confidence intervals, since those are HA-030's two controls; and a malformed target is now rejected rather than silently replaced with 500. Incidents 44–46. |
@@ -465,6 +467,10 @@ numbers.
 4. ~~No interval is computed for the M:E ratio (HA-093).~~ **Closed
    2026-08-06 (DCR-026)** — the ratio carries a confidence interval, computed as
    the odds transform of a Wilson interval on the conditional binomial.
+5. The drift-log classification in `replay/incidents.json` — root-cause class,
+   detection class and the correct-work criterion for every row — is
+   **proposed** by the session that built it (DCR-043 §5) and awaits the
+   Document Owner's confirmation; `replay/facts.json` carries its status.
 
 ---
 

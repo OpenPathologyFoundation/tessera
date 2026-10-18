@@ -1,0 +1,14 @@
+{
+  "incident": 11,
+  "kind": "instance",
+  "mode": "edit",
+  "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+  "description": "TR-001 §1 names `npm run test:all` as the command while the bundle it reports recorded a different one",
+  "edits": [
+    {
+      "file": "QMS/DHF/TR-001-TestResults.md",
+      "find": "Command: see `command.txt` in the evidence bundle this reports —",
+      "replace": "Command: `npm run test:all` — evidence bundle:"
+    }
+  ]
+}

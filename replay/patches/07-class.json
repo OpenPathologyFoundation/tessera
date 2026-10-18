@@ -1,0 +1,15 @@
+{
+  "incident": 7,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "SDD-001 §3.15 lists a non-existent file, web/scripts/wbc-export.js, among the assets the service worker caches.",
+  "same_class_because": "Design documentation lists a file that is not in the tree, as if written ahead of the code; the row's instance was the SAD-001 §5.2 file organisation, this one is the SDD-001 offline-shell description.",
+  "edits": [
+    {
+      "file": "QMS/DHF/SDD-001-SoftwareDetailedDesign.md",
+      "find": "`wbc-dialog.js`, `mdc-app.js`, `config-editor.js`, `styles/theme.css` and the",
+      "replace": "`wbc-dialog.js`, `mdc-app.js`, `config-editor.js`, `wbc-export.js`, `styles/theme.css` and the"
+    }
+  ]
+}

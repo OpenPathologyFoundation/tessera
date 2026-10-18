@@ -1,0 +1,15 @@
+{
+  "incident": 41,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "gran-combined-10 peripheral blood specimen (target 200) carries the bone marrow ICSH 500/300 targetCountBasis.",
+  "same_class_because": "A basis statement copied between specimens whose target counts differ, as row 41; here the 500-cell marrow basis lands on a 200-cell blood specimen in gran-combined-10.",
+  "edits": [
+    {
+      "file": "web/settings/presets/gran-combined-10.json",
+      "find": "CLSI H20-A2 defines the reference method as two reviewers counting 200 cells each. 200 is one observer's share of it, which is what routine single-observer practice does — a documented default, not a claim to perform the reference method.",
+      "replace": "ICSH 2008 §2.6: at least 500 cells when a precise percentage of an abnormal cell type is required for diagnosis; at least 300 when the differential is not essential to it."
+    }
+  ]
+}

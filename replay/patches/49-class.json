@@ -1,0 +1,20 @@
+{
+  "incident": 49,
+  "kind": "class",
+  "mode": "edit",
+  "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+  "description": "methods.html says NRBC are counted inside the denominator with no exclusion rule, though denominatorExcludes and per-100 reporting exist.",
+  "same_class_because": "Live text asserting a capability absent (denominator exclusion) that the engine has, rather than row 49's wrong asset delivery mechanism in the README stack table.",
+  "edits": [
+    {
+      "file": "web/methods.html",
+      "find": "Nucleated red cells are <strong class=\"text-slate-200\">counted but excluded from the",
+      "replace": "Nucleated red cells are <strong class=\"text-slate-200\">counted and kept in the"
+    },
+    {
+      "file": "web/methods.html",
+      "find": "denominator</strong>, and reported separately as NRBC per 100 WBC. They are not",
+      "replace": "denominator</strong>, with no separate per-100 figure; this counter has no NRBC-exclusion rule. They are not"
+    }
+  ]
+}

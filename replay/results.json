@@ -1,0 +1,3863 @@
+{
+  "protocol": "replay/README.md",
+  "ref": "HEAD",
+  "commit": "7d649a7e5b9be96d08f53ee4ce864d3e5635c26c",
+  "tag": null,
+  "tree_clean": true,
+  "provisional": false,
+  "dry_run": false,
+  "generated_at": "2026-10-18T16:55:06.315Z",
+  "duration_s": 638,
+  "build": "npm test; plus node scripts/qms-verification-index.js --check when a patch touches tests/ or a register; plus the patch's extra_cmd",
+  "classification_status": "proposed",
+  "controls": {
+    "negative": {
+      "expected": "green",
+      "got": "green",
+      "failing": []
+    },
+    "positive": {
+      "expected": "red",
+      "got": "red",
+      "failing": [
+        "QC-016",
+        "VV-PRE-028"
+      ],
+      "applied": true
+    }
+  },
+  "summary": {
+    "instance": {
+      "n": 53,
+      "caught": 32,
+      "caught_incidentally": 4,
+      "caught_unattributed": 1,
+      "escaped": 15,
+      "unapplied": 0,
+      "not_replayed": 1,
+      "escaped_ids": [
+        6,
+        8,
+        11,
+        20,
+        21,
+        23,
+        34,
+        35,
+        37,
+        39,
+        40,
+        42,
+        43,
+        45,
+        47
+      ],
+      "unattributed_ids": [
+        52
+      ]
+    },
+    "class": {
+      "n": 53,
+      "caught": 6,
+      "caught_incidentally": 1,
+      "caught_unattributed": 2,
+      "escaped": 44,
+      "unapplied": 0,
+      "not_replayed": 0,
+      "escaped_ids": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40,
+        42,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        53
+      ],
+      "unattributed_ids": [
+        43,
+        52
+      ]
+    }
+  },
+  "by_class": {
+    "hand_count": {
+      "instance": {
+        "caught": 1
+      },
+      "class": {
+        "escaped": 1
+      },
+      "fired": [
+        "QC-001"
+      ]
+    },
+    "traceability": {
+      "instance": {
+        "caught": 2,
+        "caught_incidentally": 1
+      },
+      "class": {
+        "escaped": 3
+      },
+      "fired": [
+        "QC-005",
+        "QC-006",
+        "VINDEX-CHECK"
+      ]
+    },
+    "stale_description": {
+      "instance": {
+        "caught": 5,
+        "escaped": 7,
+        "caught_incidentally": 2
+      },
+      "class": {
+        "escaped": 14
+      },
+      "fired": [
+        "UD-050",
+        "UD-071",
+        "UD-073",
+        "UD-098",
+        "UD-099",
+        "VV-PRE-023"
+      ]
+    },
+    "unswept_closure": {
+      "instance": {
+        "escaped": 2,
+        "caught": 5
+      },
+      "class": {
+        "caught_incidentally": 1,
+        "escaped": 5,
+        "caught": 1
+      },
+      "fired": [
+        "QC-015",
+        "QC-024",
+        "SC-055",
+        "SC-063",
+        "UD-095",
+        "UD-097"
+      ]
+    },
+    "evidence_provenance": {
+      "instance": {
+        "caught": 2,
+        "escaped": 1
+      },
+      "class": {
+        "escaped": 3
+      },
+      "fired": [
+        "QC-022",
+        "QC-026",
+        "QC-032"
+      ]
+    },
+    "two_writers": {
+      "instance": {
+        "caught": 5,
+        "escaped": 1
+      },
+      "class": {
+        "escaped": 5,
+        "caught": 1
+      },
+      "fired": [
+        "QC-015",
+        "QC-021",
+        "QC-022",
+        "QC-028",
+        "UD-095",
+        "VV-PRE-030",
+        "VV-PRE-031"
+      ]
+    },
+    "original_defect": {
+      "instance": {
+        "caught": 2,
+        "escaped": 1,
+        "caught_incidentally": 1
+      },
+      "class": {
+        "escaped": 2,
+        "caught_unattributed": 1,
+        "caught": 1
+      },
+      "fired": [
+        "SC-054",
+        "TC-B136",
+        "TC-B138",
+        "TC-B139",
+        "TC-B140",
+        "VV-PRE-023",
+        "VV-SCH-019",
+        "VV-SCH-020",
+        "VV-TGT-003",
+        "VV-VER-002"
+      ]
+    },
+    "version_split": {
+      "instance": {
+        "caught": 3,
+        "escaped": 1
+      },
+      "class": {
+        "caught": 2,
+        "escaped": 2
+      },
+      "fired": [
+        "QC-016",
+        "UD-100",
+        "VV-PRE-028",
+        "VV-PRE-029"
+      ]
+    },
+    "capability_claim": {
+      "instance": {
+        "caught": 3,
+        "escaped": 1
+      },
+      "class": {
+        "escaped": 4
+      },
+      "fired": [
+        "QC-025",
+        "SC-062"
+      ]
+    },
+    "prose_count": {
+      "instance": {
+        "caught": 1
+      },
+      "class": {
+        "escaped": 1
+      },
+      "fired": [
+        "QC-027"
+      ]
+    },
+    "copied_text": {
+      "instance": {
+        "caught": 2,
+        "escaped": 1
+      },
+      "class": {
+        "escaped": 2,
+        "caught": 1
+      },
+      "fired": [
+        "UD-101",
+        "VV-PRE-032"
+      ]
+    },
+    "test_claim": {
+      "instance": {
+        "caught": 1,
+        "not_replayed": 1,
+        "caught_unattributed": 1
+      },
+      "class": {
+        "escaped": 2,
+        "caught_unattributed": 1
+      },
+      "fired": [
+        "VINDEX-CHECK",
+        "VV-SYS-220"
+      ]
+    }
+  },
+  "regressions": [],
+  "runs": [
+    {
+      "incident": 1,
+      "kind": "class",
+      "class": "hand_count",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/01-class.json",
+      "description": "README's Test Suite Overview table states that suite 11 (application behaviour in jsdom) contains 131 tests, a hand-typed per-suite figure that does not match the suite.",
+      "expected": [
+        "QC-001",
+        "QC-002",
+        "QC-003"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 1,
+      "kind": "instance",
+      "class": "hand_count",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/01-instance.json",
+      "description": "README's QMS table states 49 user requirements against the 71 URS-001 carries",
+      "expected": [
+        "QC-001",
+        "QC-002",
+        "QC-003"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-001"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-001"
+      ]
+    },
+    {
+      "incident": 2,
+      "kind": "class",
+      "class": "traceability",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/02-class.json",
+      "description": "TR-001 records a PASS result for VV-ABS-901, an absolute-count verification identifier that no test implements.",
+      "expected": [
+        "QC-004",
+        "QC-005",
+        "QC-006"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/TR-001-TestResults.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 2,
+      "kind": "instance",
+      "class": "traceability",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/02-instance.json",
+      "description": "RTM-001 cites a verification identifier (VV-CALC-918) that no protocol document defines and no test implements",
+      "expected": [
+        "QC-004",
+        "QC-005",
+        "QC-006"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-005"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-005"
+      ]
+    },
+    {
+      "incident": 3,
+      "kind": "class",
+      "class": "traceability",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/03-class.json",
+      "description": "TP-001 section 4.2 states that the Priority 1 set is test cases TC-B901 to TC-B905, which exist in no test file.",
+      "expected": [
+        "QC-004"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/TP-001-TestPlan.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 3,
+      "kind": "instance",
+      "class": "traceability",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/03-instance.json",
+      "description": "TP-001's register carries a TC-0xx number (TC-042) that no test file carries",
+      "expected": [
+        "QC-004"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/TP-001-TestPlan.md",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-006",
+        "VINDEX-CHECK"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 1
+        }
+      ],
+      "status": "caught_incidentally",
+      "matched": []
+    },
+    {
+      "incident": 4,
+      "kind": "class",
+      "class": "traceability",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/04-class.json",
+      "description": "RTM-001 row URS-022 claims coverage by VV-A11Y-001, a series the verification register never enumerates.",
+      "expected": [
+        "QC-011",
+        "VINDEX-CHECK"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/RTM-001-RequirementsTraceabilityMatrix.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 4,
+      "kind": "instance",
+      "class": "traceability",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/04-instance.json",
+      "description": "A test exists that carries no verification identifier, so no traceability document can cite it",
+      "expected": [
+        "QC-011",
+        "VINDEX-CHECK"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "tests/01-calculation-engine.test.js",
+          "lines": 8,
+          "op": "append"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "VINDEX-CHECK"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "VINDEX-CHECK"
+      ]
+    },
+    {
+      "incident": 5,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/05-class.json",
+      "description": "USER-GUIDE.md 'Data and privacy' claims completed counts persist in the browser's local storage after the browser closes, when they are held in sessionStorage and lost with the tab.",
+      "expected": [
+        "UD-070",
+        "UD-071",
+        "UD-072",
+        "UD-073",
+        "UD-074"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "USER-GUIDE.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 5,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/05-instance.json",
+      "description": "SAD-001 §7.1 states \"sessionStorage only … No localStorage\" while the crash-recovery snapshot holds the accession number and comments in localStorage",
+      "expected": [
+        "UD-070",
+        "UD-071",
+        "UD-072",
+        "UD-073",
+        "UD-074"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SAD-001-SystemArchitectureDesign.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-071"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "UD-071"
+      ]
+    },
+    {
+      "incident": 6,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/06-class.json",
+      "description": "SOP-002 Deployment procedure step 4 tells the deployer to ensure the host can reach cdn.tailwindcss.com because Tailwind is delivered from the CDN, when it is vendored at web/vendor/tailwind.js.",
+      "expected": [
+        "UD-070",
+        "UD-071",
+        "UD-072",
+        "UD-073",
+        "UD-074"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-002-Deployment.md",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 6,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/06-instance.json",
+      "description": "SAD-001 describes Tailwind as CDN-delivered in two places while it ships vendored at web/vendor/tailwind.js",
+      "expected": [
+        "UD-070",
+        "UD-071",
+        "UD-072",
+        "UD-073",
+        "UD-074"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SAD-001-SystemArchitectureDesign.md",
+          "lines": 1,
+          "op": "edit"
+        },
+        {
+          "file": "QMS/DHF/SAD-001-SystemArchitectureDesign.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 7,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/07-class.json",
+      "description": "SDD-001 §3.15 lists a non-existent file, web/scripts/wbc-export.js, among the assets the service worker caches.",
+      "expected": [
+        "UD-070",
+        "UD-071",
+        "UD-072",
+        "UD-073",
+        "UD-074"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SDD-001-SoftwareDetailedDesign.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 7,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/07-instance.json",
+      "description": "SAD-001 §5.2 lists a file (logo-showcase.html under web/) that does not exist",
+      "expected": [
+        "UD-070",
+        "UD-071",
+        "UD-072",
+        "UD-073",
+        "UD-074"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SAD-001-SystemArchitectureDesign.md",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-073"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "UD-073"
+      ]
+    },
+    {
+      "incident": 8,
+      "kind": "class",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/08-class.json",
+      "description": "web/methods.html section 3 cites Rümke 1985 as the basis of the M:E ratio's imprecision although REF-001 [S4] withdrew that source.",
+      "expected": [
+        "UD-070",
+        "UD-071",
+        "UD-072",
+        "UD-073",
+        "UD-074"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/methods.html",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "SC-055"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught_incidentally",
+      "matched": []
+    },
+    {
+      "incident": 8,
+      "kind": "instance",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/08-instance.json",
+      "description": "SAD-001 §3.2.3 states the v1.0 key mapping, withdrawn at v2.0, as the mapping in code",
+      "expected": [
+        "UD-070",
+        "UD-071",
+        "UD-072",
+        "UD-073",
+        "UD-074"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SAD-001-SystemArchitectureDesign.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 9,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/09-class.json",
+      "description": "web/help.html Home Row table assigns segmented neutrophils (poly) to the key P, when the shipped profile maps F to poly and P is unmapped.",
+      "expected": [
+        "UD-004",
+        "UD-005",
+        "UD-006",
+        "UD-007",
+        "UD-008",
+        "UD-009",
+        "UD-010",
+        "UD-011",
+        "UD-012",
+        "UD-013",
+        "UD-014",
+        "UD-015",
+        "UD-016"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/help.html",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 9,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/09-instance.json",
+      "description": "SOP-001 instructs operators that A = blasts and X = monocytes, a layout that no longer ships",
+      "expected": [
+        "UD-004",
+        "UD-005",
+        "UD-006",
+        "UD-007",
+        "UD-008",
+        "UD-009",
+        "UD-010",
+        "UD-011",
+        "UD-012",
+        "UD-013",
+        "UD-014",
+        "UD-015",
+        "UD-016"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 2,
+          "op": "edit"
+        },
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-050"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught_incidentally",
+      "matched": []
+    },
+    {
+      "incident": 10,
+      "kind": "class",
+      "class": "evidence_provenance",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/10-class.json",
+      "description": "A new evidence bundle records tree_state=DIRTY and no git_branch yet claims status PASS, and TR-001's Evidence Folder header is pointed at it.",
+      "expected": [
+        "QC-026"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/TestEvidence/2026-08-24_090000_run/command.txt",
+          "lines": 2,
+          "op": "create"
+        },
+        {
+          "file": "QMS/DHF/TestEvidence/2026-08-24_090000_run/environment.txt",
+          "lines": 9,
+          "op": "create"
+        },
+        {
+          "file": "QMS/DHF/TestEvidence/2026-08-24_090000_run/facts.json",
+          "lines": 13,
+          "op": "create"
+        },
+        {
+          "file": "QMS/DHF/TestEvidence/2026-08-24_090000_run/test-summary.md",
+          "lines": 10,
+          "op": "create"
+        },
+        {
+          "file": "QMS/DHF/TestEvidence/2026-08-24_090000_run/test-output-raw.txt",
+          "lines": 5,
+          "op": "create"
+        },
+        {
+          "file": "QMS/DHF/TR-001-TestResults.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 10,
+      "kind": "instance",
+      "class": "evidence_provenance",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/10-instance.json",
+      "description": "TR-001 reports an evidence bundle whose environment.txt records no commit and a dirty tree, with facts.json claiming PASS",
+      "expected": [
+        "QC-026"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/TestEvidence/2026-10-18_000000_run/environment.txt",
+          "lines": 10,
+          "op": "create"
+        },
+        {
+          "file": "QMS/DHF/TestEvidence/2026-10-18_000000_run/facts.json",
+          "lines": 13,
+          "op": "create"
+        },
+        {
+          "file": "QMS/DHF/TestEvidence/2026-10-18_000000_run/command.txt",
+          "lines": 2,
+          "op": "create"
+        },
+        {
+          "file": "QMS/DHF/TestEvidence/2026-10-18_000000_run/test-summary.md",
+          "lines": 4,
+          "op": "create"
+        },
+        {
+          "file": "QMS/DHF/TR-001-TestResults.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-022",
+        "QC-026"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-026"
+      ]
+    },
+    {
+      "incident": 11,
+      "kind": "class",
+      "class": "evidence_provenance",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/11-class.json",
+      "description": "The test-summary.md of bundle 2026-08-23_151758_run names `npm run test:all` while the bundle's command.txt records `npm test && npx playwright test`.",
+      "expected": [
+        "QC-026"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/TestEvidence/2026-08-23_151758_run/test-summary.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 11,
+      "kind": "instance",
+      "class": "evidence_provenance",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/11-instance.json",
+      "description": "TR-001 §1 names `npm run test:all` as the command while the bundle it reports recorded a different one",
+      "expected": [
+        "QC-026"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/TR-001-TestResults.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 12,
+      "kind": "class",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/12-class.json",
+      "description": "CLINICAL-REVIEW-BRIEF states the tests run across two browsers while TR-001 and RTM-001 record three engines.",
+      "expected": [
+        "QC-012",
+        "QC-013",
+        "QC-015"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/CLINICAL-REVIEW-BRIEF.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 12,
+      "kind": "instance",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/12-instance.json",
+      "description": "The clinical brief restates a hand-maintained list of eleven documents needing signature instead of pointing at the generated register",
+      "expected": [
+        "QC-012",
+        "QC-013",
+        "QC-015"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/CLINICAL-REVIEW-BRIEF.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-015"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-015"
+      ]
+    },
+    {
+      "incident": 13,
+      "kind": "class",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/13-class.json",
+      "description": "CLINICAL-REVIEW-BRIEF §6 item 4 says the independent review findings (DCR-015 to DCR-026) remain open, though they were closed.",
+      "expected": [
+        "QC-015"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/CLINICAL-REVIEW-BRIEF.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 13,
+      "kind": "instance",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/13-instance.json",
+      "description": "The clinical brief §6 lists the M:E interval as an open limitation, a week after DCR-026 closed it",
+      "expected": [
+        "QC-015"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/CLINICAL-REVIEW-BRIEF.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-015"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-015"
+      ]
+    },
+    {
+      "incident": 14,
+      "kind": "class",
+      "class": "original_defect",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/14-class.json",
+      "description": "REF-001 gains a live-support entry [S11], an unpublished conference abstract whose text is recorded as not obtainable, cited as the basis for the 300-cell non-inferiority claim.",
+      "expected": [
+        "SC-054",
+        "SC-055",
+        "SC-056",
+        "SC-057"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/REF-001-StandardsAndLiterature.md",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 14,
+      "kind": "instance",
+      "class": "original_defect",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/14-instance.json",
+      "description": "REF-001 cites [S4] (Rümke 1985) as held, live support for the imprecision of a single percentage",
+      "expected": [
+        "SC-054",
+        "SC-055",
+        "SC-056",
+        "SC-057"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/REF-001-StandardsAndLiterature.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "SC-054"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "SC-054"
+      ]
+    },
+    {
+      "incident": 15,
+      "kind": "class",
+      "class": "version_split",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/15-class.json",
+      "description": "web/scripts/mdc-app.js APP_VERSION is 2.23.0 while package.json, DHF-001 and the sw.js cache key say 2.24.1.",
+      "expected": [
+        "QC-016"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/scripts/mdc-app.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-016"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-016"
+      ]
+    },
+    {
+      "incident": 15,
+      "kind": "instance",
+      "class": "version_split",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/15-instance.json",
+      "description": "Three product versions live at once: DHF-001 says 2.7.1 and the service-worker cache key says 2.3.0 against package.json",
+      "expected": [
+        "QC-016"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/DHF-001-DesignHistoryFile-Index.md",
+          "lines": 1,
+          "op": "edit"
+        },
+        {
+          "file": "web/sw.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-016"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-016"
+      ]
+    },
+    {
+      "incident": 16,
+      "kind": "class",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/16-class.json",
+      "description": "README test-total table states 9 documented skips while the evidence-run marker in TR-001, RTM-001 states 7.",
+      "expected": [
+        "QC-021",
+        "QC-022",
+        "QC-023"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-021",
+        "QC-022"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-021",
+        "QC-022"
+      ]
+    },
+    {
+      "incident": 16,
+      "kind": "instance",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/16-instance.json",
+      "description": "README states 1039 tests with 3 documented skips while TR-001 and the evidence state different totals",
+      "expected": [
+        "QC-021",
+        "QC-022",
+        "QC-023"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        },
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-021",
+        "QC-022"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-021",
+        "QC-022"
+      ]
+    },
+    {
+      "incident": 17,
+      "kind": "class",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/17-class.json",
+      "description": "DHF-001 §7.4 gains an outstanding item 5 saying acceptance of the residual Medium risks is outstanding, while RA-001 §6.4 marks it Closed 2026-08-05.",
+      "expected": [
+        "QC-024"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/DHF-001-DesignHistoryFile-Index.md",
+          "lines": 3,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 17,
+      "kind": "instance",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/17-instance.json",
+      "description": "DHF-001 §7.4 lists \"No interval is computed for the M:E ratio (HA-093)\" as outstanding while RA-001 marks HA-093 Closed",
+      "expected": [
+        "QC-024"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/DHF-001-DesignHistoryFile-Index.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-024"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-024"
+      ]
+    },
+    {
+      "incident": 18,
+      "kind": "class",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/18-class.json",
+      "description": "REF-001 §2.1, titled 'resolved without purchase', now concludes that purchasing H20-A2 is required before release.",
+      "expected": [
+        "QC-024"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/REF-001-StandardsAndLiterature.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 18,
+      "kind": "instance",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/18-instance.json",
+      "description": "REF-001 §5 gap table marks the M:E interval \"Open — needs Fieller or bootstrap\" while §3.8 above it and RA-001 say HA-093 is closed",
+      "expected": [
+        "QC-024"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/REF-001-StandardsAndLiterature.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-024"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-024"
+      ]
+    },
+    {
+      "incident": 19,
+      "kind": "class",
+      "class": "capability_claim",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/19-class.json",
+      "description": "calculation-reference.html limitations list states absolute counts are never computed, though computeAbsolute derives them from an analyser WBC.",
+      "expected": [
+        "QC-025"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/calculation-reference.html",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 19,
+      "kind": "instance",
+      "class": "capability_claim",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/19-instance.json",
+      "description": "wbc-core.js gives \"no confidence interval is computed for a ratio\" as the reason a threshold cannot target one, while ratioInterval exists",
+      "expected": [
+        "QC-025"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/scripts/wbc-core.js",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-025"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-025"
+      ]
+    },
+    {
+      "incident": 20,
+      "kind": "class",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/20-class.json",
+      "description": "DHF-001 document table lists DCR-035 as Approved though the sign-off state is held in the change record and register.",
+      "expected": [
+        "QC-012"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/DHF-001-DesignHistoryFile-Index.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 20,
+      "kind": "instance",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/20-instance.json",
+      "description": "DHF-001 §7.2 restates the sign-off register as a hand-maintained list of change records and \"the eleven documents listed as In Review\"",
+      "expected": [
+        "QC-012"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/DHF-001-DesignHistoryFile-Index.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 21,
+      "kind": "class",
+      "class": "capability_claim",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/21-class.json",
+      "description": "README offline note says the dialog script is fetched from a CDN, though wbc-dialog.js is served locally and the app makes no external request.",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 21,
+      "kind": "instance",
+      "class": "capability_claim",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/21-instance.json",
+      "description": "README's stack table says Tailwind CSS is delivered from a CDN while it ships vendored",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 22,
+      "kind": "class",
+      "class": "capability_claim",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/22-class.json",
+      "description": "methods.html states percentage rounding is fixed to one method, though a profile can select largest-remainder, largest-count or independent.",
+      "expected": [
+        "SC-060",
+        "SC-061",
+        "SC-062"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/methods.html",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 22,
+      "kind": "instance",
+      "class": "capability_claim",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/22-instance.json",
+      "description": "The service worker no longer precaches the webfonts, so the offline claim holds only after a successful online fetch",
+      "expected": [
+        "SC-060",
+        "SC-061",
+        "SC-062"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/sw.js",
+          "lines": 9,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "SC-062"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "SC-062"
+      ]
+    },
+    {
+      "incident": 23,
+      "kind": "class",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/23-class.json",
+      "description": "NOTICE no longer declares Libre Franklin, although web/vendor/fonts/ still ships libre-franklin files and the NOTICE text says three typefaces.",
+      "expected": [
+        "SC-063"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "NOTICE",
+          "lines": 3,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "SC-063"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "SC-063"
+      ]
+    },
+    {
+      "incident": 23,
+      "kind": "instance",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/23-instance.json",
+      "description": "NOTICE carries no licence declaration for the vendored Tailwind bundle",
+      "expected": [
+        "SC-063"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "NOTICE",
+          "lines": 3,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 24,
+      "kind": "class",
+      "class": "prose_count",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/24-class.json",
+      "description": "README's feature table says Bone Marrow and Peripheral Blood have 12 cell types each, in a running-prose sentence, while the default profile and SRS-001 define 14.",
+      "expected": [
+        "QC-027"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 24,
+      "kind": "instance",
+      "class": "prose_count",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/24-instance.json",
+      "description": "CLAUDE.md states the drift log's totals from memory (\"records 21 occasions … Sixteen were introduced by sessions doing correct work\")",
+      "expected": [
+        "QC-027"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "CLAUDE.md",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-027"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-027"
+      ]
+    },
+    {
+      "incident": 25,
+      "kind": "class",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/25-class.json",
+      "description": "README says the right-hand layout is also shipped as a 'right-hand' preset profile, a profile withdrawn from the catalogue.",
+      "expected": [
+        "UD-095"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 25,
+      "kind": "instance",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/25-instance.json",
+      "description": "USER-GUIDE lists two preset profiles (frequency-ergonomic, right-hand) that the catalogue withdrew",
+      "expected": [
+        "UD-095"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "USER-GUIDE.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-095",
+        "UD-097"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "UD-095"
+      ]
+    },
+    {
+      "incident": 26,
+      "kind": "class",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/26-class.json",
+      "description": "qms-run-tests.js writes tests_total as node plus browser passed only, so the written total no longer equals tests_node + tests_browser that every document states.",
+      "expected": [
+        "QC-028"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "scripts/qms-run-tests.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 26,
+      "kind": "instance",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/26-instance.json",
+      "description": "qms-facts.js admits a bundle on tree state alone, while qms-run-tests.js requires clean AND passing — two definitions of admissible evidence",
+      "expected": [
+        "QC-028"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "scripts/qms-facts.js",
+          "lines": 8,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-028"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-028"
+      ]
+    },
+    {
+      "incident": 27,
+      "kind": "class",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/27-class.json",
+      "description": "analyzer-5.json description says target 100 but its targetCount is changed to 200.",
+      "expected": [
+        "VV-PRE-030",
+        "VV-PRE-031"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/analyzer-5.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 27,
+      "kind": "instance",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/27-instance.json",
+      "description": "The default profile's name and catalogue entry say 13-Type while the profile tallies fourteen categories",
+      "expected": [
+        "VV-PRE-030",
+        "VV-PRE-031"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/ndc-14.json",
+          "lines": 1,
+          "op": "edit"
+        },
+        {
+          "file": "web/settings/presets/index.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-095",
+        "VV-PRE-030"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "VV-PRE-030"
+      ]
+    },
+    {
+      "incident": 28,
+      "kind": "class",
+      "class": "copied_text",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/28-class.json",
+      "description": "analyzer-5 provenance.notes states the peripheral blood NRBC convention, but the 5-category analyzer profile tallies no NRBC.",
+      "expected": [
+        "VV-PRE-032",
+        "VV-SYS-221"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/analyzer-5.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 28,
+      "kind": "instance",
+      "class": "copied_text",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/28-instance.json",
+      "description": "The body-fluid profile's provenance note claims bone marrow categories and an M:E ratio following ICSH 2008 §2.6, for a profile with neither",
+      "expected": [
+        "VV-PRE-032",
+        "VV-SYS-221"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/body-fluid.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "VV-PRE-032"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        },
+        {
+          "cmd": "npx playwright test --grep VV-SYS-221 --project=chromium",
+          "exit": 0
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "VV-PRE-032"
+      ]
+    },
+    {
+      "incident": 29,
+      "kind": "class",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/29-class.json",
+      "description": "index.json summary for body-fluid says five categories while body-fluid.json describes seven.",
+      "expected": [
+        "VV-PRE-031"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/index.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 29,
+      "kind": "instance",
+      "class": "two_writers",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/29-instance.json",
+      "description": "The catalogue says \"Custom (Template)\" while the profile file says \"Custom (Blank Template)\"",
+      "expected": [
+        "VV-PRE-031"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/index.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "VV-PRE-031"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "VV-PRE-031"
+      ]
+    },
+    {
+      "incident": 30,
+      "kind": "class",
+      "class": "test_claim",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/30-class.json",
+      "description": "VV-E2E-021 hand-builds its session in the test-local buildSession with a methodNotes field and asserts the CSV header carries methodNotes, so the shipped session path's omission of it could not be seen.",
+      "expected": [
+        "VV-SYS-220"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "tests/05-end-to-end-data-integrity.test.js",
+          "lines": 2,
+          "op": "edit"
+        },
+        {
+          "file": "tests/05-end-to-end-data-integrity.test.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 30,
+      "kind": "instance",
+      "class": "test_claim",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/30-instance.json",
+      "description": "prepareConfig rebuilds the profile meta from a field list that omits provenance, so the report's method statement loses its Basis line",
+      "expected": [
+        "VV-SYS-220"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/scripts/mdc-app.js",
+          "lines": 7,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "VV-SYS-220"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        },
+        {
+          "cmd": "npx playwright test --grep VV-SYS-220 --project=chromium",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "VV-SYS-220"
+      ]
+    },
+    {
+      "incident": 31,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/31-class.json",
+      "description": "SOP-001 §6.2 monthly QC vector assigns the blasts category to key A, which in the shipped default profile is monocytes (blasts are X).",
+      "expected": [
+        "UD-098"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 31,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/31-instance.json",
+      "description": "SOP-001 §5.5's miscount example says the operator pressed 'A' (blast), a key that records monocytes in the shipped profile",
+      "expected": [
+        "UD-098"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-098"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "UD-098"
+      ]
+    },
+    {
+      "incident": 32,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/32-class.json",
+      "description": "VV-001 Scenario V2 step 4 expects Count Done below target to raise a blocking confirmation dialog that must be dismissed, when the software shows a non-blocking advisory on the results screen and has no such dialog.",
+      "expected": [
+        "UD-098"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 32,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/32-instance.json",
+      "description": "Validation scenario V6 tells the validator to press R for nrbc, P for poly and L for blasts — keys that are unmapped or map elsewhere",
+      "expected": [
+        "UD-098"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+          "lines": 1,
+          "op": "edit"
+        },
+        {
+          "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+          "lines": 1,
+          "op": "edit"
+        },
+        {
+          "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-098"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 0
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "UD-098"
+      ]
+    },
+    {
+      "incident": 33,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/33-class.json",
+      "description": "SOP-003 Monitoring instructs a periodic QC run entering categories 'neut' and 'erythroid' (absent from the default profile) and recording against VV-CALC-950, which exists in no test file.",
+      "expected": [
+        "UD-098"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-003-Operations.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 33,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/33-instance.json",
+      "description": "SOP-001 §6.2 monthly QC enters `gran` and `eryth` categories that the default profile lacks and cites VV-CALC-007, which exists in no test file",
+      "expected": [
+        "UD-098"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 2,
+          "op": "edit"
+        },
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-099"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught_incidentally",
+      "matched": []
+    },
+    {
+      "incident": 34,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/34-class.json",
+      "description": "SOP-003 Data Handling now asserts the application writes nothing to browser storage beyond the theme, though autosave persists the accession number, counts and comments to localStorage.",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-003-Operations.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 34,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/34-instance.json",
+      "description": "SOP-001 §7 attests that no data is stored in permanent browser storage while autosave writes to localStorage",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 35,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/35-class.json",
+      "description": "SOP-002 post-deploy smoke check says Start Count stays disabled until a case number is entered, but requireCaseNumber is false in every profile and the button is always enabled.",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-002-Deployment.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 35,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/35-instance.json",
+      "description": "SOP-001 §5.1 says the Start Count button is disabled until a valid case number is entered; the field is optional and the button enabled",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 36,
+      "kind": "class",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/36-class.json",
+      "description": "SOP-001 §9 item 6 states the shipped profiles are full 14-part consensus, harmonized 9-part, legacy 9-part and minimal 5-part, names that no longer exist in the catalogue.",
+      "expected": [
+        "UD-097"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 36,
+      "kind": "instance",
+      "class": "unswept_closure",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/36-instance.json",
+      "description": "help.html lists seven profiles by names the catalogue withdrew or never shipped",
+      "expected": [
+        "UD-097"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/help.html",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-097"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "UD-097"
+      ]
+    },
+    {
+      "incident": 37,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/37-class.json",
+      "description": "README Limitations adds a limit that report templates are fixed and can only be changed by the maintainers, though the Configuration Editor changes report wording and templates.",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 37,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/37-instance.json",
+      "description": "SOP-001 §9 states that key assignment is fixed per specimen type and that operators must contact the laboratory director, while §4.1 says keys are configurable",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 3,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 38,
+      "kind": "class",
+      "class": "version_split",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/38-class.json",
+      "description": "README.md states the retained 2015 predecessor serves the mdc-2015-9 profile at v2.3 while the shipped profile file is v2.4.",
+      "expected": [
+        "UD-100"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 38,
+      "kind": "instance",
+      "class": "version_split",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/38-instance.json",
+      "description": "SOP-001's key table is stamped as generated from ndc-14 v2.5 while the shipped profile is v2.6",
+      "expected": [
+        "UD-100"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-100"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "UD-100"
+      ]
+    },
+    {
+      "incident": 39,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/39-class.json",
+      "description": "README features table claims Session Export shows a confirmation dialog warning that exported files contain accession numbers before download; no such dialog exists.",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 39,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/39-instance.json",
+      "description": "README's features table describes a warning dialog on completing below threshold, a modal that was never built",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 40,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/40-class.json",
+      "description": "SOP-001 §5.10 tells the operator to click a Clear History button to delete session entries, but no such control exists in the application.",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 40,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/40-instance.json",
+      "description": "SOP-001 §5.9 describes clearing the case number mid-count and a confirmation dialog, a flow that never existed",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/SOP-001-StandardOperatingProcedure.md",
+          "lines": 4,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 41,
+      "kind": "class",
+      "class": "copied_text",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/41-class.json",
+      "description": "gran-combined-10 peripheral blood specimen (target 200) carries the bone marrow ICSH 500/300 targetCountBasis.",
+      "expected": [
+        "UD-101"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/gran-combined-10.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-101"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "UD-101"
+      ]
+    },
+    {
+      "incident": 41,
+      "kind": "instance",
+      "class": "copied_text",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/41-instance.json",
+      "description": "analyzer-5 prints a 200-cell CLSI rationale into reports for a profile that targets 100: the basis text names only the 200-cell reference method and never the profile's own target",
+      "expected": [
+        "UD-101"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/analyzer-5.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "UD-101"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "UD-101"
+      ]
+    },
+    {
+      "incident": 42,
+      "kind": "class",
+      "class": "copied_text",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/42-class.json",
+      "description": "gran-combined-10 bone marrow categoryNotes.myelo says there is no promyelocyte category, copied from bands-segs-10; this profile has pro.",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "web/settings/presets/gran-combined-10.json",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 42,
+      "kind": "instance",
+      "class": "copied_text",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/42-instance.json",
+      "description": "The body-fluid panel's `other` note tells operators not to count macrophages or metastatic tumour cells, which the panel has keys for",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "web/settings/presets/body-fluid.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 43,
+      "kind": "class",
+      "class": "original_defect",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/43-class.json",
+      "description": "validateConfig's reserved-placeholder check uses indexOf(ct) > 0 instead of !== -1, so a cell type named with the first reserved placeholder name is accepted.",
+      "expected": [],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/scripts/wbc-core.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "VV-SCH-019",
+        "VV-SCH-020"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught_unattributed",
+      "matched": []
+    },
+    {
+      "incident": 43,
+      "kind": "instance",
+      "class": "original_defect",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/43-instance.json",
+      "description": "validateConfig accepts a key that needs Shift, so a cell on it could be un-counted but never counted",
+      "expected": [],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/scripts/wbc-core.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 44,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/44-class.json",
+      "description": "The analyzer-5 preset description claims its targets and report templates are those of the 14-Type profile, but its target is 100 cells against 500/200 and it has its own templates.",
+      "expected": [
+        "VV-PRE-023"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/analyzer-5.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 44,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/44-instance.json",
+      "description": "mdc-2015-9 states target counts of 200 cells, a fidelity claim the predecessor's code never implemented",
+      "expected": [
+        "VV-PRE-023"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/mdc-2015-9.json",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "VV-PRE-023"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "VV-PRE-023"
+      ]
+    },
+    {
+      "incident": 45,
+      "kind": "class",
+      "class": "version_split",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/45-class.json",
+      "description": "SDD-001's header Version field reads 3.0 while its newest revision-history row is 3.1.",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/SDD-001-SoftwareDetailedDesign.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 45,
+      "kind": "instance",
+      "class": "version_split",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/45-instance.json",
+      "description": "RA-001's header version field says 2.9 while its revision history has reached v4.0",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/RA-001-RiskAnalysis-FMEA.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 46,
+      "kind": "class",
+      "class": "original_defect",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/46-class.json",
+      "description": "validateConfig guards the rounding-method check with a truthiness test (spec.rounding &&) instead of !== undefined, so an empty-string or 0 rounding value skips validation.",
+      "expected": [
+        "VV-TGT-001"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/scripts/wbc-core.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 46,
+      "kind": "instance",
+      "class": "original_defect",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/46-instance.json",
+      "description": "normalizeConfig fills the default target on a truthiness test, so 0, NaN and '' silently become 500 before validation sees them",
+      "expected": [
+        "VV-TGT-001"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/scripts/wbc-core.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "TC-B136",
+        "TC-B138",
+        "VV-PRE-023",
+        "VV-TGT-003"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught_incidentally",
+      "matched": []
+    },
+    {
+      "incident": 47,
+      "kind": "class",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/47-class.json",
+      "description": "VV-001 Scenario V6 step 1 expects the M:E ratio display to read 0.0:1 initially, but the application renders N/A before any cells are counted.",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 47,
+      "kind": "instance",
+      "class": "stale_description",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/47-instance.json",
+      "description": "Validation scenario V2 tells the validator the progress row reads \"50 / 200 (200)\" while the application renders \"(target)\"",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "QMS/DHF/VV-001-VerificationValidationProtocol.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 48,
+      "kind": "class",
+      "class": "test_claim",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/48-class.json",
+      "description": "VV-SYS-123 replaces the auto-waiting toBeHidden assertion with a non-waiting isVisible() read taken immediately after Count Done, so it reports 'no advisory' even if the advisory renders a moment later.",
+      "expected": [],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "tests-e2e/counting-workflow.spec.js",
+          "lines": 3,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 48,
+      "kind": "instance",
+      "class": "test_claim",
+      "mode": "none",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/48-instance.json",
+      "description": "A browser test reported \"no Load button\" because its click-then-evaluate block did not wait for an asynchronous render",
+      "expected": [],
+      "guarded_in_log": true,
+      "status": "not_replayed",
+      "reason": "a load-dependent race: re-splitting loadPresetFromCatalogue into click-then-evaluate reproduces the false report only probabilistically (measured [6,6,0,0,0,6,0,0] across engines in DCR-040), so one replay run cannot classify it"
+    },
+    {
+      "incident": 49,
+      "kind": "class",
+      "class": "capability_claim",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/49-class.json",
+      "description": "methods.html says NRBC are counted inside the denominator with no exclusion rule, though denominatorExcludes and per-100 reporting exist.",
+      "expected": [
+        "QC-025"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/methods.html",
+          "lines": 1,
+          "op": "edit"
+        },
+        {
+          "file": "web/methods.html",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 49,
+      "kind": "instance",
+      "class": "capability_claim",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/49-instance.json",
+      "description": "README's stack table says the fonts come from Google Fonts (CDN) while they ship in web/vendor/fonts/",
+      "expected": [
+        "QC-025"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "README.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-025"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-025"
+      ]
+    },
+    {
+      "incident": 50,
+      "kind": "class",
+      "class": "version_split",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/50-class.json",
+      "description": "mdc-2015-9.json declares minAppVersion 2.25.0, newer than the 2.24.1 application that ships it.",
+      "expected": [
+        "VV-VER-001",
+        "VV-VER-002",
+        "TC-B139",
+        "TC-B140",
+        "TC-B141",
+        "TC-B142",
+        "VV-PRE-028",
+        "VV-PRE-029"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/mdc-2015-9.json",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "VV-PRE-028"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "VV-PRE-028"
+      ]
+    },
+    {
+      "incident": 50,
+      "kind": "instance",
+      "class": "version_split",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/50-instance.json",
+      "description": "mdc-2015-9 no longer declares the oldest build that can read it, so a release-old shell would misread its null target as 500",
+      "expected": [
+        "VV-VER-001",
+        "VV-VER-002",
+        "TC-B139",
+        "TC-B140",
+        "TC-B141",
+        "TC-B142",
+        "VV-PRE-028",
+        "VV-PRE-029"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/settings/presets/mdc-2015-9.json",
+          "lines": 2,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "VV-PRE-029"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "VV-PRE-029"
+      ]
+    },
+    {
+      "incident": 51,
+      "kind": "class",
+      "class": "original_defect",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/51-class.json",
+      "description": "normalizeConfig's returned metadata literal no longer lists minAppVersion, so the field is dropped from the normalized meta although the input branch reads it.",
+      "expected": [
+        "TC-B140"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/scripts/wbc-core.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "TC-B139",
+        "TC-B140",
+        "VV-VER-002"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "TC-B140"
+      ]
+    },
+    {
+      "incident": 51,
+      "kind": "instance",
+      "class": "original_defect",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/51-instance.json",
+      "description": "prepareConfig rebuilds the profile meta from a field list again, so minAppVersion reaches the engine and stops there",
+      "expected": [
+        "TC-B140"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "web/scripts/mdc-app.js",
+          "lines": 7,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "TC-B139",
+        "TC-B140"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "TC-B140"
+      ]
+    },
+    {
+      "incident": 52,
+      "kind": "class",
+      "class": "test_claim",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/52-class.json",
+      "description": "TC-B054's title is extended to claim that finalizing also clears the recovery prompt, though the test asserts only that the autosave record is null.",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "tests/11-application-behavior.test.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "VINDEX-CHECK"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 1
+        }
+      ],
+      "status": "caught_unattributed",
+      "matched": []
+    },
+    {
+      "incident": 52,
+      "kind": "instance",
+      "class": "test_claim",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/52-instance.json",
+      "description": "TC-B061 is named for a reload it never asserts",
+      "expected": [],
+      "guarded_in_log": false,
+      "touched": [
+        {
+          "file": "tests/11-application-behavior.test.js",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "VINDEX-CHECK"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        },
+        {
+          "cmd": "node scripts/qms-verification-index.js --check",
+          "exit": 1
+        }
+      ],
+      "status": "caught_unattributed",
+      "matched": []
+    },
+    {
+      "incident": 53,
+      "kind": "class",
+      "class": "evidence_provenance",
+      "mode": "edit",
+      "builder": "fresh AI session (Claude Sonnet) given only the log row and the class definition; did not read the consistency suite",
+      "file": "replay/patches/53-class.json",
+      "description": "TR-001 §9 run-log entry for the 2026-08-23T19:17:58Z run keeps Result PASS and its evidence bundle but its Code identity is replaced by 'unknown (not recorded)', so the PASS cannot be tied to a commit or tree state.",
+      "expected": [
+        "QC-032",
+        "QC-031"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/TR-001-TestResults.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "green",
+      "failing": [],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 0
+        }
+      ],
+      "status": "escaped",
+      "matched": []
+    },
+    {
+      "incident": 53,
+      "kind": "instance",
+      "class": "evidence_provenance",
+      "mode": "edit",
+      "builder": "DCR-043 session (Claude Fable 5.1), from the log row and the artifact's current text",
+      "file": "replay/patches/53-instance.json",
+      "description": "TR-001 §1.1 states 191 tests at the v2.0 baseline, a figure no commit or evidence bundle produces, while replay/baseline.json measured 156 at the baseline commit",
+      "expected": [
+        "QC-032",
+        "QC-031"
+      ],
+      "guarded_in_log": true,
+      "touched": [
+        {
+          "file": "QMS/DHF/TR-001-TestResults.md",
+          "lines": 1,
+          "op": "edit"
+        }
+      ],
+      "build": "red",
+      "failing": [
+        "QC-032"
+      ],
+      "checks": [
+        {
+          "cmd": "npm test",
+          "exit": 1
+        }
+      ],
+      "status": "caught",
+      "matched": [
+        "QC-032"
+      ]
+    }
+  ]
+}

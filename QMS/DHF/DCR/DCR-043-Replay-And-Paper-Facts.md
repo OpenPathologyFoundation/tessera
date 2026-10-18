@@ -66,10 +66,52 @@ with the incident.
 
 ### 2.1 Results
 
-Measured at the commit `replay/results.json` names; the table below is a dated
-record of that run, and `replay/facts.json` is the live source.
+Measured at `7d649a7` on a clean tree, 106 patches, both controls as expected
+(the positive control fired QC-016 and VV-PRE-028). The table is a dated record
+of that run; `replay/results.json` holds every run and `replay/facts.json` is
+the live source the manuscript reads.
 
-*(filled from the first admissible run — see §9 revision A)*
+| | Instance patches (the row's own contradiction) | Class patches (a different one of its class) |
+|---|---|---|
+| Caught by a guard the row names | **32** of 53 | **6** of 53 |
+| Caught by a check the row does not name | 4 (rows 3, 9, 33, 46) | 1 (row 8) |
+| Caught, row names no check to expect | 1 (row 52) | 2 (rows 43, 52) |
+| Escaped | 15 | 44 |
+| Not replayable | 1 (row 48, a race) | 0 |
+
+**Of the 43 rows the log marks as guarded**, 32 were caught by the guard the
+row names, 4 by a different check, and **6 escaped**: rows 6 and 8 (SAD-001's
+UD-070 to UD-074 cover the sentences DCR-021 corrected, not the claims), 11
+(QC-026 checks that a bundle records a command, not that TR-001 states the one
+it ran), 20 (QC-012 regenerates the register and does not look at DHF-001
+§7.2), 23 (SC-063 covers the fonts; the row says so), and 43 (the guard is a
+code path no test exercises). Row 48 cannot be replayed deterministically. The
+nine other escapes are rows the log already marks unguarded; the replay agrees
+with the log about every one of them.
+
+**Attribution.** Where the row names one guard and another fired — 3 (QC-006
+and the register check, not QC-004), 9 (UD-050, not UD-004 to UD-016), 33
+(UD-099, not UD-098), 46 (VV-TGT-003 and three behaviour tests, not VV-TGT-001)
+— the row's column is what is imprecise. The log's rows are not edited (the
+convention forbids it); `results.json` carries the check that fired, and the
+manuscript's table is generated from it.
+
+**The class result is the finding the plan said to expect.** Six class patches
+were caught by the gate the row names: the version-coherence gate (rows 15 and
+50), the fact-marker gates (16), the font-licence gate (23), the target-basis
+gate (41) and the profile-compatibility gate (51). Three more went red under
+other checks. Forty-four escaped — a different document restating a count, a
+different hazard-like item left open, a different profile describing software
+that does not ship, a different evidence bundle with no identity. The gates
+that catch a class are the ones anchored on a generated artifact or a shipped
+export; the gates that catch an instance are anchored on the sentence that
+drifted. That is the limitation the manuscript's §6 admits in prose, now with
+a number under it, and it is the number the paper should report rather than
+"twenty of twenty-three guarded".
+
+**Nothing regressed**: this is the first admissible run, so there was no
+earlier result to regress from; from here on a guard that stops catching its
+incident fails `npm run replay`.
 
 ---
 

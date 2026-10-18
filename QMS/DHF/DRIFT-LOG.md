@@ -139,7 +139,12 @@ Honesty about the guards matters as much as the guards.
   evidence bundle exists, and QC-030 says so rather than passing; and a row
   whose guard is a code path rather than a test identifier (rows 43 and 48)
   cannot be attributed by name, so a red build there is recorded as caught but
-  unattributed, which is a smaller claim than "guarded".
+  unattributed, which is a smaller claim than "guarded". A third, narrower:
+  `replay/facts.json` is held to the tree by `qms-paper-facts.js --check` at
+  the tag, not by the build. The generator refuses a dirty tree, so a build
+  that checked the file would go red after every evidence run until the file
+  was rewritten in a second commit; QC-031 holds the manuscript's markers to
+  the file, and the file's own currency is the release step's to prove.
 
 ---
 

@@ -141,6 +141,13 @@ and a spelled-out number that equals a measured fact is reported. Run against
 the draft of 2026-08-07 it lists 32 typed numbers and 12 words — the work list
 the plan said it would be.
 
+**What the build checks and what the release step checks.** QC-031 holds the
+manuscript's markers to `facts.json`. `facts.json` itself is held to the tree
+by `node scripts/qms-paper-facts.js --check`, run at the tag rather than by
+the build: the generator refuses a dirty tree, so a build-time check would go
+red after every evidence run until the file was rewritten in a further commit.
+DRIFT-LOG §3 records the gap.
+
 **How the manuscript joins the suite.** QC-031 holds the manuscript to the
 facts file wherever a clone has one. A manuscript with no marker has not yet
 joined: its typed numbers are reported and nothing fails, so a private draft
@@ -250,7 +257,7 @@ commit must build green and a hand-edited version must build red with QC-016
 named, or the run stops.
 
 **Execution Evidence**:
-- (written by `npm run test:qms`)
+- QMS/DHF/TestEvidence/2026-10-18_130730_run/
 
 ---
 

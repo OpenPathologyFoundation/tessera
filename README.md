@@ -378,7 +378,7 @@ CI can run `npm test` for quick feedback, but **QMS evidence requires `npm run t
 | 10 | `tests/10-config-editor.test.js` | Static | Editor structure, JS integrity, key assignment controls |
 | 11 | `tests/11-application-behavior.test.js` | **Behaviour** | The application executed in jsdom — 103 tests |
 | E2E | `tests-e2e/*.spec.js` | **System** | The deployed application in Chromium, Firefox and WebKit — 150 specs x 3 engines |
-| **Total** | | | **<!-- qms:fact tests_total -->1172<!-- /qms:fact --> tests** (<!-- qms:fact tests_node -->722<!-- /qms:fact --> Node + <!-- qms:fact tests_browser -->450<!-- /qms:fact --> browser), of which <!-- qms:fact tests_skipped -->7<!-- /qms:fact --> are documented skips |
+| **Total** | | | **<!-- qms:fact tests_total -->1176<!-- /qms:fact --> tests** (<!-- qms:fact tests_node -->726<!-- /qms:fact --> Node + <!-- qms:fact tests_browser -->450<!-- /qms:fact --> browser), of which <!-- qms:fact tests_skipped -->7<!-- /qms:fact --> are documented skips |
 
 See `QMS/DHF/DCR/DCR-004-Verification-Integrity-Remediation.md` for why the
 suite was restructured: prior to it, no test executed the application at all.

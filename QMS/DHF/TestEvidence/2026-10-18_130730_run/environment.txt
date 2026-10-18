@@ -1,0 +1,9 @@
+date_utc=2026-10-18T17:07:30.508Z
+node=v26.5.0
+platform=darwin
+arch=arm64
+cwd=/Users/pg/IdeaProjects/tessera
+npm=11.17.0
+git_commit=8679f24b54a653bf7d416b4b81747a85390e956c
+git_branch=dcr-043-replay-and-paper-facts
+tree_state=clean

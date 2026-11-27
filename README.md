@@ -8,6 +8,21 @@ WBC ΔΣ enables medical technologists and pathologists to perform manual differ
 
 **Key design principles**: Bauhaus-inspired (form follows function), keyboard-first operation, zero server-side patient data, clinically-validated calculation engine.
 
+## How to cite
+
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24606768.svg)](https://doi.org/10.5281/zenodo.24606768)
+
+Cite the software by its concept DOI, which always resolves to the latest
+archived version:
+
+> Gershkovich P. *WBC ΔΣ (tessera): a keyboard-driven manual differential
+> counter*. Zenodo. <https://doi.org/10.5281/zenodo.24606768>
+
+Each release is also archived under its own DOI; v2.24.1 is
+[10.5281/zenodo.24606769](https://doi.org/10.5281/zenodo.24606769).
+[`CITATION.cff`](CITATION.cff) carries the same metadata, and GitHub's
+*Cite this repository* control formats it as APA or BibTeX.
+
 ---
 
 ## Run it locally

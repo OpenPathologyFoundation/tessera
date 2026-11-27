@@ -12,6 +12,14 @@ authors:
     given-names: Peter
     affiliation: "Yale University School of Medicine"
 repository-code: "https://github.com/OpenPathologyFoundation/tessera"
+doi: 10.5281/zenodo.24606768
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.24606768
+    description: "Concept DOI: resolves to the latest archived version"
+  - type: doi
+    value: 10.5281/zenodo.24606769
+    description: "Version DOI for v2.24.1"
 license: Apache-2.0
 version: 2.24.1
 keywords:

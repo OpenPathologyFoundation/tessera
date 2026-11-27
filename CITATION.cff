@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use or refer to this software, please cite it as below."
+type: software
+title: "WBC ΔΣ (tessera): a keyboard-driven manual differential counter"
+abstract: >-
+  A keyboard-driven manual differential white blood cell counting tool for
+  haematology laboratory personnel, built under a public Design History File
+  (IEC 62304 Class A): requirements, hazards, tests and traceability are part
+  of the repository.
+authors:
+  - family-names: Gershkovich
+    given-names: Peter
+    affiliation: "Yale University School of Medicine"
+repository-code: "https://github.com/OpenPathologyFoundation/tessera"
+license: Apache-2.0
+version: 2.24.1
+keywords:
+  - haematology
+  - manual differential
+  - laboratory software
+  - IEC 62304
+  - open source

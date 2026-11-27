@@ -94,7 +94,7 @@ should be quoted until someone holds the paper.
 > `node scripts/qms-signoffs.js --write` rebuilds this from the signature
 > tables in every document. Suite 14 fails the build if it goes stale.
 
-**46 signature(s) outstanding across 7 role(s).** 16 document(s) are fully signed.
+**49 signature(s) outstanding across 7 role(s).** 16 document(s) are fully signed.
 
 ### Clinical Reviewer — 36 outstanding
 
@@ -144,11 +144,12 @@ should be quoted until someone holds the paper.
 | `SOP-001-StandardOperatingProcedure.md` | — |
 | `URS-001_UserRequirementsSpecification_v2.0.md` | — |
 
-### Design Engineer — 1 outstanding
+### Design Engineer — 2 outstanding
 
 | Document | Note |
 |----------|------|
 | `DCR/DCR-043-Replay-And-Paper-Facts.md` | — |
+| `DCR/DCR-044-Citation-And-Archive.md` | — |
 
 ### Document Owner — 1 outstanding
 
@@ -156,13 +157,14 @@ should be quoted until someone holds the paper.
 |----------|------|
 | `DCR/DCR-043-Replay-And-Paper-Facts.md` | **the classification in `replay/incidents.json` is proposed, not confirmed — §5** |
 
-### Quality Assurance — 1 outstanding
+### Quality Assurance — 2 outstanding
 
 | Document | Note |
 |----------|------|
 | `DCR/DCR-043-Replay-And-Paper-Facts.md` | — |
+| `DCR/DCR-044-Citation-And-Archive.md` | — |
 
-### Regulatory Affairs — 4 outstanding
+### Regulatory Affairs — 5 outstanding
 
 | Document | Note |
 |----------|------|
@@ -170,6 +172,7 @@ should be quoted until someone holds the paper.
 | `DCR/DCR-041-README-Currency.md` | — |
 | `DCR/DCR-042-Release-Coherence.md` | — |
 | `DCR/DCR-043-Replay-And-Paper-Facts.md` | — |
+| `DCR/DCR-044-Citation-And-Archive.md` | — |
 
 ### Regulatory Reviewer — 1 outstanding
 

@@ -44,7 +44,7 @@ The order is therefore:
    settings (zenodo.org → GitHub, signed in with the organization's GitHub
    account).
 2. A clean tree, the gates in `CLAUDE.md` §*Before you finish*, then a tag and a
-   GitHub release for the current version. Zenodo archives the release and
+   GitHub release for the current version (`v2.24.1`; §7a records the replay). Zenodo archives the release and
    issues two DOIs: one for this version, and a concept DOI that always resolves
    to the latest.
 3. A follow-up change set adds the **concept** DOI to `CITATION.cff`
@@ -96,6 +96,29 @@ sees or the engine computes.
 `npm test`, including suite 14, the document gate.
 
 **Execution Evidence**: the run recorded with the commit of this change set.
+
+---
+
+## 7a. The Pre-Tag Replay, and What It Found
+
+`CLAUDE.md` asks for `npm run replay` on a clean tree before a release the
+manuscript will describe. It was run at `78935da` (this change set's first
+commit): 602 s, exit 0. Its results were **not committed**, because QC-030
+rejects them: two instance patches no longer apply at that commit.
+
+- **Row 10** looks for the evidence-run marker `2026-08-23_215308_run` in
+  `TR-001`; the re-baseline in DCR-043 moved it to `2026-10-18_130730_run`.
+- **Row 16** looks for `tests_total` = 1172 in `README.md`; the same
+  re-baseline made it 1176.
+
+Both patches were written against the tree before DCR-043's re-baseline, so
+the replay measured at `7d649a7` was admissible and one measured after it is
+not. Nothing escaped that had been caught; the two rows are *unapplied*. The
+committed `replay/results.json` (measured at `7d649a7`) therefore stands, QC-030
+passes on it, and the release is tagged with it. Rebuilding the two patches so
+they target facts by marker rather than by value, and replaying at the commit
+the manuscript will describe, is left to a change set of its own: it changes
+the replay protocol, not the citation.
 
 ---
 
